@@ -32,9 +32,11 @@ namespace lightning
     public class ValNumber : Value
     {
         public Number content;
+        public ushort references;
         public ValNumber(Number value)
         {
             content = value;
+            references = 1;
         }
 
         public override string ToString()
@@ -541,6 +543,61 @@ namespace lightning
             {
                 throw new Exception("UnWrapp<>() type Error!");
             }
+        }
+    }
+
+    public class ValNumberPool
+    {
+        Stack<ValNumber> pool;        
+        public ValNumberPool()
+        {
+            pool = new Stack<ValNumber>();
+        }
+
+        public void Recycle(Value v)
+        {
+            if (v.GetType() == typeof(ValNumber))
+            {
+                ValNumber vv = v as ValNumber;
+                vv.references--;
+                if (vv.references <= 0)
+                {
+                    Console.WriteLine("recycled");
+                    pool.Push(vv);
+                }
+            }
+        }
+
+        public void AddReference(Value v)
+        {
+            if (v.GetType() == typeof(ValNumber))
+            {
+                (v as ValNumber).references++;
+            }
+        }
+
+        public void TakeReference(Value v)
+        {
+            if (v.GetType() == typeof(ValNumber))
+            {
+                (v as ValNumber).references--;
+            }
+        }
+
+        public ValNumber Get(Number n)
+        {
+            if(pool.Count > 0)
+            {
+                ValNumber v = pool.Pop();
+                v.content = n;
+                v.references = 1;
+                return v;
+            }
+            else
+            {
+                return new ValNumber(n);
+            }
+
         }
     }
 }

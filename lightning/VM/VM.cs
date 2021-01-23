@@ -64,6 +64,8 @@ namespace lightning
         public Dictionary<string, int> loadedModules { get; private set; }
         public List<ValModule> modules;
 
+        ValNumberPool valNumberPool;
+
         public VM(Chunk p_chunk, int function_deepness = 25)
         {          
             chunk = p_chunk;
@@ -114,6 +116,8 @@ namespace lightning
 
             loadedModules = new Dictionary<string, int>();
             modules = new List<ValModule>();
+
+            valNumberPool = new ValNumberPool();
         }
 
         public Operand AddModule(ValModule this_module)
@@ -137,12 +141,14 @@ namespace lightning
         {
             stack[stackTop] = p_value;
             stackTop++;
+            valNumberPool.AddReference(p_value);
         }
 
         Value StackPop()
         {            
             stackTop--;
             Value popped = stack[stackTop];
+            valNumberPool.TakeReference(popped);
             return popped;
         }
 
@@ -204,6 +210,10 @@ namespace lightning
             int this_basePointer = variablesBases[variablesBasesTop - 1];
             variablesBasesTop--;
             variablesTop = this_basePointer;
+            for( int i = this_basePointer; i< variables.Count; i++)
+            {
+                valNumberPool.Recycle(variables[i]);
+            }
 
 
             if (this_basePointer < (variables.Count * 0.25))
@@ -319,6 +329,9 @@ namespace lightning
                             Operand address = instruction.opA;
                             Value constant = chunk.GetConstant(address);
                             //Console.WriteLine("loadc " + "address: " + address + " value: " + constant);
+                            if (constant.GetType() == typeof(ValNumber))
+                                constant = valNumberPool.Get((constant as ValNumber).content);
+
                             StackPush(constant);
                             break;
                         }
@@ -329,6 +342,7 @@ namespace lightning
                             Operand n_shift = instruction.opB;
                             var variable = VarAt(address, (Operand)(variablesBasesTop - 1 - n_shift));
                             //Console.WriteLine("loadv " + "address: " + address + " env: " + (Operand)(variablesBases.Count - 1 - n_shift) + " value:" + variable);
+                            valNumberPool.AddReference(variable);
                             StackPush(variable);
                             break;
                         }
@@ -350,6 +364,7 @@ namespace lightning
                             Operand address = instruction.opA;
                             Value global = globals[address];
                             //Console.WriteLine("loadg " + "address: " + address + " value: " + global);
+                            valNumberPool.AddReference(global);
                             StackPush(global);
                             break;
                         }
@@ -361,6 +376,7 @@ namespace lightning
                             Operand module = instruction.opB;
                             Value global = modules[module].globals[address];
                             //Console.WriteLine("loadg " + "address: " + address + " value: " + global);
+                            valNumberPool.AddReference(global);
                             StackPush(global);
                             break;
                         }
@@ -393,6 +409,7 @@ namespace lightning
                             Operand address = instruction.opA;
                             ValUpValue up_val = UpValuesAt(address);
                             //Console.WriteLine("loadupval " + up_val);
+                            valNumberPool.AddReference(up_val.Val);
                             StackPush(up_val.Val);
                             break;
                         }
@@ -459,15 +476,26 @@ namespace lightning
                                 }
                             }
                             Value new_value = StackPeek();
-                            //Console.WriteLine("added tableset");
+
                             if (indexes[indexes_counter - 1].GetType() == typeof(ValNumber))
                             {
+                                if ((this_table as ValTable).elements.Count - 1 >= ((int)((ValNumber)indexes[indexes_counter - 1]).content))
+                                {
+                                    Value old_value = (this_table as ValTable).elements[(int)((ValNumber)indexes[indexes_counter - 1]).content];
+                                    valNumberPool.TakeReference(old_value);
+                                }
                                 (this_table as ValTable).ElementSet((int)((ValNumber)indexes[indexes_counter - 1]).content, new_value);
                             }
                             else
                             {
+                                if ((this_table as ValTable).table.ContainsKey((ValString)indexes[indexes_counter - 1]))
+                                {
+                                    Value old_value = (this_table as ValTable).table[(ValString)indexes[indexes_counter - 1]];
+                                    valNumberPool.TakeReference(old_value);
+                                }
                                 (this_table as ValTable).TableSet((ValString)indexes[indexes_counter - 1], new_value);
                             }
+                            valNumberPool.AddReference(new_value);
 
                             break;
                         }
@@ -517,6 +545,8 @@ namespace lightning
                                 variables[variablesTop] = new_value;
                                 variablesTop++;
                             }
+
+                            valNumberPool.AddReference(new_value);
                             //Console.WriteLine("vardcl adress: " + (variables.Count - 1) + " env:" + (variablesBases.Count - 1) + " value: " + new_var);
                             break;
                         }
@@ -526,6 +556,8 @@ namespace lightning
                             Value new_value = StackPop();
                             globals.Add(new_value);
                             //Console.WriteLine("globaldcl adress: " + (globals.Count - 1) + " value: " + new_var);
+
+                            valNumberPool.AddReference(new_value);
                             break;
                         }
                     case OpCode.FUNDCL:
@@ -621,7 +653,9 @@ namespace lightning
                             VarSet(new_value, address, (Operand)(variablesBasesTop - 1 - n_shift));
 
 
-                            //valPool.Recycle(old_value);
+
+                            valNumberPool.AddReference(new_value);
+                            valNumberPool.TakeReference(old_value);
 
                             //Console.WriteLine("assign adress: " + address + " env:" + (Operand)(variablesBases.Count - 1 - n_shift) + " value: " + new_value);
                             break;
@@ -634,8 +668,8 @@ namespace lightning
                             Value old_value = globals[address];
                             globals[address] = new_value;
 
-
-                            //valPool.Recycle(old_value);
+                            valNumberPool.AddReference(new_value);
+                            valNumberPool.TakeReference(old_value);
 
                             //Console.WriteLine("assigng adress: " + address + " value: " + globals[address]);
                             break;
@@ -650,16 +684,16 @@ namespace lightning
                             Value old_value = this_value.Val;
                             this_value.Val = new_value;
 
-                            //new_value.references++;
-                            //old_value.references--;
-                            //valPool.Recycle(old_value);
+                            valNumberPool.AddReference(new_value);
+                            valNumberPool.TakeReference(old_value);
+
                             break;
                         }
                     case OpCode.PUSH:
                         {
                             IP++;
                             Operand value = instruction.opA;
-                            Value new_value = new ValNumber(value);
+                            Value new_value = valNumberPool.Get(value);
                             StackPush(new_value);
                             //Console.WriteLine("push at: " + (stack.Count - 1)+ " value:  " + value);
                             break;
@@ -738,7 +772,7 @@ namespace lightning
                             ValNumber opA = (ValNumber)StackPop();
 
                             Number result = opA.content + opB.content;
-                            Value new_value = new ValNumber(result);
+                            Value new_value = valNumberPool.Get(result);
                             StackPush(new_value);
 
                             break;
@@ -763,7 +797,7 @@ namespace lightning
                             ValNumber opB = (ValNumber)StackPop();
                             ValNumber opA = (ValNumber)StackPop();
                             Number result = opA.content - opB.content;
-                            Value new_value = new ValNumber(result);
+                            Value new_value = valNumberPool.Get(result);
                             StackPush(new_value);
                             break;
                         }
@@ -774,7 +808,7 @@ namespace lightning
                             ValNumber opB = (ValNumber)StackPop();
                             ValNumber opA = (ValNumber)StackPop();
                             Number result = opA.content * opB.content;
-                            Value new_value = new ValNumber(result);
+                            Value new_value = valNumberPool.Get(result);
                             StackPush(new_value);
                             break;
                         }
@@ -785,7 +819,7 @@ namespace lightning
                             ValNumber opB = (ValNumber)StackPop();
                             ValNumber opA = (ValNumber)StackPop();
                             Number result = opA.content / opB.content;
-                            Value new_value = new ValNumber(result);
+                            Value new_value = valNumberPool.Get(result);
                             StackPush(new_value);
                             break;
                         }
@@ -794,7 +828,7 @@ namespace lightning
                             //Console.WriteLine("neg");
                             IP++;
                             ValNumber opA = (ValNumber)StackPop();
-                            Value new_value = new ValNumber(opA.content * -1);
+                            Value new_value = valNumberPool.Get(opA.content * -1);
                             StackPush(new_value);                            
                             break;
                         }
@@ -1112,7 +1146,9 @@ namespace lightning
                                 ValIntrinsic this_intrinsic = (ValIntrinsic)this_callable;
                                 Value result = this_intrinsic.function(this);
                                 //stack.RemoveRange(stack.Count - this_intrinsic.arity, this_intrinsic.arity);
-                                stackTop -= this_intrinsic.arity;
+                                for (int i = 0; i < this_intrinsic.arity; i++)
+                                    StackPop();
+                                //stackTop -= this_intrinsic.arity;
                                 StackPush(result);
                                 break;
                             }

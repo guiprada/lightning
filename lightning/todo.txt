@@ -2,12 +2,13 @@
 	- think about reference counting numbers
 	- think about a register based VM
 	- implement ++, -- += -= *= /=
+	- increment and decrement unarys
 	- overhaul function return mechanism	
 	- create a compile time eval :)
 	- valtable containers should be null until used
 	- separte error detection and warnings in parser
 	- foreach, or a map  function :)
-	- increment and decrement unarys
+
 	- table clone function	
 	- need for semicolons?
 	- error sync on statement
