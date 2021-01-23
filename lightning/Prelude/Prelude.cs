@@ -418,6 +418,15 @@ namespace lightning
                 }
                 math.TableSet(new ValString("mod"), new ValIntrinsic("mod", mod, 2));
 
+                //////////////////////////////////////////////////////
+                Value idiv(VM vm)
+                {
+                    Number value1 = ((ValNumber)vm.StackPeek(0)).content;
+                    Number value2 = ((ValNumber)vm.StackPeek(1)).content;
+                    return new ValNumber((Number)(int)(value1 / value2));
+                }
+                math.TableSet(new ValString("idiv"), new ValIntrinsic("idiv", idiv, 2));
+
                 tables.Add("math", math);
             }
 
