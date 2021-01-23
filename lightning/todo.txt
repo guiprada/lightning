@@ -1,0 +1,88 @@
+﻿todo
+	- think about a register based VM
+	- implement ++, -- += -= *= /=
+	- overhaul function return mechanism	
+	- create a compile time eval :)
+	- valtable containers should be null until used
+	- separte error detection and warnings in parser
+	- foreach, or a map  function :)
+	- increment and decrement unarys
+	- table clone function	
+	- need for semicolons?
+	- error sync on statement
+	- better parser error messages
+	- tail call optimization
+
+done
+	- nil support
+	- nil var initialization
+    - return without exp returns nil
+	- function without return gets one
+	- can we stop copyng the closure on declaration? no
+	- function return should break nested envs
+	- rets( return set ) could be done by the CALL op instruction, before the jump
+	- funclose and closure close return to caller
+	- proper bytecode decoder
+	- make instruction type independent
+	- flatten VM structures
+	- if
+	- while
+	- fixed strings being mixed with function names
+	- fixed var finding bug
+	- for
+	- clojures
+	- added support for null prints
+	- closures use shift based initialization
+	- While and for execute condition just once and jump back autmatically
+	- bool ops otimizations
+	- flatten upValue registry
+	- convert value to structs and interfaces, tested and gone back
+	- when variables that store closures go out of scope we should clear their references, yes -- captured closures are stored in ther ValClosure and get collected with it
+	- pretty printer
+	- can you return a declaration? No
+	- intrinsics
+	- remove print from language def
+	- list
+	- table assignment by index works for elements
+	- add prelude with count functions 
+	- lambda
+	- table constructors should take identifiers
+	- methods
+	- Assertions
+	- load tables with prelude
+	- unify Dotted and mettod and plain in a enum
+	- separated call for closures and intrinsics, it will break passing function pointers around
+	- single quoted strings
+	- better tests
+	- global return
+	- call specific function on script
+	- added an eval :)
+	- mudules, require function
+	- fix error lines, add error line to valfunction and to Error reporting on VM
+	- fix eval
+	- do functions beleng in constants? yes
+	- iterator
+	- import CallFunction from backpack
+	- import prelude add
+	- rename prelude load
+	- separate warnings and error on scanner, parser and chunker
+	- mod, and random
+	- list add, table add, and perhaps remove and removeRange
+	- add list split, list copy and insert
+	- add table methods, clear and copy
+	- eval and requice should error check
+	- ValNil and ValBool as structs
+
+--
+where do we create references
+	-create
+	-assign
+	-put on stack
+	-create table
+	-assign table
+
+where do we destroy references
+	-assign
+	-pop off stack
+	-assign table
+	-intrinsics return( we pop the stack off manually)
