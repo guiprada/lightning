@@ -5,7 +5,7 @@ VisualStudioVersion = 16.0.30907.101
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "lightning", "lightning\lightning.csproj", "{F78C80F4-FD69-47AF-A450-5A1B7B48FC10}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "interpreter", "interpreter\interpreter.csproj", "{A6491D13-D929-428F-B40E-037B314DB667}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "lightning_interpreter", "lightning_interpreter\lightning_interpreter.csproj", "{36F9BC5D-BADE-47B5-8261-96DE8DC781F3}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -17,10 +17,10 @@ Global
 		{F78C80F4-FD69-47AF-A450-5A1B7B48FC10}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F78C80F4-FD69-47AF-A450-5A1B7B48FC10}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F78C80F4-FD69-47AF-A450-5A1B7B48FC10}.Release|Any CPU.Build.0 = Release|Any CPU
-		{A6491D13-D929-428F-B40E-037B314DB667}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{A6491D13-D929-428F-B40E-037B314DB667}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{A6491D13-D929-428F-B40E-037B314DB667}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{A6491D13-D929-428F-B40E-037B314DB667}.Release|Any CPU.Build.0 = Release|Any CPU
+		{36F9BC5D-BADE-47B5-8261-96DE8DC781F3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{36F9BC5D-BADE-47B5-8261-96DE8DC781F3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{36F9BC5D-BADE-47B5-8261-96DE8DC781F3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{36F9BC5D-BADE-47B5-8261-96DE8DC781F3}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

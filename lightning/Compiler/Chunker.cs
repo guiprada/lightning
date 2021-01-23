@@ -57,6 +57,7 @@ namespace lightning
                 return code;
             }
         }
+
         public bool HasChunked { get; private set; }
         int instructionCounter;
         List<dynamic> constants;
@@ -96,7 +97,6 @@ namespace lightning
 
             }
         }
-
 
         void ChunkIt(Node p_node)
         {
@@ -168,17 +168,18 @@ namespace lightning
         }
 
         void ChunkProgram(ProgramNode p_node)
-        {
-            foreach (Node n in p_node.Statements)
+        {               
+            int line = p_node.Line;
+            if (p_node.Statements != null)
             {
-                ChunkIt(n);
+                foreach (Node n in p_node.Statements)
+                {
+                    ChunkIt(n);
+                }
+                      
+                if (p_node.Statements.Count > 1)
+                    line = p_node.Statements[p_node.Statements.Count - 1].Line;    
             }
-
-            int line;
-            if (p_node.Statements.Count > 1)
-                line = p_node.Statements[p_node.Statements.Count - 1].Line;
-            else
-                line = p_node.Line;
             Add(OpCode.EXIT, line);
         }
 
@@ -300,8 +301,15 @@ namespace lightning
             }
             else if (p_node.ValueType == typeof(string))
             {
-                int address = AddConstant((string)p_node.Value);
-                Add(OpCode.LOADC, (Operand)address, p_node.Line);
+                if (p_node.Value == "Nil")
+                {
+                    Add(OpCode.LOADNIL, p_node.Line);
+                }
+                else
+                {
+                    int address = AddConstant((string)p_node.Value);
+                    Add(OpCode.LOADC, (Operand)address, p_node.Line);
+                }
             }
         }
 

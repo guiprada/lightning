@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 
 using lightning;
@@ -9,15 +10,19 @@ namespace interpreter
     {
         static void Main(string[] args)
         {
-            Console.WriteLine("Welcome to little");
+            Console.WriteLine("Welcome to lightning :)");
             if (args.Length != 1)
             {
-                Console.WriteLine("Usage: little [script]");
+                Console.WriteLine("Usage: lightning_interpreter [script]");
                 Environment.Exit(64);
             }
             else if (args.Length == 1)
             {
                 RunFile(args[0]);
+            }
+            else
+            {
+                RunPrompt();
             }
         }
  
@@ -44,12 +49,32 @@ namespace interpreter
         static void RunPrompt()
         {
             bool is_running = true;
-            while (is_running)
+            Node prog_node = new ProgramNode(null, 0);
+            Chunker code_generator = new Chunker(prog_node, "main", Prelude.GetPrelude());
+            Chunk chunk = code_generator.Code;
+            
+            Value eval = chunk.GetFunction("eval");
+            if (eval == null)
             {
-                Console.Write(">");
-                string input = Console.ReadLine();
-                if (input == null) continue;
-                else Run(input);
+                throw(new Exception("Could not find eval function!"));
+
+            }
+            if (code_generator.HasChunked == true)
+            {
+                VM vm = new VM(chunk);
+                while (is_running)
+                {
+                    Console.Write(">");
+                    string input = Console.ReadLine();
+                    if (input != "")
+                    {
+                        List<Value> stack = new List<Value>();
+                        stack.Add(new ValString(input));
+                        Value result = vm.CallFunction(eval, stack);
+                        Console.WriteLine(result);
+                    }
+                }
+                //VMResult result = vm.Run();                
             }
         }
 
@@ -101,9 +126,9 @@ namespace interpreter
             Chunk chunk = code_generator.Code;
             if (code_generator.HasChunked == true)
             {                
-                Console.WriteLine("\n---------------------------------- Generated Chunk:");
-                Console.WriteLine();
-                chunk.Print();
+                //Console.WriteLine("\n---------------------------------- Generated Chunk:");
+                //Console.WriteLine();
+                //chunk.Print();
 
                 VM vm = new VM(chunk);
                 VMResult result = vm.Run();

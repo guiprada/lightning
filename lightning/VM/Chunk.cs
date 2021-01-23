@@ -293,7 +293,7 @@ namespace lightning
             return constants;
         }
 
-        public ValFunction GetFunction(string name)
+        public Value GetFunction(string name)
         {
             foreach(Value v in constants)
             {
@@ -302,6 +302,13 @@ namespace lightning
                     {
                         return v as ValFunction;
                     }
+            }
+            foreach (ValIntrinsic v in Prelude.intrinsics)
+            {
+                if (v.name == name)
+                {
+                    return v;
+                }
 
             }
             return null;

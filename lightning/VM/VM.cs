@@ -294,6 +294,14 @@ namespace lightning
                 executingInstructions = executingInstructions + 1;
                 IP = 0;
             }
+            else if (this_type == typeof(ValIntrinsic))
+            {
+                ValIntrinsic this_intrinsic = (ValIntrinsic)this_callable;
+                Value intrinsic_result = this_intrinsic.function(this);
+                //stack.RemoveRange(stack.Count - this_intrinsic.arity, this_intrinsic.arity);
+                stackTop -= this_intrinsic.arity;
+                StackPush(intrinsic_result);
+            }
             VMResult result = Run();
             if (result.status == VMResultType.OK)
                 return result.value;
@@ -1113,8 +1121,7 @@ namespace lightning
                                 Value result = this_intrinsic.function(this);
                                 //stack.RemoveRange(stack.Count - this_intrinsic.arity, this_intrinsic.arity);
                                 stackTop -= this_intrinsic.arity;
-                                StackPush(result);
-                                break;
+                                StackPush(result);   
                             }
                             else
                             {
