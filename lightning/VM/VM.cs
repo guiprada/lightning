@@ -484,8 +484,8 @@ namespace lightning
                             }
                             else
                             {
-                                Value old_value = (this_table as ValTable).elements[(int)((ValNumber)indexes[indexes_counter - 1]).content];
-                                // string Value old_value = (this_table as ValTable).table[(ValString)indexes[indexes_counter - 1]];
+                                Value old_value = (this_table as ValTable).table[(ValString)indexes[indexes_counter - 1]];                                
+                                // string (this_table as ValTable).elements[(int)((ValNumber)indexes[indexes_counter - 1]).content];
                                 if (op == 1)
                                     ((ValNumber)old_value).content += ((ValNumber)new_value).content;
                                 else if (op == 2)
