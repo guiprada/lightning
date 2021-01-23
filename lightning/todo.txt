@@ -1,4 +1,5 @@
 ﻿todo
+	- think about reference counting numbers
 	- think about a register based VM
 	- implement ++, -- += -= *= /=
 	- overhaul function return mechanism	
