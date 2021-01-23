@@ -111,24 +111,25 @@ namespace interpreter
                 }
             }
 
-            //Console.WriteLine("---------------------------------- Tokens:");
+            Console.WriteLine("---------------------------------- Tokens:");
 
-            //foreach(Token token in scanner.Tokens) {
-            //    Console.WriteLine(token.ToString());
-            //}
-            //Console.WriteLine("\n---------------------------------- AST:");
+            foreach (Token token in scanner.Tokens)
+            {
+                Console.WriteLine(token.ToString());
+            }
+            Console.WriteLine("\n---------------------------------- AST:");
 
 
-            //PrettyPrinter astPrinter = new PrettyPrinter();
-            //astPrinter.Print(program);
+            PrettyPrinter astPrinter = new PrettyPrinter();
+            astPrinter.Print(program);
 
             Chunker code_generator = new Chunker(program, "main", Prelude.GetPrelude());
             Chunk chunk = code_generator.Code;
             if (code_generator.HasChunked == true)
-            {                
-                //Console.WriteLine("\n---------------------------------- Generated Chunk:");
-                //Console.WriteLine();
-                //chunk.Print();
+            {
+                Console.WriteLine("\n---------------------------------- Generated Chunk:");
+                Console.WriteLine();
+                chunk.Print();
 
                 VM vm = new VM(chunk);
                 VMResult result = vm.Run();

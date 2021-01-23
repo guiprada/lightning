@@ -4,7 +4,7 @@ using System.Text;
 
 namespace lightning
 {
-    class PrettyPrinter
+    public class PrettyPrinter
     {
         int identLevel;
         string identString;
@@ -52,6 +52,9 @@ namespace lightning
                     break;
                 case NodeType.ASSIGMENT:
                     PrintAssignment(p_node as AssignmentNode);
+                    break;
+                case NodeType.ASSIGMENTOP:
+                    PrintAssignmentOp(p_node as AssignmentOpNode);
                     break;
                 case NodeType.LOGICAL:
                     PrintLogical(p_node as LogicalNode);
@@ -325,7 +328,33 @@ namespace lightning
 
         public void PrintAssignment(AssignmentNode p_node)
         {
-            Console.Write("[ASSIGMENT " + p_node.Assigned + " = ");
+            Console.Write("[ASSIGMENT " + p_node.Assigned.Name + " = ");
+            Print(p_node.Value);
+            Console.Write("]");
+        }
+
+        public void PrintAssignmentOp(AssignmentOpNode p_node)
+        {
+            Console.Write("[ASSIGMENTOP " + p_node.Assigned.Name);
+            string op;
+            switch (p_node.Op) {
+                case OperatorType.PLUS:
+                    op = " += ";
+                    break;
+                case OperatorType.MINUS:
+                    op = " -= ";
+                    break;
+                case OperatorType.MULTIPLICATION:
+                    op = " *= ";
+                    break;
+                case OperatorType.DIVISION:
+                    op = " /= ";
+                    break;
+                default:
+                    op = "";
+                    break;
+            }
+            Console.Write(op);
             Print(p_node.Value);
             Console.Write("]");
         }

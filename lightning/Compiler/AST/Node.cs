@@ -29,6 +29,7 @@ namespace lightning
 
         VAR_DECLARATION,
         ASSIGMENT,
+        ASSIGMENTOP,
 
         BLOCK,
         FUNCTION_CALL,
@@ -251,6 +252,22 @@ namespace lightning
         {
             Assigned = p_Assigned;
             Value = p_Value;
+        }
+    }
+
+    public class AssignmentOpNode : Node
+    {
+        public VariableNode Assigned { get; private set; }
+        public Node Value { get; private set; }
+
+        public OperatorType Op { get; private set; }
+
+        public AssignmentOpNode(VariableNode p_Assigned, Node p_Value, OperatorType p_op, int p_Line)
+        : base(NodeType.ASSIGMENTOP, p_Line)
+        {
+            Assigned = p_Assigned;
+            Value = p_Value;
+            Op = p_op;
         }
     }
 

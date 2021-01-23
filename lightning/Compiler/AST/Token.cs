@@ -20,11 +20,15 @@ namespace lightning
         RIGHT_BRACKET,
         COMMA,
         MINUS,
+        MINUS_EQUAL,
         PLUS,
+        PLUS_EQUAL,
         SEMICOLON,
         COLON,
         SLASH,
+        SLASH_EQUAL,
         STAR,
+        STAR_EQUAL,
 
         // one or two character tokens.
         DOT,

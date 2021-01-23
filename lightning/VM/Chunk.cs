@@ -206,8 +206,6 @@ namespace lightning
                 case OpCode.LOADC:
                 case OpCode.LOADG: 
                 case OpCode.LOADUPVAL:
-                case OpCode.ASSIGNG:
-                case OpCode.ASSIGNUPVAL:    
                 case OpCode.PUSH:
                 case OpCode.LOADINTR:
                 case OpCode.JMP:
@@ -217,19 +215,21 @@ namespace lightning
                 case OpCode.TABLEGET:
                 case OpCode.LOADTABLEG:
                 case OpCode.LOADTABLEUPVAL:
-                case OpCode.TABLESET:
                     return op.ToString() + " " + instruction.opA;
                 // 2 op
+                case OpCode.ASSIGNG:
+                case OpCode.ASSIGNUPVAL:
                 case OpCode.LOADV:
-                case OpCode.LOADI:
-                case OpCode.ASSIGN:                
+                case OpCode.LOADI:               
                 case OpCode.NTABLE:
                 case OpCode.FUNDCL:
                 case OpCode.LOADTABLEV:
                 case OpCode.LOADTABLEI:
+                case OpCode.TABLESET:
                     return op.ToString() + " " + instruction.opA + " " + instruction.opB;
                 // 3 op
-                //    return op.ToString() + " " + instruction.opA + " " + instruction.opB + " " + instruction.opC;
+                case OpCode.ASSIGN:
+                    return op.ToString() + " " + instruction.opA + " " + instruction.opB + " " + instruction.opC;
                 default:
                     return "Unkown Opcode: " + op.ToString();
             }

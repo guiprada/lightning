@@ -137,6 +137,9 @@ namespace lightning
                 case NodeType.ASSIGMENT:
                     ChunkAssignment(p_node as AssignmentNode);
                     break;
+                case NodeType.ASSIGMENTOP:
+                    ChunkAssignmentOp(p_node as AssignmentOpNode);
+                    break;
                 case NodeType.LOGICAL:
                     ChunkLogical(p_node as LogicalNode);
                     break;
@@ -301,7 +304,7 @@ namespace lightning
             }
             else if (p_node.ValueType == typeof(string))
             {
-                if (p_node.Value == "Nil")
+                if ((string)p_node.Value == "Nil")
                 {
                     Add(OpCode.LOADNIL, p_node.Line);
                 }
@@ -491,14 +494,14 @@ namespace lightning
                     switch (this_var.type)
                     {
                         case ValType.Local:
-                            Add(OpCode.ASSIGN, (Operand)this_var.address, (Operand)this_var.envIndex, p_node.Line);
+                            Add(OpCode.ASSIGN, (Operand)this_var.address, (Operand)this_var.envIndex, 0,p_node.Line);
                             break;
                         case ValType.Global:
-                            Add(OpCode.ASSIGNG, (Operand)this_var.address, p_node.Line);
+                            Add(OpCode.ASSIGNG, (Operand)this_var.address, 0, p_node.Line);
                             break;
                         case ValType.UpValue:
                             int this_index = upvalueStack.Peek().IndexOf(this_var);
-                            Add(OpCode.ASSIGNUPVAL, (Operand)this_index, p_node.Line);
+                            Add(OpCode.ASSIGNUPVAL, (Operand)this_index, 0, p_node.Line);
                             break;
 
                     }
@@ -530,7 +533,93 @@ namespace lightning
                         }
                     }
 
-                    Add(OpCode.TABLESET, (Operand)p_node.Assigned.Indexes.Count, p_node.Line);
+                    Add(OpCode.TABLESET, (Operand)p_node.Assigned.Indexes.Count, 0, p_node.Line);
+                }
+            }
+            else
+            {
+                Error("Assignment to non existing variable!", p_node.Line);
+            }
+        }
+
+        void ChunkAssignmentOp(AssignmentOpNode p_node)
+        {
+            ChunkIt(p_node.Value);
+            Nullable<Variable> maybe_var = GetVar(p_node.Assigned.Name);
+
+            Operand op = 0;
+            switch (p_node.Op)
+            {
+                case OperatorType.PLUS:
+                    {
+                        op = 1;
+                    }
+                    break;
+                case OperatorType.MINUS:
+                    {
+                        op = 2;
+                    }
+                    break;
+                case OperatorType.MULTIPLICATION:
+                    {
+                        op = 3;
+                    }
+                    break;
+                case OperatorType.DIVISION:
+                    {
+                        op = 4;
+                    }
+                    break;
+            }
+
+            if (maybe_var.HasValue)
+            {
+                Variable this_var = maybe_var.Value;
+                if (p_node.Assigned.Indexes.Count == 0)
+                {
+                    switch (this_var.type)
+                    {
+                        case ValType.Local:
+                            Add(OpCode.ASSIGN, (Operand)this_var.address, (Operand)this_var.envIndex, op, p_node.Line);
+                            break;
+                        case ValType.Global:
+                            Add(OpCode.ASSIGNG, (Operand)this_var.address, op, p_node.Line);
+                            break;
+                        case ValType.UpValue:
+                            int this_index = upvalueStack.Peek().IndexOf(this_var);
+                            Add(OpCode.ASSIGNUPVAL, (Operand)this_index, op, p_node.Line);
+                            break;
+
+                    }
+                }
+                else//  it is a compoundVar
+                {
+                    switch (this_var.type)
+                    {
+                        case ValType.Local:
+                            Add(OpCode.LOADTABLEV, (Operand)this_var.address, (Operand)this_var.envIndex, p_node.Line);
+                            break;
+                        case ValType.Global:
+                            Add(OpCode.LOADTABLEG, (Operand)this_var.address, p_node.Line);
+                            break;
+                        case ValType.UpValue:
+                            int this_index = upvalueStack.Peek().IndexOf(this_var);
+                            Add(OpCode.LOADTABLEUPVAL, (Operand)this_index, p_node.Line);
+                            break;
+                    }
+
+                    foreach (Node n in p_node.Assigned.Indexes)
+                    {
+                        if (n.GetType() != typeof(VariableNode) || (n as VariableNode).AccessType == VarAccessType.PLAIN)
+                            ChunkIt(n);
+                        else
+                        {
+                            Operand string_address = (Operand)AddConstant((n as VariableNode).Name);
+                            Add(OpCode.LOADC, string_address, p_node.Line);
+                        }
+                    }
+
+                    Add(OpCode.TABLESET, (Operand)p_node.Assigned.Indexes.Count, op, p_node.Line);
                 }
             }
             else

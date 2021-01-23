@@ -327,7 +327,10 @@ namespace lightning
                             Operand address = instruction.opA;
                             Value constant = chunk.GetConstant(address);
                             //Console.WriteLine("loadc " + "address: " + address + " value: " + constant);
-                            StackPush(constant);
+                            if (constant.GetType() == typeof(ValNumber))                        
+                                StackPush(new ValNumber(((ValNumber)constant).content));
+                            else                                
+                                StackPush(constant);
                             break;
                         }
                     case OpCode.LOADV:
@@ -447,6 +450,7 @@ namespace lightning
                         {
                             IP++;
                             Operand indexes_counter = instruction.opA;
+                            Operand op = instruction.opB;
 
                             Value[] indexes = new Value[indexes_counter];
                             for (int i = indexes_counter - 1; i >= 0; i--)
@@ -467,15 +471,31 @@ namespace lightning
                                 }
                             }
                             Value new_value = StackPeek();
-                            //Console.WriteLine("added tableset");
-                            if (indexes[indexes_counter - 1].GetType() == typeof(ValNumber))
+                            if (op == 0)
                             {
-                                (this_table as ValTable).ElementSet((int)((ValNumber)indexes[indexes_counter - 1]).content, new_value);
+                                if (indexes[indexes_counter - 1].GetType() == typeof(ValNumber))
+                                {
+                                    (this_table as ValTable).ElementSet((int)((ValNumber)indexes[indexes_counter - 1]).content, new_value);
+                                }
+                                else
+                                {
+                                    (this_table as ValTable).TableSet((ValString)indexes[indexes_counter - 1], new_value);
+                                }
                             }
                             else
                             {
-                                (this_table as ValTable).TableSet((ValString)indexes[indexes_counter - 1], new_value);
+                                Value old_value = (this_table as ValTable).elements[(int)((ValNumber)indexes[indexes_counter - 1]).content];
+                                // string Value old_value = (this_table as ValTable).table[(ValString)indexes[indexes_counter - 1]];
+                                if (op == 1)
+                                    ((ValNumber)old_value).content += ((ValNumber)new_value).content;
+                                else if (op == 2)
+                                    ((ValNumber)old_value).content -= ((ValNumber)new_value).content;
+                                else if (op == 3)
+                                    ((ValNumber)old_value).content *= ((ValNumber)new_value).content;
+                                else if (op == 4)
+                                    ((ValNumber)old_value).content /= ((ValNumber)new_value).content;
                             }
+                            
 
                             break;
                         }
@@ -624,43 +644,75 @@ namespace lightning
                             IP++;
                             Operand address = instruction.opA;
                             Operand n_shift = instruction.opB;
+                            Operand op = instruction.opC;
                             Value new_value = StackPeek();
-                            Value old_value = VarAt(address, (Operand)(variablesBasesTop - 1 - n_shift));
-                            VarSet(new_value, address, (Operand)(variablesBasesTop - 1 - n_shift));
-
-
-                            //valPool.Recycle(old_value);
-
-                            //Console.WriteLine("assign adress: " + address + " env:" + (Operand)(variablesBases.Count - 1 - n_shift) + " value: " + new_value);
+                            if (op == 0)
+                            {                                                    
+                                VarSet(new_value, address, (Operand)(variablesBasesTop - 1 - n_shift));
+                            }
+                            else
+                            {
+                                Value old_value = VarAt(address, (Operand)(variablesBasesTop - 1 - n_shift));
+                                if (op == 1)
+                                    ((ValNumber)old_value).content += ((ValNumber)new_value).content;
+                                else if (op == 2)
+                                    ((ValNumber)old_value).content -= ((ValNumber)new_value).content;
+                                else if (op == 3)
+                                    ((ValNumber)old_value).content *= ((ValNumber)new_value).content;
+                                else if (op == 4)
+                                    ((ValNumber)old_value).content /= ((ValNumber)new_value).content;
+                            }
                             break;
                         }
                     case OpCode.ASSIGNG:
                         {
                             IP++;
                             Operand address = instruction.opA;
+                            Operand op = instruction.opB;
                             Value new_value = StackPeek();
-                            Value old_value = globals[address];
-                            globals[address] = new_value;
-
-
-                            //valPool.Recycle(old_value);
-
-                            //Console.WriteLine("assigng adress: " + address + " value: " + globals[address]);
+                            if (op == 0)
+                            {                                
+                                globals[address] = new_value;
+                            }
+                            else
+                            {
+                                Value old_value = globals[address];
+                                Console.WriteLine(old_value + " " + op + " " + new_value);
+                                if (op == 1)
+                                    ((ValNumber)old_value).content += ((ValNumber)new_value).content;
+                                else if (op == 2)
+                                    ((ValNumber)old_value).content -= ((ValNumber)new_value).content;
+                                else if (op == 3)
+                                    ((ValNumber)old_value).content *= ((ValNumber)new_value).content;
+                                else if (op == 4)
+                                    ((ValNumber)old_value).content /= ((ValNumber)new_value).content;
+                                
+                            }
                             break;
                         }
                     case OpCode.ASSIGNUPVAL:
                         {
                             IP++;
                             Operand address = instruction.opA;
-                            ValUpValue this_value = UpValuesAt(address);
-                            //Console.WriteLine(this_value.GetType() + " " + this_value + StackPeek());
+                            Operand op = instruction.opB;
+                            ValUpValue this_value = UpValuesAt(address);                            
                             Value new_value = StackPeek();
-                            Value old_value = this_value.Val;
-                            this_value.Val = new_value;
-
-                            //new_value.references++;
-                            //old_value.references--;
-                            //valPool.Recycle(old_value);
+                            if (op == 0)
+                            {                                
+                                this_value.Val = new_value;
+                            }
+                            else
+                            {                                
+                                Value old_value = this_value.Val;
+                                if (op == 1)
+                                    ((ValNumber)old_value).content += ((ValNumber)new_value).content;
+                                else if (op == 2)
+                                    ((ValNumber)old_value).content -= ((ValNumber)new_value).content;
+                                else if (op == 3)
+                                    ((ValNumber)old_value).content *= ((ValNumber)new_value).content;
+                                else if (op == 4)
+                                    ((ValNumber)old_value).content /= ((ValNumber)new_value).content;
+                            }
                             break;
                         }
                     case OpCode.PUSH:

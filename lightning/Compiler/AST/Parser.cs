@@ -351,12 +351,48 @@ namespace lightning
         {
             Node expr = LogicalOr();
 
-            if (Match(TokenType.EQUAL))
+            if (Match(TokenType.PLUS_EQUAL))
             {
                 Node value = Assignment();
 
                 if (expr.Type == NodeType.VARIABLE)
-                    return new AssignmentNode((expr as VariableNode), value, expr.Line);
+                    return new AssignmentOpNode((VariableNode)expr, value, OperatorType.PLUS, expr.Line);
+                else
+                    Error("Invalid assignment.");
+            }
+            else if (Match(TokenType.MINUS_EQUAL))
+            {
+                Node value = Assignment();
+
+                if (expr.Type == NodeType.VARIABLE)
+                    return new AssignmentOpNode((VariableNode)expr, value, OperatorType.MINUS, expr.Line);
+                else
+                    Error("Invalid assignment.");
+            }
+            else if (Match(TokenType.STAR_EQUAL))
+            {
+                Node value = Assignment();
+
+                if (expr.Type == NodeType.VARIABLE)
+                    return new AssignmentOpNode((VariableNode)expr, value, OperatorType.MULTIPLICATION, expr.Line);
+                else
+                    Error("Invalid assignment.");
+            }
+            if (Match(TokenType.SLASH_EQUAL))
+            {
+                Node value = Assignment();
+
+                if (expr.Type == NodeType.VARIABLE)
+                    return new AssignmentOpNode((VariableNode)expr, value, OperatorType.DIVISION, expr.Line);
+                else
+                    Error("Invalid assignment.");
+            }
+            else if (Match(TokenType.EQUAL))
+            {
+                Node value = Assignment();
+
+                if (expr.Type == NodeType.VARIABLE)
+                    return new AssignmentNode((VariableNode)expr, value, expr.Line);
                 else
                     Error("Invalid assignment.");
                 
@@ -667,7 +703,7 @@ namespace lightning
                 return CompoundVar();
             else
             {
-                Error("No match found! " + Previous().Line + " " + Previous());
+                Error("No match found! " + Peek().Line + " " + Peek());
                 return null;
             }
 
