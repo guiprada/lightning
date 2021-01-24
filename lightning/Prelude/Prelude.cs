@@ -134,7 +134,7 @@ namespace lightning
                 Value listClear(VM vm)
                 {
                     ValTable list = (ValTable)vm.StackPeek(0);
-
+                    list.elements.Clear();
                     return Value.Nil;
                 }
                 list.TableSet(new ValString("clear"), new ValIntrinsic("clear", listClear, 1));
