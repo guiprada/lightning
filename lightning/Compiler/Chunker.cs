@@ -251,17 +251,24 @@ namespace lightning
             {
                 case OperatorType.NOT:
                     this_opcode = OpCode.NOT;
+                    Add(this_opcode, p_node.Line);
                     break;
                 case OperatorType.MINUS:
                     this_opcode = OpCode.NEG;
+                    Add(this_opcode, p_node.Line);
+                    break;
+                case OperatorType.PLUS_PLUS:
+                    this_opcode = OpCode.INC;
+                    Add(this_opcode, p_node.Line);
+                    break;
+                case OperatorType.MINUS_MINUS:
+                    this_opcode = OpCode.DEC;
+                    Add(this_opcode, p_node.Line);
                     break;
                 default:
-                    Error("Unkown Unary operator " + p_node.Op.ToString(), p_node.Line);
-                    this_opcode = OpCode.EXIT;
+                    Error("Unkown Unary operator " + p_node.Op.ToString(), p_node.Line);                    
                     break;
             }
-
-            Add(this_opcode, p_node.Line);
         }
 
         void ChunkTable(TableNode p_node)

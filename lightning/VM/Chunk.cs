@@ -60,6 +60,8 @@ namespace lightning
         MUL,
         DIV,
         NEG,
+        INC,
+        DEC,
 
         NOT,
         AND,
@@ -176,6 +178,8 @@ namespace lightning
                 case OpCode.DIV:
                 case OpCode.NEG:
                 case OpCode.NOT:
+                case OpCode.INC:
+                case OpCode.DEC:
                 case OpCode.AND:
                 case OpCode.OR:
                 case OpCode.XOR:

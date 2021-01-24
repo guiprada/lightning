@@ -118,7 +118,7 @@ namespace lightning
             loadedModules = new Dictionary<string, int>();
             modules = new List<ValModule>();
 
-            valNumberPool = new Stack<ValNumber>();
+            valNumberPool = new Stack<ValNumber>();            
             vmPool = new Stack<VM>();
         }
 
@@ -137,7 +137,7 @@ namespace lightning
             {
                 VM new_vm = new VM(chunk);
                 new_vm.globals = globals;
-                new_vm.valNumberPool = valNumberPool;
+                new_vm.valNumberPool = valNumberPool;                
                 return new_vm;
             }
         }
@@ -917,6 +917,20 @@ namespace lightning
                             StackPush(new_value);
                             break;
                         }
+                    case OpCode.INC:
+                        {
+                            IP++;
+                            ValNumber opA = (ValNumber)StackPeek();
+                            opA.content++;
+                            break;
+                        }
+                    case OpCode.DEC:
+                        {
+                            IP++;
+                            ValNumber opA = (ValNumber)StackPeek();
+                            opA.content--;
+                            break;
+                        }
                     case OpCode.EQ:
                         {
                             //Console.WriteLine("eq");
@@ -1333,22 +1347,22 @@ namespace lightning
             }
         }
 
-        void Stats()
+        public void Stats()
         {
             Console.WriteLine("\nStack:");
             int counter = 0;
-            foreach (Value v in stack)
+            for(int i = 0; i<stackTop; i++)
             {
-                Console.WriteLine(counter + ": " + v);
+                Console.WriteLine(counter + ": " + stack[i]);
                 counter++;
             }
             if (counter == 0) Console.WriteLine("empty :)");
 
             Console.WriteLine("\nVariables:");
             counter = 0;
-            foreach (Value v in variables)
+            for(int i = 0; i<variablesTop; i++)
             {
-                Console.WriteLine(counter + ": " + v);
+                Console.WriteLine(counter + ": " + variables[i]);
                 counter++;
             }
             if (counter == 0) Console.WriteLine("empty :)");
@@ -1357,25 +1371,27 @@ namespace lightning
 
             Console.WriteLine("\nUpvalues:");
             counter = 0;
+            for(int i=0; i<upValuesBases[upValuesBasesTop-1]; i++)
             foreach (Value v in upValues)
             {
-                Console.WriteLine(counter + ": " + v);
+                Console.WriteLine(counter + ": " + upValues[i]);
                 counter++;
             }
             if (counter == 0) Console.WriteLine("empty :)");
 
             Console.WriteLine("Envs: " + upValuesBasesTop);
 
-            Console.WriteLine("\nUpvaluesRegistry:");
-            counter = 0;
-            foreach (Value v in upValuesRegistry)
-            {
-                Console.WriteLine(counter + ": " + v);
-                counter++;
-            }
-            if (counter == 0) Console.WriteLine("empty :)");
+            //Console.WriteLine("\nUpvaluesRegistry:");
+            //counter = 0;
+            
+            //foreach (Value v in upValuesRegistry)
+            //{
+            //    Console.WriteLine(counter + ": " + v);
+            //    counter++;
+            //}
+            //if (counter == 0) Console.WriteLine("empty :)");
 
-            Console.WriteLine("Envs: " + upValuesRegistryBasesTop);
+            //Console.WriteLine("Envs: " + upValuesRegistryBasesTop);
         }
     }
 }

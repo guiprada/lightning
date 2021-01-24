@@ -44,7 +44,9 @@ namespace lightning
     public enum OperatorType
     {
         PLUS,
+        PLUS_PLUS,
         MINUS,
+        MINUS_MINUS,
         MULTIPLICATION,
         DIVISION,
 
@@ -63,7 +65,8 @@ namespace lightning
         GREATER,
         GREATER_EQUAL,
         LESS,
-        LESS_EQUAL
+        LESS_EQUAL,
+        VOID
     }
 
     public enum VarAccessType

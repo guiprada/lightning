@@ -617,13 +617,24 @@ namespace lightning
 
         Node Unary()
         {
-            if (Match(TokenType.BANG, TokenType.MINUS))
+            if (Match(TokenType.BANG, TokenType.MINUS, TokenType.MINUS_MINUS, TokenType.PLUS_PLUS))
             {
                 Token op = Previous();
                 OperatorType this_op;
 
-                if (op.Type == TokenType.BANG) this_op = OperatorType.NOT;                
-                else this_op = OperatorType.MINUS;
+                if (op.Type == TokenType.BANG)
+                    this_op = OperatorType.NOT;
+                else if (op.Type == TokenType.PLUS_PLUS)
+                    this_op = OperatorType.PLUS_PLUS;
+                else if (op.Type == TokenType.MINUS_MINUS)
+                    this_op = OperatorType.MINUS_MINUS;
+                else if (op.Type == TokenType.MINUS)
+                    this_op = OperatorType.MINUS;
+                else
+                {
+                    Error("Unkown unary operator!");
+                    this_op = OperatorType.VOID;
+                }
 
                 Node right = Unary();
                 return new UnaryNode(this_op, right, op.Line);

@@ -135,6 +135,7 @@ namespace interpreter
                 VMResult result = vm.Run();
                 if (result.status == VMResultType.OK)
                     Console.WriteLine("Program returned: " + result.value);
+                vm.Stats();
             }
             else
             {
