@@ -81,7 +81,7 @@ namespace lightning
         CALL,
         CLOSURECLOSE,
         FUNCLOSE,
-        PFOR,
+        RANGE,
         FOREACH,
 
         EXIT// EXIT ;)
@@ -198,7 +198,7 @@ namespace lightning
                 case OpCode.FUNCLOSE:
                 case OpCode.LOADFALSE:
                 case OpCode.LOADTRUE:
-                case OpCode.PFOR:
+                case OpCode.RANGE:
                 case OpCode.FOREACH:
                     return op.ToString();
 

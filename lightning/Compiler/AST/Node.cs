@@ -27,7 +27,7 @@ namespace lightning
         WHILE,
         FOR,
         FOREACH,
-        PFOR,
+        RANGE,
 
         VAR_DECLARATION,
         ASSIGMENT,
@@ -215,13 +215,13 @@ namespace lightning
         }
     }
 
-    public class PForNode : Node
+    public class RangeNode : Node
     {
         public Node Tasks { get; private set; }
         public Node List { get; private set; }
         public Node Function { get; private set; }
-        public PForNode(Node p_Tasks, Node p_List, Node p_Function, int p_Line)
-            : base(NodeType.PFOR, p_Line)
+        public RangeNode(Node p_Tasks, Node p_List, Node p_Function, int p_Line)
+            : base(NodeType.RANGE, p_Line)
         {
             Tasks = p_Tasks;
             List = p_List;

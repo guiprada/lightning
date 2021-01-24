@@ -225,8 +225,8 @@ namespace lightning
                 return For();
             else if (Match(TokenType.FOREACH))
                 return ForEach();
-            else if (Match(TokenType.PFOR))
-                return PFor();
+            else if (Match(TokenType.RANGE))
+                return Range();
             else if (Match(TokenType.RETURN))
                 return Return();
             else if (Match(TokenType.IF))
@@ -308,7 +308,7 @@ namespace lightning
             return new ForEachNode(list, function, line);
         }
 
-        Node PFor()
+        Node Range()
         {
             int line = Previous().Line;
             Consume(TokenType.LEFT_PAREN, "Expected '(' after 'for'.", true);
@@ -320,7 +320,7 @@ namespace lightning
             Consume(TokenType.COMMA, "Expected ',' separating 'pfor'", false);
             Node function = Primary();
             Consume(TokenType.RIGHT_PAREN, "Expected ')' after 'for'.", true);
-            return new PForNode(tasks, list, function, line);
+            return new RangeNode(tasks, list, function, line);
         }
 
         Node While()

@@ -1283,7 +1283,7 @@ namespace lightning
                             }
                             break;
                         }
-                    case OpCode.PFOR:
+                    case OpCode.RANGE:
                         {
                             IP++;
                             Value func = StackPop();

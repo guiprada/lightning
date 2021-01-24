@@ -58,7 +58,7 @@ namespace lightning
         FALSE,
         FUN,
         FOR,
-        PFOR,
+        RANGE,
         FOREACH,
         IF,
         NIL,

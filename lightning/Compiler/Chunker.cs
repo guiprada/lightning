@@ -164,8 +164,8 @@ namespace lightning
                 case NodeType.FOREACH:
                     ChunkForEach(p_node as ForEachNode);
                     break;
-                case NodeType.PFOR:
-                    ChunkPFor(p_node as PForNode);
+                case NodeType.RANGE:
+                    ChunkRange(p_node as RangeNode);
                     break;
                 case NodeType.TABLE:
                     ChunkTable(p_node as TableNode);
@@ -392,12 +392,12 @@ namespace lightning
             Add(OpCode.FOREACH, p_node.Line);
         }
 
-        void ChunkPFor(PForNode p_node)
+        void ChunkRange(RangeNode p_node)
         {
             ChunkIt(p_node.Tasks);
             ChunkIt(p_node.List);
             ChunkIt(p_node.Function);
-            Add(OpCode.PFOR, p_node.Line);
+            Add(OpCode.RANGE, p_node.Line);
         }
 
         void ChunkWhile(WhileNode p_node)

@@ -17,7 +17,7 @@ namespace lightning
             {"else", TokenType.ELSE},
             {"false", TokenType.FALSE},
             {"for", TokenType.FOR},
-            {"pfor", TokenType.PFOR},
+            {"range", TokenType.RANGE},
             {"foreach", TokenType.FOREACH},
             {"function", TokenType.FUN},
             {"if", TokenType.IF},

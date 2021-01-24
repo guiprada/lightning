@@ -1,12 +1,5 @@
 ﻿todo
-	- think about reference counting numbers
-	- think about a register based VM
-	- implement ++, -- += -= *= /=
-	- overhaul function return mechanism	
-	- create a compile time eval :)
 	- valtable containers should be null until used
-	- separte error detection and warnings in parser
-	- foreach, or a map  function :)
 	- increment and decrement unarys
 	- table clone function	
 	- need for semicolons?
@@ -73,6 +66,8 @@ done
 	- add table methods, clear and copy
 	- eval and requice should error check
 	- ValNil and ValBool as structs
+	- implement ++, -- += -= *= /=
+	- separte error detection and warnings in parser
 
 --
 where do we create references
