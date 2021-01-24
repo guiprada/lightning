@@ -1286,8 +1286,9 @@ namespace lightning
                             }
                             System.Threading.Tasks.Parallel.For(init, end, (index) =>
                             {
-                                List<Value> args = new List<Value>();                                
-                                args.Add(table.elements[index]);
+                                List<Value> args = new List<Value>();
+                                args.Add(GetValNumber(index));
+                                args.Add(table);
                                 vms[index].CallFunction(func, args);
                             });
                             for (int i = init; i < end; i++)
@@ -1314,15 +1315,16 @@ namespace lightning
                             }
 
                             int count = table.ECount;
-                            int step = count / n_tasks;
+                            int step = (count / n_tasks) + 1;
 
                             System.Threading.Tasks.Parallel.For(init, end, (index) =>
                             {
                                 List<Value> args = new List<Value>();
-                                int start = index * step;
-                                args.Add(GetValNumber(start));
-                                int end = start + step;
-                                args.Add(GetValNumber(end));
+                                int range_start = index * step;
+                                args.Add(GetValNumber(range_start));
+                                int range_end = range_start + step;
+                                if (range_end > count) range_end = count;
+                                args.Add(GetValNumber(range_end));
                                 args.Add(table);
                                 vms[index].CallFunction(func, args);
                             });
