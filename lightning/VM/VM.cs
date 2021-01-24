@@ -282,10 +282,11 @@ namespace lightning
             }
         }
 
-        public Value CallFunction(Value this_callable, List<Value> stack)
+        public Value CallFunction(Value this_callable, List<Value> args)
         {
+            args.Reverse();
             if (stack != null)
-                foreach (Value v in stack)
+                foreach (Value v in args)
                     StackPush(v);
 
             Type this_type = this_callable.GetType();
@@ -1273,6 +1274,29 @@ namespace lightning
                             IP++;
                             StackPush(stash[stashTop - 1]);
                             stashTop--;
+                            break;
+                        }
+                    case OpCode.PFOR:
+                        {
+                            IP++;
+                            Value func = StackPop();   
+                            ValTable table = StackPop() as ValTable;
+
+                            int init = 0;
+                            int end = table.ECount;
+                            VM[] vms = new VM[end];
+                            for (int i = 0; i < end; i++)
+                            {
+                                vms[i] = new VM(chunk);
+ 
+                            }
+                            System.Threading.Tasks.Parallel.For(init, end, (index) =>
+                            {
+                                List<Value> stack = new List<Value>();
+                                stack.Add(GetValNumber(index));
+                                stack.Add(table.elements[index]);
+                                vms[index].CallFunction(func, stack);
+                            });
                             break;
                         }
                     case OpCode.EXIT:

@@ -85,6 +85,7 @@ namespace lightning
         CALL,
         CLOSURECLOSE,
         FUNCLOSE,
+        PFOR,
 
         EXIT// EXIT ;)
     }
@@ -200,6 +201,7 @@ namespace lightning
                 case OpCode.FUNCLOSE:
                 case OpCode.LOADFALSE:
                 case OpCode.LOADTRUE:
+                case OpCode.PFOR:
                     return op.ToString();
 
                 // 1 op
@@ -216,7 +218,7 @@ namespace lightning
                 case OpCode.LOADTABLEG:
                 case OpCode.LOADTABLEUPVAL:
                     return op.ToString() + " " + instruction.opA;
-                // 2 op
+                // 2 op                
                 case OpCode.ASSIGNG:
                 case OpCode.ASSIGNUPVAL:
                 case OpCode.LOADV:

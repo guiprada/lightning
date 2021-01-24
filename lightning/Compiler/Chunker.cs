@@ -161,6 +161,9 @@ namespace lightning
                 case NodeType.FOR:
                     ChunkFor(p_node as ForNode);
                     break;
+                case NodeType.PFOR:
+                    ChunkPFor(p_node as PForNode);
+                    break;
                 case NodeType.TABLE:
                     ChunkTable(p_node as TableNode);
                     break;
@@ -377,6 +380,13 @@ namespace lightning
             code.FixInstruction(start_address, null, (Operand)(exit_adress - start_address), null, null);
             code.FixInstruction(go_back_address, null, (Operand)(go_back_address - condition_address), null, null);
 
+        }
+
+        void ChunkPFor(PForNode p_node)
+        {
+            ChunkIt(p_node.List);
+            ChunkIt(p_node.Function);
+            Add(OpCode.PFOR, p_node.Line);
         }
 
         void ChunkWhile(WhileNode p_node)

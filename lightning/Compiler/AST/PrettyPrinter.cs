@@ -77,6 +77,9 @@ namespace lightning
                 case NodeType.FOR:
                     PrintFor(p_node as ForNode);
                     break;
+                case NodeType.PFOR:
+                    PrintPFor(p_node as PForNode);
+                    break;
                 case NodeType.TABLE:
                     PrintTable(p_node as TableNode);
                     break;
@@ -267,6 +270,13 @@ namespace lightning
             Console.WriteLine(identString + "]");
         }
 
+        public void PrintPFor(PForNode p_node)
+        {
+            Console.Write(identString + "[PFOR ");
+            Print(p_node.List);
+            Print(p_node.Function);
+            Console.WriteLine("]");
+        }
         public void PrintWhile(WhileNode p_node)
         {
             Console.Write(identString + "[WHILE ");

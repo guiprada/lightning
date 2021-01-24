@@ -223,6 +223,8 @@ namespace lightning
         {
             if (Match(TokenType.FOR))
                 return For();
+            else if (Match(TokenType.PFOR))
+                return PFor();
             else if (Match(TokenType.RETURN))
                 return Return();
             else if (Match(TokenType.IF))
@@ -249,9 +251,11 @@ namespace lightning
             Consume(TokenType.LEFT_PAREN, "Expected '(' after 'for'.", true);
 
             Node initializer;
-            if (Match(TokenType.SEMICOLON)){
+            if (Match(TokenType.SEMICOLON))
+            {
                 initializer = null;
-            }else if (Match(TokenType.VAR))
+            }
+            else if (Match(TokenType.VAR))
             {
                 initializer = VarDeclaration();
             }
@@ -288,6 +292,18 @@ namespace lightning
             Node body = Statement();
 
             return new ForNode(initializer, condition, finalizer, body, line);
+        }
+
+        Node PFor()
+        {
+            int line = Previous().Line;
+            Consume(TokenType.LEFT_PAREN, "Expected '(' after 'for'.", true);
+
+            Node list = Primary();
+            Consume(TokenType.COMMA, "Expected ',' separating 'pfor'", false);            
+            Node function = Primary();
+            Consume(TokenType.RIGHT_PAREN, "Expected ')' after 'for'.", true);
+            return new PForNode(list, function, line);
         }
 
         Node While()

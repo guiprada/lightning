@@ -26,6 +26,7 @@ namespace lightning
         IF,
         WHILE,
         FOR,
+        PFOR,
 
         VAR_DECLARATION,
         ASSIGMENT,
@@ -198,6 +199,19 @@ namespace lightning
             Condition = p_Condition;
             Finalizer = p_Finalizer;
             Body = p_Body;
+        }
+    }
+
+    public class PForNode : Node
+    {
+        public Node List  { get; private set; }
+        public Node Function { get; private set; }
+        public PForNode(Node p_List, Node p_Function, int p_Line)
+            : base(NodeType.PFOR, p_Line)
+        {
+            List = p_List;
+            Function = p_Function;
+            Function = p_Function;
         }
     }
 
