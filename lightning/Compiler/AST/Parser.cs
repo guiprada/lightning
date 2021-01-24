@@ -223,6 +223,10 @@ namespace lightning
         {
             if (Match(TokenType.FOR))
                 return For();
+            else if (Match(TokenType.FOREACH))
+                return ForEach();
+            else if (Match(TokenType.RANGE))
+                return Range();
             else if (Match(TokenType.RETURN))
                 return Return();
             else if (Match(TokenType.IF))
@@ -249,9 +253,11 @@ namespace lightning
             Consume(TokenType.LEFT_PAREN, "Expected '(' after 'for'.", true);
 
             Node initializer;
-            if (Match(TokenType.SEMICOLON)){
+            if (Match(TokenType.SEMICOLON))
+            {
                 initializer = null;
-            }else if (Match(TokenType.VAR))
+            }
+            else if (Match(TokenType.VAR))
             {
                 initializer = VarDeclaration();
             }
@@ -288,6 +294,33 @@ namespace lightning
             Node body = Statement();
 
             return new ForNode(initializer, condition, finalizer, body, line);
+        }
+
+        Node ForEach()
+        {
+            int line = Previous().Line;
+            Consume(TokenType.LEFT_PAREN, "Expected '(' after 'for'.", true);
+
+            Node list = Primary();
+            Consume(TokenType.COMMA, "Expected ',' separating 'pfor'", false);            
+            Node function = Primary();
+            Consume(TokenType.RIGHT_PAREN, "Expected ')' after 'for'.", true);
+            return new ForEachNode(list, function, line);
+        }
+
+        Node Range()
+        {
+            int line = Previous().Line;
+            Consume(TokenType.LEFT_PAREN, "Expected '(' after 'for'.", true);
+
+            Node tasks = Primary();
+            Consume(TokenType.COMMA, "Expected ',' separating 'pfor'", false);
+
+            Node list = Primary();
+            Consume(TokenType.COMMA, "Expected ',' separating 'pfor'", false);
+            Node function = Primary();
+            Consume(TokenType.RIGHT_PAREN, "Expected ')' after 'for'.", true);
+            return new RangeNode(tasks, list, function, line);
         }
 
         Node While()
@@ -360,9 +393,27 @@ namespace lightning
                 else
                     Error("Invalid assignment.");
             }
+            else if (Match(TokenType.PLUS_PLUS))
+            {
+                Node value = new LiteralNode(1, expr.Line);
+
+                if (expr.Type == NodeType.VARIABLE)
+                    return new AssignmentOpNode((VariableNode)expr, value, OperatorType.PLUS, expr.Line);
+                else
+                    Error("Invalid assignment.");
+            }
             else if (Match(TokenType.MINUS_EQUAL))
             {
                 Node value = Assignment();
+
+                if (expr.Type == NodeType.VARIABLE)
+                    return new AssignmentOpNode((VariableNode)expr, value, OperatorType.MINUS, expr.Line);
+                else
+                    Error("Invalid assignment.");
+            }
+            else if (Match(TokenType.MINUS_MINUS))
+            {
+                Node value = new LiteralNode(1, expr.Line);
 
                 if (expr.Type == NodeType.VARIABLE)
                     return new AssignmentOpNode((VariableNode)expr, value, OperatorType.MINUS, expr.Line);

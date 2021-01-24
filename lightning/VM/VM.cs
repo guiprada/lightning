@@ -7,7 +7,7 @@ using Operand = System.UInt16;
 #if DOUBLE
 using Number = System.Double;
 #else
-    using Number = System.Single;
+using Number = System.Single;
 #endif
 
 namespace lightning
@@ -64,8 +64,11 @@ namespace lightning
         public Dictionary<string, int> loadedModules { get; private set; }
         public List<ValModule> modules;
 
+        Stack<ValNumber> valNumberPool;
+        Stack<VM> vmPool;
+
         public VM(Chunk p_chunk, int function_deepness = 25)
-        {          
+        {
             chunk = p_chunk;
 
             instructionsStack = new List<Instruction>[function_deepness];
@@ -114,6 +117,54 @@ namespace lightning
 
             loadedModules = new Dictionary<string, int>();
             modules = new List<ValModule>();
+
+            valNumberPool = new Stack<ValNumber>();
+            vmPool = new Stack<VM>();
+        }
+
+        void RecycleVM(VM vm)
+        {
+            vmPool.Push(vm);
+        }
+
+        VM GetVM()
+        {
+            if(vmPool.Count > 0)
+            {
+                return vmPool.Pop();                
+            }
+            else
+            {
+                VM new_vm = new VM(chunk);
+                new_vm.globals = globals;
+                new_vm.valNumberPool = valNumberPool;
+                return new_vm;
+            }
+        }
+
+        void RecycleNumber(ValNumber v)
+        {
+            lock (valNumberPool)
+            {
+                valNumberPool.Push(v);
+            }
+        }
+
+        ValNumber GetValNumber(Number n)
+        {
+            lock (valNumberPool)
+            {
+                if (valNumberPool.Count > 0)
+                {
+                    ValNumber v = valNumberPool.Pop();
+                    v.content = n;
+                    return v;
+                }
+                else
+                {
+                    return new ValNumber(n);
+                }
+            }
         }
 
         public Operand AddModule(ValModule this_module)
@@ -140,20 +191,20 @@ namespace lightning
         }
 
         Value StackPop()
-        {            
+        {
             stackTop--;
             Value popped = stack[stackTop];
             return popped;
         }
 
         Value StackPeek()
-        {            
+        {
             return stack[stackTop - 1];
         }
 
         public Value StackPeek(int n)
         {
-            if (n < 0 || n > (stackTop - 1)) return null;            
+            if (n < 0 || n > (stackTop - 1)) return null;
             return stack[stackTop - n - 1];
         }
 
@@ -176,7 +227,7 @@ namespace lightning
         }
 
         void EnvPush()
-        {            
+        {
             variablesBases[variablesBasesTop] = variablesTop;
             variablesBasesTop++;
             upValuesRegistryBases[upValuesRegistryBasesTop] = upValuesRegistry.Count;
@@ -242,7 +293,7 @@ namespace lightning
 
         ValUpValue UpValuesAt(int address)
         {
-            int this_UpvalueBasePointer = upValuesBases[upValuesBasesTop -1];
+            int this_UpvalueBasePointer = upValuesBases[upValuesBasesTop - 1];
             return upValues[this_UpvalueBasePointer + address];
         }
 
@@ -259,11 +310,11 @@ namespace lightning
             }
         }
 
-        public Value CallFunction(Value this_callable, List<Value> stack)
-        {
-            if (stack != null)
-                foreach (Value v in stack)
-                    StackPush(v);
+        public Value CallFunction(Value this_callable, List<Value> args)
+        {            
+            if (args != null)
+                for(int i = args.Count - 1; i>=0; i--)                
+                    StackPush(args[i]);
 
             Type this_type = this_callable.GetType();
             ret[ret_count] = (Operand)(chunk.ProgramSize - 1);
@@ -327,9 +378,9 @@ namespace lightning
                             Operand address = instruction.opA;
                             Value constant = chunk.GetConstant(address);
                             //Console.WriteLine("loadc " + "address: " + address + " value: " + constant);
-                            if (constant.GetType() == typeof(ValNumber))                        
-                                StackPush(new ValNumber(((ValNumber)constant).content));
-                            else                                
+                            if (constant.GetType() == typeof(ValNumber))
+                                StackPush(GetValNumber(((ValNumber)constant).content));
+                            else
                                 StackPush(constant);
                             break;
                         }
@@ -339,19 +390,7 @@ namespace lightning
                             Operand address = instruction.opA;
                             Operand n_shift = instruction.opB;
                             var variable = VarAt(address, (Operand)(variablesBasesTop - 1 - n_shift));
-                            //Console.WriteLine("loadv " + "address: " + address + " env: " + (Operand)(variablesBases.Count - 1 - n_shift) + " value:" + variable);
                             StackPush(variable);
-                            break;
-                        }
-                    case OpCode.LOADTABLEV:
-                        {
-                            IP++;
-                            Operand address = instruction.opA;
-                            Operand n_shift = instruction.opB;
-
-                            Value this_table = VarAt(address, (Operand)(variablesBasesTop - 1 - n_shift)) as ValTable;
-
-                            StackPush(this_table);
                             break;
                         }
                     case OpCode.LOADG:
@@ -375,29 +414,6 @@ namespace lightning
                             StackPush(global);
                             break;
                         }
-                    case OpCode.LOADTABLEG:
-                        {
-                            IP++;
-                            //Console.WriteLine("loadg in");
-                            Operand address = instruction.opA;
-
-                            Value this_table = globals[address] as ValTable;
-
-                            StackPush(this_table);
-                            break;
-                        }
-                    case OpCode.LOADTABLEI:
-                        {
-                            IP++;
-                            //Console.WriteLine("loadg in");
-                            Operand address = instruction.opA;
-                            Operand module_index = instruction.opB;
-
-                            Value this_table = modules[module_index].globals[address] as ValTable;
-
-                            StackPush(this_table);
-                            break;
-                        }
                     case OpCode.LOADUPVAL:
                         {
                             IP++;
@@ -405,17 +421,6 @@ namespace lightning
                             ValUpValue up_val = UpValuesAt(address);
                             //Console.WriteLine("loadupval " + up_val);
                             StackPush(up_val.Val);
-                            break;
-                        }
-                    case OpCode.LOADTABLEUPVAL:
-                        {
-                            IP++;
-                            Operand address = instruction.opA;
-
-                            ValUpValue up_val = UpValuesAt(address);
-                            Value this_table = up_val.Val;
-
-                            StackPush(this_table);
                             break;
                         }
                     case OpCode.TABLEGET:
@@ -436,12 +441,9 @@ namespace lightning
                                 }
                                 else
                                 {
-                                    //Console.WriteLine(v.GetType());
-                                    //Console.WriteLine(value);
                                     value = (value as ValTable).table[(ValString)v];
                                 }
                             }
-                            //Console.WriteLine(value);
                             StackPush(value);
                             break;
                         }
@@ -475,10 +477,30 @@ namespace lightning
                             {
                                 if (indexes[indexes_counter - 1].GetType() == typeof(ValNumber))
                                 {
+                                    if ((this_table as ValTable).elements.Count - 1 >= ((int)((ValNumber)indexes[indexes_counter - 1]).content))
+                                    {
+                                        Value old_value = (this_table as ValTable).elements[(int)((ValNumber)indexes[indexes_counter - 1]).content];
+                                        if (old_value.GetType() == typeof(ValNumber))
+                                            RecycleNumber(old_value as ValNumber);
+                                    }
+                                    if (new_value.GetType() == typeof(ValNumber))
+                                    {
+                                        new_value = GetValNumber(((ValNumber)new_value).content);
+                                    }
                                     (this_table as ValTable).ElementSet((int)((ValNumber)indexes[indexes_counter - 1]).content, new_value);
                                 }
                                 else
                                 {
+                                    if ((this_table as ValTable).table.ContainsKey((ValString)indexes[indexes_counter - 1]))
+                                    {
+                                        Value old_value = (this_table as ValTable).table[(ValString)indexes[indexes_counter - 1]];
+                                        if (old_value.GetType() == typeof(ValNumber))
+                                            RecycleNumber(old_value as ValNumber);
+                                    }
+                                    if (new_value.GetType() == typeof(ValNumber))
+                                    {
+                                        new_value = GetValNumber(((ValNumber)new_value).content);
+                                    }
                                     (this_table as ValTable).TableSet((ValString)indexes[indexes_counter - 1], new_value);
                                 }
                             }
@@ -499,7 +521,7 @@ namespace lightning
                                 else if (op == 4)
                                     ((ValNumber)old_value).content /= ((ValNumber)new_value).content;
                             }
-                            
+
 
                             break;
                         }
@@ -537,7 +559,12 @@ namespace lightning
                         {
                             IP++;
                             Value new_value = StackPop();
-                            
+
+                            if (new_value.GetType() == typeof(ValNumber))
+                            {
+                                new_value = GetValNumber(((ValNumber)new_value).content);
+                            }
+
                             if (variablesTop > (variables.Count - 1))
                             {
                                 //Console.WriteLine("new");
@@ -556,6 +583,12 @@ namespace lightning
                         {
                             IP++;
                             Value new_value = StackPop();
+
+                            if (new_value.GetType() == typeof(ValNumber))
+                            {
+                                new_value = GetValNumber(((ValNumber)new_value).content);
+                            }
+
                             globals.Add(new_value);
                             //Console.WriteLine("globaldcl adress: " + (globals.Count - 1) + " value: " + new_var);
                             break;
@@ -615,7 +648,7 @@ namespace lightning
                                 new_closure.Register(variables, variablesBases);
                                 foreach (ValUpValue u in new_closure.upValues)
                                 {
-                                    RegisterUpValue(u);                                    
+                                    RegisterUpValue(u);
                                     //Console.WriteLine("added " + u.env.ToString() + " " + u.address + " value " + u.Val);
                                 }
                                 //Console.WriteLine(new_closure.upValues.Count);
@@ -651,7 +684,14 @@ namespace lightning
                             Operand op = instruction.opC;
                             Value new_value = StackPeek();
                             if (op == 0)
-                            {                                                    
+                            {
+                                Value old_value = VarAt(address, (Operand)(variablesBasesTop - 1 - n_shift));
+                                if (old_value.GetType() == typeof(ValNumber))
+                                    RecycleNumber(old_value as ValNumber);
+                                if (new_value.GetType() == typeof(ValNumber))
+                                {
+                                    new_value = GetValNumber(((ValNumber)new_value).content);
+                                }
                                 VarSet(new_value, address, (Operand)(variablesBasesTop - 1 - n_shift));
                             }
                             else
@@ -675,13 +715,20 @@ namespace lightning
                             Operand op = instruction.opB;
                             Value new_value = StackPeek();
                             if (op == 0)
-                            {                                
+                            {
+
+                                Value old_value = globals[address];
+                                if (old_value.GetType() == typeof(ValNumber))
+                                    RecycleNumber(old_value as ValNumber);
+                                if (new_value.GetType() == typeof(ValNumber))
+                                {
+                                    new_value = GetValNumber(((ValNumber)new_value).content);
+                                }
                                 globals[address] = new_value;
                             }
                             else
                             {
                                 Value old_value = globals[address];
-                                Console.WriteLine(old_value + " " + op + " " + new_value);
                                 if (op == 1)
                                     ((ValNumber)old_value).content += ((ValNumber)new_value).content;
                                 else if (op == 2)
@@ -690,7 +737,7 @@ namespace lightning
                                     ((ValNumber)old_value).content *= ((ValNumber)new_value).content;
                                 else if (op == 4)
                                     ((ValNumber)old_value).content /= ((ValNumber)new_value).content;
-                                
+
                             }
                             break;
                         }
@@ -699,14 +746,22 @@ namespace lightning
                             IP++;
                             Operand address = instruction.opA;
                             Operand op = instruction.opB;
-                            ValUpValue this_value = UpValuesAt(address);                            
+                            ValUpValue this_value = UpValuesAt(address);
                             Value new_value = StackPeek();
                             if (op == 0)
-                            {                                
+                            {
+
+                                Value old_value = this_value.Val;
+                                if (old_value.GetType() == typeof(ValNumber))
+                                    RecycleNumber(old_value as ValNumber);
+                                if (new_value.GetType() == typeof(ValNumber))
+                                {
+                                    new_value = GetValNumber(((ValNumber)new_value).content);
+                                }
                                 this_value.Val = new_value;
                             }
                             else
-                            {                                
+                            {
                                 Value old_value = this_value.Val;
                                 if (op == 1)
                                     ((ValNumber)old_value).content += ((ValNumber)new_value).content;
@@ -723,7 +778,7 @@ namespace lightning
                         {
                             IP++;
                             Operand value = instruction.opA;
-                            Value new_value = new ValNumber(value);
+                            Value new_value = GetValNumber(value);
                             StackPush(new_value);
                             //Console.WriteLine("push at: " + (stack.Count - 1)+ " value:  " + value);
                             break;
@@ -802,7 +857,7 @@ namespace lightning
                             ValNumber opA = (ValNumber)StackPop();
 
                             Number result = opA.content + opB.content;
-                            Value new_value = new ValNumber(result);
+                            Value new_value = GetValNumber(result);
                             StackPush(new_value);
 
                             break;
@@ -827,7 +882,7 @@ namespace lightning
                             ValNumber opB = (ValNumber)StackPop();
                             ValNumber opA = (ValNumber)StackPop();
                             Number result = opA.content - opB.content;
-                            Value new_value = new ValNumber(result);
+                            Value new_value = GetValNumber(result);
                             StackPush(new_value);
                             break;
                         }
@@ -838,7 +893,7 @@ namespace lightning
                             ValNumber opB = (ValNumber)StackPop();
                             ValNumber opA = (ValNumber)StackPop();
                             Number result = opA.content * opB.content;
-                            Value new_value = new ValNumber(result);
+                            Value new_value = GetValNumber(result);
                             StackPush(new_value);
                             break;
                         }
@@ -849,7 +904,7 @@ namespace lightning
                             ValNumber opB = (ValNumber)StackPop();
                             ValNumber opA = (ValNumber)StackPop();
                             Number result = opA.content / opB.content;
-                            Value new_value = new ValNumber(result);
+                            Value new_value = GetValNumber(result);
                             StackPush(new_value);
                             break;
                         }
@@ -858,8 +913,8 @@ namespace lightning
                             //Console.WriteLine("neg");
                             IP++;
                             ValNumber opA = (ValNumber)StackPop();
-                            Value new_value = new ValNumber(opA.content * -1);
-                            StackPush(new_value);                            
+                            Value new_value = GetValNumber(opA.content * -1);
+                            StackPush(new_value);
                             break;
                         }
                     case OpCode.EQ:
@@ -1113,7 +1168,7 @@ namespace lightning
 
                             ValTable new_table = new ValTable(null, null);
 
-                            int n_table = instruction.opB;                            
+                            int n_table = instruction.opB;
                             for (int i = 0; i < n_table; i++)
                             {
                                 Value val = StackPop();
@@ -1127,7 +1182,7 @@ namespace lightning
                                 Value new_value = StackPop();
                                 new_table.elements.Add(new_value);
                             }
-                                                        
+
                             //new_table.references++;
                             StackPush(new_table);
                             break;
@@ -1177,7 +1232,7 @@ namespace lightning
                                 Value result = this_intrinsic.function(this);
                                 //stack.RemoveRange(stack.Count - this_intrinsic.arity, this_intrinsic.arity);
                                 stackTop -= this_intrinsic.arity;
-                                StackPush(result);   
+                                StackPush(result);
                             }
                             else
                             {
@@ -1200,6 +1255,67 @@ namespace lightning
                             IP++;
                             StackPush(stash[stashTop - 1]);
                             stashTop--;
+                            break;
+                        }
+                    case OpCode.FOREACH:
+                        {
+                            IP++;
+                            Value func = StackPop();   
+                            ValTable table = StackPop() as ValTable;
+
+                            int init = 0;
+                            int end = table.ECount;
+                            VM[] vms = new VM[end];
+                            for (int i = init; i < end; i++)
+                            {
+                                vms[i] = GetVM();
+                            }
+                            System.Threading.Tasks.Parallel.For(init, end, (index) =>
+                            {
+                                List<Value> args = new List<Value>();                                
+                                args.Add(table.elements[index]);
+                                vms[index].CallFunction(func, args);
+                            });
+                            for (int i = init; i < end; i++)
+                            {
+                                RecycleVM(vms[i]);
+                            }
+                            break;
+                        }
+                    case OpCode.RANGE:
+                        {
+                            IP++;
+                            Value func = StackPop();
+                            ValTable table = StackPop() as ValTable;
+                            ValNumber tasks = StackPop() as ValNumber;
+
+                            int n_tasks = (int)tasks.content;
+
+                            int init = 0;
+                            int end = n_tasks;
+                            VM[] vms = new VM[end];
+                            for (int i = 0; i < end; i++)
+                            {
+                                vms[i] = GetVM();
+                            }
+
+                            int count = table.ECount;
+                            int step = count / n_tasks;
+
+                            System.Threading.Tasks.Parallel.For(init, end, (index) =>
+                            {
+                                List<Value> args = new List<Value>();
+                                int start = index * step;
+                                args.Add(GetValNumber(start));
+                                int end = start + step;
+                                args.Add(GetValNumber(end));
+                                args.Add(table);
+                                vms[index].CallFunction(func, args);
+                            });
+                            for (int i = 0; i < end; i++)
+                            {
+                                RecycleVM(vms[i]);
+                            }
                             break;
                         }
                     case OpCode.EXIT:

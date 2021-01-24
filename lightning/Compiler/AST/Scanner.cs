@@ -17,6 +17,8 @@ namespace lightning
             {"else", TokenType.ELSE},
             {"false", TokenType.FALSE},
             {"for", TokenType.FOR},
+            {"range", TokenType.RANGE},
+            {"foreach", TokenType.FOREACH},
             {"function", TokenType.FUN},
             {"if", TokenType.IF},
             {"nil", TokenType.NIL},
@@ -100,10 +102,32 @@ namespace lightning
                 case ']': tokens.Add(new Token(TokenType.RIGHT_BRACKET, line)); break;
                 case ',': tokens.Add(new Token(TokenType.COMMA, line)); break;                
                 case '-':
-                    tokens.Add(Match('=') ? new Token(TokenType.MINUS_EQUAL, line) : new Token(TokenType.MINUS, line));
+                    if (Match('='))
+                    {
+                        tokens.Add(new Token(TokenType.MINUS_EQUAL, line));
+                    }
+                    else if (Match('-'))
+                    {
+                        tokens.Add(new Token(TokenType.MINUS_MINUS, line));
+                    }
+                    else
+                    {
+                        tokens.Add(new Token(TokenType.MINUS, line));
+                    }
                     break;
                 case '+':
-                    tokens.Add(Match('=') ? new Token(TokenType.PLUS_EQUAL, line) : new Token(TokenType.PLUS, line));
+                    if (Match('='))
+                    {
+                        tokens.Add(new Token(TokenType.PLUS_EQUAL, line));
+                    }
+                    else if (Match('+'))
+                    {
+                        tokens.Add(new Token(TokenType.PLUS_PLUS, line));
+                    }
+                    else
+                    {
+                        tokens.Add(new Token(TokenType.PLUS, line));
+                    }                    
                     break;
                 case ';': tokens.Add(new Token(TokenType.SEMICOLON, line)); break;
                 case ':': tokens.Add(new Token(TokenType.COLON, line)); break;
