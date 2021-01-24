@@ -5,11 +5,12 @@ funDecl         -> "fun" function
 function        -> IDENTIFIER "(" parameters? ")" block
 parameters      -> IDENTIFIER ( "," IDENTIFIER )*
 varDecl         -> "var" IDENTIFIER ( "=" expression ) ? ";"
-statement       -> exprStmt | forStmt | pforStmt | ifStmt | returnStmt | whileStmt| block // | printStmt
+statement       -> exprStmt | forStmt | pforStmt | foreachStmt | ifStmt | returnStmt | whileStmt | block // | printStmt
 returnStmt      -> "return" expression? ";"
 exprStmt        -> expression ";"
 forStmt         -> "for" "(" ( varDecl | exprStmt | ";" ) expression ";" expression? ")" statement
-pforStmt         -> "pfor" "(" PRIMARY, PRIMARY, PRIMARY ")"
+pforStmt        -> "pfor" "(" PRIMARY, PRIMARY, PRIMARY, PRIMARY ")"
+foreachStmt     -> "foreach" "(" PRIMARY, PRIMARY ")"
 ifStmt          -> "if" "(" expression ")" statement ( "else" statement )?
 whileStmt       -> "while" "(" expression ")" statement
 block           -> "{" declaration* "}"

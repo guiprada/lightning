@@ -26,6 +26,7 @@ namespace lightning
         IF,
         WHILE,
         FOR,
+        FOREACH,
         PFOR,
 
         VAR_DECLARATION,
@@ -202,11 +203,27 @@ namespace lightning
         }
     }
 
-    public class PForNode : Node
+    public class ForEachNode : Node
     {
         public Node List  { get; private set; }
         public Node Function { get; private set; }
-        public PForNode(Node p_List, Node p_Function, int p_Line)
+        public ForEachNode(Node p_List, Node p_Function, int p_Line)
+            : base(NodeType.FOREACH, p_Line)
+        {
+            List = p_List;
+            Function = p_Function;
+            Function = p_Function;
+        }
+    }
+
+    public class PForNode : Node
+    {
+        public Node Init { get; private set; }
+
+        public Node End { get; private set; }
+        public Node List { get; private set; }
+        public Node Function { get; private set; }
+        public PForNode(Node p_init, Node p_end, Node p_List, Node p_Function, int p_Line)
             : base(NodeType.PFOR, p_Line)
         {
             List = p_List;

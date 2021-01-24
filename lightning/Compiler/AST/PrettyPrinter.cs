@@ -80,6 +80,9 @@ namespace lightning
                 case NodeType.PFOR:
                     PrintPFor(p_node as PForNode);
                     break;
+                case NodeType.FOREACH:
+                    PrintForEach(p_node as ForEachNode);
+                    break;
                 case NodeType.TABLE:
                     PrintTable(p_node as TableNode);
                     break;
@@ -270,13 +273,23 @@ namespace lightning
             Console.WriteLine(identString + "]");
         }
 
-        public void PrintPFor(PForNode p_node)
+        public void PrintForEach(ForEachNode p_node)
         {
-            Console.Write(identString + "[PFOR ");
+            Console.Write(identString + "[FOREACH ");
             Print(p_node.List);
             Print(p_node.Function);
             Console.WriteLine("]");
         }
+        public void PrintPFor(PForNode p_node)
+        {
+            Console.Write(identString + "[PFOR ");
+            Print(p_node.Init);
+            Print(p_node.End);
+            Print(p_node.List);
+            Print(p_node.Function);
+            Console.WriteLine("]");
+        }
+
         public void PrintWhile(WhileNode p_node)
         {
             Console.Write(identString + "[WHILE ");

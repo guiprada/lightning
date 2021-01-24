@@ -845,17 +845,12 @@ namespace lightning
             for (Operand i = 0; i < function.body.Count; i++)
             {
                 Instruction next = function.body[i];
-                if (next.opCode == OpCode.LOADG || next.opCode == OpCode.LOADTABLEG)
+                if (next.opCode == OpCode.LOADG)
                 {
-                    if ((next.opCode == OpCode.LOADG && next.opA >= relocationInfo.importedVM.GetChunk().Prelude.intrinsics.Count) ||
-                        (next.opCode == OpCode.LOADTABLEG && next.opA >= relocationInfo.importedVM.GetChunk().Prelude.intrinsics.Count))
+                    if ((next.opCode == OpCode.LOADG && next.opA >= relocationInfo.importedVM.GetChunk().Prelude.intrinsics.Count))
                     {
 
-                        OpCode this_opcode;
-                        if (next.opCode == OpCode.LOADG)
-                            this_opcode = OpCode.LOADI;
-                        else
-                            this_opcode = OpCode.LOADTABLEI;
+                        OpCode this_opcode = OpCode.LOADI;
 
                         if (relocationInfo.relocatedGlobals.ContainsKey(next.opA))
                         {
@@ -879,7 +874,7 @@ namespace lightning
                         }
                     }
                 }
-                else if (next.opCode == OpCode.LOADI || next.opCode == OpCode.LOADTABLEI)
+                else if (next.opCode == OpCode.LOADI)
                 {
                     next.opB = relocationInfo.relocatedModules[next.opB];
                 }

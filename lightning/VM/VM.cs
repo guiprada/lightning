@@ -365,17 +365,6 @@ namespace lightning
                             StackPush(variable);
                             break;
                         }
-                    case OpCode.LOADTABLEV:
-                        {
-                            IP++;
-                            Operand address = instruction.opA;
-                            Operand n_shift = instruction.opB;
-
-                            Value this_table = VarAt(address, (Operand)(variablesBasesTop - 1 - n_shift)) as ValTable;
-
-                            StackPush(this_table);
-                            break;
-                        }
                     case OpCode.LOADG:
                         {
                             IP++;
@@ -397,29 +386,6 @@ namespace lightning
                             StackPush(global);
                             break;
                         }
-                    case OpCode.LOADTABLEG:
-                        {
-                            IP++;
-                            //Console.WriteLine("loadg in");
-                            Operand address = instruction.opA;
-
-                            Value this_table = globals[address] as ValTable;
-
-                            StackPush(this_table);
-                            break;
-                        }
-                    case OpCode.LOADTABLEI:
-                        {
-                            IP++;
-                            //Console.WriteLine("loadg in");
-                            Operand address = instruction.opA;
-                            Operand module_index = instruction.opB;
-
-                            Value this_table = modules[module_index].globals[address] as ValTable;
-
-                            StackPush(this_table);
-                            break;
-                        }
                     case OpCode.LOADUPVAL:
                         {
                             IP++;
@@ -427,17 +393,6 @@ namespace lightning
                             ValUpValue up_val = UpValuesAt(address);
                             //Console.WriteLine("loadupval " + up_val);
                             StackPush(up_val.Val);
-                            break;
-                        }
-                    case OpCode.LOADTABLEUPVAL:
-                        {
-                            IP++;
-                            Operand address = instruction.opA;
-
-                            ValUpValue up_val = UpValuesAt(address);
-                            Value this_table = up_val.Val;
-
-                            StackPush(this_table);
                             break;
                         }
                     case OpCode.TABLEGET:
@@ -1275,7 +1230,7 @@ namespace lightning
                             stashTop--;
                             break;
                         }
-                    case OpCode.PFOR:
+                    case OpCode.FOREACH:
                         {
                             IP++;
                             Value func = StackPop();   
@@ -1287,7 +1242,9 @@ namespace lightning
                             for (int i = 0; i < end; i++)
                             {
                                 vms[i] = new VM(chunk);
- 
+                                vms[i].globals = globals;
+                                vms[i].valNumberPool = valNumberPool;
+
                             }
                             System.Threading.Tasks.Parallel.For(init, end, (index) =>
                             {

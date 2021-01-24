@@ -161,6 +161,9 @@ namespace lightning
                 case NodeType.FOR:
                     ChunkFor(p_node as ForNode);
                     break;
+                case NodeType.FOREACH:
+                    ChunkForEach(p_node as ForEachNode);
+                    break;
                 case NodeType.PFOR:
                     ChunkPFor(p_node as PForNode);
                     break;
@@ -382,8 +385,17 @@ namespace lightning
 
         }
 
+        void ChunkForEach(ForEachNode p_node)
+        {
+            ChunkIt(p_node.List);
+            ChunkIt(p_node.Function);
+            Add(OpCode.FOREACH, p_node.Line);
+        }
+
         void ChunkPFor(PForNode p_node)
         {
+            ChunkIt(p_node.Init);
+            ChunkIt(p_node.End);
             ChunkIt(p_node.List);
             ChunkIt(p_node.Function);
             Add(OpCode.PFOR, p_node.Line);
@@ -433,14 +445,14 @@ namespace lightning
                     switch (this_var.type)
                     {
                         case ValType.Local:
-                            Add(OpCode.LOADTABLEV, (Operand)this_var.address, (Operand)this_var.envIndex, p_node.Line);
+                            Add(OpCode.LOADV, (Operand)this_var.address, (Operand)this_var.envIndex, p_node.Line);
                             break;
                         case ValType.Global:
-                            Add(OpCode.LOADTABLEG, (Operand)this_var.address, p_node.Line);
+                            Add(OpCode.LOADG, (Operand)this_var.address, p_node.Line);
                             break;
                         case ValType.UpValue:
                             int this_index = upvalueStack.Peek().IndexOf(this_var);
-                            Add(OpCode.LOADTABLEUPVAL, (Operand)this_index, p_node.Line);
+                            Add(OpCode.LOADUPVAL, (Operand)this_index, p_node.Line);
                             break;
                     }
 
@@ -521,14 +533,14 @@ namespace lightning
                     switch (this_var.type)
                     {
                         case ValType.Local:
-                            Add(OpCode.LOADTABLEV, (Operand)this_var.address, (Operand)this_var.envIndex, p_node.Line);
+                            Add(OpCode.LOADV, (Operand)this_var.address, (Operand)this_var.envIndex, p_node.Line);
                             break;
                         case ValType.Global:
-                            Add(OpCode.LOADTABLEG, (Operand)this_var.address, p_node.Line);
+                            Add(OpCode.LOADG, (Operand)this_var.address, p_node.Line);
                             break;
                         case ValType.UpValue:
                             int this_index = upvalueStack.Peek().IndexOf(this_var);
-                            Add(OpCode.LOADTABLEUPVAL, (Operand)this_index, p_node.Line);
+                            Add(OpCode.LOADUPVAL, (Operand)this_index, p_node.Line);
                             break;
                     }
 
@@ -607,14 +619,14 @@ namespace lightning
                     switch (this_var.type)
                     {
                         case ValType.Local:
-                            Add(OpCode.LOADTABLEV, (Operand)this_var.address, (Operand)this_var.envIndex, p_node.Line);
+                            Add(OpCode.LOADV, (Operand)this_var.address, (Operand)this_var.envIndex, p_node.Line);
                             break;
                         case ValType.Global:
-                            Add(OpCode.LOADTABLEG, (Operand)this_var.address, p_node.Line);
+                            Add(OpCode.LOADG, (Operand)this_var.address, p_node.Line);
                             break;
                         case ValType.UpValue:
                             int this_index = upvalueStack.Peek().IndexOf(this_var);
-                            Add(OpCode.LOADTABLEUPVAL, (Operand)this_index, p_node.Line);
+                            Add(OpCode.LOADUPVAL, (Operand)this_index, p_node.Line);
                             break;
                     }
 
@@ -723,14 +735,14 @@ namespace lightning
                         switch (this_func.type)
                         {
                             case ValType.Local:
-                                Add(OpCode.LOADTABLEV, (Operand)this_func.address, (Operand)this_func.envIndex, p_node.Line);
+                                Add(OpCode.LOADV, (Operand)this_func.address, (Operand)this_func.envIndex, p_node.Line);
                                 break;
                             case ValType.Global:
-                                Add(OpCode.LOADTABLEG, (Operand)this_func.address, p_node.Line);
+                                Add(OpCode.LOADG, (Operand)this_func.address, p_node.Line);
                                 break;
                             case ValType.UpValue:
                                 int this_index = upvalueStack.Peek().IndexOf(this_func);
-                                Add(OpCode.LOADTABLEUPVAL, (Operand)this_index, p_node.Line);
+                                Add(OpCode.LOADUPVAL, (Operand)this_index, p_node.Line);
                                 break;
                         }
 
@@ -754,14 +766,14 @@ namespace lightning
                     switch (this_func.type)
                     {
                         case ValType.Local:
-                            Add(OpCode.LOADTABLEV, (Operand)this_func.address, (Operand)this_func.envIndex, p_node.Line);
+                            Add(OpCode.LOADV, (Operand)this_func.address, (Operand)this_func.envIndex, p_node.Line);
                             break;
                         case ValType.Global:
-                            Add(OpCode.LOADTABLEG, (Operand)this_func.address, p_node.Line);
+                            Add(OpCode.LOADG, (Operand)this_func.address, p_node.Line);
                             break;
                         case ValType.UpValue:
                             int this_index = upvalueStack.Peek().IndexOf(this_func);
-                            Add(OpCode.LOADTABLEUPVAL, (Operand)this_index, p_node.Line);
+                            Add(OpCode.LOADUPVAL, (Operand)this_index, p_node.Line);
                             break;
                     }
 

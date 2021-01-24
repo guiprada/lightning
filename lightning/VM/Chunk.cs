@@ -26,10 +26,6 @@ namespace lightning
         LOADG,
         LOADI,
         LOADUPVAL,
-        LOADTABLEV,
-        LOADTABLEG,
-        LOADTABLEI,
-        LOADTABLEUPVAL,
         LOADINTR,
         LOADNIL,
         LOADTRUE,
@@ -86,6 +82,7 @@ namespace lightning
         CLOSURECLOSE,
         FUNCLOSE,
         PFOR,
+        FOREACH,
 
         EXIT// EXIT ;)
     }
@@ -202,6 +199,7 @@ namespace lightning
                 case OpCode.LOADFALSE:
                 case OpCode.LOADTRUE:
                 case OpCode.PFOR:
+                case OpCode.FOREACH:
                     return op.ToString();
 
                 // 1 op
@@ -215,8 +213,6 @@ namespace lightning
                 case OpCode.JMPB:
                 case OpCode.RETSREL:
                 case OpCode.TABLEGET:
-                case OpCode.LOADTABLEG:
-                case OpCode.LOADTABLEUPVAL:
                     return op.ToString() + " " + instruction.opA;
                 // 2 op                
                 case OpCode.ASSIGNG:
@@ -225,8 +221,6 @@ namespace lightning
                 case OpCode.LOADI:               
                 case OpCode.NTABLE:
                 case OpCode.FUNDCL:
-                case OpCode.LOADTABLEV:
-                case OpCode.LOADTABLEI:
                 case OpCode.TABLESET:
                     return op.ToString() + " " + instruction.opA + " " + instruction.opB;
                 // 3 op

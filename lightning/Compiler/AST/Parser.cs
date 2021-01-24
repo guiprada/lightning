@@ -223,6 +223,8 @@ namespace lightning
         {
             if (Match(TokenType.FOR))
                 return For();
+            else if (Match(TokenType.FOREACH))
+                return ForEach();
             else if (Match(TokenType.PFOR))
                 return PFor();
             else if (Match(TokenType.RETURN))
@@ -294,7 +296,7 @@ namespace lightning
             return new ForNode(initializer, condition, finalizer, body, line);
         }
 
-        Node PFor()
+        Node ForEach()
         {
             int line = Previous().Line;
             Consume(TokenType.LEFT_PAREN, "Expected '(' after 'for'.", true);
@@ -303,7 +305,24 @@ namespace lightning
             Consume(TokenType.COMMA, "Expected ',' separating 'pfor'", false);            
             Node function = Primary();
             Consume(TokenType.RIGHT_PAREN, "Expected ')' after 'for'.", true);
-            return new PForNode(list, function, line);
+            return new ForEachNode(list, function, line);
+        }
+
+        Node PFor()
+        {
+            int line = Previous().Line;
+            Consume(TokenType.LEFT_PAREN, "Expected '(' after 'for'.", true);
+
+            Node init = Primary();
+            Consume(TokenType.COMMA, "Expected ',' separating 'pfor'", false);
+            Node end =  Primary();
+            Consume(TokenType.RIGHT_PAREN, "Expected ')' after 'for'.", true);
+
+            Node list = Primary();
+            Consume(TokenType.COMMA, "Expected ',' separating 'pfor'", false);
+            Node function = Primary();
+            Consume(TokenType.RIGHT_PAREN, "Expected ')' after 'for'.", true);
+            return new PForNode(init, end, list, function, line);
         }
 
         Node While()
