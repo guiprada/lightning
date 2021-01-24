@@ -729,7 +729,6 @@ namespace lightning
                             else
                             {
                                 Value old_value = globals[address];
-                                Console.WriteLine(old_value + " " + op + " " + new_value);
                                 if (op == 1)
                                     ((ValNumber)old_value).content += ((ValNumber)new_value).content;
                                 else if (op == 2)

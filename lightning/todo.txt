@@ -1,4 +1,5 @@
 ﻿todo
+	- Write to file intrinsic
 	- valtable containers should be null until used
 	- increment and decrement unarys
 	- table clone function	

@@ -393,9 +393,27 @@ namespace lightning
                 else
                     Error("Invalid assignment.");
             }
+            else if (Match(TokenType.PLUS_PLUS))
+            {
+                Node value = new LiteralNode(1, expr.Line);
+
+                if (expr.Type == NodeType.VARIABLE)
+                    return new AssignmentOpNode((VariableNode)expr, value, OperatorType.PLUS, expr.Line);
+                else
+                    Error("Invalid assignment.");
+            }
             else if (Match(TokenType.MINUS_EQUAL))
             {
                 Node value = Assignment();
+
+                if (expr.Type == NodeType.VARIABLE)
+                    return new AssignmentOpNode((VariableNode)expr, value, OperatorType.MINUS, expr.Line);
+                else
+                    Error("Invalid assignment.");
+            }
+            else if (Match(TokenType.MINUS_MINUS))
+            {
+                Node value = new LiteralNode(1, expr.Line);
 
                 if (expr.Type == NodeType.VARIABLE)
                     return new AssignmentOpNode((VariableNode)expr, value, OperatorType.MINUS, expr.Line);
