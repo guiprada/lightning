@@ -424,38 +424,21 @@ namespace lightning
             if (maybe_var.HasValue)
             {
                 Variable this_var = maybe_var.Value;
-                if (p_node.Indexes.Count == 0)// simple var
+                switch (this_var.type)
                 {
-                    switch (this_var.type)
-                    {
-                        case ValType.Local:
-                            Add(OpCode.LOADV, (Operand)this_var.address, (Operand)this_var.envIndex, p_node.Line);
-                            break;
-                        case ValType.Global:
-                            Add(OpCode.LOADG, (Operand)this_var.address, p_node.Line);
-                            break;
-                        case ValType.UpValue:
-                            int this_index = upvalueStack.Peek().IndexOf(this_var);
-                            Add(OpCode.LOADUPVAL, (Operand)this_index, p_node.Line);
-                            break;
-                    }
+                    case ValType.Local:
+                        Add(OpCode.LOADV, (Operand)this_var.address, (Operand)this_var.envIndex, p_node.Line);
+                        break;
+                    case ValType.Global:
+                        Add(OpCode.LOADG, (Operand)this_var.address, p_node.Line);
+                        break;
+                    case ValType.UpValue:
+                        int this_index = upvalueStack.Peek().IndexOf(this_var);
+                        Add(OpCode.LOADUPVAL, (Operand)this_index, p_node.Line);
+                        break;
                 }
-                else
+                if (p_node.Indexes.Count != 0)
                 {// it is a compoundVar
-                    switch (this_var.type)
-                    {
-                        case ValType.Local:
-                            Add(OpCode.LOADV, (Operand)this_var.address, (Operand)this_var.envIndex, p_node.Line);
-                            break;
-                        case ValType.Global:
-                            Add(OpCode.LOADG, (Operand)this_var.address, p_node.Line);
-                            break;
-                        case ValType.UpValue:
-                            int this_index = upvalueStack.Peek().IndexOf(this_var);
-                            Add(OpCode.LOADUPVAL, (Operand)this_index, p_node.Line);
-                            break;
-                    }
-
                     foreach (Node n in p_node.Indexes)
                     {
                         if (n.GetType() != typeof(VariableNode) || (n as VariableNode).AccessType == VarAccessType.PLAIN)
@@ -761,7 +744,6 @@ namespace lightning
 
                         Add(OpCode.TABLEGET, (Operand)(p_node.Name.Indexes.Count - 1), p_node.Line);
                     }
-
 
                     switch (this_func.type)
                     {
