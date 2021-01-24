@@ -283,11 +283,10 @@ namespace lightning
         }
 
         public Value CallFunction(Value this_callable, List<Value> args)
-        {
-            args.Reverse();
-            if (stack != null)
-                foreach (Value v in args)
-                    StackPush(v);
+        {            
+            if (args != null)
+                for(int i = args.Count - 1; i>=0; i--)                
+                    StackPush(args[i]);
 
             Type this_type = this_callable.GetType();
             ret[ret_count] = (Operand)(chunk.ProgramSize - 1);
@@ -1292,10 +1291,10 @@ namespace lightning
                             }
                             System.Threading.Tasks.Parallel.For(init, end, (index) =>
                             {
-                                List<Value> stack = new List<Value>();
-                                stack.Add(GetValNumber(index));
-                                stack.Add(table.elements[index]);
-                                vms[index].CallFunction(func, stack);
+                                List<Value> args = new List<Value>();
+                                args.Add(GetValNumber(index));
+                                args.Add(table.elements[index]);
+                                vms[index].CallFunction(func, args);
                             });
                             break;
                         }
