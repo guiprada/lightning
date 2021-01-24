@@ -9,7 +9,7 @@ statement       -> exprStmt | forStmt | pforStmt | foreachStmt | ifStmt | return
 returnStmt      -> "return" expression? ";"
 exprStmt        -> expression ";"
 forStmt         -> "for" "(" ( varDecl | exprStmt | ";" ) expression ";" expression? ")" statement
-pforStmt        -> "pfor" "(" PRIMARY, PRIMARY, PRIMARY, PRIMARY ")"
+pforStmt        -> "pfor" "(" PRIMARY, PRIMARY, PRIMARY ")"
 foreachStmt     -> "foreach" "(" PRIMARY, PRIMARY ")"
 ifStmt          -> "if" "(" expression ")" statement ( "else" statement )?
 whileStmt       -> "while" "(" expression ")" statement

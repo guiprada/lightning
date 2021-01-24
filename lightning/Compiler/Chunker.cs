@@ -394,8 +394,7 @@ namespace lightning
 
         void ChunkPFor(PForNode p_node)
         {
-            ChunkIt(p_node.Init);
-            ChunkIt(p_node.End);
+            ChunkIt(p_node.Tasks);
             ChunkIt(p_node.List);
             ChunkIt(p_node.Function);
             Add(OpCode.PFOR, p_node.Line);

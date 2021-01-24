@@ -283,8 +283,7 @@ namespace lightning
         public void PrintPFor(PForNode p_node)
         {
             Console.Write(identString + "[PFOR ");
-            Print(p_node.Init);
-            Print(p_node.End);
+            Print(p_node.Tasks);
             Print(p_node.List);
             Print(p_node.Function);
             Console.WriteLine("]");

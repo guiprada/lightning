@@ -313,16 +313,14 @@ namespace lightning
             int line = Previous().Line;
             Consume(TokenType.LEFT_PAREN, "Expected '(' after 'for'.", true);
 
-            Node init = Primary();
+            Node tasks = Primary();
             Consume(TokenType.COMMA, "Expected ',' separating 'pfor'", false);
-            Node end =  Primary();
-            Consume(TokenType.RIGHT_PAREN, "Expected ')' after 'for'.", true);
 
             Node list = Primary();
             Consume(TokenType.COMMA, "Expected ',' separating 'pfor'", false);
             Node function = Primary();
             Consume(TokenType.RIGHT_PAREN, "Expected ')' after 'for'.", true);
-            return new PForNode(init, end, list, function, line);
+            return new PForNode(tasks, list, function, line);
         }
 
         Node While()

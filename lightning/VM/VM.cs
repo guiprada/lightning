@@ -65,6 +65,7 @@ namespace lightning
         public List<ValModule> modules;
 
         Stack<ValNumber> valNumberPool;
+        Stack<VM> vmPool;
 
         public VM(Chunk p_chunk, int function_deepness = 25)
         {
@@ -118,24 +119,51 @@ namespace lightning
             modules = new List<ValModule>();
 
             valNumberPool = new Stack<ValNumber>();
+            vmPool = new Stack<VM>();
+        }
+
+        void RecycleVM(VM vm)
+        {
+            vmPool.Push(vm);
+        }
+
+        VM GetVM()
+        {
+            if(vmPool.Count > 0)
+            {
+                return vmPool.Pop();                
+            }
+            else
+            {
+                VM new_vm = new VM(chunk);
+                new_vm.globals = globals;
+                new_vm.valNumberPool = valNumberPool;
+                return new_vm;
+            }
         }
 
         void RecycleNumber(ValNumber v)
         {
-            valNumberPool.Push(v);
+            lock (valNumberPool)
+            {
+                valNumberPool.Push(v);
+            }
         }
 
         ValNumber GetValNumber(Number n)
         {
-            if (valNumberPool.Count > 0)
+            lock (valNumberPool)
             {
-                ValNumber v = valNumberPool.Pop();
-                v.content = n;
-                return v;
-            }
-            else
-            {
-                return new ValNumber(n);
+                if (valNumberPool.Count > 0)
+                {
+                    ValNumber v = valNumberPool.Pop();
+                    v.content = n;
+                    return v;
+                }
+                else
+                {
+                    return new ValNumber(n);
+                }
             }
         }
 
@@ -1239,20 +1267,56 @@ namespace lightning
                             int init = 0;
                             int end = table.ECount;
                             VM[] vms = new VM[end];
-                            for (int i = 0; i < end; i++)
+                            for (int i = init; i < end; i++)
                             {
-                                vms[i] = new VM(chunk);
-                                vms[i].globals = globals;
-                                vms[i].valNumberPool = valNumberPool;
-
+                                vms[i] = GetVM();
                             }
                             System.Threading.Tasks.Parallel.For(init, end, (index) =>
                             {
-                                List<Value> args = new List<Value>();
-                                args.Add(GetValNumber(index));
+                                List<Value> args = new List<Value>();                                
                                 args.Add(table.elements[index]);
                                 vms[index].CallFunction(func, args);
                             });
+                            for (int i = init; i < end; i++)
+                            {
+                                RecycleVM(vms[i]);
+                            }
+                            break;
+                        }
+                    case OpCode.PFOR:
+                        {
+                            IP++;
+                            Value func = StackPop();
+                            ValTable table = StackPop() as ValTable;
+                            ValNumber tasks = StackPop() as ValNumber;
+
+                            int n_tasks = (int)tasks.content;
+
+                            int init = 0;
+                            int end = n_tasks;
+                            VM[] vms = new VM[end];
+                            for (int i = 0; i < end; i++)
+                            {
+                                vms[i] = GetVM();
+                            }
+
+                            int count = table.ECount;
+                            int step = count / n_tasks;
+
+                            System.Threading.Tasks.Parallel.For(init, end, (index) =>
+                            {
+                                List<Value> args = new List<Value>();
+                                int start = index * step;
+                                args.Add(GetValNumber(start));
+                                int end = start + step;
+                                args.Add(GetValNumber(end));
+                                args.Add(table);
+                                vms[index].CallFunction(func, args);
+                            });
+                            for (int i = 0; i < end; i++)
+                            {
+                                RecycleVM(vms[i]);
+                            }
                             break;
                         }
                     case OpCode.EXIT:
