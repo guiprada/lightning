@@ -1,0 +1,224 @@
+{
+	"$schema": "https://raw.githubusercontent.com/martinring/tmlanguage/master/tmlanguage.json",
+	"name": "little",
+	"scopeName": "source.lightning",
+	"patterns": [
+		{
+            "name": "comment.line.note.little", 
+            "match": "(//).*$\\n?", 
+            "captures": {
+                "1": {
+                    "name": "punctuation.definition.comment.little"
+                }
+            }
+        },
+		{
+			"begin": "\\b(function)\\s*(?:\\s+([a-zA-Z_][a-zA-Z0-9_]*(?:([\\.:])[a-zA-Z_][a-zA-Z0-9_]*)?)\\s*)?(\\()",
+			"beginCaptures": {
+				"1": {
+					"name": "keyword.control.little"
+				},
+				"2": {
+					"name": "entity.name.function.little"
+				},
+				"3": {
+					"name": "punctuation.separator.parameter.little"
+				},
+				"4": {
+					"name": "punctuation.definition.parameters.begin.little"
+				}
+			},
+			"end": "\\)",
+			"endCaptures": {
+				"0": {
+					"name": "punctuation.definition.parameters.end.little"
+				}
+			},
+			"name": "meta.function.little",
+			"patterns": [
+				{
+					"match": "[a-zA-Z_][a-zA-Z0-9_]*",
+					"name": "variable.parameter.function.little"
+				},
+				{
+					"match": ",",
+					"name": "punctuation.separator.arguments.little"
+				}
+			]
+		},
+		{
+			"match": "(?<![\\w\\d.])\\d+(?![pPeE.0-9])",
+			"name": "constant.numeric.integer.little"
+		},
+		{
+			"match": "(?<![\\w\\d.])\\d+(\\.\\d+)?([eE]-?\\d*)?",
+			"name": "constant.numeric.float.little"
+		},
+		{
+			"begin": "\"",
+			"beginCaptures": {
+				"0": {
+					"name": "punctuation.definition.string.begin.little"
+				}
+			},
+			"end": "\"",
+			"endCaptures": {
+				"0": {
+					"name": "punctuation.definition.string.end.little"
+				}
+			},
+			"name": "string.quoted.double.little",
+			"patterns": [
+				{
+					"include": "#escaped_char"
+				}
+			]
+		},
+		{
+			"begin": "'",
+			"beginCaptures": {
+				"0": {
+					"name": "punctuation.definition.string.begin.little"
+				}
+			},
+			"end": "'",
+			"endCaptures": {
+				"0": {
+					"name": "punctuation.definition.string.end.little"
+				}
+			},
+			"name": "string.quoted.single.little",
+			"patterns": [
+				{
+					"include": "#escaped_char"
+				}
+			]
+		},
+		{
+			"begin": "(?<=\\.cdef)\\s*(\\[(=*)\\[)",
+			"beginCaptures": {
+				"0": {
+					"name": "string.quoted.other.multiline.little"
+				},
+				"1": {
+					"name": "punctuation.definition.string.begin.little"
+				}
+			},
+			"contentName": "meta.embedded.little",
+			"end": "(\\]\\2\\])",
+			"endCaptures": {
+				"0": {
+					"name": "string.quoted.other.multiline.little"
+				},
+				"1": {
+					"name": "punctuation.definition.string.end.little"
+				}
+			},
+			"patterns": [
+				{
+					"include": "source.c"
+				}
+			]
+		},
+		{
+			"begin": "(?<!--)\\[(=*)\\[",
+			"beginCaptures": {
+				"0": {
+					"name": "punctuation.definition.string.begin.little"
+				}
+			},
+			"end": "\\]\\1\\]",
+			"endCaptures": {
+				"0": {
+					"name": "punctuation.definition.string.end.little"
+				}
+			},
+			"name": "string.quoted.other.multiline.little"
+		},
+		{
+			"captures": {
+				"1": {
+					"name": "keyword.control.goto.little"
+				},
+				"2": {
+					"name": "constant.other.placeholder.little"
+				}
+			},
+			"match": "\\b(goto)\\s+([a-zA-Z_][a-zA-Z0-9_]*)"
+		},
+		{
+			"captures": {
+				"1": {
+					"name": "punctuation.definition.label.begin.little"
+				},
+				"2": {
+					"name": "punctuation.definition.label.end.little"
+				}
+			},
+			"match": "(::)[a-zA-Z_][a-zA-Z0-9_]*(::)",
+			"name": "constant.other.placeholder.little"
+		},
+		{
+			"match": "\\b(else | for| if | return | while)\\b",
+			"name": "keyword.control.little"
+		},
+		{
+			"match": "(?<![^.]\\.|:)\\b(false|null|true|_G|_VERSION|math\\.(pi|huge))\\b|(?<![.])\\.{3}(?!\\.)",
+			"name": "constant.language.little"
+		},
+		{
+			"match": "(?<![^.]\\.|:)\\b(self)\\b",
+			"name": "variable.language.self.little"
+		},
+		{
+			"match": "(?<![^.]\\.|:)\\b(assert|collectgarbage|dofile|error|getfenv|getmetatable|ipairs|loadfile|loadstring|module|next|pairs|pcall|print|rawequal|rawget|rawset|require|select|setfenv|setmetatable|tonumber|tostring|type|unpack|xpcall)\\b(?=\\s*(?:[({\"']|\\[\\[))",
+			"name": "support.function.little"
+		},
+		{
+			"match": "(?<![^.]\\.|:)\\b(listMap\\.(indexOf|indexes|values|sum|shuffle|remove|range|slice|push|pop|pull)|string\\.(char|hasIndex|indexOf|len|lower|remove|upper)|table\\.(concat|insert|maxn|remove|sort)|math\\.(abs|acos|asin|atan|cos|pi|r|rnd|sign|sin|sqrt|tan)|io\\.(close|flush|input|lines|open|output|popen|read|tmpfile|type|write)|os\\.(clock|date|difftime|execute|exit|getenv|remove|rename|setlocale|time|tmpname)|package\\.(cpath|loaded|loadlib|path|preload|seeall))\\b(?=\\s*(?:[({\"']|\\[\\[))",
+			"name": "support.function.library.little"
+		},
+		{
+			"match": "\\b(and|or|not|xor|nand|nor|xnor)\\b",
+			"name": "keyword.operator.little"
+		},
+		{
+			"match": "\\b([a-zA-Z_][a-zA-Z0-9_]*)\\b(?=\\s*(?:[({\"']|\\[\\[))",
+			"name": "support.function.any-method.little"
+		},
+		{
+			"match": "(?<=[^.]\\.|:)\\b([a-zA-Z_][a-zA-Z0-9_]*)",
+			"name": "variable.other.little"
+		},
+		{
+			"match": "\\+|-|%|#|\\*|\\/|\\^|==?|~=|<=?|>=?|(?<!\\.)\\.{2}(?!\\.)",
+			"name": "keyword.operator.little"
+		}
+	],
+	"repository": {
+		"escaped_char": {
+			"patterns": [
+				{
+					"match": "\\\\[abfnrtvz\\\\\"'\\n]",
+					"name": "constant.character.escape.little"
+				},
+				{
+					"match": "\\\\\\d{1,3}",
+					"name": "constant.character.escape.byte.little"
+				},
+				{
+					"match": "\\\\x[0-9A-Fa-f][0-9A-Fa-f]",
+					"name": "constant.character.escape.byte.little"
+				},
+				{
+					"match": "\\\\u\\{[0-9A-Fa-f]+\\}",
+					"name": "constant.character.escape.unicode.little"
+				},
+				{
+					"match": "\\\\.",
+					"name": "invalid.illegal.character.escape.little"
+				}
+			]
+		}
+	}
+}

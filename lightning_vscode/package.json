@@ -1,0 +1,26 @@
+{
+    "name": "lightning",
+    "displayName": "lightning",
+    "description": "lightning is a yet another little language",
+    "version": "0.0.1",
+    "publisher": "void*",
+    "engines": {
+        "vscode": "^1.27.0"
+    },
+    "categories": [
+        "Programming Languages"
+    ],
+    "contributes": {
+        "languages": [{
+            "id": "lightning",
+            "aliases": ["lightning", "lightning"],
+            "extensions": ["ltn"],
+            "configuration": "./language-configuration.json"
+        }],
+        "grammars": [{
+            "language": "lightning",
+            "scopeName": "source.lightning",
+            "path": "./syntaxes/lightning_tml.json"
+        }]
+    }
+}

@@ -64,7 +64,7 @@ namespace lightning
                 rand.TableSet(new ValString("int"), new ValIntrinsic("int", nextInt, 1));
 
                 Value nextFloat(VM vm)
-                {                    
+                {
                     return new ValNumber((Number)rng.NextDouble());
                 }
                 rand.TableSet(new ValString("float"), new ValIntrinsic("float", nextFloat, 0));
@@ -156,12 +156,12 @@ namespace lightning
                 {
                     ValTable list = (ValTable)vm.StackPeek(0);
                     List<Value> new_list_elements = new List<Value>();
-                    foreach(Value v in list.elements)
+                    foreach (Value v in list.elements)
                     {
                         new_list_elements.Add(v);
                     }
                     ValTable new_list = new ValTable(new_list_elements, null);
-                    
+
                     return new_list;
                 }
                 list.TableSet(new ValString("copy"), new ValIntrinsic("copy", listCopy, 1));
@@ -232,7 +232,7 @@ namespace lightning
                 {
                     ValTable this_table = vm.StackPeek(0) as ValTable;
                     Dictionary<ValString, Value> table_copy = new Dictionary<ValString, Value>();
-                    foreach(KeyValuePair<ValString, Value> entry in this_table.table)
+                    foreach (KeyValuePair<ValString, Value> entry in this_table.table)
                     {
                         table_copy.Add(entry.Key, entry.Value);
                     }
@@ -258,7 +258,7 @@ namespace lightning
             /////////////////////////////////////////////////////////////////////////////////////////////////////// math
 
             {
-                    ValTable math = new ValTable(null, null);
+                ValTable math = new ValTable(null, null);
                 math.TableSet(new ValString("pi"), new ValNumber((Number)Math.PI));
                 math.TableSet(new ValString("e"), new ValNumber((Number)Math.E));
 #if DOUBLE
@@ -414,7 +414,7 @@ namespace lightning
                 {
                     Number value1 = ((ValNumber)vm.StackPeek(0)).content;
                     Number value2 = ((ValNumber)vm.StackPeek(1)).content;
-                    return new ValNumber((Number)value1%value2);
+                    return new ValNumber((Number)value1 % value2);
                 }
                 math.TableSet(new ValString("mod"), new ValIntrinsic("mod", mod, 2));
 
@@ -508,6 +508,34 @@ namespace lightning
                 return Value.Nil;
             }
             functions.Add(new ValIntrinsic("load_file", loadFile, 1));
+
+            //////////////////////////////////////////////////////
+            Value writeFile(VM vm)
+            {
+                string path = ((ValString)vm.StackPeek(0)).ToString();
+                string output = ((ValString)vm.StackPeek(1)).ToString();
+                using (System.IO.StreamWriter file = new System.IO.StreamWriter(path, false))
+                {
+                    file.Write(output);
+                }
+
+                return Value.Nil;
+            }
+            functions.Add(new ValIntrinsic("write_file", writeFile, 2));
+
+            //////////////////////////////////////////////////////
+            Value appendFile(VM vm)
+            {
+                string path = ((ValString)vm.StackPeek(0)).ToString();
+                string output = ((ValString)vm.StackPeek(1)).ToString();
+                using (System.IO.StreamWriter file = new System.IO.StreamWriter(path, true))
+                {
+                    file.Write(output);
+                }
+
+                return Value.Nil;
+            }
+            functions.Add(new ValIntrinsic("append_file", appendFile, 2));
 
             ////////////////////////////////////////////////////
             Value require(VM vm)
@@ -679,7 +707,35 @@ namespace lightning
                 string read = Console.ReadLine();
                 return new ValString(read);
             }
-            functions.Add(new ValIntrinsic("readln", readln, 0));
+            functions.Add(new ValIntrinsic("read_line", readln, 0));
+
+            //////////////////////////////////////////////////////
+            Value readNumber(VM vm)
+            {
+                string read = Console.ReadLine();
+                Number n;
+                if (Number.TryParse(read, out n))
+                    return new ValNumber(n);
+                else
+                    return Value.Nil;
+            }
+            functions.Add(new ValIntrinsic("read_number", readNumber, 0));
+
+            //////////////////////////////////////////////////////
+            Value read(VM vm)
+            {
+                int read = Console.Read();
+                if (read > 0) {
+                    char next = Convert.ToChar(read);
+                    if (next == '\n')
+                        return Value.Nil;
+                    else
+                        return new ValString(Char.ToString(next));
+                 }
+                else
+                    return Value.Nil;
+            }
+            functions.Add(new ValIntrinsic("read", read, 0));
 
 
             //////////////////////////////////////////////////////

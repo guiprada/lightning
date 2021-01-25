@@ -1,5 +1,7 @@
 ﻿todo
 	- Write to file intrinsic
+	- read intrinsic
+	- parser generators and combinators
 	- valtable containers should be null until used
 	- increment and decrement unarys
 	- table clone function	
