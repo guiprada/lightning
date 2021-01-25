@@ -66,10 +66,16 @@ namespace lightning
 
         Stack<ValNumber> valNumberPool;
         Stack<VM> vmPool;
+        int function_deepness;
+        int maxValNumberPool;
+        int maxVmPool;
 
-        public VM(Chunk p_chunk, int function_deepness = 25)
+        public VM(Chunk p_chunk, int p_function_deepness = 25, int p_maxValNumberPool = 100, int p_maxVmPool = 16)
         {
             chunk = p_chunk;
+            function_deepness = p_function_deepness;
+            maxValNumberPool = p_maxValNumberPool;
+            maxVmPool = p_maxVmPool;
 
             instructionsStack = new List<Instruction>[function_deepness];
             instructionsStack[0] = chunk.Program;
@@ -118,26 +124,27 @@ namespace lightning
             loadedModules = new Dictionary<string, int>();
             modules = new List<ValModule>();
 
-            valNumberPool = new Stack<ValNumber>();            
+            valNumberPool = new Stack<ValNumber>();
             vmPool = new Stack<VM>();
         }
 
         void RecycleVM(VM vm)
         {
-            vmPool.Push(vm);
+            if (vmPool.Count < maxVmPool)
+                vmPool.Push(vm);
         }
 
         VM GetVM()
         {
-            if(vmPool.Count > 0)
+            if (vmPool.Count > 0)
             {
-                return vmPool.Pop();                
+                return vmPool.Pop();
             }
             else
             {
-                VM new_vm = new VM(chunk);
+                VM new_vm = new VM(chunk, function_deepness, maxValNumberPool, maxVmPool);
                 new_vm.globals = globals;
-                new_vm.valNumberPool = valNumberPool;                
+                new_vm.valNumberPool = valNumberPool;
                 return new_vm;
             }
         }
@@ -146,7 +153,8 @@ namespace lightning
         {
             lock (valNumberPool)
             {
-                valNumberPool.Push(v);
+                if (valNumberPool.Count < maxValNumberPool)
+                    valNumberPool.Push(v);
             }
         }
 
@@ -245,17 +253,12 @@ namespace lightning
             {
                 upValuesRegistry[i].Capture();
             }
-            if (upvalues_start < (upValuesRegistry.Count * 0.25))
-            {
-                int medium = (upvalues_start + upValuesRegistry.Count) / 2;
-                upValuesRegistry.RemoveRange(medium, upValuesRegistry.Count - medium);
-            }
-            //upValuesRegistry.RemoveRange(upvalues_start, upValuesRegistry.Count - upvalues_start);
 
             int this_basePointer = variablesBases[variablesBasesTop - 1];
             variablesBasesTop--;
             variablesTop = this_basePointer;
 
+            // Returning Resources, slowly :)
 
             if (this_basePointer < (variables.Count * 0.25))
             {
@@ -263,6 +266,23 @@ namespace lightning
                 variables.RemoveRange(medium, variables.Count - medium);
             }
             //variables.RemoveRange(this_basePointer, variables.Count - this_basePointer);
+
+            if (upvalues_start < (upValuesRegistry.Count * 0.25))
+            {
+                int medium = (upvalues_start + upValuesRegistry.Count) / 2;
+                upValuesRegistry.RemoveRange(medium, upValuesRegistry.Count - medium);
+            }
+            //upValuesRegistry.RemoveRange(upvalues_start, upValuesRegistry.Count - upvalues_start);
+
+            lock (valNumberPool)
+            {                
+                for(int i=0; i<(maxValNumberPool*0.05 + 1); i++)
+                    if (valNumberPool.Count > 0)
+                        valNumberPool.Pop();
+            }
+            for (int i = 0; i < (maxVmPool * 0.05 + 1); i++)
+                if (vmPool.Count > 0)
+                    vmPool.Pop();
         }
 
         void EnvSet(int target_env)
@@ -311,9 +331,9 @@ namespace lightning
         }
 
         public Value CallFunction(Value this_callable, List<Value> args)
-        {            
+        {
             if (args != null)
-                for(int i = args.Count - 1; i>=0; i--)                
+                for (int i = args.Count - 1; i >= 0; i--)
                     StackPush(args[i]);
 
             Type this_type = this_callable.GetType();
@@ -787,7 +807,7 @@ namespace lightning
                         {
                             //Console.WriteLine("in pop");
                             IP++;
-                            StackPop();
+                            Value value = StackPop();
                             //Console.WriteLine("pop at:" + stack.Count);
                             break;
                         }
@@ -1274,7 +1294,7 @@ namespace lightning
                     case OpCode.FOREACH:
                         {
                             IP++;
-                            Value func = StackPop();   
+                            Value func = StackPop();
                             ValTable table = StackPop() as ValTable;
 
                             int init = 0;
@@ -1353,7 +1373,7 @@ namespace lightning
         {
             Console.WriteLine("\nStack:");
             int counter = 0;
-            for(int i = 0; i<stackTop; i++)
+            for (int i = 0; i < stackTop; i++)
             {
                 Console.WriteLine(counter + ": " + stack[i]);
                 counter++;
@@ -1362,7 +1382,7 @@ namespace lightning
 
             Console.WriteLine("\nVariables:");
             counter = 0;
-            for(int i = 0; i<variablesTop; i++)
+            for (int i = 0; i < variablesTop; i++)
             {
                 Console.WriteLine(counter + ": " + variables[i]);
                 counter++;
@@ -1373,19 +1393,19 @@ namespace lightning
 
             Console.WriteLine("\nUpvalues:");
             counter = 0;
-            for(int i=0; i<upValuesBases[upValuesBasesTop-1]; i++)
-            foreach (Value v in upValues)
-            {
-                Console.WriteLine(counter + ": " + upValues[i]);
-                counter++;
-            }
+            for (int i = 0; i < upValuesBases[upValuesBasesTop - 1]; i++)
+                foreach (Value v in upValues)
+                {
+                    Console.WriteLine(counter + ": " + upValues[i]);
+                    counter++;
+                }
             if (counter == 0) Console.WriteLine("empty :)");
 
             Console.WriteLine("Envs: " + upValuesBasesTop);
 
             //Console.WriteLine("\nUpvaluesRegistry:");
             //counter = 0;
-            
+
             //foreach (Value v in upValuesRegistry)
             //{
             //    Console.WriteLine(counter + ": " + v);
