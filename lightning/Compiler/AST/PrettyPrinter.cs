@@ -138,6 +138,8 @@ namespace lightning
             Console.Write("[UNARY ");
             if (p_node.Op == OperatorType.MINUS) Console.Write(" - ");
             else if (p_node.Op == OperatorType.NOT) Console.Write(" ! ");
+            else if (p_node.Op == OperatorType.PLUS_PLUS) Console.Write(" ++ ");
+            else if (p_node.Op == OperatorType.MINUS_MINUS) Console.Write(" -- ");
             else 
                 Error("Invalid unary operator.", p_node.Line);
             Print(p_node.Right);

@@ -445,7 +445,154 @@ namespace lightning
             }
 
             ////////////////////////////////////////////////////////////////////////////////////////////////////////////
+            //////////////////////////////////////////////////////////////////////////////////////////////////// Parsing
+            {
+                ValTable parser = new ValTable(null, null);
+
+                ValString match_val_string = new ValString("match");
+                ValString tail_val_string = new ValString("tail");
+
+                Value makeStringParser(VM vm)
+                {
+                    ValString val_match_string = vm.StackPeek(0) as ValString;
+                    string match_string = val_match_string.ToString();
+
+                    Func<VM, Value> parser = (vm) =>
+                    {
+                        ValString val_input_string = vm.StackPeek(0) as ValString;
+                        string input_string = val_input_string.ToString();
+                        int length = match_string.Length;
+                        if (length <= input_string.Length)
+                        {
+                            string slice_input_string = input_string.Substring(0, length);
+                            if (slice_input_string == match_string)
+                            {
+                                ValTable match_result = new ValTable(null, null);
+                                match_result.TableSet(match_val_string, val_match_string);
+                                string tail = input_string.Substring(length, input_string.Length - length);
+                                match_result.TableSet(tail_val_string, new ValString(tail));
+                                return match_result;
+                            }
+                        }
+                        ValTable result = new ValTable(null, null);
+                        result.TableSet(match_val_string, Value.Nil);
+                        result.TableSet(tail_val_string, val_input_string);
+                        return result;
+                    };
+                    return new ValIntrinsic(match_string + "_parser", parser, 1);
+                }
+                parser.TableSet(new ValString("make_string"), new ValIntrinsic("make_string_parser", makeStringParser, 1));
+
+                //////////////////////////////////////////////////////
+
+                Value digitParser(VM vm)
+                {
+                    ValString val_input_string = vm.StackPeek(0) as ValString;
+                    string input_string = val_input_string.ToString();
+                    if (1 <= input_string.Length)
+                    {
+                        char head = input_string[0];
+                        if (Char.IsDigit(head))
+                        {
+                            ValTable match_result = new ValTable(null, null);
+                            match_result.TableSet(match_val_string, new ValString(head.ToString()));
+                            string tail = input_string.Substring(1, input_string.Length - 1);
+                            match_result.TableSet(tail_val_string, new ValString(tail));
+                            return match_result;
+                        }
+                    }
+                    ValTable result = new ValTable(null, null);
+                    result.TableSet(match_val_string, Value.Nil);
+                    result.TableSet(tail_val_string, val_input_string);
+                    return result;
+                }
+                parser.TableSet(new ValString("digit"), new ValIntrinsic("digit_parser", digitParser, 1));
+
+                //////////////////////////////////////////////////////
+
+                Value alphaParser(VM vm)
+                {
+                    ValString val_input_string = vm.StackPeek(0) as ValString;
+                    string input_string = val_input_string.ToString();
+                    if (1 <= input_string.Length)
+                    {
+                        char head = input_string[0];
+                        if (Char.IsLetter(head))
+                        {
+                            ValTable match_result = new ValTable(null, null);
+                            match_result.TableSet(match_val_string, new ValString(head.ToString()));
+                            string tail = input_string.Substring(1, input_string.Length - 1);
+                            match_result.TableSet(tail_val_string, new ValString(tail));
+                            return match_result;
+                        }
+                    }
+                    ValTable result = new ValTable(null, null);
+                    result.TableSet(match_val_string, Value.Nil);
+                    result.TableSet(tail_val_string, val_input_string);
+                    return result;
+                }
+                parser.TableSet(new ValString("alpha"), new ValIntrinsic("alpha_parser", alphaParser, 1));
+
+                //////////////////////////////////////////////////////
+
+                Value orCombinator(VM vm)
+                {
+                    ValIntrinsic parser1 = vm.StackPeek(0) as ValIntrinsic;
+                    ValIntrinsic parser2 = vm.StackPeek(1) as ValIntrinsic;
+
+                    Func<VM, Value> parser = (vm) =>
+                    {
+                        ValTable result1 = parser1.function(vm) as ValTable;
+                        if (result1.table[match_val_string] != Value.Nil)
+                            return result1;
+                        ValTable result2 = parser2.function(vm) as ValTable;
+                        return result2;
+                    };
+                    return new ValIntrinsic(parser1.name + "_or_" + parser2.name, parser, 1);
+                }
+                parser.TableSet(new ValString("Or"), new ValIntrinsic("or_combinator", orCombinator, 2));
+
+                //////////////////////////////////////////////////////
+
+                Value andCombinator(VM vm)
+                {
+                    ValIntrinsic parser1 = vm.StackPeek(0) as ValIntrinsic;
+                    ValIntrinsic parser2 = vm.StackPeek(1) as ValIntrinsic;
+
+                    Func<VM, Value> parser = (vm) =>
+                    {
+                        ValTable result1 = parser1.function(vm) as ValTable;
+                        if (result1.table[match_val_string] != Value.Nil)
+                        {
+                            vm.StackPush(result1.table[tail_val_string]);
+                            ValTable result2 = parser2.function(vm) as ValTable;
+                            vm.StackPop();
+                            if (result2.table[match_val_string] != Value.Nil)
+                            {
+                                result2.table[match_val_string] = new ValString(result1.table[match_val_string].ToString() + result2.table[match_val_string].ToString());
+                                return result2;
+                            }
+                            else
+                            {
+                                ValTable result3 = new ValTable(null, null);
+                                result3.TableSet(match_val_string, Value.Nil);
+                                result3.TableSet(tail_val_string, vm.StackPeek(0));
+                                return result3;
+                            }
+                        }
+
+                        return result1;
+                    };
+                    return new ValIntrinsic(parser1.name + "_and_" + parser2.name, parser, 1);
+                }
+                parser.TableSet(new ValString("And"), new ValIntrinsic("And_combinator", andCombinator, 2));
+
+                tables.Add("parser", parser);
+            }
+
+            ////////////////////////////////////////////////////////////////////////////////////////////////////////////
             ////////////////////////////////////////////////////////////////////////////////////////// Global Intrinsics
+
             List<ValIntrinsic> functions = new List<ValIntrinsic>();
 
             //////////////////////////////////////////////////////
@@ -774,7 +921,7 @@ namespace lightning
                 else
                     return second;
             }
-            functions.Add(new ValIntrinsic("maybe", maybe, 2));
+            functions.Add(new ValIntrinsic("maybe", maybe, 2));            
 
             //////////////////////////////////////////////////////
             Library prelude = new Library(functions, tables);

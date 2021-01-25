@@ -186,13 +186,13 @@ namespace lightning
             return globals[address];
         }
 
-        void StackPush(Value p_value)
+        public void StackPush(Value p_value)
         {
             stack[stackTop] = p_value;
             stackTop++;
         }
 
-        Value StackPop()
+        public Value StackPop()
         {
             stackTop--;
             Value popped = stack[stackTop];
