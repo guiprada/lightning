@@ -4,8 +4,12 @@ using System.IO;
 using System.Text;
 
 using Operand = System.UInt16;
+#if ROSLYN
+    using Microsoft.CodeAnalysis.Scripting;
+    using Microsoft.CodeAnalysis.CSharp.Scripting;
+#endif
 #if DOUBLE
-using Number = System.Double;
+    using Number = System.Double;
 #else
     using Number = System.Single;
 #endif
@@ -920,8 +924,24 @@ namespace lightning
                 else
                     return second;
             }
-            functions.Add(new ValIntrinsic("maybe", maybe, 2));            
+            functions.Add(new ValIntrinsic("maybe", maybe, 2));
 
+            //////////////////////////////////////////////////////
+#if ROSLYN
+            Value createIntrinsic(VM vm)
+            {
+                ValString name = vm.StackPeek(0) as ValString;
+                ValNumber arity = vm.StackPeek(1) as ValNumber;
+                ValString val_body = vm.StackPeek(2) as ValString;                
+                string body = val_body.ToString();
+
+                var options = ScriptOptions.Default.AddReferences(typeof(Value).Assembly, typeof(VM).Assembly).WithImports("lightning");
+                Func<VM, Value> new_intrinsic = CSharpScript.EvaluateAsync<Func<VM, Value>>(body, options).GetAwaiter().GetResult();
+
+                return new ValIntrinsic(name.ToString(), new_intrinsic, (int)arity.content);
+            }
+            functions.Add(new ValIntrinsic("intrinsic", createIntrinsic, 3));
+#endif
             //////////////////////////////////////////////////////
             Library prelude = new Library(functions, tables);
 
