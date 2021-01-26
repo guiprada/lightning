@@ -580,7 +580,6 @@ namespace lightning
                                 return result3;
                             }
                         }
-
                         return result1;
                     };
                     return new ValIntrinsic(parser1.name + "_and_" + parser2.name, parser, 1);

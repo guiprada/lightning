@@ -1,7 +1,6 @@
 ﻿todo
-	- Write to file intrinsic
-	- read intrinsic
-	- parser generators and combinators
+	- parser generators and combinators 
+	- many(*), at_least_one(+), optional(?)
 	- valtable containers should be null until used
 	- increment and decrement unarys
 	- table clone function	
@@ -71,6 +70,8 @@ done
 	- ValNil and ValBool as structs
 	- implement ++, -- += -= *= /=
 	- separte error detection and warnings in parser
+	- Write to file intrinsic
+	- read intrinsic
 
 --
 where do we create references
