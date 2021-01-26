@@ -117,10 +117,10 @@ namespace interpreter
             //{
             //    Console.WriteLine(token.ToString());
             //}
-            Console.WriteLine("\n---------------------------------- AST:");
+            //Console.WriteLine("\n---------------------------------- AST:");
 
-            PrettyPrinter astPrinter = new PrettyPrinter();
-            astPrinter.Print(program);
+            //PrettyPrinter astPrinter = new PrettyPrinter();
+            //astPrinter.Print(program);
 
             Chunker code_generator = new Chunker(program, "main", Prelude.GetPrelude());
             Chunk chunk = code_generator.Code;

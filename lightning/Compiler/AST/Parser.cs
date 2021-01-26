@@ -125,7 +125,7 @@ namespace lightning
             else
                 initializer = null;
 
-            Consume(TokenType.SEMICOLON, "Expect ';' after 'variable declaration'.", false);
+            Elide(TokenType.SEMICOLON);
             return new VarDeclarationNode(name.value, initializer, name.Line);
         }
 
@@ -243,7 +243,7 @@ namespace lightning
         {
             int line = Previous().Line;
             Node expr = Expression();
-            Consume(TokenType.SEMICOLON, "Expected ';' after 'return'.", false);
+            Elide(TokenType.SEMICOLON);
             return new ReturnNode(expr, line);
         }
 
@@ -371,7 +371,7 @@ namespace lightning
         Node StmtExpr()
         {
             Node expr = Expression();
-            Consume(TokenType.SEMICOLON, "Expected ';' after 'expression statement'.", false);
+            Elide(TokenType.SEMICOLON);
             return new StmtExprNode(expr, expr.Line);
         }
 
@@ -858,6 +858,12 @@ namespace lightning
                 return null;
             }
 
+        }
+
+        Token Elide(TokenType type)
+        {
+            if (Check(type)) return Advance();
+            return null;
         }
 
         void Error(string msg)

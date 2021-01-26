@@ -1,14 +1,14 @@
 {
 	"$schema": "https://raw.githubusercontent.com/martinring/tmlanguage/master/tmlanguage.json",
-	"name": "little",
+	"name": "lightning",
 	"scopeName": "source.lightning",
 	"patterns": [
 		{
-            "name": "comment.line.note.little", 
+            "name": "comment.line.note.lightning", 
             "match": "(//).*$\\n?", 
             "captures": {
                 "1": {
-                    "name": "punctuation.definition.comment.little"
+                    "name": "punctuation.definition.comment.lightning"
                 }
             }
         },
@@ -16,58 +16,58 @@
 			"begin": "\\b(function)\\s*(?:\\s+([a-zA-Z_][a-zA-Z0-9_]*(?:([\\.:])[a-zA-Z_][a-zA-Z0-9_]*)?)\\s*)?(\\()",
 			"beginCaptures": {
 				"1": {
-					"name": "keyword.control.little"
+					"name": "keyword.control.lightning"
 				},
 				"2": {
-					"name": "entity.name.function.little"
+					"name": "entity.name.function.lightning"
 				},
 				"3": {
-					"name": "punctuation.separator.parameter.little"
+					"name": "punctuation.separator.parameter.lightning"
 				},
 				"4": {
-					"name": "punctuation.definition.parameters.begin.little"
+					"name": "punctuation.definition.parameters.begin.lightning"
 				}
 			},
 			"end": "\\)",
 			"endCaptures": {
 				"0": {
-					"name": "punctuation.definition.parameters.end.little"
+					"name": "punctuation.definition.parameters.end.lightning"
 				}
 			},
-			"name": "meta.function.little",
+			"name": "meta.function.lightning",
 			"patterns": [
 				{
 					"match": "[a-zA-Z_][a-zA-Z0-9_]*",
-					"name": "variable.parameter.function.little"
+					"name": "variable.parameter.function.lightning"
 				},
 				{
 					"match": ",",
-					"name": "punctuation.separator.arguments.little"
+					"name": "punctuation.separator.arguments.lightning"
 				}
 			]
 		},
 		{
 			"match": "(?<![\\w\\d.])\\d+(?![pPeE.0-9])",
-			"name": "constant.numeric.integer.little"
+			"name": "constant.numeric.integer.lightning"
 		},
 		{
 			"match": "(?<![\\w\\d.])\\d+(\\.\\d+)?([eE]-?\\d*)?",
-			"name": "constant.numeric.float.little"
+			"name": "constant.numeric.float.lightning"
 		},
 		{
 			"begin": "\"",
 			"beginCaptures": {
 				"0": {
-					"name": "punctuation.definition.string.begin.little"
+					"name": "punctuation.definition.string.begin.lightning"
 				}
 			},
 			"end": "\"",
 			"endCaptures": {
 				"0": {
-					"name": "punctuation.definition.string.end.little"
+					"name": "punctuation.definition.string.end.lightning"
 				}
 			},
-			"name": "string.quoted.double.little",
+			"name": "string.quoted.double.lightning",
 			"patterns": [
 				{
 					"include": "#escaped_char"
@@ -78,16 +78,16 @@
 			"begin": "'",
 			"beginCaptures": {
 				"0": {
-					"name": "punctuation.definition.string.begin.little"
+					"name": "punctuation.definition.string.begin.lightning"
 				}
 			},
 			"end": "'",
 			"endCaptures": {
 				"0": {
-					"name": "punctuation.definition.string.end.little"
+					"name": "punctuation.definition.string.end.lightning"
 				}
 			},
-			"name": "string.quoted.single.little",
+			"name": "string.quoted.single.lightning",
 			"patterns": [
 				{
 					"include": "#escaped_char"
@@ -98,20 +98,20 @@
 			"begin": "(?<=\\.cdef)\\s*(\\[(=*)\\[)",
 			"beginCaptures": {
 				"0": {
-					"name": "string.quoted.other.multiline.little"
+					"name": "string.quoted.other.multiline.lightning"
 				},
 				"1": {
-					"name": "punctuation.definition.string.begin.little"
+					"name": "punctuation.definition.string.begin.lightning"
 				}
 			},
-			"contentName": "meta.embedded.little",
+			"contentName": "meta.embedded.lightning",
 			"end": "(\\]\\2\\])",
 			"endCaptures": {
 				"0": {
-					"name": "string.quoted.other.multiline.little"
+					"name": "string.quoted.other.multiline.lightning"
 				},
 				"1": {
-					"name": "punctuation.definition.string.end.little"
+					"name": "punctuation.definition.string.end.lightning"
 				}
 			},
 			"patterns": [
@@ -124,24 +124,24 @@
 			"begin": "(?<!--)\\[(=*)\\[",
 			"beginCaptures": {
 				"0": {
-					"name": "punctuation.definition.string.begin.little"
+					"name": "punctuation.definition.string.begin.lightning"
 				}
 			},
 			"end": "\\]\\1\\]",
 			"endCaptures": {
 				"0": {
-					"name": "punctuation.definition.string.end.little"
+					"name": "punctuation.definition.string.end.lightning"
 				}
 			},
-			"name": "string.quoted.other.multiline.little"
+			"name": "string.quoted.other.multiline.lightning"
 		},
 		{
 			"captures": {
 				"1": {
-					"name": "keyword.control.goto.little"
+					"name": "keyword.control.goto.lightning"
 				},
 				"2": {
-					"name": "constant.other.placeholder.little"
+					"name": "constant.other.placeholder.lightning"
 				}
 			},
 			"match": "\\b(goto)\\s+([a-zA-Z_][a-zA-Z0-9_]*)"
@@ -149,50 +149,50 @@
 		{
 			"captures": {
 				"1": {
-					"name": "punctuation.definition.label.begin.little"
+					"name": "punctuation.definition.label.begin.lightning"
 				},
 				"2": {
-					"name": "punctuation.definition.label.end.little"
+					"name": "punctuation.definition.label.end.lightning"
 				}
 			},
 			"match": "(::)[a-zA-Z_][a-zA-Z0-9_]*(::)",
-			"name": "constant.other.placeholder.little"
+			"name": "constant.other.placeholder.lightning"
 		},
 		{
 			"match": "\\b(else | for| if | return | while)\\b",
-			"name": "keyword.control.little"
+			"name": "keyword.control.lightning"
 		},
 		{
 			"match": "(?<![^.]\\.|:)\\b(false|null|true|_G|_VERSION|math\\.(pi|huge))\\b|(?<![.])\\.{3}(?!\\.)",
-			"name": "constant.language.little"
+			"name": "constant.language.lightning"
 		},
 		{
 			"match": "(?<![^.]\\.|:)\\b(self)\\b",
-			"name": "variable.language.self.little"
+			"name": "variable.language.self.lightning"
 		},
 		{
 			"match": "(?<![^.]\\.|:)\\b(assert|collectgarbage|dofile|error|getfenv|getmetatable|ipairs|loadfile|loadstring|module|next|pairs|pcall|print|rawequal|rawget|rawset|require|select|setfenv|setmetatable|tonumber|tostring|type|unpack|xpcall)\\b(?=\\s*(?:[({\"']|\\[\\[))",
-			"name": "support.function.little"
+			"name": "support.function.lightning"
 		},
 		{
 			"match": "(?<![^.]\\.|:)\\b(listMap\\.(indexOf|indexes|values|sum|shuffle|remove|range|slice|push|pop|pull)|string\\.(char|hasIndex|indexOf|len|lower|remove|upper)|table\\.(concat|insert|maxn|remove|sort)|math\\.(abs|acos|asin|atan|cos|pi|r|rnd|sign|sin|sqrt|tan)|io\\.(close|flush|input|lines|open|output|popen|read|tmpfile|type|write)|os\\.(clock|date|difftime|execute|exit|getenv|remove|rename|setlocale|time|tmpname)|package\\.(cpath|loaded|loadlib|path|preload|seeall))\\b(?=\\s*(?:[({\"']|\\[\\[))",
-			"name": "support.function.library.little"
+			"name": "support.function.library.lightning"
 		},
 		{
 			"match": "\\b(and|or|not|xor|nand|nor|xnor)\\b",
-			"name": "keyword.operator.little"
+			"name": "keyword.operator.lightning"
 		},
 		{
 			"match": "\\b([a-zA-Z_][a-zA-Z0-9_]*)\\b(?=\\s*(?:[({\"']|\\[\\[))",
-			"name": "support.function.any-method.little"
+			"name": "support.function.any-method.lightning"
 		},
 		{
 			"match": "(?<=[^.]\\.|:)\\b([a-zA-Z_][a-zA-Z0-9_]*)",
-			"name": "variable.other.little"
+			"name": "variable.other.lightning"
 		},
 		{
 			"match": "\\+|-|%|#|\\*|\\/|\\^|==?|~=|<=?|>=?|(?<!\\.)\\.{2}(?!\\.)",
-			"name": "keyword.operator.little"
+			"name": "keyword.operator.lightning"
 		}
 	],
 	"repository": {
@@ -200,23 +200,23 @@
 			"patterns": [
 				{
 					"match": "\\\\[abfnrtvz\\\\\"'\\n]",
-					"name": "constant.character.escape.little"
+					"name": "constant.character.escape.lightning"
 				},
 				{
 					"match": "\\\\\\d{1,3}",
-					"name": "constant.character.escape.byte.little"
+					"name": "constant.character.escape.byte.lightning"
 				},
 				{
 					"match": "\\\\x[0-9A-Fa-f][0-9A-Fa-f]",
-					"name": "constant.character.escape.byte.little"
+					"name": "constant.character.escape.byte.lightning"
 				},
 				{
 					"match": "\\\\u\\{[0-9A-Fa-f]+\\}",
-					"name": "constant.character.escape.unicode.little"
+					"name": "constant.character.escape.unicode.lightning"
 				},
 				{
 					"match": "\\\\.",
-					"name": "invalid.illegal.character.escape.little"
+					"name": "invalid.illegal.character.escape.lightning"
 				}
 			]
 		}
