@@ -1042,6 +1042,18 @@ namespace lightning
             functions.Add(new ValIntrinsic("string_length", stringLength, 1));
 
             //////////////////////////////////////////////////////
+
+            Value stringCopy(VM vm)
+            {
+                Value val_input_string = vm.StackPeek(0);
+                if (val_input_string.GetType() == typeof(ValString))
+                    return new ValString(val_input_string.ToString());
+                else
+                    return Value.Nil;
+            }
+            functions.Add(new ValIntrinsic("string_copy", stringCopy, 1));
+
+            //////////////////////////////////////////////////////
             Library prelude = new Library(functions, tables);
 
             return prelude;
