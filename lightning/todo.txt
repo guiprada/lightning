@@ -1,4 +1,8 @@
 ﻿todo
+	- char at intrinsic
+	- string slice intrincic
+	- add loading Value.Nil for missing parameters on function call, emit a warning
+	- elide more stuff on parser
 	- parser generators and combinators 
 	- many(*), at_least_one(+), optional(?)
 	- valtable containers should be null until used

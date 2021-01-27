@@ -224,11 +224,11 @@ namespace lightning
                 case OpCode.LOADV:
                 case OpCode.LOADI:               
                 case OpCode.NTABLE:
-                case OpCode.FUNDCL:
                 case OpCode.TABLESET:
                     return op.ToString() + " " + instruction.opA + " " + instruction.opB;
                 // 3 op
                 case OpCode.ASSIGN:
+                case OpCode.FUNDCL:
                     return op.ToString() + " " + instruction.opA + " " + instruction.opB + " " + instruction.opC;
                 default:
                     return "Unkown Opcode: " + op.ToString();

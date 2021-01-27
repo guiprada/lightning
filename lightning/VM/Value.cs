@@ -190,7 +190,8 @@ namespace lightning
         {
             if (other.GetType() == typeof(ValFunction))
             {
-                if (other == this) return true;
+                ValFunction other_val_func = other as ValFunction;
+                if (other_val_func.name == this.name && other_val_func.module == this.module) return true;
             }
             return false;
         }

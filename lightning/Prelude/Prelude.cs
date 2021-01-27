@@ -942,6 +942,105 @@ namespace lightning
             }
             functions.Add(new ValIntrinsic("intrinsic", createIntrinsic, 3));
 #endif
+
+            ////////////////////////////////////////////// strings
+            
+            Value charAt(VM vm)
+            {
+                ValString val_input_string = vm.StackPeek(0) as ValString;
+                ValNumber index = vm.StackPeek(1) as ValNumber;
+                string input_string = val_input_string.ToString();
+                if (index.content < input_string.Length)
+                {
+                    char result = input_string[(int)index.content];
+                    return new ValString(result.ToString());
+                }
+                return Value.Nil;
+            }
+            functions.Add(new ValIntrinsic("char_at", charAt, 2));
+
+            //////////////////////////////////////////////////////
+
+            Value isAlpha(VM vm)
+            {
+                ValString val_input_string = vm.StackPeek(0) as ValString;
+                string input_string = val_input_string.ToString();
+                if (1 <= input_string.Length)
+                {
+                    char head = input_string[0];
+                    if (Char.IsLetter(head))
+                    {
+                        return Value.True;
+                    }
+                }
+                return Value.False;
+            }
+            functions.Add(new ValIntrinsic("is_alpha", isAlpha, 1));
+
+            //////////////////////////////////////////////////////
+
+            Value isDigit(VM vm)
+            {
+                ValString val_input_string = vm.StackPeek(0) as ValString;
+                string input_string = val_input_string.ToString();
+                if (1 <= input_string.Length)
+                {
+                    char head = input_string[0];
+                    if (Char.IsDigit(head))
+                    {
+                        return Value.True;
+                    }
+                    return Value.False;
+                }
+                return Value.Nil;
+            }
+            functions.Add(new ValIntrinsic("is_digit", isDigit, 1));
+
+            //////////////////////////////////////////////////////
+
+            Value stringSlice(VM vm)
+            {
+                ValString val_input_string = vm.StackPeek(0) as ValString;
+                string input_string = val_input_string.ToString();
+                Number start = (vm.StackPeek(1) as ValNumber).content;
+                Number end = (vm.StackPeek(2) as ValNumber).content;
+
+                if (end < input_string.Length)
+                {
+                    string result = input_string.Substring((int)start, (int)(end - start));
+                    return new ValString(result);
+                }
+                return Value.Nil;
+            }
+            functions.Add(new ValIntrinsic("string_slice", stringSlice, 3));
+
+            //////////////////////////////////////////////////////
+            
+            Value stringSplit(VM vm)
+            {
+                ValString val_input_string = vm.StackPeek(0) as ValString;
+                string input_string = val_input_string.ToString();
+                Number start = (vm.StackPeek(1) as ValNumber).content; 
+                if (start < input_string.Length)
+                {
+                    Number end = input_string.Length ;                    
+                    string result = input_string.Substring((int)start, (int)(end - start));                    
+                    val_input_string.content = input_string.Substring(0, (int)start);
+                    return new ValString(result);
+                }
+                return Value.Nil;
+            }
+            functions.Add(new ValIntrinsic("string_split", stringSplit, 2));
+
+            //////////////////////////////////////////////////////
+
+            Value stringLength(VM vm)
+            {
+                ValString val_input_string = vm.StackPeek(0) as ValString;
+                return new ValNumber(val_input_string.ToString().Length);
+            }
+            functions.Add(new ValIntrinsic("string_length", stringLength, 1));
+
             //////////////////////////////////////////////////////
             Library prelude = new Library(functions, tables);
 
@@ -1065,8 +1164,9 @@ namespace lightning
         static void RelocateChunk(ValFunction function, RelocationInfo relocationInfo)
         {
             for (Operand i = 0; i < function.body.Count; i++)
-            {
+            {                
                 Instruction next = function.body[i];
+                
                 if (next.opCode == OpCode.LOADG)
                 {
                     if ((next.opCode == OpCode.LOADG && next.opA >= relocationInfo.importedVM.GetChunk().Prelude.intrinsics.Count))
@@ -1113,6 +1213,16 @@ namespace lightning
                         next.opA = (Operand)(relocationInfo.importingVM.GetChunk().GetConstants().Count - 1);
                     }
                 }
+                else if (next.opCode == OpCode.FUNDCL)
+                {
+                    Value this_value = relocationInfo.importedVM.GetChunk().GetConstant(next.opC);
+                    relocationInfo.importingVM.GetChunk().GetConstants().Add(relocationInfo.importedVM.GetChunk().GetConstant(next.opC));
+                    next.opC = (Operand)(relocationInfo.importingVM.GetChunk().GetConstants().Count - 1);
+                    RelocateChunk((this_value as ValClosure).function, relocationInfo);
+                    Console.WriteLine(this_value);
+                }
+                //Chunk.PrintInstruction(next);
+                //Console.WriteLine();
                 function.body[i] = next;
             }
         }

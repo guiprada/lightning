@@ -139,6 +139,11 @@ namespace interpreter
                 //Console.WriteLine();
                 //chunk.Print();
 
+                //foreach(Value v in chunk.GetConstants())
+                //{
+                //    Console.WriteLine(v);
+                //}
+
                 VM vm = new VM(chunk);
                 VMResult result = vm.Run();
                 if (result.status == VMResultType.OK)

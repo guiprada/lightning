@@ -65,6 +65,7 @@ namespace lightning
         List<string> globals;
         Stack<List<Variable>> upvalueStack;
         Stack<int> funStartEnv;
+        int lambdaCounter;
 
         public List<string> Errors { get; private set; }
 
@@ -82,7 +83,7 @@ namespace lightning
             env = new List<List<string>>();
             env.Add(globals);// set env[0] to globals
             funStartEnv = new Stack<int>();
-
+            lambdaCounter = 0;
 
             // place prelude functions on constans
             foreach (ValIntrinsic v in prelude.intrinsics)
@@ -849,7 +850,9 @@ namespace lightning
         void ChunkFunctionExpression(FunctionExpressionNode p_node)
         {
             //set the address
-            CompileFunction(null, p_node.Line, p_node, false);
+
+            CompileFunction("lambda" + lambdaCounter, p_node.Line, p_node, false);
+            lambdaCounter++;
         }
 
         void ChunkFunctionDeclaration(FunctionDeclarationNode p_node)
@@ -886,21 +889,19 @@ namespace lightning
             ValFunction new_function = new ValFunction(name, module_name);
             Operand this_address = (Operand)AddConstant(new_function);
 
-            Add(OpCode.PUSH, this_address, line);
-
             if (p_node.GetType() == typeof(FunctionExpressionNode))
             {
-                Add(OpCode.FUNDCL, 0, 1, line);
+                Add(OpCode.FUNDCL, 0, 1, this_address, line);
             }
             else
             {
                 if (isGlobal)
                 {
-                    Add(OpCode.FUNDCL, 0, 0, p_node.Line);// zero for gloabal
+                    Add(OpCode.FUNDCL, 0, 0, this_address, p_node.Line);// zero for gloabal
                 }
                 else
                 {
-                    Add(OpCode.FUNDCL, 1, 0, p_node.Line);// one for current env
+                    Add(OpCode.FUNDCL, 1, 0, this_address, p_node.Line);// one for current env
                 }
             }
 

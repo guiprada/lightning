@@ -592,8 +592,8 @@ namespace lightning
                             IP++;
                             Operand env = instruction.opA;
                             Operand lambda = instruction.opB;
-                            int new_fun_adress = (int)((ValNumber)StackPop()).content;
-                            Value this_callable = chunk.GetConstant((Operand)new_fun_adress);
+                            Operand new_fun_address = instruction.opC;                            
+                            Value this_callable = chunk.GetConstant(new_fun_address);
                             if (this_callable.GetType() == typeof(ValFunction))
                             {
                                 ValFunction this_function = (ValFunction)this_callable;
@@ -620,6 +620,7 @@ namespace lightning
                             }
                             else
                             {
+                                //Console.WriteLine(this_callable);
                                 ValClosure this_closure = (ValClosure)this_callable;
 
                                 // new upvalues
