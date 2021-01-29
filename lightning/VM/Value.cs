@@ -480,13 +480,15 @@ namespace lightning
     public class ValModule : ValTable
     {
         public string name;
-        public List<Value> globals;        
+        public List<Value> globals;
+        public List<Value> constants;
         public Operand importIndex;
-        public ValModule(string p_name, List<Value> p_elements, Dictionary<ValString, Value> p_table, List<Value> p_globals)
+        public ValModule(string p_name, List<Value> p_elements, Dictionary<ValString, Value> p_table, List<Value> p_globals, List<Value> p_constants)
             : base(p_elements, p_table)
         {
             name = p_name;
             globals = p_globals ??= new List<Value>();
+            constants = p_constants ??= new List<Value>();
             importIndex = 0;
         }
 

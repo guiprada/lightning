@@ -381,6 +381,12 @@ namespace lightning
                 //Console.WriteLine();
                 switch (instruction.opCode)
                 {
+                    case OpCode.POP:
+                        {
+                            IP++;
+                            Value value = StackPop();
+                            break;
+                        }
                     case OpCode.LOADC:
                         {
                             IP++;
@@ -410,13 +416,25 @@ namespace lightning
                             StackPush(global);
                             break;
                         }
-                    case OpCode.LOADI:
+                    case OpCode.LOADGI:
                         {
                             IP++;
                             Operand address = instruction.opA;
                             Operand module = instruction.opB;
                             Value global = modules[module].globals[address];
                             StackPush(global);
+                            break;
+                        }
+                    case OpCode.LOADCI:
+                        {
+                            IP++;
+                            Operand address = instruction.opA;
+                            Operand module = instruction.opB;
+                            Value constant = modules[module].constants[address];
+                            if (constant.GetType() == typeof(ValNumber))
+                                StackPush(GetValNumber(((ValNumber)constant).content));
+                            else
+                                StackPush(constant);
                             break;
                         }
                     case OpCode.LOADUPVAL:
@@ -427,109 +445,6 @@ namespace lightning
                             StackPush(up_val.Val);
                             break;
                         }
-                    case OpCode.TABLEGET:
-                        {
-                            IP++;
-                            Operand indexes_counter = instruction.opA;
-
-                            Value[] indexes = new Value[indexes_counter];
-                            for (int i = indexes_counter - 1; i >= 0; i--)
-                                indexes[i] = StackPop();
-
-                            Value value = StackPop();
-                            foreach (Value v in indexes)
-                            {
-                                if (v.GetType() == typeof(ValNumber))
-                                {
-                                    value = (value as ValTable).elements[(int)((ValNumber)v).content];
-                                }
-                                else
-                                {
-                                    value = (value as ValTable).table[(ValString)v];
-                                }
-                            }
-                            StackPush(value);
-                            break;
-                        }
-
-                    case OpCode.TABLESET:
-                        {
-                            IP++;
-                            Operand indexes_counter = instruction.opA;
-                            Operand op = instruction.opB;
-
-                            Value[] indexes = new Value[indexes_counter];
-                            for (int i = indexes_counter - 1; i >= 0; i--)
-                                indexes[i] = StackPop();
-
-                            Value this_table = StackPop();
-
-                            for (int i = 0; i < indexes_counter - 1; i++)
-                            {
-                                Value v = indexes[i];
-                                if (v.GetType() == typeof(ValNumber))
-                                {
-                                    this_table = (this_table as ValTable).elements[(int)((ValNumber)v).content];
-                                }
-                                else
-                                {
-                                    this_table = (this_table as ValTable).table[(ValString)v];
-                                }
-                            }
-                            Value new_value = StackPeek();
-                            if (op == 0)
-                            {
-                                if (indexes[indexes_counter - 1].GetType() == typeof(ValNumber))
-                                {
-                                    if ((this_table as ValTable).elements.Count - 1 >= ((int)((ValNumber)indexes[indexes_counter - 1]).content))
-                                    {
-                                        Value old_value = (this_table as ValTable).elements[(int)((ValNumber)indexes[indexes_counter - 1]).content];
-                                        if (old_value.GetType() == typeof(ValNumber))
-                                            RecycleNumber(old_value as ValNumber);
-                                    }
-                                    if (new_value.GetType() == typeof(ValNumber))
-                                    {
-                                        new_value = GetValNumber(((ValNumber)new_value).content);
-                                    }
-                                    (this_table as ValTable).ElementSet((int)((ValNumber)indexes[indexes_counter - 1]).content, new_value);
-                                }
-                                else
-                                {
-                                    if ((this_table as ValTable).table.ContainsKey((ValString)indexes[indexes_counter - 1]))
-                                    {
-                                        Value old_value = (this_table as ValTable).table[(ValString)indexes[indexes_counter - 1]];
-                                        if (old_value.GetType() == typeof(ValNumber))
-                                            RecycleNumber(old_value as ValNumber);
-                                    }
-                                    if (new_value.GetType() == typeof(ValNumber))
-                                    {
-                                        new_value = GetValNumber(((ValNumber)new_value).content);
-                                    }
-                                    (this_table as ValTable).TableSet((ValString)indexes[indexes_counter - 1], new_value);
-                                }
-                            }
-                            else
-                            {
-                                Value old_value;
-                                if (indexes[indexes_counter - 1].GetType() == typeof(ValNumber))
-                                    old_value = (this_table as ValTable).elements[(int)((ValNumber)indexes[indexes_counter - 1]).content];
-                                else
-                                    old_value = (this_table as ValTable).table[(ValString)indexes[indexes_counter - 1]];
-
-                                if (op == 1)
-                                    ((ValNumber)old_value).content += ((ValNumber)new_value).content;
-                                else if (op == 2)
-                                    ((ValNumber)old_value).content -= ((ValNumber)new_value).content;
-                                else if (op == 3)
-                                    ((ValNumber)old_value).content *= ((ValNumber)new_value).content;
-                                else if (op == 4)
-                                    ((ValNumber)old_value).content /= ((ValNumber)new_value).content;
-                            }
-
-
-                            break;
-                        }
-
                     case OpCode.LOADNIL:
                         {
                             IP++;
@@ -764,18 +679,106 @@ namespace lightning
                             }
                             break;
                         }
-                    case OpCode.PUSH:
+                    case OpCode.TABLEGET:
                         {
                             IP++;
-                            Operand value = instruction.opA;
-                            Value new_value = GetValNumber(value);
-                            StackPush(new_value);
+                            Operand indexes_counter = instruction.opA;
+
+                            Value[] indexes = new Value[indexes_counter];
+                            for (int i = indexes_counter - 1; i >= 0; i--)
+                                indexes[i] = StackPop();
+
+                            Value value = StackPop();
+                            foreach (Value v in indexes)
+                            {
+                                if (v.GetType() == typeof(ValNumber))
+                                {
+                                    value = (value as ValTable).elements[(int)((ValNumber)v).content];
+                                }
+                                else
+                                {
+                                    value = (value as ValTable).table[(ValString)v];
+                                }
+                            }
+                            StackPush(value);
                             break;
                         }
-                    case OpCode.POP:
+
+                    case OpCode.TABLESET:
                         {
                             IP++;
-                            Value value = StackPop();
+                            Operand indexes_counter = instruction.opA;
+                            Operand op = instruction.opB;
+
+                            Value[] indexes = new Value[indexes_counter];
+                            for (int i = indexes_counter - 1; i >= 0; i--)
+                                indexes[i] = StackPop();
+
+                            Value this_table = StackPop();
+
+                            for (int i = 0; i < indexes_counter - 1; i++)
+                            {
+                                Value v = indexes[i];
+                                if (v.GetType() == typeof(ValNumber))
+                                {
+                                    this_table = (this_table as ValTable).elements[(int)((ValNumber)v).content];
+                                }
+                                else
+                                {
+                                    this_table = (this_table as ValTable).table[(ValString)v];
+                                }
+                            }
+                            Value new_value = StackPeek();
+                            if (op == 0)
+                            {
+                                if (indexes[indexes_counter - 1].GetType() == typeof(ValNumber))
+                                {
+                                    if ((this_table as ValTable).elements.Count - 1 >= ((int)((ValNumber)indexes[indexes_counter - 1]).content))
+                                    {
+                                        Value old_value = (this_table as ValTable).elements[(int)((ValNumber)indexes[indexes_counter - 1]).content];
+                                        if (old_value.GetType() == typeof(ValNumber))
+                                            RecycleNumber(old_value as ValNumber);
+                                    }
+                                    if (new_value.GetType() == typeof(ValNumber))
+                                    {
+                                        new_value = GetValNumber(((ValNumber)new_value).content);
+                                    }
+                                    (this_table as ValTable).ElementSet((int)((ValNumber)indexes[indexes_counter - 1]).content, new_value);
+                                }
+                                else
+                                {
+                                    if ((this_table as ValTable).table.ContainsKey((ValString)indexes[indexes_counter - 1]))
+                                    {
+                                        Value old_value = (this_table as ValTable).table[(ValString)indexes[indexes_counter - 1]];
+                                        if (old_value.GetType() == typeof(ValNumber))
+                                            RecycleNumber(old_value as ValNumber);
+                                    }
+                                    if (new_value.GetType() == typeof(ValNumber))
+                                    {
+                                        new_value = GetValNumber(((ValNumber)new_value).content);
+                                    }
+                                    (this_table as ValTable).TableSet((ValString)indexes[indexes_counter - 1], new_value);
+                                }
+                            }
+                            else
+                            {
+                                Value old_value;
+                                if (indexes[indexes_counter - 1].GetType() == typeof(ValNumber))
+                                    old_value = (this_table as ValTable).elements[(int)((ValNumber)indexes[indexes_counter - 1]).content];
+                                else
+                                    old_value = (this_table as ValTable).table[(ValString)indexes[indexes_counter - 1]];
+
+                                if (op == 1)
+                                    ((ValNumber)old_value).content += ((ValNumber)new_value).content;
+                                else if (op == 2)
+                                    ((ValNumber)old_value).content -= ((ValNumber)new_value).content;
+                                else if (op == 3)
+                                    ((ValNumber)old_value).content *= ((ValNumber)new_value).content;
+                                else if (op == 4)
+                                    ((ValNumber)old_value).content /= ((ValNumber)new_value).content;
+                            }
+
+
                             break;
                         }
                     case OpCode.JMP:

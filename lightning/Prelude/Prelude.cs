@@ -936,8 +936,9 @@ namespace lightning
             public VM importedVM;
             public Dictionary<Operand, Operand> relocatedGlobals;
             public List<Operand> toBeRelocatedGlobals;
+            public Dictionary<Operand, Operand> relocatedConstants;
+            public List<Operand> toBeRelocatedConstants;
             public List<int> relocatedTables;
-            public Dictionary<Operand, Operand> relocatedModules;            
             public ValModule module;
             public Operand moduleIndex;
             public RelocationInfo(
@@ -945,9 +946,9 @@ namespace lightning
                 VM p_importedVM,
                 Dictionary<Operand, Operand> p_relocatedGlobals,
                 List<Operand> p_toBeRelocatedGlobals,
+                Dictionary<Operand, Operand> p_relocatedConstants,
+                List<Operand> p_toBeRelocatedConstants,
                 List<int> p_relocatedTables,
-                Dictionary<Operand, Operand> p_relocatedModules,
-
                 ValModule p_module,
                 Operand p_moduleIndex)
             {
@@ -955,8 +956,9 @@ namespace lightning
                 importedVM = p_importedVM;
                 relocatedGlobals = p_relocatedGlobals;
                 toBeRelocatedGlobals = p_toBeRelocatedGlobals;
+                relocatedConstants = p_relocatedConstants;
+                toBeRelocatedConstants = p_toBeRelocatedConstants;
                 relocatedTables = p_relocatedTables;
-                relocatedModules = p_relocatedModules;
                 module = p_module;
                 moduleIndex = p_moduleIndex;
             }
@@ -977,11 +979,9 @@ namespace lightning
                     copied_module_index = (Operand)importing_vm.modules.IndexOf(m);
 
                 m.importIndex = copied_module_index;// ready for next import
-                relocated_modules.Add(old_module_index, copied_module_index);
-                //ImportModule(m, (Operand)copied_module_index);
             }
 
-            ValModule module = new ValModule(name, null, null, null);
+            ValModule module = new ValModule(name, null, null, null, null);
             Operand module_index = importing_vm.AddModule(module);
             module.importIndex = module_index;
             RelocationInfo relocationInfo = new RelocationInfo(
@@ -989,8 +989,9 @@ namespace lightning
                 imported_vm,
                 new Dictionary<Operand, Operand>(),
                 new List<Operand>(),
+                new Dictionary<Operand, Operand>(),
+                new List<Operand>(),
                 new List<int>(),
-                relocated_modules,
                 module,
                 (Operand)module_index);
 
@@ -1052,6 +1053,17 @@ namespace lightning
                 if (new_value.GetType() == typeof(ValTable)) relocation_stack.Add(new_value as ValTable);
             }
             relocationInfo.toBeRelocatedGlobals.Clear();
+
+            for (Operand i = 0; i < relocationInfo.toBeRelocatedConstants.Count; i++)
+            {
+                Value new_value = relocationInfo.importedVM.GetChunk().GetConstant(relocationInfo.toBeRelocatedConstants[i]);
+
+                relocationInfo.module.constants.Add(new_value);
+                relocationInfo.relocatedConstants.Add(relocationInfo.toBeRelocatedConstants[i], (Operand)(relocationInfo.module.constants.Count - 1));
+
+                if (new_value.GetType() == typeof(ValTable)) relocation_stack.Add(new_value as ValTable);
+            }
+            relocationInfo.toBeRelocatedConstants.Clear();
         
             foreach (ValTable v in relocation_stack)
             {
@@ -1069,18 +1081,15 @@ namespace lightning
                 {
                     if ((next.opCode == OpCode.LOADG && next.opA >= relocationInfo.importedVM.GetChunk().Prelude.intrinsics.Count))
                     {
-
-                        OpCode this_opcode = OpCode.LOADI;
-
                         if (relocationInfo.relocatedGlobals.ContainsKey(next.opA))
                         {
-                            next.opCode = this_opcode;
+                            next.opCode = OpCode.LOADGI;
                             next.opA = relocationInfo.relocatedGlobals[next.opA];
                             next.opB = relocationInfo.moduleIndex;
                         }
                         else if (relocationInfo.toBeRelocatedGlobals.Contains(next.opA))
                         {
-                            next.opCode = this_opcode;
+                            next.opCode = OpCode.LOADGI;
                             next.opA = (Operand)(relocationInfo.toBeRelocatedGlobals.IndexOf(next.opA) + relocationInfo.relocatedGlobals.Count);
                             next.opB = relocationInfo.moduleIndex;
                         }
@@ -1088,49 +1097,33 @@ namespace lightning
                         {
                             Operand global_count = (Operand)(relocationInfo.relocatedGlobals.Count + relocationInfo.toBeRelocatedGlobals.Count);
                             relocationInfo.toBeRelocatedGlobals.Add(next.opA);
-                            next.opCode = this_opcode;
+                            next.opCode = OpCode.LOADGI;
                             next.opA = global_count;
                             next.opB = relocationInfo.moduleIndex;
                         }
                     }
                 }
-                else if (next.opCode == OpCode.LOADI)
+                else if (next.opCode == OpCode.LOADC)
                 {
-                    if (function.module != relocationInfo.module.name)
+                    if (relocationInfo.relocatedConstants.ContainsKey(next.opA))
                     {
-                        bool found = false;
-                        foreach(ValModule v  in relocationInfo.importingVM.modules)
-                        {
-                            if(function.module == v.name)
-                            {
-                                next.opB = v.importIndex;
-                                found = true;
-                                break;
-                            }
-                        }
-                        if(found == false)
-                            Console.WriteLine("Can not find LOADI index" + function.module);
+                        next.opCode = OpCode.LOADCI;
+                        next.opA = relocationInfo.relocatedConstants[next.opA];
+                        next.opB = relocationInfo.moduleIndex;
+                    }
+                    else if (relocationInfo.toBeRelocatedConstants.Contains(next.opA))
+                    {
+                        next.opCode = OpCode.LOADCI;
+                        next.opA = (Operand)(relocationInfo.toBeRelocatedConstants.IndexOf(next.opA) + relocationInfo.relocatedConstants.Count);
+                        next.opB = relocationInfo.moduleIndex;
                     }
                     else
                     {
-                        next.opB = relocationInfo.relocatedModules[next.opB];
-                    }
-                }
-                else if (next.opCode == OpCode.LOADC)
-                {
-                    if (function.module == relocationInfo.module.name)
-                    {
-                        Value this_value = relocationInfo.importedVM.GetChunk().GetConstant(next.opA);
-
-                        if (relocationInfo.importingVM.GetChunk().GetConstants().Contains(this_value))
-                        {
-                            next.opA = (Operand)relocationInfo.importingVM.GetChunk().GetConstants().IndexOf(this_value);
-                        }
-                        else
-                        {
-                            relocationInfo.importingVM.GetChunk().GetConstants().Add(this_value);
-                            next.opA = (Operand)(relocationInfo.importingVM.GetChunk().GetConstants().Count - 1);
-                        }
+                        Operand global_count = (Operand)(relocationInfo.relocatedConstants.Count + relocationInfo.toBeRelocatedConstants.Count);
+                        relocationInfo.toBeRelocatedConstants.Add(next.opA);
+                        next.opCode = OpCode.LOADCI;
+                        next.opA = global_count;
+                        next.opB = relocationInfo.moduleIndex;
                     }
                 }
                 else if (next.opCode == OpCode.FUNDCL)
@@ -1147,38 +1140,28 @@ namespace lightning
                         RelocateChunk((this_value as ValClosure).function, relocationInfo);
                     }
                 }
+                else if (next.opCode == OpCode.LOADGI || next.opCode == OpCode.LOADCI)
+                {
+                    bool found = false;
+                    foreach(ValModule v  in relocationInfo.importingVM.modules)
+                    {
+                        if(function.module == v.name)
+                        {
+                            next.opB = v.importIndex;
+                            found = true;
+                            break;
+                        }
+                    }
+                    if(found == false)
+                    {
+                        Console.WriteLine("Can not find LOADGI/LOADCI index" + function.module);
+                    }
+                }
+ 
                 //Chunk.PrintInstruction(next);
                 //Console.WriteLine();
                 function.body[i] = next;
             }
         }
-
-        //static void ImportModule(ValModule module, Operand new_index)
-        //{
-        //    Console.WriteLine("Importing module " + module.name);
-        //    foreach (KeyValuePair<ValString, Value> entry in module.table)
-        //    {
-        //        if (entry.Value.GetType() == typeof(ValFunction))
-        //        {
-        //            ValFunction function = entry.Value as ValFunction;
-        //            for (Operand i = 0; i < function.body.Count; i++)
-        //            {
-        //                Instruction next = function.body[i];
-
-        //                if (next.opCode == OpCode.LOADI)
-        //                {
-        //                    Chunk.PrintInstruction(next);
-        //                    Console.Write(" ");
-        //                    Console.WriteLine("here");
-        //                    next.opB = new_index;
-        //                    function.body[i] = next;
-        //                    Chunk.PrintInstruction(function.body[i]);
-        //                    Console.WriteLine();
-        //                }
-        //            }
-        //        }
-        //    }
-        //    Console.WriteLine("end importing module " + module.name);
-        //}
     }
 }

@@ -29,7 +29,8 @@ namespace lightning
         LOADC,// Loads a constant to stack
         LOADV,// Loads o variable to stack
         LOADG,
-        LOADI,
+        LOADGI,
+        LOADCI,
         LOADUPVAL,
         LOADINTR,
         LOADNIL,
@@ -45,7 +46,6 @@ namespace lightning
         TABLEGET,
         TABLESET,
 
-        PUSH,
         POP,
         STASHTOP,
         POPSTASH,
@@ -215,7 +215,6 @@ namespace lightning
                 case OpCode.LOADC:
                 case OpCode.LOADG: 
                 case OpCode.LOADUPVAL:
-                case OpCode.PUSH:
                 case OpCode.LOADINTR:
                 case OpCode.JMP:
                 case OpCode.JNT:
@@ -227,7 +226,8 @@ namespace lightning
                 case OpCode.ASSIGNG:
                 case OpCode.ASSIGNUPVAL:
                 case OpCode.LOADV:
-                case OpCode.LOADI:               
+                case OpCode.LOADGI:
+                case OpCode.LOADCI:
                 case OpCode.NTABLE:
                 case OpCode.TABLESET:
                     return op.ToString() + " " + instruction.opA + " " + instruction.opB;
