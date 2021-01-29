@@ -448,151 +448,6 @@ namespace lightning
                 tables.Add("time", time);
             }
 
-            //////////////////////////////////////////////////////////////////////////////////////////////////////////////
-            ////////////////////////////////////////////////////////////////////////////////////////////////////// parsing
-            //{
-            //    ValTable parser = new ValTable(null, null);
-
-            //    ValString match_val_string = new ValString("match");
-            //    ValString tail_val_string = new ValString("tail");
-
-            //    Value makeStringParser(VM vm)
-            //    {
-            //        ValString val_match_string = vm.StackPeek(0) as ValString;
-            //        string match_string = val_match_string.ToString();
-
-            //        Func<VM, Value> parser = (vm) =>
-            //        {
-            //            ValString val_input_string = vm.StackPeek(0) as ValString;
-            //            string input_string = val_input_string.ToString();
-            //            int length = match_string.Length;
-            //            if (length <= input_string.Length)
-            //            {
-            //                string slice_input_string = input_string.Substring(0, length);
-            //                if (slice_input_string == match_string)
-            //                {
-            //                    ValTable match_result = new ValTable(null, null);
-            //                    match_result.TableSet(match_val_string, val_match_string);
-            //                    string tail = input_string.Substring(length, input_string.Length - length);
-            //                    match_result.TableSet(tail_val_string, new ValString(tail));
-            //                    return match_result;
-            //                }
-            //            }
-            //            ValTable result = new ValTable(null, null);
-            //            result.TableSet(match_val_string, Value.Nil);
-            //            result.TableSet(tail_val_string, val_input_string);
-            //            return result;
-            //        };
-            //        return new ValIntrinsic(match_string + "_parser", parser, 1);
-            //    }
-            //    parser.TableSet(new ValString("make_string"), new ValIntrinsic("make_string_parser", makeStringParser, 1));
-
-            //    //////////////////////////////////////////////////////
-
-            //    Value digitParser(VM vm)
-            //    {
-            //        ValString val_input_string = vm.StackPeek(0) as ValString;
-            //        string input_string = val_input_string.ToString();
-            //        if (1 <= input_string.Length)
-            //        {
-            //            char head = input_string[0];
-            //            if (Char.IsDigit(head))
-            //            {
-            //                ValTable match_result = new ValTable(null, null);
-            //                match_result.TableSet(match_val_string, new ValString(head.ToString()));
-            //                string tail = input_string.Substring(1, input_string.Length - 1);
-            //                match_result.TableSet(tail_val_string, new ValString(tail));
-            //                return match_result;
-            //            }
-            //        }
-            //        ValTable result = new ValTable(null, null);
-            //        result.TableSet(match_val_string, Value.Nil);
-            //        result.TableSet(tail_val_string, val_input_string);
-            //        return result;
-            //    }
-            //    parser.TableSet(new ValString("digit"), new ValIntrinsic("digit_parser", digitParser, 1));
-
-            //    //////////////////////////////////////////////////////
-
-            //    Value alphaParser(VM vm)
-            //    {
-            //        ValString val_input_string = vm.StackPeek(0) as ValString;
-            //        string input_string = val_input_string.ToString();
-            //        if (1 <= input_string.Length)
-            //        {
-            //            char head = input_string[0];
-            //            if (Char.IsLetter(head))
-            //            {
-            //                ValTable match_result = new ValTable(null, null);
-            //                match_result.TableSet(match_val_string, new ValString(head.ToString()));
-            //                string tail = input_string.Substring(1, input_string.Length - 1);
-            //                match_result.TableSet(tail_val_string, new ValString(tail));
-            //                return match_result;
-            //            }
-            //        }
-            //        ValTable result = new ValTable(null, null);
-            //        result.TableSet(match_val_string, Value.Nil);
-            //        result.TableSet(tail_val_string, val_input_string);
-            //        return result;
-            //    }
-            //    parser.TableSet(new ValString("alpha"), new ValIntrinsic("alpha_parser", alphaParser, 1));
-
-            //    //////////////////////////////////////////////////////
-
-            //    Value orCombinator(VM vm)
-            //    {
-            //        ValIntrinsic parser1 = vm.StackPeek(0) as ValIntrinsic;
-            //        ValIntrinsic parser2 = vm.StackPeek(1) as ValIntrinsic;
-
-            //        Func<VM, Value> parser = (vm) =>
-            //        {
-            //            ValTable result1 = parser1.function(vm) as ValTable;
-            //            if (result1.table[match_val_string] != Value.Nil)
-            //                return result1;
-            //            ValTable result2 = parser2.function(vm) as ValTable;
-            //            return result2;
-            //        };
-            //        return new ValIntrinsic(parser1.name + "_or_" + parser2.name, parser, 1);
-            //    }
-            //    parser.TableSet(new ValString("Or"), new ValIntrinsic("or_combinator", orCombinator, 2));
-
-            //    //////////////////////////////////////////////////////
-
-            //    Value andCombinator(VM vm)
-            //    {
-            //        ValIntrinsic parser1 = vm.StackPeek(0) as ValIntrinsic;
-            //        ValIntrinsic parser2 = vm.StackPeek(1) as ValIntrinsic;
-
-            //        Func<VM, Value> parser = (vm) =>
-            //        {
-            //            ValTable result1 = parser1.function(vm) as ValTable;
-            //            if (result1.table[match_val_string] != Value.Nil)
-            //            {
-            //                vm.StackPush(result1.table[tail_val_string]);
-            //                ValTable result2 = parser2.function(vm) as ValTable;
-            //                vm.StackPop();
-            //                if (result2.table[match_val_string] != Value.Nil)
-            //                {
-            //                    result2.table[match_val_string] = new ValString(result1.table[match_val_string].ToString() + result2.table[match_val_string].ToString());
-            //                    return result2;
-            //                }
-            //                else
-            //                {
-            //                    ValTable result3 = new ValTable(null, null);
-            //                    result3.TableSet(match_val_string, Value.Nil);
-            //                    result3.TableSet(tail_val_string, vm.StackPeek(0));
-            //                    return result3;
-            //                }
-            //            }
-            //            return result1;
-            //        };
-            //        return new ValIntrinsic(parser1.name + "_and_" + parser2.name, parser, 1);
-            //    }
-            //    parser.TableSet(new ValString("And"), new ValIntrinsic("And_combinator", andCombinator, 2));
-
-            //    tables.Add("parser", parser);
-            //}
-
             ////////////////////////////////////////////////////////////////////////////////////////////////////////////
             ////////////////////////////////////////////////////////////////////////////////////////// Global Intrinsics
 
@@ -691,6 +546,11 @@ namespace lightning
             Value require(VM vm)
             {
                 string path = ((ValString)vm.StackPeek(0)).ToString();
+                foreach(ValModule v in vm.modules)// skip already imported modules
+                {
+                    if (v.name == path)
+                        return v;
+                }
                 string module_code;
                 using (var sr = new StreamReader(path))
                 {
@@ -772,7 +632,7 @@ namespace lightning
                 ValString value_string = new ValString("value");
 
                 ValTable iterator = new ValTable(null, null);
-                Func<VM, Value> next = (vm) =>
+                Value next(VM vm)
                 {
                     if (i < (this_table.ECount - 1))
                     {
@@ -799,7 +659,7 @@ namespace lightning
                 iterator.table[key_string] = Value.Nil;
                 iterator.table[value_string] = Value.Nil;
 
-                Func<VM, Value> next = (vm) =>
+                Value next(VM vm)
                 {
                     if (enumerator.MoveNext())
                     {
@@ -809,6 +669,7 @@ namespace lightning
                     }
                     return Value.False;
                 };
+
                 iterator.TableSet(new ValString("next"), new ValIntrinsic("iterator_table_next", next, 0));
                 return iterator;
             }
@@ -839,12 +700,17 @@ namespace lightning
                 {
                     if (first)
                     {
-                        Console.Write(System.Text.RegularExpressions.Regex.Unescape(entry.Key.ToString()) + " : " + System.Text.RegularExpressions.Regex.Unescape(entry.Value.ToString()));
+                        Console.Write(
+                            System.Text.RegularExpressions.Regex.Unescape(entry.Key.ToString())
+                            + " : " + System.Text.RegularExpressions.Regex.Unescape(entry.Value.ToString()));
                         first = false;
                     }
                     else
                     {
-                        Console.Write(", " + System.Text.RegularExpressions.Regex.Unescape(entry.Key.ToString()) + " : " + System.Text.RegularExpressions.Regex.Unescape(entry.Value.ToString()));
+                        Console.Write(
+                            ", "
+                            + System.Text.RegularExpressions.Regex.Unescape(entry.Key.ToString())
+                            + " : " + System.Text.RegularExpressions.Regex.Unescape(entry.Value.ToString()));
                     }
                 }
                 return Value.Nil;
@@ -862,9 +728,8 @@ namespace lightning
             //////////////////////////////////////////////////////
             Value readNumber(VM vm)
             {
-                string read = Console.ReadLine();
-                Number n;
-                if (Number.TryParse(read, out n))
+                string read = Console.ReadLine();    
+                if (Number.TryParse(read, out Number n))
                     return new ValNumber(n);
                 else
                     return Value.Nil;
@@ -935,8 +800,11 @@ namespace lightning
                 ValString val_body = vm.StackPeek(2) as ValString;                
                 string body = val_body.ToString();
 
-                var options = ScriptOptions.Default.AddReferences(typeof(Value).Assembly, typeof(VM).Assembly).WithImports("lightning", "System");
-                Func<VM, Value> new_intrinsic = CSharpScript.EvaluateAsync<Func<VM, Value>>(body, options).GetAwaiter().GetResult();
+                var options = ScriptOptions.Default.AddReferences(
+                    typeof(Value).Assembly,
+                    typeof(VM).Assembly).WithImports("lightning", "System");
+                Func<VM, Value> new_intrinsic = CSharpScript.EvaluateAsync<Func<VM, Value>>(body, options)
+                    .GetAwaiter().GetResult();
 
                 return new ValIntrinsic(name.ToString(), new_intrinsic, (int)arity.content);
             }
@@ -1069,7 +937,7 @@ namespace lightning
             public Dictionary<Operand, Operand> relocatedGlobals;
             public List<Operand> toBeRelocatedGlobals;
             public List<int> relocatedTables;
-            public Dictionary<Operand, Operand> relocatedModules;
+            public Dictionary<Operand, Operand> relocatedModules;            
             public ValModule module;
             public Operand moduleIndex;
             public RelocationInfo(
@@ -1079,6 +947,7 @@ namespace lightning
                 List<Operand> p_toBeRelocatedGlobals,
                 List<int> p_relocatedTables,
                 Dictionary<Operand, Operand> p_relocatedModules,
+
                 ValModule p_module,
                 Operand p_moduleIndex)
             {
@@ -1100,10 +969,8 @@ namespace lightning
             {
                 Operand old_module_index = m.importIndex;
                 Operand copied_module_index;
-                //Console.WriteLine(m.name);
                 if (!importing_vm.modules.Contains(m))
                 {
-                    Console.WriteLine("does not contain");
                     copied_module_index = importing_vm.AddModule(m);
                 }
                 else
@@ -1128,7 +995,7 @@ namespace lightning
                 (Operand)module_index);
 
             if (this_value.GetType() == typeof(ValFunction)) RelocateFunction(this_value as ValFunction, relocationInfo);
-            else if (this_value.GetType() == typeof(ValClosure)) RelocateFunction((this_value as ValClosure).function, relocationInfo);
+            else if (this_value.GetType() == typeof(ValClosure)) RelocateClosure(this_value as ValClosure, relocationInfo);
             else if (this_value.GetType() == typeof(ValTable)) FindFunction(this_value as ValTable, relocationInfo);
 
 
@@ -1143,7 +1010,7 @@ namespace lightning
                 foreach (KeyValuePair<ValString, Value> entry in table.table)
                 {
                     if (entry.Value.GetType() == typeof(ValFunction)) RelocateFunction(entry.Value as ValFunction, relocationInfo);
-                    else if (entry.Value.GetType() == typeof(ValClosure)) RelocateFunction((entry.Value as ValClosure).function, relocationInfo);
+                    else if (entry.Value.GetType() == typeof(ValClosure)) RelocateClosure(entry.Value as ValClosure, relocationInfo);
                     else if (entry.Value.GetType() == typeof(ValTable)) FindFunction(entry.Value as ValTable, relocationInfo);
 
                     relocationInfo.module.TableSet(entry.Key, entry.Value);
@@ -1151,22 +1018,41 @@ namespace lightning
             }
         }
 
+        static void RelocateClosure(ValClosure closure, RelocationInfo relocationInfo)
+        {
+            foreach (ValUpValue v in closure.upValues)
+            {
+                if (v.Val.GetType() == typeof(ValClosure)/* && relocationInfo.module.name != closure.function.module*/)
+                {
+                    Console.WriteLine("here--------");
+                    RelocateClosure(v.Val as ValClosure, relocationInfo);
+                }
+                else if (v.Val.GetType() == typeof(ValFunction)/* && relocationInfo.module.name != closure.function.module*/)
+                {
+                    Console.WriteLine("here--------");
+                    RelocateFunction(v.Val as ValFunction, relocationInfo);
+                }
+            }
+
+            RelocateFunction(closure.function, relocationInfo);
+        }
+
         static void RelocateFunction(ValFunction function, RelocationInfo relocationInfo)
         {
             List<ValTable> relocation_stack = new List<ValTable>();
-
             RelocateChunk(function, relocationInfo);
 
             for (Operand i = 0; i < relocationInfo.toBeRelocatedGlobals.Count; i++)
             {
                 Value new_value = relocationInfo.importedVM.GetGlobal(relocationInfo.toBeRelocatedGlobals[i]);
+
                 relocationInfo.module.globals.Add(new_value);
                 relocationInfo.relocatedGlobals.Add(relocationInfo.toBeRelocatedGlobals[i], (Operand)(relocationInfo.module.globals.Count - 1));
 
                 if (new_value.GetType() == typeof(ValTable)) relocation_stack.Add(new_value as ValTable);
             }
             relocationInfo.toBeRelocatedGlobals.Clear();
-
+        
             foreach (ValTable v in relocation_stack)
             {
                 FindFunction(v, relocationInfo);
@@ -1210,28 +1096,56 @@ namespace lightning
                 }
                 else if (next.opCode == OpCode.LOADI)
                 {
-                    next.opB = relocationInfo.relocatedModules[next.opB];
-                }
-                else if (next.opCode == OpCode.LOADC)
-                {
-                    Value this_value = relocationInfo.importedVM.GetChunk().GetConstant(next.opA);
-                    if (relocationInfo.importingVM.GetChunk().GetConstants().Contains(this_value))
+                    if (function.module != relocationInfo.module.name)
                     {
-                        next.opA = (Operand)relocationInfo.importingVM.GetChunk().GetConstants().IndexOf(relocationInfo.importedVM.GetChunk().GetConstant(next.opA));
+                        bool found = false;
+                        foreach(ValModule v  in relocationInfo.importingVM.modules)
+                        {
+                            if(function.module == v.name)
+                            {
+                                next.opB = v.importIndex;
+                                found = true;
+                                break;
+                            }
+                        }
+                        if(found == false)
+                            Console.WriteLine("Can not find LOADI index" + function.module);
                     }
                     else
                     {
-                        relocationInfo.importingVM.GetChunk().GetConstants().Add(relocationInfo.importedVM.GetChunk().GetConstant(next.opA));
-                        next.opA = (Operand)(relocationInfo.importingVM.GetChunk().GetConstants().Count - 1);
+                        next.opB = relocationInfo.relocatedModules[next.opB];
+                    }
+                }
+                else if (next.opCode == OpCode.LOADC)
+                {
+                    if (function.module == relocationInfo.module.name)
+                    {
+                        Value this_value = relocationInfo.importedVM.GetChunk().GetConstant(next.opA);
+
+                        if (relocationInfo.importingVM.GetChunk().GetConstants().Contains(this_value))
+                        {
+                            next.opA = (Operand)relocationInfo.importingVM.GetChunk().GetConstants().IndexOf(this_value);
+                        }
+                        else
+                        {
+                            relocationInfo.importingVM.GetChunk().GetConstants().Add(this_value);
+                            next.opA = (Operand)(relocationInfo.importingVM.GetChunk().GetConstants().Count - 1);
+                        }
                     }
                 }
                 else if (next.opCode == OpCode.FUNDCL)
                 {
                     Value this_value = relocationInfo.importedVM.GetChunk().GetConstant(next.opC);
-                    relocationInfo.importingVM.GetChunk().GetConstants().Add(relocationInfo.importedVM.GetChunk().GetConstant(next.opC));
-                    next.opC = (Operand)(relocationInfo.importingVM.GetChunk().GetConstants().Count - 1);
-                    RelocateChunk((this_value as ValClosure).function, relocationInfo);
-                    Console.WriteLine(this_value);
+                    if (relocationInfo.importingVM.GetChunk().GetConstants().Contains(this_value))
+                    {
+                        next.opC = (Operand)relocationInfo.importingVM.GetChunk().GetConstants().IndexOf(this_value);
+                    }
+                    else
+                    {
+                        relocationInfo.importingVM.GetChunk().GetConstants().Add(this_value);
+                        next.opC = (Operand)(relocationInfo.importingVM.GetChunk().GetConstants().Count - 1);
+                        RelocateChunk((this_value as ValClosure).function, relocationInfo);
+                    }
                 }
                 //Chunk.PrintInstruction(next);
                 //Console.WriteLine();
@@ -1242,28 +1156,29 @@ namespace lightning
         //static void ImportModule(ValModule module, Operand new_index)
         //{
         //    Console.WriteLine("Importing module " + module.name);
-        //    foreach(KeyValuePair<ValString, Value> entry in module.table)
+        //    foreach (KeyValuePair<ValString, Value> entry in module.table)
         //    {
-        //        if (entry.Value.GetType() == typeof(ValFunction)) {
+        //        if (entry.Value.GetType() == typeof(ValFunction))
+        //        {
         //            ValFunction function = entry.Value as ValFunction;
         //            for (Operand i = 0; i < function.body.Count; i++)
         //            {
         //                Instruction next = function.body[i];
-        //                Chunk.PrintInstruction(next);
-        //                Console.Write(" ");                        
-        //                if (next.opCode == OpCode.LOADI || next.opCode == OpCode.LOADTABLEI)
-        //                {
-        //                    next.opB = new_index;
-        //                    function.body[i] = next;                            
-        //                }
 
-        //                Chunk.PrintInstruction(function.body[i]);
-        //                Console.WriteLine();
+        //                if (next.opCode == OpCode.LOADI)
+        //                {
+        //                    Chunk.PrintInstruction(next);
+        //                    Console.Write(" ");
+        //                    Console.WriteLine("here");
+        //                    next.opB = new_index;
+        //                    function.body[i] = next;
+        //                    Chunk.PrintInstruction(function.body[i]);
+        //                    Console.WriteLine();
+        //                }
         //            }
         //        }
         //    }
         //    Console.WriteLine("end importing module " + module.name);
         //}
-
     }
 }

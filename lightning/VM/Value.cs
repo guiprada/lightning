@@ -137,7 +137,7 @@ namespace lightning
     {
         public override string ToString()
         {
-            return "Nil";
+            return "nil";
         }
 
         public override bool ToBool()
@@ -177,7 +177,12 @@ namespace lightning
         }
         public override string ToString()
         {
-            return new string("fun" + (name != null ? " " + name : "") + " (" + arity + ")");
+            string str = new string("fun" + " " + name + ":" + module +  " " + " (" + arity + ")");
+            foreach (Instruction i in body)
+            {
+                str += i.ToString() + "\n";
+            }
+            return str;
         }
 
         public override bool ToBool()
@@ -475,7 +480,7 @@ namespace lightning
     public class ValModule : ValTable
     {
         public string name;
-        public List<Value> globals;
+        public List<Value> globals;        
         public Operand importIndex;
         public ValModule(string p_name, List<Value> p_elements, Dictionary<ValString, Value> p_table, List<Value> p_globals)
             : base(p_elements, p_table)
@@ -492,6 +497,10 @@ namespace lightning
                 if ((other as ValModule).name == this.name) return true;
             }
             return false;
+        }
+        public override string ToString()
+        {
+            return "module" + name;
         }
 
         public override int GetHashCode()

@@ -18,6 +18,11 @@ namespace lightning
             opB = p_opB;
             opC = p_opC;
         }
+
+        public override string ToString()
+        {
+            return Chunk.ToString(this);
+        }
     }
     public enum OpCode: Operand
     {

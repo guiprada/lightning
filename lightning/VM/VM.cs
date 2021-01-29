@@ -5,9 +5,9 @@ using System.Text;
 
 using Operand = System.UInt16;
 #if DOUBLE
-using Number = System.Double;
+    using Number = System.Double;
 #else
-using Number = System.Single;
+    using Number = System.Single;
 #endif
 
 namespace lightning
@@ -186,13 +186,13 @@ namespace lightning
             return globals[address];
         }
 
-        public void StackPush(Value p_value)
+        void StackPush(Value p_value)
         {
             stack[stackTop] = p_value;
             stackTop++;
         }
 
-        public Value StackPop()
+        Value StackPop()
         {
             stackTop--;
             Value popped = stack[stackTop];
@@ -317,7 +317,9 @@ namespace lightning
                 Console.Write("Error: " + msg);
                 Console.Write(" on function: " + functionCallStack[executingInstructions].name);
                 Console.Write(" from module: " + functionCallStack[executingInstructions].module);
-                Console.WriteLine(" on line: " + chunk.GetLine(IP + functionCallStack[executingInstructions].originalPosition));
+                Console.WriteLine(
+                    " on line: "
+                    + chunk.GetLine(IP + functionCallStack[executingInstructions].originalPosition));
             }
         }
 
@@ -384,6 +386,7 @@ namespace lightning
                             IP++;
                             Operand address = instruction.opA;
                             Value constant = chunk.GetConstant(address);
+                            //Console.WriteLine(constant);
                             if (constant.GetType() == typeof(ValNumber))
                                 StackPush(GetValNumber(((ValNumber)constant).content));
                             else
