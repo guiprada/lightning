@@ -277,18 +277,14 @@ namespace lightning
             }
             if (condition == null) Error("'For' 'condition' can not be null.");
 
-            Consume(TokenType.SEMICOLON, "Expected ';' separating 'for' condition and finalizer.", false);
-
-            Node finalizer;
-            if (!Check(TokenType.RIGHT_PAREN))
-            {
-                finalizer = Expression();
+            Node finalizer = null;
+            if (Match(TokenType.SEMICOLON))
+            {   
+                if (!Check(TokenType.RIGHT_PAREN))
+                {
+                    finalizer = Expression();
+                }
             }
-            else
-            {
-                finalizer = null;
-            }
-
             Consume(TokenType.RIGHT_PAREN, "Expected ')' after 'for' finalizer.", true);
 
             Node body = Statement();

@@ -207,6 +207,33 @@ namespace lightning
                 }
                 list.TableSet(new ValString("reverse"), new ValIntrinsic("reverse", listReverse, 1));
 
+                //////////////////////////////////////////////////////
+
+                Value makeIterator(VM vm)
+                {
+                    ValTable this_table = vm.StackPeek(0) as ValTable;
+                    int i = -1;
+                    Value value = Value.Nil;
+                    ValString value_string = new ValString("value");
+
+                    ValTable iterator = new ValTable(null, null);
+                    Value next(VM vm)
+                    {
+                        if (i < (this_table.ECount - 1))
+                        {
+                            i++;
+                            iterator.table[value_string] = this_table.elements[i];
+                            return Value.True;
+                        }
+                        return Value.False;
+                    };
+                    iterator.TableSet(new ValString("next"), new ValIntrinsic("iterator_next", next, 0));
+                    return iterator;
+                }
+                list.TableSet(new ValString("iterator"), new ValIntrinsic("list_iterator", makeIterator, 1));
+
+                ////////////////////////////////////////////////////// 
+
                 tables.Add("list", list);
             }
 
@@ -215,6 +242,15 @@ namespace lightning
 
             {
                 ValTable table = new ValTable(null, null);
+
+                //////////////////////////////////////////////////////
+                Value tableCount(VM vm)
+                {
+                    ValTable this_table = vm.StackPeek(0) as ValTable;
+                    int count = this_table.TCount;
+                    return new ValNumber(count);
+                }
+                table.TableSet(new ValString("count"), new ValIntrinsic("table_count", tableCount, 1));
 
                 //////////////////////////////////////////////////////
                 Value tableIndexes(VM vm)
@@ -254,6 +290,60 @@ namespace lightning
                     return Value.Nil;
                 }
                 table.TableSet(new ValString("clear"), new ValIntrinsic("clear", tableClear, 1));
+
+                Value makeIteratorTable(VM vm)
+                {
+                    ValTable this_table = vm.StackPeek(0) as ValTable;
+                    System.Collections.IDictionaryEnumerator enumerator = this_table.table.GetEnumerator();
+
+                    ValString value_string = new ValString("value");
+                    ValString key_string = new ValString("key");
+                    ValTable iterator = new ValTable(null, null);
+                    iterator.table[key_string] = Value.Nil;
+                    iterator.table[value_string] = Value.Nil;
+
+                    Value next(VM vm)
+                    {
+                        if (enumerator.MoveNext())
+                        {
+                            iterator.table[key_string] = (ValString)enumerator.Key;
+                            iterator.table[value_string] = enumerator.Value as Value;
+                            return Value.True;
+                        }
+                        return Value.False;
+                    };
+
+                    iterator.TableSet(new ValString("next"), new ValIntrinsic("table_iterator_next", next, 0));
+                    return iterator;
+                }
+                table.TableSet(new ValString("iterator"), new ValIntrinsic("iterator_table", makeIteratorTable, 1));
+
+                //////////////////////////////////////////////////////
+                Value tableToString(VM vm)
+                {
+                    ValTable this_table = vm.StackPeek(0) as ValTable;
+                    string value = "";
+                    bool first = true;
+                    foreach (KeyValuePair<ValString, Value> entry in this_table.table)
+                    {
+                        if (first)
+                        {
+                            value +=
+                                System.Text.RegularExpressions.Regex.Unescape(entry.Key.ToString())
+                                + " : " + System.Text.RegularExpressions.Regex.Unescape(entry.Value.ToString());
+                            first = false;
+                        }
+                        else
+                        {
+                            value +=
+                                ", "
+                                + System.Text.RegularExpressions.Regex.Unescape(entry.Key.ToString())
+                                + " : " + System.Text.RegularExpressions.Regex.Unescape(entry.Value.ToString());
+                        }
+                    }
+                    return new ValString(value);
+                }
+                table.TableSet(new ValString("to_string"), new ValIntrinsic("table_to_string", tableToString, 1));
 
                 tables.Add("table", table);
             }
@@ -449,6 +539,178 @@ namespace lightning
             }
 
             ////////////////////////////////////////////////////////////////////////////////////////////////////////////
+            ///////////////////////////////////////////////////////////////////////////////////////////////////// string
+            {
+                ValTable string_table = new ValTable(null, null);
+
+                Value stringSlice(VM vm)
+                {
+                    ValString val_input_string = vm.StackPeek(0) as ValString;
+                    string input_string = val_input_string.ToString();
+                    Number start = (vm.StackPeek(1) as ValNumber).content;
+                    Number end = (vm.StackPeek(2) as ValNumber).content;
+
+                    if (end < input_string.Length)
+                    {
+                        string result = input_string.Substring((int)start, (int)(end - start));
+                        return new ValString(result);
+                    }
+                    return Value.Nil;
+                }
+                string_table.TableSet(new ValString("slice"), new ValIntrinsic("string_slice", stringSlice, 3));
+
+                //////////////////////////////////////////////////////
+
+                Value stringSplit(VM vm)
+                {
+                    ValString val_input_string = vm.StackPeek(0) as ValString;
+                    string input_string = val_input_string.ToString();
+                    Number start = (vm.StackPeek(1) as ValNumber).content;
+                    if (start < input_string.Length)
+                    {
+                        Number end = input_string.Length;
+                        string result = input_string.Substring((int)start, (int)(end - start));
+                        val_input_string.content = input_string.Substring(0, (int)start);
+                        return new ValString(result);
+                    }
+                    return Value.Nil;
+                }
+                string_table.TableSet(new ValString("split"), new ValIntrinsic("string_split", stringSplit, 2));
+
+                //////////////////////////////////////////////////////
+
+                Value stringLength(VM vm)
+                {
+                    ValString val_input_string = vm.StackPeek(0) as ValString;
+                    return new ValNumber(val_input_string.ToString().Length);
+                }
+                string_table.TableSet(new ValString("length"), new ValIntrinsic("string_length", stringLength, 1));
+
+                //////////////////////////////////////////////////////
+
+                Value stringCopy(VM vm)
+                {
+                    Value val_input_string = vm.StackPeek(0);
+                    if (val_input_string.GetType() == typeof(ValString))
+                        return new ValString(val_input_string.ToString());
+                    else
+                        return Value.Nil;
+                }
+                string_table.TableSet(new ValString("copy"), new ValIntrinsic("string_copy", stringCopy, 1));
+
+                //////////////////////////////////////////////////////
+
+                tables.Add("string", string_table);
+            }
+
+            ////////////////////////////////////////////////////////////////////////////////////////////////////////////
+            /////////////////////////////////////////////////////////////////////////////////////////////////////// char
+            {
+                ValTable char_table = new ValTable(null, null);
+                Value charAt(VM vm)
+                {
+                    ValString val_input_string = vm.StackPeek(0) as ValString;
+                    ValNumber index = vm.StackPeek(1) as ValNumber;
+                    string input_string = val_input_string.ToString();
+                    if (index.content < input_string.Length)
+                    {
+                        char result = input_string[(int)index.content];
+                        return new ValString(result.ToString());
+                    }
+                    return Value.Nil;
+                }
+                char_table.TableSet(new ValString("at"), new ValIntrinsic("char_at", charAt, 2));
+
+                //////////////////////////////////////////////////////
+
+                Value isAlpha(VM vm)
+                {
+                    ValString val_input_string = vm.StackPeek(0) as ValString;
+                    string input_string = val_input_string.ToString();
+                    if (1 <= input_string.Length)
+                    {
+                        char head = input_string[0];
+                        if (Char.IsLetter(head))
+                        {
+                            return Value.True;
+                        }
+                    }
+                    return Value.False;
+                }
+                char_table.TableSet(new ValString("is_alpha"), new ValIntrinsic("is_alpha", isAlpha, 1));
+
+                //////////////////////////////////////////////////////
+
+                Value isDigit(VM vm)
+                {
+                    ValString val_input_string = vm.StackPeek(0) as ValString;
+                    string input_string = val_input_string.ToString();
+                    if (1 <= input_string.Length)
+                    {
+                        char head = input_string[0];
+                        if (Char.IsDigit(head))
+                        {
+                            return Value.True;
+                        }
+                        return Value.False;
+                    }
+                    return Value.Nil;
+                }
+                char_table.TableSet(new ValString("is_digit"), new ValIntrinsic("is_digit", isDigit, 1));
+
+                tables.Add("char", char_table);
+            }
+
+            ////////////////////////////////////////////////////////////////////////////////////////////////////////////
+            /////////////////////////////////////////////////////////////////////////////////////////////////////// file
+            {
+                ValTable file = new ValTable(null, null);
+                Value loadFile(VM vm)
+                {
+                    string path = ((ValString)vm.StackPeek(0)).ToString();
+                    string input;
+                    using (var sr = new StreamReader(path))
+                    {
+                        input = sr.ReadToEnd();
+                    }
+                    if (input != null)
+                        return new ValString(input);
+
+                    return Value.Nil;
+                }
+                file.TableSet(new ValString("load"), new ValIntrinsic("load_file", loadFile, 1));
+
+                //////////////////////////////////////////////////////
+                Value writeFile(VM vm)
+                {
+                    string path = ((ValString)vm.StackPeek(0)).ToString();
+                    string output = ((ValString)vm.StackPeek(1)).ToString();
+                    using (System.IO.StreamWriter file = new System.IO.StreamWriter(path, false))
+                    {
+                        file.Write(output);
+                    }
+
+                    return Value.Nil;
+                }
+                file.TableSet(new ValString("write"), new ValIntrinsic("write_file", writeFile, 2));
+
+                //////////////////////////////////////////////////////
+                Value appendFile(VM vm)
+                {
+                    string path = ((ValString)vm.StackPeek(0)).ToString();
+                    string output = ((ValString)vm.StackPeek(1)).ToString();
+                    using (System.IO.StreamWriter file = new System.IO.StreamWriter(path, true))
+                    {
+                        file.Write(output);
+                    }
+
+                    return Value.Nil;
+                }
+                file.TableSet(new ValString("append"), new ValIntrinsic("append_file", appendFile, 2));
+
+                tables.Add("file", file);
+            }
+            ////////////////////////////////////////////////////////////////////////////////////////////////////////////
             ////////////////////////////////////////////////////////////////////////////////////////// Global Intrinsics
 
             List<ValIntrinsic> functions = new List<ValIntrinsic>();
@@ -497,50 +759,6 @@ namespace lightning
                 return Value.Nil;
             }
             functions.Add(new ValIntrinsic("eval", eval, 1));
-
-            //////////////////////////////////////////////////////
-            Value loadFile(VM vm)
-            {
-                string path = ((ValString)vm.StackPeek(0)).ToString();
-                string input;
-                using (var sr = new StreamReader(path))
-                {
-                    input = sr.ReadToEnd();
-                }
-                if (input != null)
-                    return new ValString(input);
-
-                return Value.Nil;
-            }
-            functions.Add(new ValIntrinsic("load_file", loadFile, 1));
-
-            //////////////////////////////////////////////////////
-            Value writeFile(VM vm)
-            {
-                string path = ((ValString)vm.StackPeek(0)).ToString();
-                string output = ((ValString)vm.StackPeek(1)).ToString();
-                using (System.IO.StreamWriter file = new System.IO.StreamWriter(path, false))
-                {
-                    file.Write(output);
-                }
-
-                return Value.Nil;
-            }
-            functions.Add(new ValIntrinsic("write_file", writeFile, 2));
-
-            //////////////////////////////////////////////////////
-            Value appendFile(VM vm)
-            {
-                string path = ((ValString)vm.StackPeek(0)).ToString();
-                string output = ((ValString)vm.StackPeek(1)).ToString();
-                using (System.IO.StreamWriter file = new System.IO.StreamWriter(path, true))
-                {
-                    file.Write(output);
-                }
-
-                return Value.Nil;
-            }
-            functions.Add(new ValIntrinsic("append_file", appendFile, 2));
 
             ////////////////////////////////////////////////////
             Value require(VM vm)
@@ -622,60 +840,8 @@ namespace lightning
             }
             functions.Add(new ValIntrinsic("modules", modules, 0));
 
-
-            //////////////////////////////////////////////////////            
-            Value makeIterator(VM vm)
-            {
-                ValTable this_table = vm.StackPeek(0) as ValTable;
-                int i = -1;
-                Value value = Value.Nil;
-                ValString value_string = new ValString("value");
-
-                ValTable iterator = new ValTable(null, null);
-                Value next(VM vm)
-                {
-                    if (i < (this_table.ECount - 1))
-                    {
-                        i++;
-                        iterator.table[value_string] = this_table.elements[i];
-                        return Value.True;
-                    }
-                    return Value.False;
-                };
-                iterator.TableSet(new ValString("next"), new ValIntrinsic("iterator_next", next, 0));
-                return iterator;
-            }
-            functions.Add(new ValIntrinsic("iterator", makeIterator, 1));
-
             //////////////////////////////////////////////////////
-            Value makeIteratorTable(VM vm)
-            {
-                ValTable this_table = vm.StackPeek(0) as ValTable;
-                System.Collections.IDictionaryEnumerator enumerator = this_table.table.GetEnumerator();
 
-                ValString value_string = new ValString("value");
-                ValString key_string = new ValString("key");
-                ValTable iterator = new ValTable(null, null);
-                iterator.table[key_string] = Value.Nil;
-                iterator.table[value_string] = Value.Nil;
-
-                Value next(VM vm)
-                {
-                    if (enumerator.MoveNext())
-                    {
-                        iterator.table[key_string] = (ValString)enumerator.Key;
-                        iterator.table[value_string] = enumerator.Value as Value;
-                        return Value.True;
-                    }
-                    return Value.False;
-                };
-
-                iterator.TableSet(new ValString("next"), new ValIntrinsic("iterator_table_next", next, 0));
-                return iterator;
-            }
-            functions.Add(new ValIntrinsic("iterator_table", makeIteratorTable, 1));
-
-            //////////////////////////////////////////////////////
             Value writeLine(VM vm)
             {
                 Console.WriteLine(System.Text.RegularExpressions.Regex.Unescape(vm.StackPeek(0).ToString()));
@@ -690,32 +856,6 @@ namespace lightning
                 return Value.Nil;
             }
             functions.Add(new ValIntrinsic("write", write, 1));
-
-            //////////////////////////////////////////////////////
-            Value writeTable(VM vm)
-            {
-                ValTable this_table = vm.StackPeek(0) as ValTable;
-                bool first = true;
-                foreach (KeyValuePair<ValString, Value> entry in this_table.table)
-                {
-                    if (first)
-                    {
-                        Console.Write(
-                            System.Text.RegularExpressions.Regex.Unescape(entry.Key.ToString())
-                            + " : " + System.Text.RegularExpressions.Regex.Unescape(entry.Value.ToString()));
-                        first = false;
-                    }
-                    else
-                    {
-                        Console.Write(
-                            ", "
-                            + System.Text.RegularExpressions.Regex.Unescape(entry.Key.ToString())
-                            + " : " + System.Text.RegularExpressions.Regex.Unescape(entry.Value.ToString()));
-                    }
-                }
-                return Value.Nil;
-            }
-            functions.Add(new ValIntrinsic("write_table", writeTable, 1));
 
             //////////////////////////////////////////////////////
             Value readln(VM vm)
@@ -751,16 +891,6 @@ namespace lightning
                     return Value.Nil;
             }
             functions.Add(new ValIntrinsic("read", read, 0));
-
-
-            //////////////////////////////////////////////////////
-            Value tCount(VM vm)
-            {
-                ValTable this_table = vm.StackPeek(0) as ValTable;
-                int count = this_table.TCount;
-                return new ValNumber(count);
-            }
-            functions.Add(new ValIntrinsic("count_table", tCount, 1));
 
             //////////////////////////////////////////////////////
             Value count(VM vm)
@@ -809,119 +939,8 @@ namespace lightning
                 return new ValIntrinsic(name.ToString(), new_intrinsic, (int)arity.content);
             }
             functions.Add(new ValIntrinsic("intrinsic", createIntrinsic, 3));
-#endif
+#endif            
 
-            ////////////////////////////////////////////// strings
-            
-            Value charAt(VM vm)
-            {
-                ValString val_input_string = vm.StackPeek(0) as ValString;
-                ValNumber index = vm.StackPeek(1) as ValNumber;
-                string input_string = val_input_string.ToString();
-                if (index.content < input_string.Length)
-                {
-                    char result = input_string[(int)index.content];
-                    return new ValString(result.ToString());
-                }
-                return Value.Nil;
-            }
-            functions.Add(new ValIntrinsic("char_at", charAt, 2));
-
-            //////////////////////////////////////////////////////
-
-            Value isAlpha(VM vm)
-            {
-                ValString val_input_string = vm.StackPeek(0) as ValString;
-                string input_string = val_input_string.ToString();
-                if (1 <= input_string.Length)
-                {
-                    char head = input_string[0];
-                    if (Char.IsLetter(head))
-                    {
-                        return Value.True;
-                    }
-                }
-                return Value.False;
-            }
-            functions.Add(new ValIntrinsic("is_alpha", isAlpha, 1));
-
-            //////////////////////////////////////////////////////
-
-            Value isDigit(VM vm)
-            {
-                ValString val_input_string = vm.StackPeek(0) as ValString;
-                string input_string = val_input_string.ToString();
-                if (1 <= input_string.Length)
-                {
-                    char head = input_string[0];
-                    if (Char.IsDigit(head))
-                    {
-                        return Value.True;
-                    }
-                    return Value.False;
-                }
-                return Value.Nil;
-            }
-            functions.Add(new ValIntrinsic("is_digit", isDigit, 1));
-
-            //////////////////////////////////////////////////////
-
-            Value stringSlice(VM vm)
-            {
-                ValString val_input_string = vm.StackPeek(0) as ValString;
-                string input_string = val_input_string.ToString();
-                Number start = (vm.StackPeek(1) as ValNumber).content;
-                Number end = (vm.StackPeek(2) as ValNumber).content;
-
-                if (end < input_string.Length)
-                {
-                    string result = input_string.Substring((int)start, (int)(end - start));
-                    return new ValString(result);
-                }
-                return Value.Nil;
-            }
-            functions.Add(new ValIntrinsic("string_slice", stringSlice, 3));
-
-            //////////////////////////////////////////////////////
-            
-            Value stringSplit(VM vm)
-            {
-                ValString val_input_string = vm.StackPeek(0) as ValString;
-                string input_string = val_input_string.ToString();
-                Number start = (vm.StackPeek(1) as ValNumber).content; 
-                if (start < input_string.Length)
-                {
-                    Number end = input_string.Length ;                    
-                    string result = input_string.Substring((int)start, (int)(end - start));                    
-                    val_input_string.content = input_string.Substring(0, (int)start);
-                    return new ValString(result);
-                }
-                return Value.Nil;
-            }
-            functions.Add(new ValIntrinsic("string_split", stringSplit, 2));
-
-            //////////////////////////////////////////////////////
-
-            Value stringLength(VM vm)
-            {
-                ValString val_input_string = vm.StackPeek(0) as ValString;
-                return new ValNumber(val_input_string.ToString().Length);
-            }
-            functions.Add(new ValIntrinsic("string_length", stringLength, 1));
-
-            //////////////////////////////////////////////////////
-
-            Value stringCopy(VM vm)
-            {
-                Value val_input_string = vm.StackPeek(0);
-                if (val_input_string.GetType() == typeof(ValString))
-                    return new ValString(val_input_string.ToString());
-                else
-                    return Value.Nil;
-            }
-            functions.Add(new ValIntrinsic("string_copy", stringCopy, 1));
-
-            //////////////////////////////////////////////////////
             Library prelude = new Library(functions, tables);
 
             return prelude;

@@ -1325,19 +1325,17 @@ namespace lightning
             }
             if (counter == 0) Console.WriteLine("empty :)");
 
-            Console.WriteLine("Envs: " + variablesBasesTop);
-
             Console.WriteLine("\nUpvalues:");
             counter = 0;
             for (int i = 0; i < upValuesBases[upValuesBasesTop - 1]; i++)
+            {
                 foreach (Value v in upValues)
                 {
                     Console.WriteLine(counter + ": " + upValues[i]);
                     counter++;
                 }
+            }
             if (counter == 0) Console.WriteLine("empty :)");
-
-            Console.WriteLine("Envs: " + upValuesBasesTop);
         }
     }
 }
