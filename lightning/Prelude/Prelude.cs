@@ -1196,7 +1196,6 @@ namespace lightning
         }
         static void ImportModule(ValModule module, Operand new_index)
         {
-            Console.WriteLine("Importing module " + module.name);
             foreach (KeyValuePair<ValString, Value> entry in module.table)
             {
                 if (entry.Value.GetType() == typeof(ValFunction))
@@ -1208,18 +1207,12 @@ namespace lightning
 
                         if (next.opCode == OpCode.LOADGI || next.opCode == OpCode.LOADCI)
                         {
-                            Chunk.PrintInstruction(next);
-                            Console.Write(" ");
-                            Console.WriteLine("here");
                             next.opB = new_index;
                             function.body[i] = next;
-                            Chunk.PrintInstruction(function.body[i]);
-                            Console.WriteLine();
                         }
                     }
                 }
             }
-            Console.WriteLine("end importing module " + module.name);
         }
     }
 }
