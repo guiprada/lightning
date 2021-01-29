@@ -1,6 +1,5 @@
 ﻿todo
-	- char at intrinsic
-	- string slice intrincic
+
 	- add loading Value.Nil for missing parameters on function call, emit a warning
 	- elide more stuff on parser
 	- parser generators and combinators 
@@ -76,6 +75,8 @@ done
 	- separte error detection and warnings in parser
 	- Write to file intrinsic
 	- read intrinsic
+	- char at intrinsic
+	- string slice intrincic
 
 --
 where do we create references

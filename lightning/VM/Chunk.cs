@@ -21,7 +21,77 @@ namespace lightning
 
         public override string ToString()
         {
-            return Chunk.ToString(this);
+            OpCode op = this.opCode;
+            switch (op)
+            {
+                // 0 op
+                case OpCode.VARDCL:
+                case OpCode.GLOBALDCL:
+                case OpCode.NENV:
+                case OpCode.CENV:
+                case OpCode.RET:
+                case OpCode.ADD:
+                case OpCode.APP:
+                case OpCode.SUB:
+                case OpCode.MUL:
+                case OpCode.DIV:
+                case OpCode.NEG:
+                case OpCode.NOT:
+                case OpCode.INC:
+                case OpCode.DEC:
+                case OpCode.AND:
+                case OpCode.OR:
+                case OpCode.XOR:
+                case OpCode.NAND:
+                case OpCode.NOR:
+                case OpCode.XNOR:
+                case OpCode.EQ:
+                case OpCode.NEQ:
+                case OpCode.GTQ:
+                case OpCode.LTQ:
+                case OpCode.GT:
+                case OpCode.LT:
+                case OpCode.EXIT:
+                case OpCode.LOADNIL:
+                case OpCode.POP:
+                case OpCode.STASHTOP:
+                case OpCode.POPSTASH:
+                case OpCode.CALL:
+                case OpCode.CLOSURECLOSE:
+                case OpCode.FUNCLOSE:
+                case OpCode.LOADFALSE:
+                case OpCode.LOADTRUE:
+                case OpCode.RANGE:
+                case OpCode.FOREACH:
+                    return op.ToString();
+
+                // 1 op
+                case OpCode.LOADC:
+                case OpCode.LOADG:
+                case OpCode.LOADUPVAL:
+                case OpCode.LOADINTR:
+                case OpCode.JMP:
+                case OpCode.JNT:
+                case OpCode.JMPB:
+                case OpCode.RETSREL:
+                case OpCode.TABLEGET:
+                    return op.ToString() + " " + this.opA;
+                // 2 op                
+                case OpCode.ASSIGNG:
+                case OpCode.ASSIGNUPVAL:
+                case OpCode.LOADV:
+                case OpCode.LOADGI:
+                case OpCode.LOADCI:
+                case OpCode.NTABLE:
+                case OpCode.TABLESET:
+                    return op.ToString() + " " + this.opA + " " + this.opB;
+                // 3 op
+                case OpCode.ASSIGN:
+                case OpCode.FUNDCL:
+                    return op.ToString() + " " + this.opA + " " + this.opB + " " + this.opC;
+                default:
+                    return "Unkown Opcode: " + op.ToString();
+            }
         }
     }
     public enum OpCode: Operand
@@ -162,82 +232,7 @@ namespace lightning
 
         static public void PrintInstruction(Instruction instruction)
         {
-            Console.Write(ToString(instruction));
-        }
-
-        static public string ToString(Instruction instruction)
-        {
-            OpCode op = instruction.opCode;
-            switch (op)
-            {
-                // 0 op
-                case OpCode.VARDCL:
-                case OpCode.GLOBALDCL:
-                case OpCode.NENV:
-                case OpCode.CENV:
-                case OpCode.RET:
-                case OpCode.ADD:
-                case OpCode.APP:
-                case OpCode.SUB:
-                case OpCode.MUL:
-                case OpCode.DIV:
-                case OpCode.NEG:
-                case OpCode.NOT:
-                case OpCode.INC:
-                case OpCode.DEC:
-                case OpCode.AND:
-                case OpCode.OR:
-                case OpCode.XOR:
-                case OpCode.NAND:
-                case OpCode.NOR:
-                case OpCode.XNOR:
-                case OpCode.EQ:
-                case OpCode.NEQ:
-                case OpCode.GTQ:
-                case OpCode.LTQ:
-                case OpCode.GT:
-                case OpCode.LT:
-                case OpCode.EXIT:
-                case OpCode.LOADNIL:
-                case OpCode.POP:
-                case OpCode.STASHTOP:
-                case OpCode.POPSTASH:
-                case OpCode.CALL:
-                case OpCode.CLOSURECLOSE:
-                case OpCode.FUNCLOSE:
-                case OpCode.LOADFALSE:
-                case OpCode.LOADTRUE:
-                case OpCode.RANGE:
-                case OpCode.FOREACH:
-                    return op.ToString();
-
-                // 1 op
-                case OpCode.LOADC:
-                case OpCode.LOADG: 
-                case OpCode.LOADUPVAL:
-                case OpCode.LOADINTR:
-                case OpCode.JMP:
-                case OpCode.JNT:
-                case OpCode.JMPB:
-                case OpCode.RETSREL:
-                case OpCode.TABLEGET:
-                    return op.ToString() + " " + instruction.opA;
-                // 2 op                
-                case OpCode.ASSIGNG:
-                case OpCode.ASSIGNUPVAL:
-                case OpCode.LOADV:
-                case OpCode.LOADGI:
-                case OpCode.LOADCI:
-                case OpCode.NTABLE:
-                case OpCode.TABLESET:
-                    return op.ToString() + " " + instruction.opA + " " + instruction.opB;
-                // 3 op
-                case OpCode.ASSIGN:
-                case OpCode.FUNDCL:
-                    return op.ToString() + " " + instruction.opA + " " + instruction.opB + " " + instruction.opC;
-                default:
-                    return "Unkown Opcode: " + op.ToString();
-            }
+            Console.Write(instruction.ToString());
         }
  
         public ushort AddConstant(Value value)
