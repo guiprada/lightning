@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.Text;
 
 using Operand = System.UInt16;
+
 #if DOUBLE
     using Number = System.Double;
 #else

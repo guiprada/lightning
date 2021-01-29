@@ -4,15 +4,18 @@ using System.IO;
 using System.Text;
 
 using Operand = System.UInt16;
+
 #if ROSLYN
     using Microsoft.CodeAnalysis.Scripting;
     using Microsoft.CodeAnalysis.CSharp.Scripting;
 #endif
+
 #if DOUBLE
     using Number = System.Double;
 #else
     using Number = System.Single;
 #endif
+
 namespace lightning
 {
     public struct Library

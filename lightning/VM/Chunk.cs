@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 
 using Operand = System.UInt16;
+
 namespace lightning
 {   
     public struct Instruction

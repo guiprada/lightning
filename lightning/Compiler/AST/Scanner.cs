@@ -5,7 +5,7 @@ using System.Text;
 #if DOUBLE
     using Number = System.Double;
 #else
-using Number = System.Single;
+    using Number = System.Single;
 #endif
 
 namespace lightning
