@@ -212,6 +212,33 @@ namespace lightning
 
                 //////////////////////////////////////////////////////
 
+                Value makeIndexesIterator(VM vm)
+                {
+                    ValTable this_table = vm.StackPeek(0) as ValTable;
+                    int i = -1;
+                    Value value = Value.Nil;
+                    ValString value_string = new ValString("value");
+                    ValString key_string = new ValString("key");
+
+                    ValTable iterator = new ValTable(null, null);
+                    Value next(VM vm)
+                    {
+                        if (i < (this_table.ECount - 1))
+                        {
+                            i++;
+                            iterator.table[key_string] = new ValNumber(i);
+                            iterator.table[value_string] = this_table.elements[i];
+                            return Value.True;
+                        }
+                        return Value.False;
+                    };
+                    iterator.TableSet(new ValString("next"), new ValIntrinsic("iterator_next", next, 0));
+                    return iterator;
+                }
+                list.TableSet(new ValString("index_iterator"), new ValIntrinsic("list_index_iterator", makeIndexesIterator, 1));
+
+                //////////////////////////////////////////////////////
+
                 Value makeIterator(VM vm)
                 {
                     ValTable this_table = vm.StackPeek(0) as ValTable;

@@ -10,7 +10,7 @@ namespace interpreter
     {
         static void Main(string[] args)
         {
-            Console.WriteLine("Welcome to lightning :)");
+            Console.WriteLine("Welcome to lightning Zzz :)");
             if (args.Length != 1)
             {
                 Console.WriteLine("Usage: lightning_interpreter [script]");

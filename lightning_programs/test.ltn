@@ -594,31 +594,52 @@ function clear_errors()
     list.clear(list_copy)
     assert(list.count(list_copy), 0, "Failed List test 7.")
 }
+{
+    // Testing inline Intrinsics
+    var intr_sum =
+    '
+        using System;
+        (vm) =>{
+            ValNumber opA = vm.StackPeek(0) as ValNumber;
+            ValNumber opB = vm.StackPeek(1) as ValNumber;
 
+            return new ValNumber(opA.content + opB.content);
+        }
+    '
+    var sum_intr = intrinsic("sum", 2, intr_sum)
+    assert(sum_intr(5, 6), 11, "Failed inline Intrinsic test 1.")
+}
 {
     // Testing iterators
-    var list1 = [0, 1, 2, 3, 4, 5]
-    var it = list.iterator(list)
-
-    while(it.next())
-    {
-        write_line(it.value)
-    }
-
-    for(var it = list.iterator(list1) ; it.next())
-    {
-        write_line(it.value)
-    }
     var table1 = [ brazil:"Brasilia", eua:"Washington", australia:"Canberra"]
-    it = table.iterator(table1)
+    var indexes_table1 = table.indexes(table1)
+    var counter = 0
     for(var it = table.iterator(table1); it.next())
     {
-        write(it.key .. " : ")
-        write_line(it.value)
+        assert(it.key, indexes_table1[counter], "Failed iterator key Test 1, iteration: " .. counter)
+        assert(it.value, table1[it.key], "Failed iterator value Test 1, iteration: " .. counter)
+        counter++
     }
-    write_line(list.to_string(table.indexes(table1)))
-    write_line("")
-    write_line(table.to_string(table1))
+    assert(list.to_string(table.indexes(table1)), "australia, eua, brazil", "Failed iterator Test 2")
+    assert(table.to_string(table1), "australia : Canberra, eua : Washington, brazil : Brasilia", "Failed iterator Test 3")
+
+    ///////////////////////////////
+    var list1 = [0, 1, 2, 3, 4, 5]
+    counter = 0
+    for(var it = list.iterator(list1); it.next())
+    {
+        assert(it.value, list1[counter], "Failed iterator value Test 4, iteration: " .. counter)
+        counter++
+    }
+
+    ///////////////////////////////
+    counter = 0
+    for(var it = list.index_iterator(list1); it.next())
+    {
+        assert(it.key, counter, "Failed iterator key Test 5, iteration: " .. counter)
+        assert(it.value, list1[counter], "Failed iterator value Test 5, iteration: " .. counter)
+        counter++
+    }
 }
 
 var end_time = time.now()
