@@ -1,5 +1,7 @@
-﻿var start_time = time.now()
+﻿write_line("Welcome to lightning Zzz :)")
 write_line("Starting tests ..")
+var start_time = time.now()
+write_line(start_time)
 
 // Lets use some modules
 var lib_assert_counter = require("assert_counter.ltn")
@@ -21,7 +23,7 @@ function count_errors()
 function clear_errors()
 {
     lib_assert_counter_not.errors = 0
-    lib_assert_counter.errors = 0    
+    lib_assert_counter.errors = 0
 }
 
 {
@@ -335,7 +337,7 @@ function clear_errors()
         var y = 0
 
         player.move = function (p_x, p_y)
-        {        
+        {
             x = x + p_x;
             y = y + p_y;
             return [x:x, y:y]
@@ -647,7 +649,8 @@ if (count_errors() == 0)
     write_line("No errors found! :)")
 else
     write_line(":( " .. count_errors() .. " errors found!")
-write_line("Elapsed time: " .. (end_time - start_time)/10000 .. "s")
+write_line(end_time)
+write_line("Elapsed time: " .. time.span(start_time, end_time) .. " ms")
 write_line("Loaded modules: " .. modules())
 write(stats())
 

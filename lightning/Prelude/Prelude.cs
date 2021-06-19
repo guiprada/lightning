@@ -561,9 +561,17 @@ namespace lightning
 
                 Value now(VM vm)
                 {
-                    return new ValNumber((Number)(DateTime.UtcNow.Ticks / 10000));// Convert to seconds
+                    return new ValWrapper<long>(DateTime.Now.Ticks);
                 }
                 time.TableSet(new ValString("now"), new ValIntrinsic("now", now, 0));
+
+                Value timeSpan(VM vm)
+                {
+                    long timeStart = (vm.StackPeek(0) as ValWrapper<long>).UnWrapp();
+                    long timeEnd = (vm.StackPeek(1) as ValWrapper<long>).UnWrapp();
+                    return new ValNumber((Number)(new TimeSpan(timeEnd - timeStart).TotalMilliseconds));// Convert to milliseconds
+                }
+                time.TableSet(new ValString("span"), new ValIntrinsic("span", timeSpan, 2));
 
                 tables.Add("time", time);
             }
