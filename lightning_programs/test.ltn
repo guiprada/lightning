@@ -545,7 +545,7 @@ function clear_errors()
         collection[index] = 1
     }
     foreach(table1, many_number)
-    for(var i = 0; i< 100; i++
+    for(var i = 0; i< 100; i++)
     {
         assert(table1[i], 1, "Failed Foreach Test " .. i .. ".")
     }
@@ -595,6 +595,32 @@ function clear_errors()
     assert(list.count(list_copy), 0, "Failed List test 7.")
 }
 
+{
+    // Testing iterators
+    var list1 = [0, 1, 2, 3, 4, 5]
+    var it = list.iterator(list)
+
+    while(it.next())
+    {
+        write_line(it.value)
+    }
+
+    for(var it = list.iterator(list1) ; it.next())
+    {
+        write_line(it.value)
+    }
+    var table1 = [ brazil:"Brasilia", eua:"Washington", australia:"Canberra"]
+    it = table.iterator(table1)
+    for(var it = table.iterator(table1); it.next())
+    {
+        write(it.key .. " : ")
+        write_line(it.value)
+    }
+    write_line(list.to_string(table.indexes(table1)))
+    write_line("")
+    write_line(table.to_string(table1))
+}
+
 var end_time = time.now()
 write("\nFinished tests! ")
 if(count_errors()  == 0)
@@ -624,7 +650,7 @@ write_line(parsec.apply(lightning_parser.number_parser(parsing_text),
         new_node.value = input.match
         new_node.type = "Number"
         list.push(input.nodes, new_node)
-        input.match = nil        
+        input.match = nil
     }))
 
 
@@ -811,28 +837,3 @@ write_line(parsec.apply(lightning_parser.number_parser(parsing_text),
 // var n = read_number()
 // write_line(n)
 
-{
-    // Testing iterators
-    var list1 = [0, 1, 2, 3, 4, 5]
-    var it = list.iterator(list)
-
-    while(it.next())
-    {
-        write_line(it.value)
-    }
-
-    for(var it = list.iterator(list1) ; it.next())
-    {
-        write_line(it.value)
-    }
-    var table1 = [ brazil:"Brasilia", eua:"Washington", australia:"Canberra"]
-    it = table.iterator(table1)
-    for(var it = table.iterator(table1); it.next())
-    {
-        write(it.key .. " : ")
-        write_line(it.value)
-    }
-    write_line(list.to_string(table.indexes(table1)))
-    write_line("")
-    write_line(table.to_string(table1))
-}
