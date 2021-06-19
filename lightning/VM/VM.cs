@@ -1306,37 +1306,58 @@ namespace lightning
             }
         }
 
-        public void Stats()
+        public string Stats()
         {
-            Console.WriteLine("\nStack:");
+            string statsValue = "";
             int counter = 0;
             for (int i = 0; i < stackTop; i++)
             {
-                Console.WriteLine(counter + ": " + stack[i]);
+                if (i == 0)
+                {
+                    statsValue += "Stack:\n";
+                }
+                statsValue += counter.ToString() + ": " + stack[i].ToString() + '\n';
                 counter++;
             }
-            if (counter == 0) Console.WriteLine("empty :)");
+            if (counter == 0)
+            {
+                statsValue += "Stack empty :)\n";
+            }
 
-            Console.WriteLine("\nVariables:");
             counter = 0;
             for (int i = 0; i < variablesTop; i++)
             {
-                Console.WriteLine(counter + ": " + variables[i]);
+                if (i == 0)
+                {
+                    statsValue = statsValue + "Variables:\n";
+                }
+                statsValue += counter.ToString() + ": " + variables[i].ToString() + '\n';
                 counter++;
             }
-            if (counter == 0) Console.WriteLine("empty :)");
+            if (counter == 0)
+            {
+                statsValue += "Variables empty :)\n";
+            }
 
-            Console.WriteLine("\nUpvalues:");
             counter = 0;
             for (int i = 0; i < upValuesBases[upValuesBasesTop - 1]; i++)
             {
+                if (i == 0)
+                {
+                    statsValue += "Upvalues:\n";
+                }
                 foreach (Value v in upValues)
                 {
-                    Console.WriteLine(counter + ": " + upValues[i]);
+                    statsValue += counter.ToString() + ": " + upValues[i].ToString() + '\n';
                     counter++;
                 }
             }
-            if (counter == 0) Console.WriteLine("empty :)");
+            if (counter == 0)
+            {
+                statsValue += "Upvalues empty :)\n";
+            }
+
+            return statsValue;
         }
     }
 }

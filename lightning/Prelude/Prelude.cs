@@ -952,6 +952,13 @@ namespace lightning
             functions.Add(new ValIntrinsic("maybe", maybe, 2));
 
             //////////////////////////////////////////////////////
+            Value stats(VM vm)
+            {
+                return new ValString(vm.Stats());
+            }
+            functions.Add(new ValIntrinsic("stats", stats, 0));
+
+            //////////////////////////////////////////////////////
 #if ROSLYN
             Value createIntrinsic(VM vm)
             {

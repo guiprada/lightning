@@ -20,10 +20,10 @@ namespace interpreter
             {
                 RunFile(args[0]);
             }
-            else
-            {
-                RunPrompt();
-            }
+            //else
+            //{
+            //    RunPrompt();
+            //}
         }
  
         static int RunFile(string path)
@@ -46,37 +46,37 @@ namespace interpreter
             }
         }
 
-        static void RunPrompt()
-        {
-            bool is_running = true;
-            Node prog_node = new ProgramNode(null, 0);
-            Chunker code_generator = new Chunker(prog_node, "main", Prelude.GetPrelude());
-            Chunk chunk = code_generator.Code;
+        //static void RunPrompt()
+        //{
+        //    bool is_running = true;
+        //    Node prog_node = new ProgramNode(null, 0);
+        //    Chunker code_generator = new Chunker(prog_node, "main", Prelude.GetPrelude());
+        //    Chunk chunk = code_generator.Code;
             
-            Value eval = chunk.GetFunction("eval");
-            if (eval == null)
-            {
-                throw(new Exception("Could not find eval function!"));
+        //    Value eval = chunk.GetFunction("eval");
+        //    if (eval == null)
+        //    {
+        //        throw(new Exception("Could not find eval function!"));
 
-            }
-            if (code_generator.HasChunked == true)
-            {
-                VM vm = new VM(chunk);
-                while (is_running)
-                {
-                    Console.Write(">");
-                    string input = Console.ReadLine();
-                    if (input != "")
-                    {
-                        List<Value> stack = new List<Value>();
-                        stack.Add(new ValString(input));
-                        Value result = vm.CallFunction(eval, stack);
-                        Console.WriteLine(result);
-                    }
-                }
-                //VMResult result = vm.Run();                
-            }
-        }
+        //    }
+        //    if (code_generator.HasChunked == true)
+        //    {
+        //        VM vm = new VM(chunk);
+        //        while (is_running)
+        //        {
+        //            Console.Write(">");
+        //            string input = Console.ReadLine();
+        //            if (input != "")
+        //            {
+        //                List<Value> stack = new List<Value>();
+        //                stack.Add(new ValString(input));
+        //                Value result = vm.CallFunction(eval, stack);
+        //                Console.WriteLine(result);
+        //            }
+        //        }
+        //        //VMResult result = vm.Run();                
+        //    }
+        //}
 
         static int Run(string input)
         {            
@@ -146,9 +146,10 @@ namespace interpreter
 
                 VM vm = new VM(chunk);
                 VMResult result = vm.Run();
-                if (result.status == VMResultType.OK)
+                if (result.status != VMResultType.OK)
+                    Console.WriteLine("Program returned ERROR");
+                else if (result.value != Value.Nil)
                     Console.WriteLine("Program returned: " + result.value);
-                vm.Stats();
             }
             else
             {

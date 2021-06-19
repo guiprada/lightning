@@ -1,5 +1,5 @@
 ﻿var start_time = time.now()
-write_line("Starting tests :)")
+write_line("Starting tests ..")
 
 // Lets use some modules
 var lib_assert_counter = require("assert_counter.ltn")
@@ -8,7 +8,7 @@ var lib_assert = require("assert.ltn")
 var lightning_parser = require("lightning_parser.ltn")
 var parsec = require("parsec.ltn")
 
-lib_assert.assert(2,1,"OK!")
+lib_assert.assert(2,1,"assertion detects errors, OK!")
 
 
 var assert = lib_assert_counter.assert
@@ -26,10 +26,10 @@ function clear_errors()
 
 {
     // Assertions
-    assert(1,2,'assert() OK!')
-    assert_not(1,1,"assert_not() OK!")
+    assert(1,2,'assert(), OK!')
+    assert_not(1,1,"assert_not(), OK!")
 
-    if(count_errors() == 2){
+    if (count_errors() == 2){
         write_line("Reseted error count.")
         clear_errors()
     }else{
@@ -208,7 +208,7 @@ function clear_errors()
         var i = 0;
         while(i <= n)
         {
-            fibs[i] = ant;            
+            fibs[i] = ant;
             next = num + ant;
             ant = num;
             num = next;
@@ -225,7 +225,7 @@ function clear_errors()
 
     function rec_fib(n)
     {
-        if(n < 2)
+        if (n < 2)
         {
             return n;
         }
@@ -241,15 +241,15 @@ function clear_errors()
     var matrix = []
     var lines = 10
     var columns = 3
-    for(var i = 0; i < 10; i++)
+    for (var i = 0; i < 10; i++)
     {
         matrix[i] = []
-        for(var j = 0; j < columns; j++)
+        for (var j = 0; j < columns; j++)
         {
-            matrix[i][j] = i + j        
+            matrix[i][j] = i + j
         }
-    }    
-    assert(matrix[0][0], 0, "Failed multi dimensional array test 1.")    
+    }
+    assert(matrix[0][0], 0, "Failed multi dimensional array test 1.")
     assert(matrix[9][2], 11, "Failed multi dimensional array test 2.")
 }
 {
@@ -274,7 +274,7 @@ function clear_errors()
         j = i(1)
     }
     i = make_iterator(0);
-    for(var j = 0; j < 10; j = i(1))
+    for (var j = 0; j < 10; j = i(1))
     {
         assert(array[j], j, "Failed iterator test " .. j .. ".")
     }
@@ -311,7 +311,7 @@ function clear_errors()
         var y = 0
 
         player.move = function (_, p_x, p_y)
-        {        
+        {
             x = x + p_x;
             y = y + p_y;
             return [x:x, y:y]
@@ -323,8 +323,8 @@ function clear_errors()
     var p2 = make_player()
 
     assert(p1:move(1,1).x, 1, "Failed hidden properties test 1.")
-    assert(p1:move(0,2).y, 3, "Failed hidden properties test 2.")    
-    assert(p2:move(0,2).y, 2, "Failed hidden properties test 3.")    
+    assert(p1:move(0,2).y, 3, "Failed hidden properties test 2.")
+    assert(p2:move(0,2).y, 2, "Failed hidden properties test 3.")
 }
 {
     // Testing "hidden properties" 2
@@ -347,8 +347,8 @@ function clear_errors()
     var p2 = make_player()
 
     assert(p1.move(1,1).x, 1, "Failed hidden properties test 4.")
-    assert(p1.move(0,2).y, 3, "Failed hidden properties test 5.")    
-    assert(p2.move(0,2).y, 2, "Failed hidden properties test 6.")    
+    assert(p1.move(0,2).y, 3, "Failed hidden properties test 5.")
+    assert(p2.move(0,2).y, 2, "Failed hidden properties test 6.")
 }
 {
     // Testing compound calls
@@ -372,10 +372,10 @@ function clear_errors()
     var table1 = []
     {
         table1.inner_table = []
-        table1.inner_table.x = 1 
+        table1.inner_table.x = 1
         table1.inner_table.closure =
         function (self)
-        {            
+        {
             return [x:self.x, y:2]
         }
     }
@@ -411,7 +411,7 @@ function clear_errors()
     var truthy
     var falsy = false
     truthy = falsy
-    truthy = true 
+    truthy = true
     assert(falsy, false, "Failed Transient Test 7.")
 
     var something
@@ -443,7 +443,7 @@ function clear_errors()
     }
     return table1
     '
-    var a = eval(my_prog1)    
+    var a = eval(my_prog1)
     assert(a.append("a","b","c"),"globalabcup", "Failed Eval test 1.")
 
     var my_prog2 = '
@@ -469,7 +469,7 @@ function clear_errors()
     assert(e, 3, "Failed Or init test 1.")
 }
 {
-    // Testing Math    
+    // Testing Math
     assert(math.mod(7,3), 1, "Failed Math test 1.")
 }
 {
@@ -488,33 +488,33 @@ function clear_errors()
     // Testing range
     var table1 = []
     table1[99] = nil
-    function many_for(start, end, this_table)
+    function many_for (start, end, this_table)
     {
-        for(var i = start; i<end; i++)
+        for (var i = start; i<end; i++)
         {
             this_table[i] = i
         }
     }
     range(6, table1, many_for)
-    for(var i = 0; i< 100; i++)
+    for (var i = 0; i< 100; i++)
     {
         assert(table1[i], i, "Failed Range Test " .. i .. ".")
     }
 
     range(1, table1, many_for)
-    for(var i = 0; i< 100; i++)
+    for (var i = 0; i< 100; i++)
     {
         assert(table1[i], i, "Failed Range Test " .. i .. ".")
     }
 
     range(3, table1, many_for)
-    for(var i = 0; i< 100; i++)
+    for (var i = 0; i< 100; i++)
     {
         assert(table1[i], i, "Failed Range Test " .. i .. ".")
     }
 
     range(200, table1, many_for)
-    for(var i = 0; i< 100; i++)
+    for (var i = 0; i< 100; i++)
     {
         assert(table1[i], i, "Failed Range Test " .. i .. ".")
     }
@@ -523,7 +523,7 @@ function clear_errors()
     // Testing foreach
     var table1 = []
     table1[99] = nil
-    // for(var i = 0; i< 100; i++)
+    // for (var i = 0; i< 100; i++)
     // {
     //     table1[i] = []
     // }
@@ -533,7 +533,7 @@ function clear_errors()
         collection[index].x = 1
     }
     foreach(table1, many)
-    for(var i = 0; i< 100; i++)
+    for (var i = 0; i< 100; i++)
     {
         assert(table1[i].x, 1, "Failed Foreach Test " .. i .. ".")
     }
@@ -541,22 +541,22 @@ function clear_errors()
     table1 = []
     table1[99] = nil
     function many_number(index, collection)
-    {        
+    {
         collection[index] = 1
     }
     foreach(table1, many_number)
-    for(var i = 0; i< 100; i++)
+    for (var i = 0; i< 100; i++)
     {
         assert(table1[i], 1, "Failed Foreach Test " .. i .. ".")
     }
 
     table1 = []
-    table1[99] = nil    
+    table1[99] = nil
     foreach(table1, function(index, collection)
     {
         collection[index] = 100 - index
     })
-    for(var i = 0; i< 100; i++)
+    for (var i = 0; i< 100; i++)
     {
         assert(table1[i], 100 - i, "Failed Foreach Test " .. (99+i) .. ".")
     }
@@ -571,8 +571,7 @@ function clear_errors()
     assert(j1, 1, "Failed Increment Test 2.")
     var j2 = 0
     j2++
-    assert(j2, 
-    1, "Failed Increment Test 2.")
+    assert(j2, 1, "Failed Increment Test 2.")
 }
 {
     // Testing List
@@ -583,12 +582,12 @@ function clear_errors()
     assert(new_list[0], 3, "Failed List test 1.")
     assert(new_list[1], 2, "Failed List test 2.")
     assert(new_list[2], 1, "Failed List test 3.")
-    
+
     var list_copy = list.copy(new_list)
-    assert_not(list_copy, new_list, "Failed List test 4.")    
+    assert_not(list_copy, new_list, "Failed List test 4.")
     list.pop(new_list)
     list.pop(new_list)
-    list.pop(new_list)    
+    list.pop(new_list)
     assert(list.count(new_list), 0, "Failed List test 5.")
     assert(list.count(list_copy), 3, "Failed List test 6.")
     list.clear(list_copy)
@@ -614,7 +613,7 @@ function clear_errors()
     var table1 = [ brazil:"Brasilia", eua:"Washington", australia:"Canberra"]
     var indexes_table1 = table.indexes(table1)
     var counter = 0
-    for(var it = table.iterator(table1); it.next())
+    for (var it = table.iterator(table1); it.next())
     {
         assert(it.key, indexes_table1[counter], "Failed iterator key Test 1, iteration: " .. counter)
         assert(it.value, table1[it.key], "Failed iterator value Test 1, iteration: " .. counter)
@@ -626,7 +625,7 @@ function clear_errors()
     ///////////////////////////////
     var list1 = [0, 1, 2, 3, 4, 5]
     counter = 0
-    for(var it = list.iterator(list1); it.next())
+    for (var it = list.iterator(list1); it.next())
     {
         assert(it.value, list1[counter], "Failed iterator value Test 4, iteration: " .. counter)
         counter++
@@ -634,7 +633,7 @@ function clear_errors()
 
     ///////////////////////////////
     counter = 0
-    for(var it = list.index_iterator(list1); it.next())
+    for (var it = list.index_iterator(list1); it.next())
     {
         assert(it.key, counter, "Failed iterator key Test 5, iteration: " .. counter)
         assert(it.value, list1[counter], "Failed iterator value Test 5, iteration: " .. counter)
@@ -643,13 +642,14 @@ function clear_errors()
 }
 
 var end_time = time.now()
-write("\nFinished tests! ")
-if(count_errors()  == 0)
-    write_line(":)")
+write_line("-- Finished tests! --")
+if (count_errors() == 0)
+    write_line("No errors found! :)")
 else
     write_line(":( " .. count_errors() .. " errors found!")
 write_line("Elapsed time: " .. (end_time - start_time)/10000 .. "s")
 write_line("Loaded modules: " .. modules())
+write(stats())
 
 ////////////////////////////// scratch
 
@@ -850,7 +850,7 @@ write_line(parsec.apply(lightning_parser.number_parser(parsing_text),
 //     ch = read()
 // }
 // write_line("")
-// for(var ch = read(); ch != nil; ch = read()){
+// for (var ch = read(); ch != nil; ch = read()){
 //     write(ch)
 //     ch = read()
 // }
