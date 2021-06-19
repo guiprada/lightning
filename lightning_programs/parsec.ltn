@@ -1,0 +1,177 @@
+var parsec = []
+
+parsec.new = function(str)
+{
+    var o = []
+    o.body = str
+    o.nodes = []
+    o.match = nil
+
+    return o
+}
+
+parsec.clone = function(o)
+{
+    var clone = []
+    clone.body = string.copy(o.body)
+    clone.nodes = []
+    for(var it = list.iterator(o.nodes); it.next()){
+        list.push(clone.nodes, it.value)
+    }
+    clone.match = string.copy(o.match)
+    return clone
+}
+
+parsec.alpha = function(input)
+{
+    if(input.body != nil)
+        if(char.is_alpha(input.body)){
+            input.match = char.at(input.body, 0)
+            input.body = string.split(input.body,1)
+        }
+    return input        
+}
+
+parsec.digit = function(input)
+{
+    if(input.body != nil)
+        if(char.is_digit(input.body)){
+            input.match = char.at(input.body, 0)
+            input.body = string.split(input.body,1)
+        }
+    return input  
+}
+
+parsec.make_string_parser = function(str)
+{
+    return function (input){
+        var length_str = string.length(str)
+        var length_body
+        if(input.body != nil)
+            length_body = string.length(input.body)
+        else
+            return input
+
+        if(length_str > length_body)
+            return input        
+        for(var i=0; i<length_str; i++){
+            if(char.at(str, i) != char.at(input.body, i))
+                return input                
+        }        
+        input.match = str
+        input.body = string.split(input.body, length_str)
+        return input
+    }    
+}
+
+parsec.Or = function(parser1, parser2)
+{
+    return function(input)
+    {
+        input = parser1(input)
+        if(input.match == nil)
+            input = parser2 (input)
+
+        return input
+    }
+}
+
+parsec.And = function(parser1, parser2)
+{
+    return function(input)
+    {
+        var clone = parsec.clone(input)
+        clone = parser1(clone)
+        if(clone.match != nil)
+        {
+            var acc = clone.match
+            clone.match = nil            
+            clone = parser2(clone)
+            if(clone.match != nil)
+            {
+                clone.match = acc .. clone.match                
+                return clone           
+            }
+        }
+        return input
+    }
+}
+
+parsec.Many = function(parser)
+{
+    return function(input)
+    {
+        input = parser(input)
+        var acc = ""        
+        while(input.match != nil)
+        {
+            acc = acc .. input.match
+            input.match = nil
+            input = parser(input)        
+        }        
+        input.match = acc
+        return input
+    }
+}
+
+parsec.At_least_one = function(parser)
+{
+    return function(input)
+    {        
+        input = parser(input)
+        var acc = ""
+        if(input.match != nil)
+        {
+            while(input.match != nil)
+            {
+                acc = acc .. input.match
+                input.match = nil                
+                input = parser(input)                
+            }        
+            input.match = acc            
+            return input
+        }
+        else
+        {
+            return input
+        }
+    }
+}
+
+parsec.Optional = function(parser)
+{
+    return function(input)
+    {        
+        input = parser(input)
+        var acc = ""
+        if(input.match != nil)
+        {                       
+            acc = acc .. input.match            
+        }
+        input.match = acc
+        return input
+    }
+}
+
+parsec.Any = function(parser_list)
+{
+    return function(input)
+    {
+        for(var it = list.iterator(parser_list); it.next()){
+            input = it.value(input)
+            if(input.match != nil){
+                return input
+            }
+        }
+        return input
+    }
+}
+
+parsec.apply = function(input, fn)
+{    
+    if(input.match != nil)
+        fn(input)
+    return input
+}
+
+return parsec

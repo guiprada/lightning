@@ -1,0 +1,27 @@
+var j = 1
+var j1 = --j
+write_line(j1 .. " " .. j)
+
+var table1 = []
+for(var i = 0; i< 20; i+=1){
+    table1[i] = i
+}
+
+function many(item){
+    write_line(item)
+}
+
+function many_for(start, end, this_table){
+    for(var i = start; i<end; i+=1){
+        this_table[i] = rand.int(1000)
+    }
+}
+
+//foreach(table1, many)
+
+range(6, table1, many_for)
+
+for(var i = 0; i< 20; i+=1){
+    write_line(table1[i])
+}
+write_line(list.to_string(table1))

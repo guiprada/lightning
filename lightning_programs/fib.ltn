@@ -1,0 +1,21 @@
+var start_time = time.now()
+fun fibs(n){
+    var next
+    var num = 1
+    var ant = 0
+    var i = 0
+    var result;
+    while(i <= n){
+        result = ant
+        next = num + ant
+        ant = num
+        num = next
+        i = i + 1
+    }
+    return result
+}
+
+for(var i = 0; i<10000000; i = i + 1)
+    fibs(39)
+
+write_line((time.now() - start_time)/10000 .. "ms")

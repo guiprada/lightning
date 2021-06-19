@@ -1,0 +1,14 @@
+var start_time = time.now()
+write_line(start_time)
+fun rec_fib(n){
+    if(n < 2){
+        return n;
+    }
+    return rec_fib(n -1) + rec_fib(n -2);
+}
+
+var n = rec_fib(39)
+write_line(n)
+var end_time = time.now()
+write_line(end_time)
+write_line((end_time - start_time)/10000 .. "ms")

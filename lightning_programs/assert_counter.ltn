@@ -1,0 +1,15 @@
+var assert = require("assert.ltn")
+
+var lib = []
+
+lib.errors = 0
+
+lib.assert =
+    function (value1, value2, msg){   
+        var result = assert.assert(value1, value2, msg)
+        if(result == true)
+           lib.errors++
+        return result
+    }
+
+return lib

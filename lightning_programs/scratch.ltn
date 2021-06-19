@@ -1,0 +1,12 @@
+var lib = require("assert_counter.ltl");
+var lib_not = require("assert_counter_not.ltl")
+
+write_line(lib)
+lib.assert(1, 2, "Failed, and thats good!");
+lib_not.assert_not(1, 1, "Failed too, good!");
+lib_not.assert_not(2, 2, "Failed too, good!");
+
+write_line(lib.errors)
+write_line(lib_not.errors)
+
+write_line(modules())

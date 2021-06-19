@@ -1,0 +1,838 @@
+﻿var start_time = time.now()
+write_line("Starting tests :)")
+
+// Lets use some modules
+var lib_assert_counter = require("assert_counter.ltn")
+var lib_assert_counter_not = require("assert_counter_not.ltn")
+var lib_assert = require("assert.ltn")
+var lightning_parser = require("lightning_parser.ltn")
+var parsec = require("parsec.ltn")
+
+lib_assert.assert(2,1,"OK!")
+
+
+var assert = lib_assert_counter.assert
+var assert_not = lib_assert_counter_not.assert_not
+
+function count_errors()
+{
+    return lib_assert_counter_not.errors + lib_assert_counter.errors
+}
+function clear_errors()
+{
+    lib_assert_counter_not.errors = 0
+    lib_assert_counter.errors = 0    
+}
+
+{
+    // Assertions
+    assert(1,2,'assert() OK!')
+    assert_not(1,1,"assert_not() OK!")
+
+    if(count_errors() == 2){
+        write_line("Reseted error count.")
+        clear_errors()
+    }else{
+        write_line("Assertion functionctions are insane!")
+    }
+
+    lib_assert.header = "ERROR: "
+
+    assert(nil, nil, "Failed nil sanity check 1.")
+    assert_not(1, nil, "Failed nil sanity check 2.")
+    assert(true, true, "Failed true sanity check 3.")
+    assert(false, false, "Failed false sanity check 4.")
+    assert_not(true, false, "Failed boolean sanity check 5.")
+}
+{
+    // Numbers Comparisson
+    var num1 = 1
+    var num2 = 2
+    assert(num1, 1, "Failed numbers comparisson test 1.")
+    assert_not(num1, 2, "Failed numbers comparisson test 2.")
+    assert_not(num1, num2, "Failed numbers comparisson test 3.")
+    num2 = 1
+    assert(num1, num2, "Failed numbers comparisson test 4.")
+}
+{
+    // String Comparisson
+    var hello = "hello"
+    var world = "world"
+    assert("hello", hello, "Failed string concatenation test 1.")
+    assert_not(hello, "world", "Failed string concatenation test 2.")
+    assert_not(hello, world, "Failed string concatenation test 3.")
+}
+{
+    //String concatenation
+    var hello = "hello"
+    var world = "world"
+    var result = "hello" .. " " .. "world!"
+    assert(result, "hello world!", "Failed string concatenation test 1.")
+    assert_not(result, "world!", "Failed string concatenation test 2.")
+}
+{
+    // Table test
+    var this_list = []
+    this_list.a = "a"
+    this_list.b = "b"
+    var this_list_alias = this_list
+    assert(this_list_alias, this_list, "Failed Table test 1.")
+    assert_not([a:"a",b:"b"], this_list, "Failed Table test 2.")
+    assert_not([a:"b",b:"b"], this_list, "Failed Table test 3.")
+    assert_not([], this_list, "Failed Table test 4.")
+    assert(count_all(this_list), 2, "Failed Table test 5")
+    assert(table.count(this_list), 2, "Failed Table test 6")
+    assert(list.count(this_list), 0, "Failed Table test 7")
+
+    var this_array = this_list
+    this_array[0] = 100
+    this_array[99] = 0    
+    assert(this_array[0], 100, "Failed Array test 1.")
+    assert(this_array[1], nil, "Failed Array test 2.")
+    assert(this_array[99], 0, "Failed Array test 3.")
+    assert(count_all(this_list), 102, "Failed Array test 4")
+    assert(list.count(this_array), 100, "Failed Array test 5.")
+    assert(table.count(this_list), 2, "Failed Array test 6.")
+}
+{
+    // Testing lexical scoping
+    var a = "a"
+    {
+        var a = "b"
+        assert(a, "b", "Failed lexical scoping test 1.")
+
+    }
+    assert(a, "a", "Failed lexical scoping test 2.")
+}
+{
+    // Testing a lamba function
+    var lambda = function (a, b, c)
+    {
+	    return (a+b)/c;
+    }
+    assert(lambda(1,2,3), 1, "Failed Lambda test 1.")
+}
+{
+    // Testing closures
+    function make_say(value)
+    {
+        return function ()
+        {
+            return value
+        }
+    }
+    var doughnut = make_say("doughnut")
+    var bagel = make_say("bagel")
+    assert(doughnut(), "doughnut", "Failed Closure test 1.")
+    assert(bagel(), "bagel", "Failed Closure test 2.")
+
+    function make_changer()
+    {
+        var local = "";
+        function closure()
+        {
+            local = local .. " extra";
+            return local
+        }
+        return closure;
+    }
+
+    var changer = make_changer();
+    assert(changer(), " extra", "Failed Closure test 3.")
+    assert(changer(), " extra extra", "Failed Closure test 4.")
+    assert(changer(), " extra extra extra", "Failed Closure test 5.")
+
+    function make_accumulator(value)
+    {
+        var counter = value
+        return function (x)
+        {
+            counter = counter + x
+            return counter;
+        }
+    }
+    var my_acc = make_accumulator(5)
+    assert(my_acc(-5), 0, "Failed Closure test 6.")
+    assert(my_acc(5), 5, "Failed Closure test 7.")
+}
+{
+    // Testing boolean operations
+    //AND
+    assert(false, (false and false), "Failed AND test 1.");
+    assert(false, (false and true), "Failed AND test 2.");
+    assert(false, (true and false), "Failed AND test 3.");
+    assert(true, (true and true), "Failed AND test 4.");
+
+    //OR
+    assert(false, (false or false), "Failed OR test 1.");
+    assert(true, (false or true), "Failed OR test 2.");
+    assert(true, (true or false), "Failed OR test 3.");
+    assert(true, (true or true), "Failed OR test 4.");
+
+    //XOR
+    assert(false, (false xor false), "Failed XOR test 1.");
+    assert(true, (false xor true), "Failed XOR test 2.");
+    assert(true, (true xor false), "Failed XOR test 3.");
+    assert(false, (true xor true), "Failed XOR test 4.");
+
+    //NOT
+    assert(false, !true, "Failed NOT test 1.");
+    assert(true, !false, "Failed NOT test 2.");
+
+    //NAND
+    assert(true, (false nand false), "Failed NAND test 1.");
+    assert(true, (false nand true), "Failed NAND test 2.");
+    assert(true, (true nand false), "Failed NAND test 3.");
+    assert(false, (true nand true), "Failed NAND test 4.");
+
+    //NOR
+    assert(true, (false nor false), "Failed NOR test 1.");
+    assert(false, (false nor true), "Failed NOR test 2.");
+    assert(false, (true nor false), "Failed NOR test 3.");
+    assert(false, (true nor true), "Failed NOR test 4.");
+
+    //XNOR
+    assert(true, (false xnor false), "Failed XNOR test 1.");
+    assert(false, (false xnor true), "Failed XNOR test 2.");
+    assert(false, (true xnor false), "Failed XNOR test 3.");
+    assert(true, (true xnor true), "Failed XNOR test 4.");
+}
+{
+    // Some arrays, functions and recursion
+    var fibs = []
+    function populate_fibs(n)
+    {
+        var next;
+        var num = 1;
+        var ant = 0;
+        var i = 0;
+        while(i <= n)
+        {
+            fibs[i] = ant;            
+            next = num + ant;
+            ant = num;
+            num = next;
+            i = i + 1;
+        }
+    }
+    populate_fibs(50)
+    assert(fibs[0], 0, "Failed Fibonacci test 1.")
+    assert(fibs[1], 1, "Failed Fibonacci test 2.")
+    assert(fibs[2], 1, "Failed Fibonacci test 3.")
+    assert(fibs[3], 2, "Failed Fibonacci test 4.")
+    assert(fibs[30], 832040, "Failed Fibonacci test 5.")
+    assert(fibs[40], 102334155, "Failed Fibonacci test 6.")
+
+    function rec_fib(n)
+    {
+        if(n < 2)
+        {
+            return n;
+        }
+        return rec_fib(n -1) + rec_fib(n -2);
+    }
+
+    assert(rec_fib(0), 0, "Failed Fibonacci test 7.")
+    assert(rec_fib(1), 1, "Failed Fibonacci test 8.")
+    assert(rec_fib(10), fibs[10], "Failed Fibonacci test 9.")
+}
+{
+    // Testing multi dimensional arrays
+    var matrix = []
+    var lines = 10
+    var columns = 3
+    for(var i = 0; i < 10; i++)
+    {
+        matrix[i] = []
+        for(var j = 0; j < columns; j++)
+        {
+            matrix[i][j] = i + j        
+        }
+    }    
+    assert(matrix[0][0], 0, "Failed multi dimensional array test 1.")    
+    assert(matrix[9][2], 11, "Failed multi dimensional array test 2.")
+}
+{
+    // Testing an iterator :)
+    function make_iterator(init)
+    {
+        var counter = init;
+        function closure(i)
+        {
+            counter = counter + i
+            return counter
+        }
+        return closure
+    }
+
+    var i = make_iterator(0)
+    var j = 0
+    var array = []
+    while( j < 10)
+    {    
+        array[j] = j
+        j = i(1)
+    }
+    i = make_iterator(0);
+    for(var j = 0; j < 10; j = i(1))
+    {
+        assert(array[j], j, "Failed iterator test " .. j .. ".")
+    }
+}
+{
+    // Testing method calls
+
+    function make_player()
+    {
+        var player = []
+        player.position = [];
+        player.position["x"] = 0
+        player.position["y"] = 0
+
+        player.move = function (self, x, y)
+        {        
+            self.position.x = self.position.x + x;
+            self.position.y = self.position.y + y;
+            return self.position
+        }
+        return player
+    }
+
+    var p1 = make_player();
+    assert(p1:move(1,0).x, 1, "Failed method call test 1.")
+    assert(p1:move(0,3).y, 3, "Failed method call test 2.")
+}
+{
+    // Testing "hidden properties"
+    function make_player()
+    {
+        var player = []
+        var x = 0
+        var y = 0
+
+        player.move = function (_, p_x, p_y)
+        {        
+            x = x + p_x;
+            y = y + p_y;
+            return [x:x, y:y]
+        }
+        return player
+    }
+
+    var p1 = make_player()
+    var p2 = make_player()
+
+    assert(p1:move(1,1).x, 1, "Failed hidden properties test 1.")
+    assert(p1:move(0,2).y, 3, "Failed hidden properties test 2.")    
+    assert(p2:move(0,2).y, 2, "Failed hidden properties test 3.")    
+}
+{
+    // Testing "hidden properties" 2
+    function make_player()
+    {
+        var player = []
+        var x = 0
+        var y = 0
+
+        player.move = function (p_x, p_y)
+        {        
+            x = x + p_x;
+            y = y + p_y;
+            return [x:x, y:y]
+        }
+        return player
+    }
+
+    var p1 = make_player()
+    var p2 = make_player()
+
+    assert(p1.move(1,1).x, 1, "Failed hidden properties test 4.")
+    assert(p1.move(0,2).y, 3, "Failed hidden properties test 5.")    
+    assert(p2.move(0,2).y, 2, "Failed hidden properties test 6.")    
+}
+{
+    // Testing compound calls
+    function return_table_with_function ()
+    {
+        return function ()
+        {
+            var closure = function (value)
+            {
+                return value
+            }
+            return [another_function: closure]
+        }
+    }
+
+    assert(return_table_with_function ()().another_function ("viva"), "viva", "Failed compound calls test 1.")
+
+    var func1 = return_table_with_function ()
+    assert(func1().another_function ("viva"), "viva", "Failed compound calls test 2.")
+
+    var table1 = []
+    {
+        table1.inner_table = []
+        table1.inner_table.x = 1 
+        table1.inner_table.closure =
+        function (self)
+        {            
+            return [x:self.x, y:2]
+        }
+    }
+
+    assert(table1.inner_table:closure().x, 1, "Failed compound calls test 3.")
+}
+{
+    // Transient tests
+    var a = 5
+    var b = a
+    a = 3
+    assert(a, 3, "Failed Transient Test 1.")
+    assert(b, 5, "Failed Transient Test 2.")
+
+    var str1 = "Hello"
+    var str2 = str1
+    str1 = "World"
+    assert_not(str1, str2, "Failed Transient Test 3.")
+
+    var fun1 = math.sin
+    var fun2 = fun1
+    fun1 = write_line
+    assert_not(fun1, fun2, "Failed Transient Test 4.")
+
+    var table1 = [1,2]
+    var table2 = table1
+    table1[2] = 3
+    assert(table2[2], 3, "Failed Transient Test 5.")
+
+    table2 = nil
+    assert(table1[2], 3, "Failed Transient Test 6.")
+
+    var truthy
+    var falsy = false
+    truthy = falsy
+    truthy = true 
+    assert(falsy, false, "Failed Transient Test 7.")
+
+    var something
+    var nothing = nil
+    something = nothing
+    something = 1
+    assert(nothing, nil, "Failed Transient Test 8.")
+
+    var list1 = [0,1,2]
+    var list2 = list1
+    assert(list2, list1, "Failed Transient Test 9.")
+}
+{
+    // Testing Prelude
+    assert(math.pi, 3.141592653589793, "Failed Prelude test 1.")
+    assert(math.sin(math.pi/2), 1, "Failed Prelude test 2.")
+}
+{
+    // Testing Eval
+    var my_prog1 = '
+    var table1 = []
+    var str_global = "global"
+    {
+        var str_upvalue = "up"
+        table1.append = 
+            function (value1, value2, value3){
+                return str_global .. value1  .. value2 .. value3 .. str_upvalue
+            }
+    }
+    return table1
+    '
+    var a = eval(my_prog1)    
+    assert(a.append("a","b","c"),"globalabcup", "Failed Eval test 1.")
+
+    var my_prog2 = '
+    var str_global = "global"
+    var str_upvalue = "up"
+    return function (value1, value2, value3){
+            return str_global .. value1  .. value2 .. value3 .. str_upvalue
+        }
+    '
+    file.write("file_write_test.ltn", my_prog2)
+    file.append("file_write_test.ltn", my_prog1)
+    a = eval(my_prog2)
+    assert(a("a","b","c"),"globalabcup", "Failed Eval test 2.")
+}
+{
+    // Testing Maybe init
+    var a = nil
+    var b = nil
+    var c = nil
+    var d = 3
+    var e = maybe(maybe(maybe(a, b), c), d)
+    d = 1
+    assert(e, 3, "Failed Or init test 1.")
+}
+{
+    // Testing Math    
+    assert(math.mod(7,3), 1, "Failed Math test 1.")
+}
+{
+    // Testing assign ops
+    var i = 0
+    i+=1
+    assert(i, 1, "Failed Assign Ops Test 1.")
+    i*=10
+    assert(i, 10, "Failed Assign Ops Test 2.")
+    i/=2
+    assert(i, 5, "Failed Assign Ops Test 3.")
+    i-=10
+    assert(i, -5, "Failed Assign Ops Test 4.")
+}
+{
+    // Testing range
+    var table1 = []
+    table1[99] = nil
+    function many_for(start, end, this_table)
+    {
+        for(var i = start; i<end; i++)
+        {
+            this_table[i] = i
+        }
+    }
+    range(6, table1, many_for)
+    for(var i = 0; i< 100; i++)
+    {
+        assert(table1[i], i, "Failed Range Test " .. i .. ".")
+    }
+
+    range(1, table1, many_for)
+    for(var i = 0; i< 100; i++)
+    {
+        assert(table1[i], i, "Failed Range Test " .. i .. ".")
+    }
+
+    range(3, table1, many_for)
+    for(var i = 0; i< 100; i++)
+    {
+        assert(table1[i], i, "Failed Range Test " .. i .. ".")
+    }
+
+    range(200, table1, many_for)
+    for(var i = 0; i< 100; i++)
+    {
+        assert(table1[i], i, "Failed Range Test " .. i .. ".")
+    }
+}
+{    
+    // Testing foreach
+    var table1 = []
+    table1[99] = nil
+    // for(var i = 0; i< 100; i++)
+    // {
+    //     table1[i] = []
+    // }
+    function many(index, collection)
+    {
+        collection[index] = []
+        collection[index].x = 1
+    }
+    foreach(table1, many)
+    for(var i = 0; i< 100; i++)
+    {
+        assert(table1[i].x, 1, "Failed Foreach Test " .. i .. ".")
+    }
+
+    table1 = []
+    table1[99] = nil
+    function many_number(index, collection)
+    {        
+        collection[index] = 1
+    }
+    foreach(table1, many_number)
+    for(var i = 0; i< 100; i++
+    {
+        assert(table1[i], 1, "Failed Foreach Test " .. i .. ".")
+    }
+
+    table1 = []
+    table1[99] = nil    
+    foreach(table1, function(index, collection)
+    {
+        collection[index] = 100 - index
+    })
+    for(var i = 0; i< 100; i++)
+    {
+        assert(table1[i], 100 - i, "Failed Foreach Test " .. (99+i) .. ".")
+    }
+}
+{
+    // Testing increment and decrement
+    var j = 1
+    var j1 = --j
+    assert(j1, 0, "Failed Increment Test 1.")
+    j = 2
+    j1 = j+=1 // chained assignment op works weird, this is equivalent to j1 = .. = 1
+    assert(j1, 1, "Failed Increment Test 2.")
+    var j2 = 0
+    j2++
+    assert(j2, 
+    1, "Failed Increment Test 2.")
+}
+{
+    // Testing List
+    var new_list = []
+    list.push(new_list, 3)
+    list.push(new_list, 2)
+    list.push(new_list, 1)
+    assert(new_list[0], 3, "Failed List test 1.")
+    assert(new_list[1], 2, "Failed List test 2.")
+    assert(new_list[2], 1, "Failed List test 3.")
+    
+    var list_copy = list.copy(new_list)
+    assert_not(list_copy, new_list, "Failed List test 4.")    
+    list.pop(new_list)
+    list.pop(new_list)
+    list.pop(new_list)    
+    assert(list.count(new_list), 0, "Failed List test 5.")
+    assert(list.count(list_copy), 3, "Failed List test 6.")
+    list.clear(list_copy)
+    assert(list.count(list_copy), 0, "Failed List test 7.")
+}
+
+var end_time = time.now()
+write("\nFinished tests! ")
+if(count_errors()  == 0)
+    write_line(":)")
+else
+    write_line(":( " .. count_errors() .. " errors found!")
+write_line("Elapsed time: " .. (end_time - start_time)/10000 .. "s")
+write_line("Loaded modules: " .. modules())
+
+////////////////////////////// scratch
+
+//var parsing_text = parsec.new("33")
+var parsing_text = []
+parsing_text.body = "33"
+parsing_text.match = nil
+parsing_text.nodes = []
+//write_line(parsing_text)
+
+// write_line(lightning_parser.number_parser)
+//write_line(lightning_parser.number_parser()(parsing_text))
+//write_line(lightning_parser.number_parser(parsing_text))
+
+write_line(parsec.apply(lightning_parser.number_parser(parsing_text),
+    function(input)
+    {
+        var new_node = []
+        new_node.value = input.match
+        new_node.type = "Number"
+        list.push(input.nodes, new_node)
+        input.match = nil        
+    }))
+
+
+// var parsing_text = []
+// parsing_text.body = 'a1funcABAAABC'
+// parsing_text.nodes = []
+// parsing_text.match = nil
+// write_line(parsec.apply(parsec.alpha(parsing_text),
+//     function(input){
+//         var new_node = []
+//         new_node.value = input.match
+//         new_node.type = "char"
+//         list.push(input.nodes, new_node)
+//         input.match = nil        
+//     }))
+// write_line(parsec.apply(parsec.alpha(parsing_text),
+//     function(input){
+//         var new_node = []
+//         new_node.value = input.match
+//         new_node.type = "char"
+//         list.push(input.nodes, new_node)
+//         input.match = nil        
+//     }))
+// write_line(parsec.apply(parsec.digit(parsing_text),
+//     function(input){
+//         var new_node = []
+//         new_node.value = input.match
+//         new_node.type = "digit"
+//         list.push(input.nodes, new_node)
+//         input.match = nil        
+//     }))
+
+// var match_func = parsec.make_string_parser("func")
+
+// write_line(parsec.apply(match_func(parsing_text),
+//     function(input){
+//         var new_node = []
+//         new_node.value = input.match
+//         new_node.type = "function"
+//         list.push(input.nodes, new_node)
+//         input.match = nil        
+//     }))
+
+// var parser_A = parsec.make_string_parser("A")
+// var parser_B = parsec.make_string_parser("B")
+// var parser_A_Or_B = parsec.Or(parser_A, parser_B)
+// write_line(parsec.apply(parser_A_Or_B(parsing_text),
+//     function(input){
+//         var new_node = []
+//         new_node.value = input.match
+//         new_node.type = "A_Or_B"
+//         list.push(input.nodes, new_node)
+//         input.match = nil        
+//     }))
+// write_line(parsec.apply(parser_A_Or_B(parsing_text),
+//     function(input){
+//         var new_node = []
+//         new_node.value = input.match
+//         new_node.type = "A_Or_B"
+//         list.push(input.nodes, new_node)
+//         input.match = nil        
+//     }))
+
+
+// var parser_A_And_B = parsec.And(parser_A, parser_B)
+// write_line(parsec.apply(parser_A_And_B(parsing_text),
+//     function(input){
+//         var new_node = []
+//         new_node.value = input.match
+//         new_node.type = "A_And_B"
+//         list.push(input.nodes, new_node)
+//         input.match = nil        
+//     }))
+
+// write_line(parsec.apply(parser_A_And_B(parsing_text),
+//     function(input){
+//         var new_node = []
+//         new_node.value = input.match
+//         new_node.type = "A_And_B"
+//         list.push(input.nodes, new_node)
+//         input.match = nil        
+//     }))
+
+// var parser_many_A = parsec.Many(parser_A)
+// write_line(parsec.apply(parser_many_A(parsing_text),
+//     function(input){
+//         var new_node = []
+//         new_node.value = input.match
+//         new_node.type = "A*"
+//         list.push(input.nodes, new_node)
+//         input.match = nil        
+//     }))
+
+// write_line("reset")
+// parsing_text.body = "AAAAAAAAa"
+// var parser_at_least_one_A = parsec.At_least_one(parser_A)
+// write_line(parsec.apply(parser_at_least_one_A(parsing_text),
+//     function(input){
+//         var new_node = []
+//         new_node.value = input.match
+//         new_node.type = "A+"
+//         list.push(input.nodes, new_node)
+//         input.match = nil        
+//     }))
+
+// write_line("reset")
+// parsing_text.body = "BAA"
+// var parser_optional_A = parsec.Optional(parser_A)
+// write_line(parsec.apply(parser_optional_A(parsing_text),
+//     function(input){
+//         var new_node = []
+//         new_node.value = input.match
+//         new_node.type = "A?"
+//         list.push(input.nodes, new_node)
+//         input.match = nil        
+//     }))
+
+// write_line("reset")
+// parsing_text.body = "AA"
+// var parser_CC = parsec.make_string_parser("CC")
+// var parser_list = []
+// list.push(parser_list, parser_A)
+// list.push(parser_list, parser_B)
+// list.push(parser_list, parser_CC)
+
+// var parser_Any = parsec.Any(parser_list)
+// write_line(parsec.apply(parser_Any(parsing_text),
+//     function(input){
+//         var new_node = []
+//         new_node.value = input.match
+//         new_node.type = "Any"
+//         list.push(input.nodes, new_node)
+//         input.match = nil        
+//     }))
+
+
+// var str1 = "Ola mundo cruel"
+// var parser_Ola = parsec.make_string("Ola");
+// var result = parser_Ola(str1)
+// write_line(result)
+// result = parser_Ola(result.tail)
+// write_line(result)
+
+// var str2 = ""
+// result = parser_Ola(str2)
+// write_line(result)
+
+// var str3 = "53_"
+// result = parsec.digit(str3)
+// write_line(result)
+
+// var parser_a = parsec.make_string("a")
+// var parser_b = parsec.make_string("b")
+// var parser_a_or_b = parsec.And(parser_a, parser_b)
+// write_line(parser_a_or_b("b2"))
+// write_line(parser_a_or_b("aaa"))
+// write_line(parser_a_or_b("ab"))
+
+// var intr_sum = '
+//         using System;
+//         (vm) =>{
+//             ValNumber opA = vm.StackPeek(0) as ValNumber;
+//             ValNumber opB = vm.StackPeek(1) as ValNumber;
+//             Console.WriteLine("in");
+//             return new ValNumber(opA.content + opB.content);
+//         }
+// '
+// var sum_intr = intrinsic("sum", 2, intr_sum)
+// write_line(sum_intr(5, 6))
+
+
+
+// var ch = read()
+// while(ch != nil){
+//     write(ch)
+//     ch = read()
+// }
+// write_line("")
+// for(var ch = read(); ch != nil; ch = read()){
+//     write(ch)
+//     ch = read()
+// }
+// write_line("")
+// var n = read_number()
+// write_line(n)
+
+{
+    // Testing iterators
+    var list1 = [0, 1, 2, 3, 4, 5]
+    var it = list.iterator(list)
+
+    while(it.next())
+    {
+        write_line(it.value)
+    }
+
+    for(var it = list.iterator(list1) ; it.next())
+    {
+        write_line(it.value)
+    }
+    var table1 = [ brazil:"Brasilia", eua:"Washington", australia:"Canberra"]
+    it = table.iterator(table1)
+    for(var it = table.iterator(table1); it.next())
+    {
+        write(it.key .. " : ")
+        write_line(it.value)
+    }
+    write_line(list.to_string(table.indexes(table1)))
+    write_line("")
+    write_line(table.to_string(table1))
+}
