@@ -49,12 +49,34 @@ namespace lightning
 
         public static Library GetPrelude()
         {
-
-            ////////////////////////////////////////////////////////////////////////////////////////////////////////////
-            ///////////////////////////////////////////////////////////////////////////////////////////////////// Tables
-
             Dictionary<string, ValTable> tables = new Dictionary<string, ValTable>();
 
+            ////////////////////////////////////////////////////////////////////////////////////////////////////////////
+            ////////////////////////////////////////////////////////////////////////////////////////////////// intrinsic
+            {
+                ValTable intrinsic = new ValTable(null, null);
+#if ROSLYN
+                Value createIntrinsic(VM vm)
+                {
+                    ValString name = (ValString)vm.StackPeek(0);
+                    ValNumber arity = (ValNumber)vm.StackPeek(1);
+                    ValString val_body = (ValString)vm.StackPeek(2);
+                    string body = val_body.ToString();
+
+                    var options = ScriptOptions.Default.AddReferences(
+                        typeof(Value).Assembly,
+                        typeof(VM).Assembly).WithImports("lightning", "System");
+                    Func<VM, Value> new_intrinsic = CSharpScript.EvaluateAsync<Func<VM, Value>>(body, options)
+                        .GetAwaiter().GetResult();
+
+                    return new ValIntrinsic(name.ToString(), new_intrinsic, (int)arity.content);
+                }
+                intrinsic.TableSet(new ValString("create"), new ValIntrinsic("create", createIntrinsic, 3));
+#else
+                intrinsic.TableSet(new ValString("create"), Value.Nil);
+#endif
+                tables.Add("intrinsic", intrinsic);
+            }
             ////////////////////////////////////////////////////////////////////////////////////////////////////////////
             /////////////////////////////////////////////////////////////////////////////////////////////////////// rand
 
@@ -968,24 +990,6 @@ namespace lightning
             functions.Add(new ValIntrinsic("stats", stats, 0));
 
             //////////////////////////////////////////////////////
-#if ROSLYN
-            Value createIntrinsic(VM vm)
-            {
-                ValString name = (ValString)vm.StackPeek(0);
-                ValNumber arity = (ValNumber)vm.StackPeek(1);
-                ValString val_body = (ValString)vm.StackPeek(2);
-                string body = val_body.ToString();
-
-                var options = ScriptOptions.Default.AddReferences(
-                    typeof(Value).Assembly,
-                    typeof(VM).Assembly).WithImports("lightning", "System");
-                Func<VM, Value> new_intrinsic = CSharpScript.EvaluateAsync<Func<VM, Value>>(body, options)
-                    .GetAwaiter().GetResult();
-
-                return new ValIntrinsic(name.ToString(), new_intrinsic, (int)arity.content);
-            }
-            functions.Add(new ValIntrinsic("intrinsic", createIntrinsic, 3));
-#endif            
 
             Library prelude = new Library(functions, tables);
 
