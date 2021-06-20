@@ -109,7 +109,7 @@ namespace lightning
                 //////////////////////////////////////////////////////
                 Value listToString(VM vm)
                 {
-                    ValTable this_table = vm.StackPeek(0) as ValTable;
+                    ValTable this_table = (ValTable)vm.StackPeek(0);
                     bool first = true;
                     string value = "";
                     foreach (Value v in this_table.elements)
@@ -131,7 +131,7 @@ namespace lightning
                 ////////////////////////////////////////////////////
                 Value listCount(VM vm)
                 {
-                    ValTable this_table = vm.StackPeek(0) as ValTable;
+                    ValTable this_table = (ValTable)vm.StackPeek(0);
                     int count = this_table.ECount;
                     return new ValNumber(count);
                 }
@@ -214,7 +214,7 @@ namespace lightning
 
                 Value makeIndexesIterator(VM vm)
                 {
-                    ValTable this_table = vm.StackPeek(0) as ValTable;
+                    ValTable this_table = (ValTable)vm.StackPeek(0);
                     int i = -1;
                     Value value = Value.Nil;
                     ValString value_string = new ValString("value");
@@ -241,7 +241,7 @@ namespace lightning
 
                 Value makeIterator(VM vm)
                 {
-                    ValTable this_table = vm.StackPeek(0) as ValTable;
+                    ValTable this_table = (ValTable)vm.StackPeek(0);
                     int i = -1;
                     Value value = Value.Nil;
                     ValString value_string = new ValString("value");
@@ -276,7 +276,7 @@ namespace lightning
                 //////////////////////////////////////////////////////
                 Value tableCount(VM vm)
                 {
-                    ValTable this_table = vm.StackPeek(0) as ValTable;
+                    ValTable this_table = (ValTable)vm.StackPeek(0);
                     int count = this_table.TCount;
                     return new ValNumber(count);
                 }
@@ -285,7 +285,7 @@ namespace lightning
                 //////////////////////////////////////////////////////
                 Value tableIndexes(VM vm)
                 {
-                    ValTable this_table = vm.StackPeek(0) as ValTable;
+                    ValTable this_table = (ValTable)vm.StackPeek(0);
                     ValTable indexes = new ValTable(null, null);
 
                     foreach (ValString v in this_table.table.Keys)
@@ -300,7 +300,7 @@ namespace lightning
                 //////////////////////////////////////////////////////
                 Value tableCopy(VM vm)
                 {
-                    ValTable this_table = vm.StackPeek(0) as ValTable;
+                    ValTable this_table = (ValTable)vm.StackPeek(0);
                     Dictionary<ValString, Value> table_copy = new Dictionary<ValString, Value>();
                     foreach (KeyValuePair<ValString, Value> entry in this_table.table)
                     {
@@ -316,14 +316,14 @@ namespace lightning
                 //////////////////////////////////////////////////////
                 Value tableClear(VM vm)
                 {
-                    ValTable this_table = vm.StackPeek(0) as ValTable;
+                    ValTable this_table = (ValTable)vm.StackPeek(0);
                     return Value.Nil;
                 }
                 table.TableSet(new ValString("clear"), new ValIntrinsic("clear", tableClear, 1));
 
                 Value makeIteratorTable(VM vm)
                 {
-                    ValTable this_table = vm.StackPeek(0) as ValTable;
+                    ValTable this_table = (ValTable)vm.StackPeek(0);
                     System.Collections.IDictionaryEnumerator enumerator = this_table.table.GetEnumerator();
 
                     ValString value_string = new ValString("value");
@@ -337,7 +337,7 @@ namespace lightning
                         if (enumerator.MoveNext())
                         {
                             iterator.table[key_string] = (ValString)enumerator.Key;
-                            iterator.table[value_string] = enumerator.Value as Value;
+                            iterator.table[value_string] = (Value)enumerator.Value;
                             return Value.True;
                         }
                         return Value.False;
@@ -351,7 +351,7 @@ namespace lightning
                 //////////////////////////////////////////////////////
                 Value tableToString(VM vm)
                 {
-                    ValTable this_table = vm.StackPeek(0) as ValTable;
+                    ValTable this_table = (ValTable)vm.StackPeek(0);
                     string value = "";
                     bool first = true;
                     foreach (KeyValuePair<ValString, Value> entry in this_table.table)
@@ -567,8 +567,8 @@ namespace lightning
 
                 Value timeSpan(VM vm)
                 {
-                    long timeStart = (vm.StackPeek(0) as ValWrapper<long>).UnWrapp();
-                    long timeEnd = (vm.StackPeek(1) as ValWrapper<long>).UnWrapp();
+                    long timeStart = ((ValWrapper<long>)vm.StackPeek(0)).UnWrapp();
+                    long timeEnd = ((ValWrapper<long>)vm.StackPeek(1)).UnWrapp();
                     return new ValNumber((Number)(new TimeSpan(timeEnd - timeStart).TotalMilliseconds));// Convert to milliseconds
                 }
                 time.TableSet(new ValString("span"), new ValIntrinsic("span", timeSpan, 2));
@@ -583,10 +583,10 @@ namespace lightning
 
                 Value stringSlice(VM vm)
                 {
-                    ValString val_input_string = vm.StackPeek(0) as ValString;
+                    ValString val_input_string = (ValString)vm.StackPeek(0);
                     string input_string = val_input_string.ToString();
-                    Number start = (vm.StackPeek(1) as ValNumber).content;
-                    Number end = (vm.StackPeek(2) as ValNumber).content;
+                    Number start = ((ValNumber)vm.StackPeek(1)).content;
+                    Number end = ((ValNumber)vm.StackPeek(2)).content;
 
                     if (end < input_string.Length)
                     {
@@ -601,9 +601,9 @@ namespace lightning
 
                 Value stringSplit(VM vm)
                 {
-                    ValString val_input_string = vm.StackPeek(0) as ValString;
+                    ValString val_input_string = (ValString)vm.StackPeek(0);
                     string input_string = val_input_string.ToString();
-                    Number start = (vm.StackPeek(1) as ValNumber).content;
+                    Number start = ((ValNumber)vm.StackPeek(1)).content;
                     if (start < input_string.Length)
                     {
                         Number end = input_string.Length;
@@ -619,7 +619,7 @@ namespace lightning
 
                 Value stringLength(VM vm)
                 {
-                    ValString val_input_string = vm.StackPeek(0) as ValString;
+                    ValString val_input_string = (ValString)vm.StackPeek(0);
                     return new ValNumber(val_input_string.ToString().Length);
                 }
                 string_table.TableSet(new ValString("length"), new ValIntrinsic("string_length", stringLength, 1));
@@ -647,8 +647,8 @@ namespace lightning
                 ValTable char_table = new ValTable(null, null);
                 Value charAt(VM vm)
                 {
-                    ValString val_input_string = vm.StackPeek(0) as ValString;
-                    ValNumber index = vm.StackPeek(1) as ValNumber;
+                    ValString val_input_string = (ValString)vm.StackPeek(0);
+                    ValNumber index = (ValNumber)vm.StackPeek(1);
                     string input_string = val_input_string.ToString();
                     if (index.content < input_string.Length)
                     {
@@ -663,7 +663,7 @@ namespace lightning
 
                 Value isAlpha(VM vm)
                 {
-                    ValString val_input_string = vm.StackPeek(0) as ValString;
+                    ValString val_input_string = (ValString)vm.StackPeek(0);
                     string input_string = val_input_string.ToString();
                     if (1 <= input_string.Length)
                     {
@@ -681,7 +681,7 @@ namespace lightning
 
                 Value isDigit(VM vm)
                 {
-                    ValString val_input_string = vm.StackPeek(0) as ValString;
+                    ValString val_input_string = (ValString)vm.StackPeek(0);
                     string input_string = val_input_string.ToString();
                     if (1 <= input_string.Length)
                     {
@@ -933,7 +933,7 @@ namespace lightning
             //////////////////////////////////////////////////////
             Value count(VM vm)
             {
-                ValTable this_table = vm.StackPeek(0) as ValTable;
+                ValTable this_table = (ValTable)vm.StackPeek(0);
                 int count = this_table.Count;
                 return new ValNumber(count);
             }
@@ -970,9 +970,9 @@ namespace lightning
 #if ROSLYN
             Value createIntrinsic(VM vm)
             {
-                ValString name = vm.StackPeek(0) as ValString;
-                ValNumber arity = vm.StackPeek(1) as ValNumber;
-                ValString val_body = vm.StackPeek(2) as ValString;                
+                ValString name = (ValString)vm.StackPeek(0);
+                ValNumber arity = (ValNumber)vm.StackPeek(1);
+                ValString val_body = (ValString)vm.StackPeek(2); 
                 string body = val_body.ToString();
 
                 var options = ScriptOptions.Default.AddReferences(
@@ -1065,9 +1065,9 @@ namespace lightning
                 module,
                 (Operand)module_index);
 
-            if (this_value.GetType() == typeof(ValFunction)) RelocateFunction(this_value as ValFunction, relocationInfo);
-            else if (this_value.GetType() == typeof(ValClosure)) RelocateClosure(this_value as ValClosure, relocationInfo);
-            else if (this_value.GetType() == typeof(ValTable)) FindFunction(this_value as ValTable, relocationInfo);
+            if (this_value.GetType() == typeof(ValFunction)) RelocateFunction((ValFunction)this_value, relocationInfo);
+            else if (this_value.GetType() == typeof(ValClosure)) RelocateClosure((ValClosure)this_value, relocationInfo);
+            else if (this_value.GetType() == typeof(ValTable)) FindFunction((ValTable)this_value, relocationInfo);
 
 
             return module;
@@ -1080,9 +1080,9 @@ namespace lightning
                 relocationInfo.relocatedTables.Add(table.GetHashCode());
                 foreach (KeyValuePair<ValString, Value> entry in table.table)
                 {
-                    if (entry.Value.GetType() == typeof(ValFunction)) RelocateFunction(entry.Value as ValFunction, relocationInfo);
-                    else if (entry.Value.GetType() == typeof(ValClosure)) RelocateClosure(entry.Value as ValClosure, relocationInfo);
-                    else if (entry.Value.GetType() == typeof(ValTable)) FindFunction(entry.Value as ValTable, relocationInfo);
+                    if (entry.Value.GetType() == typeof(ValFunction)) RelocateFunction((ValFunction)entry.Value, relocationInfo);
+                    else if (entry.Value.GetType() == typeof(ValClosure)) RelocateClosure((ValClosure)entry.Value, relocationInfo);
+                    else if (entry.Value.GetType() == typeof(ValTable)) FindFunction((ValTable)entry.Value, relocationInfo);
 
                     relocationInfo.module.TableSet(entry.Key, entry.Value);
                 }
@@ -1095,11 +1095,11 @@ namespace lightning
             {
                 if (v.Val.GetType() == typeof(ValClosure)/* && relocationInfo.module.name != closure.function.module*/)
                 {
-                    RelocateClosure(v.Val as ValClosure, relocationInfo);
+                    RelocateClosure((ValClosure)v.Val, relocationInfo);
                 }
                 else if (v.Val.GetType() == typeof(ValFunction)/* && relocationInfo.module.name != closure.function.module*/)
                 {
-                    RelocateFunction(v.Val as ValFunction, relocationInfo);
+                    RelocateFunction((ValFunction)v.Val, relocationInfo);
                 }
             }
 
@@ -1118,7 +1118,7 @@ namespace lightning
                 relocationInfo.module.globals.Add(new_value);
                 relocationInfo.relocatedGlobals.Add(relocationInfo.toBeRelocatedGlobals[i], (Operand)(relocationInfo.module.globals.Count - 1));
 
-                if (new_value.GetType() == typeof(ValTable)) relocation_stack.Add(new_value as ValTable);
+                if (new_value.GetType() == typeof(ValTable)) relocation_stack.Add((ValTable)new_value);
             }
             relocationInfo.toBeRelocatedGlobals.Clear();
 
@@ -1129,7 +1129,7 @@ namespace lightning
                 relocationInfo.module.constants.Add(new_value);
                 relocationInfo.relocatedConstants.Add(relocationInfo.toBeRelocatedConstants[i], (Operand)(relocationInfo.module.constants.Count - 1));
 
-                if (new_value.GetType() == typeof(ValTable)) relocation_stack.Add(new_value as ValTable);
+                if (new_value.GetType() == typeof(ValTable)) relocation_stack.Add((ValTable)new_value);
             }
             relocationInfo.toBeRelocatedConstants.Clear();
         
@@ -1205,7 +1205,7 @@ namespace lightning
                     {
                         relocationInfo.importingVM.GetChunk().GetConstants().Add(this_value);
                         next.opC = (Operand)(relocationInfo.importingVM.GetChunk().GetConstants().Count - 1);
-                        RelocateChunk((this_value as ValClosure).function, relocationInfo);
+                        RelocateChunk(((ValClosure)this_value).function, relocationInfo);
                     }
                 }
                 else if (next.opCode == OpCode.LOADGI)
@@ -1264,7 +1264,7 @@ namespace lightning
             {
                 if (entry.Value.GetType() == typeof(ValFunction))
                 {
-                    ValFunction function = entry.Value as ValFunction;
+                    ValFunction function = (ValFunction)entry.Value;
                     for (Operand i = 0; i < function.body.Count; i++)
                     {
                         Instruction next = function.body[i];
