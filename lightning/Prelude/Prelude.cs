@@ -792,7 +792,7 @@ namespace lightning
                             MakeModule(result.value, eval_name, vm, imported_vm);
                         //vm.GetChunk().Print();                    
                         return result.value;
-                    }
+                    }                     
                 }
                 return Value.Nil;
             }
@@ -1080,9 +1080,9 @@ namespace lightning
                 relocationInfo.relocatedTables.Add(table.GetHashCode());
                 foreach (KeyValuePair<ValString, Value> entry in table.table)
                 {
-                    if (entry.Value.GetType() == typeof(ValFunction)) RelocateFunction(entry.Value as ValFunction, relocationInfo);
-                    else if (entry.Value.GetType() == typeof(ValClosure)) RelocateClosure(entry.Value as ValClosure, relocationInfo);
-                    else if (entry.Value.GetType() == typeof(ValTable)) FindFunction(entry.Value as ValTable, relocationInfo);
+                    if (entry.Value.GetType() == typeof(ValFunction)) RelocateFunction((ValFunction)entry.Value, relocationInfo);
+                    else if (entry.Value.GetType() == typeof(ValClosure)) RelocateClosure((ValClosure)entry.Value, relocationInfo);
+                    else if (entry.Value.GetType() == typeof(ValTable)) FindFunction((ValTable)entry.Value, relocationInfo);
 
                     relocationInfo.module.TableSet(entry.Key, entry.Value);
                 }
@@ -1092,7 +1092,7 @@ namespace lightning
         static void RelocateClosure(ValClosure closure, RelocationInfo relocationInfo)
         {
             foreach (ValUpValue v in closure.upValues)
-            {
+            {                
                 if (v.Val.GetType() == typeof(ValClosure)/* && relocationInfo.module.name != closure.function.module*/)
                 {
                     RelocateClosure(v.Val as ValClosure, relocationInfo);
@@ -1102,7 +1102,6 @@ namespace lightning
                     RelocateFunction(v.Val as ValFunction, relocationInfo);
                 }
             }
-
             RelocateFunction(closure.function, relocationInfo);
         }
 

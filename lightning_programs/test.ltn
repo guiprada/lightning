@@ -7,8 +7,8 @@ write_line(start_time)
 var lib_assert_counter = require("assert_counter.ltn")
 var lib_assert_counter_not = require("assert_counter_not.ltn")
 var lib_assert = require("assert.ltn")
-var lightning_parser = require("lightning_parser.ltn")
-var parsec = require("parsec.ltn")
+// var lightning_parser = require("lightning_parser.ltn")
+// var parsec = require("parsec.ltn")
 
 lib_assert.assert(2,1,"assertion detects errors, OK!")
 
@@ -434,30 +434,33 @@ function clear_errors()
 {
     // Testing Eval
     var my_prog1 = '
-    var table1 = []
-    var str_global = "global"
-    {
-        var str_upvalue = "up"
-        table1.append = 
-            function (value1, value2, value3){
-                return str_global .. value1  .. value2 .. value3 .. str_upvalue
-            }
-    }
-    return table1
+        var table1 = []
+        var str_global = "global"
+        {
+            var str_upvalue = "up"
+            table1.append = 
+                function (value1, value2, value3){
+                    return str_global .. value1  .. value2 .. value3 .. str_upvalue
+                }
+        }
+        return table1
     '
     var a = eval(my_prog1)
+    //var a = require("prog1.ltn")
+    
     assert(a.append("a","b","c"),"globalabcup", "Failed Eval test 1.")
 
     var my_prog2 = '
-    var str_global = "global"
-    var str_upvalue = "up"
-    return function (value1, value2, value3){
-            return str_global .. value1  .. value2 .. value3 .. str_upvalue
-        }
+        var str_global = "global"
+        var str_upvalue = "up"
+        return function (value1, value2, value3){
+                return str_global .. value1  .. value2 .. value3 .. str_upvalue
+            }
     '
     file.write("file_write_test.ltn", my_prog2)
     file.append("file_write_test.ltn", my_prog1)
     a = eval(my_prog2)
+    // a = require("prog2.ltn")
     assert(a("a","b","c"),"globalabcup", "Failed Eval test 2.")
 }
 {
@@ -521,7 +524,7 @@ function clear_errors()
         assert(table1[i], i, "Failed Range Test " .. i .. ".")
     }
 }
-{    
+{
     // Testing foreach
     var table1 = []
     table1[99] = nil
@@ -607,8 +610,8 @@ function clear_errors()
             return new ValNumber(opA.content + opB.content);
         }
     '
-    var sum_intr = intrinsic("sum", 2, intr_sum)
-    assert(sum_intr(5, 6), 11, "Failed inline Intrinsic test 1.")
+    // var sum_intr = intrinsic("sum", 2, intr_sum)
+    // assert(sum_intr(5, 6), 11, "Failed inline Intrinsic test 1.")
 }
 {
     // Testing iterators
@@ -645,10 +648,12 @@ function clear_errors()
 
 var end_time = time.now()
 write_line("-- Finished tests! --")
-if (count_errors() == 0)
+if (count_errors() == 0){
     write_line("No errors found! :)")
-else
+}
+else{
     write_line(":( " .. count_errors() .. " errors found!")
+}
 write_line(end_time)
 write_line("Elapsed time: " .. time.span(start_time, end_time) .. " ms")
 write_line("Loaded modules: " .. modules())
@@ -656,208 +661,208 @@ write(stats())
 
 ////////////////////////////// scratch
 
-//var parsing_text = parsec.new("33")
-var parsing_text = []
-parsing_text.body = "33"
-parsing_text.match = nil
-parsing_text.nodes = []
-//write_line(parsing_text)
-
-// write_line(lightning_parser.number_parser)
-//write_line(lightning_parser.number_parser()(parsing_text))
-//write_line(lightning_parser.number_parser(parsing_text))
-
-write_line(parsec.apply(lightning_parser.number_parser(parsing_text),
-    function(input)
-    {
-        var new_node = []
-        new_node.value = input.match
-        new_node.type = "Number"
-        list.push(input.nodes, new_node)
-        input.match = nil
-    }))
-
-
+// //var parsing_text = parsec.new("33")
 // var parsing_text = []
-// parsing_text.body = 'a1funcABAAABC'
-// parsing_text.nodes = []
+// parsing_text.body = "33"
 // parsing_text.match = nil
-// write_line(parsec.apply(parsec.alpha(parsing_text),
-//     function(input){
-//         var new_node = []
-//         new_node.value = input.match
-//         new_node.type = "char"
-//         list.push(input.nodes, new_node)
-//         input.match = nil        
-//     }))
-// write_line(parsec.apply(parsec.alpha(parsing_text),
-//     function(input){
-//         var new_node = []
-//         new_node.value = input.match
-//         new_node.type = "char"
-//         list.push(input.nodes, new_node)
-//         input.match = nil        
-//     }))
-// write_line(parsec.apply(parsec.digit(parsing_text),
-//     function(input){
-//         var new_node = []
-//         new_node.value = input.match
-//         new_node.type = "digit"
-//         list.push(input.nodes, new_node)
-//         input.match = nil        
-//     }))
+// parsing_text.nodes = []
+// //write_line(parsing_text)
 
-// var match_func = parsec.make_string_parser("func")
+// // write_line(lightning_parser.number_parser)
+// //write_line(lightning_parser.number_parser()(parsing_text))
+// //write_line(lightning_parser.number_parser(parsing_text))
 
-// write_line(parsec.apply(match_func(parsing_text),
-//     function(input){
+// write_line(parsec.apply(lightning_parser.number_parser(parsing_text),
+//     function(input)
+//     {
 //         var new_node = []
 //         new_node.value = input.match
-//         new_node.type = "function"
+//         new_node.type = "Number"
 //         list.push(input.nodes, new_node)
-//         input.match = nil        
-//     }))
-
-// var parser_A = parsec.make_string_parser("A")
-// var parser_B = parsec.make_string_parser("B")
-// var parser_A_Or_B = parsec.Or(parser_A, parser_B)
-// write_line(parsec.apply(parser_A_Or_B(parsing_text),
-//     function(input){
-//         var new_node = []
-//         new_node.value = input.match
-//         new_node.type = "A_Or_B"
-//         list.push(input.nodes, new_node)
-//         input.match = nil        
-//     }))
-// write_line(parsec.apply(parser_A_Or_B(parsing_text),
-//     function(input){
-//         var new_node = []
-//         new_node.value = input.match
-//         new_node.type = "A_Or_B"
-//         list.push(input.nodes, new_node)
-//         input.match = nil        
+//         input.match = nil
 //     }))
 
 
-// var parser_A_And_B = parsec.And(parser_A, parser_B)
-// write_line(parsec.apply(parser_A_And_B(parsing_text),
-//     function(input){
-//         var new_node = []
-//         new_node.value = input.match
-//         new_node.type = "A_And_B"
-//         list.push(input.nodes, new_node)
-//         input.match = nil        
-//     }))
+// // var parsing_text = []
+// // parsing_text.body = 'a1funcABAAABC'
+// // parsing_text.nodes = []
+// // parsing_text.match = nil
+// // write_line(parsec.apply(parsec.alpha(parsing_text),
+// //     function(input){
+// //         var new_node = []
+// //         new_node.value = input.match
+// //         new_node.type = "char"
+// //         list.push(input.nodes, new_node)
+// //         input.match = nil        
+// //     }))
+// // write_line(parsec.apply(parsec.alpha(parsing_text),
+// //     function(input){
+// //         var new_node = []
+// //         new_node.value = input.match
+// //         new_node.type = "char"
+// //         list.push(input.nodes, new_node)
+// //         input.match = nil        
+// //     }))
+// // write_line(parsec.apply(parsec.digit(parsing_text),
+// //     function(input){
+// //         var new_node = []
+// //         new_node.value = input.match
+// //         new_node.type = "digit"
+// //         list.push(input.nodes, new_node)
+// //         input.match = nil        
+// //     }))
 
-// write_line(parsec.apply(parser_A_And_B(parsing_text),
-//     function(input){
-//         var new_node = []
-//         new_node.value = input.match
-//         new_node.type = "A_And_B"
-//         list.push(input.nodes, new_node)
-//         input.match = nil        
-//     }))
+// // var match_func = parsec.make_string_parser("func")
 
-// var parser_many_A = parsec.Many(parser_A)
-// write_line(parsec.apply(parser_many_A(parsing_text),
-//     function(input){
-//         var new_node = []
-//         new_node.value = input.match
-//         new_node.type = "A*"
-//         list.push(input.nodes, new_node)
-//         input.match = nil        
-//     }))
+// // write_line(parsec.apply(match_func(parsing_text),
+// //     function(input){
+// //         var new_node = []
+// //         new_node.value = input.match
+// //         new_node.type = "function"
+// //         list.push(input.nodes, new_node)
+// //         input.match = nil        
+// //     }))
 
-// write_line("reset")
-// parsing_text.body = "AAAAAAAAa"
-// var parser_at_least_one_A = parsec.At_least_one(parser_A)
-// write_line(parsec.apply(parser_at_least_one_A(parsing_text),
-//     function(input){
-//         var new_node = []
-//         new_node.value = input.match
-//         new_node.type = "A+"
-//         list.push(input.nodes, new_node)
-//         input.match = nil        
-//     }))
-
-// write_line("reset")
-// parsing_text.body = "BAA"
-// var parser_optional_A = parsec.Optional(parser_A)
-// write_line(parsec.apply(parser_optional_A(parsing_text),
-//     function(input){
-//         var new_node = []
-//         new_node.value = input.match
-//         new_node.type = "A?"
-//         list.push(input.nodes, new_node)
-//         input.match = nil        
-//     }))
-
-// write_line("reset")
-// parsing_text.body = "AA"
-// var parser_CC = parsec.make_string_parser("CC")
-// var parser_list = []
-// list.push(parser_list, parser_A)
-// list.push(parser_list, parser_B)
-// list.push(parser_list, parser_CC)
-
-// var parser_Any = parsec.Any(parser_list)
-// write_line(parsec.apply(parser_Any(parsing_text),
-//     function(input){
-//         var new_node = []
-//         new_node.value = input.match
-//         new_node.type = "Any"
-//         list.push(input.nodes, new_node)
-//         input.match = nil        
-//     }))
+// // var parser_A = parsec.make_string_parser("A")
+// // var parser_B = parsec.make_string_parser("B")
+// // var parser_A_Or_B = parsec.Or(parser_A, parser_B)
+// // write_line(parsec.apply(parser_A_Or_B(parsing_text),
+// //     function(input){
+// //         var new_node = []
+// //         new_node.value = input.match
+// //         new_node.type = "A_Or_B"
+// //         list.push(input.nodes, new_node)
+// //         input.match = nil        
+// //     }))
+// // write_line(parsec.apply(parser_A_Or_B(parsing_text),
+// //     function(input){
+// //         var new_node = []
+// //         new_node.value = input.match
+// //         new_node.type = "A_Or_B"
+// //         list.push(input.nodes, new_node)
+// //         input.match = nil        
+// //     }))
 
 
-// var str1 = "Ola mundo cruel"
-// var parser_Ola = parsec.make_string("Ola");
-// var result = parser_Ola(str1)
-// write_line(result)
-// result = parser_Ola(result.tail)
-// write_line(result)
+// // var parser_A_And_B = parsec.And(parser_A, parser_B)
+// // write_line(parsec.apply(parser_A_And_B(parsing_text),
+// //     function(input){
+// //         var new_node = []
+// //         new_node.value = input.match
+// //         new_node.type = "A_And_B"
+// //         list.push(input.nodes, new_node)
+// //         input.match = nil        
+// //     }))
 
-// var str2 = ""
-// result = parser_Ola(str2)
-// write_line(result)
+// // write_line(parsec.apply(parser_A_And_B(parsing_text),
+// //     function(input){
+// //         var new_node = []
+// //         new_node.value = input.match
+// //         new_node.type = "A_And_B"
+// //         list.push(input.nodes, new_node)
+// //         input.match = nil        
+// //     }))
 
-// var str3 = "53_"
-// result = parsec.digit(str3)
-// write_line(result)
+// // var parser_many_A = parsec.Many(parser_A)
+// // write_line(parsec.apply(parser_many_A(parsing_text),
+// //     function(input){
+// //         var new_node = []
+// //         new_node.value = input.match
+// //         new_node.type = "A*"
+// //         list.push(input.nodes, new_node)
+// //         input.match = nil        
+// //     }))
 
-// var parser_a = parsec.make_string("a")
-// var parser_b = parsec.make_string("b")
-// var parser_a_or_b = parsec.And(parser_a, parser_b)
-// write_line(parser_a_or_b("b2"))
-// write_line(parser_a_or_b("aaa"))
-// write_line(parser_a_or_b("ab"))
+// // write_line("reset")
+// // parsing_text.body = "AAAAAAAAa"
+// // var parser_at_least_one_A = parsec.At_least_one(parser_A)
+// // write_line(parsec.apply(parser_at_least_one_A(parsing_text),
+// //     function(input){
+// //         var new_node = []
+// //         new_node.value = input.match
+// //         new_node.type = "A+"
+// //         list.push(input.nodes, new_node)
+// //         input.match = nil        
+// //     }))
 
-// var intr_sum = '
-//         using System;
-//         (vm) =>{
-//             ValNumber opA = vm.StackPeek(0) as ValNumber;
-//             ValNumber opB = vm.StackPeek(1) as ValNumber;
-//             Console.WriteLine("in");
-//             return new ValNumber(opA.content + opB.content);
-//         }
-// '
-// var sum_intr = intrinsic("sum", 2, intr_sum)
-// write_line(sum_intr(5, 6))
+// // write_line("reset")
+// // parsing_text.body = "BAA"
+// // var parser_optional_A = parsec.Optional(parser_A)
+// // write_line(parsec.apply(parser_optional_A(parsing_text),
+// //     function(input){
+// //         var new_node = []
+// //         new_node.value = input.match
+// //         new_node.type = "A?"
+// //         list.push(input.nodes, new_node)
+// //         input.match = nil        
+// //     }))
+
+// // write_line("reset")
+// // parsing_text.body = "AA"
+// // var parser_CC = parsec.make_string_parser("CC")
+// // var parser_list = []
+// // list.push(parser_list, parser_A)
+// // list.push(parser_list, parser_B)
+// // list.push(parser_list, parser_CC)
+
+// // var parser_Any = parsec.Any(parser_list)
+// // write_line(parsec.apply(parser_Any(parsing_text),
+// //     function(input){
+// //         var new_node = []
+// //         new_node.value = input.match
+// //         new_node.type = "Any"
+// //         list.push(input.nodes, new_node)
+// //         input.match = nil        
+// //     }))
+
+
+// // var str1 = "Ola mundo cruel"
+// // var parser_Ola = parsec.make_string("Ola");
+// // var result = parser_Ola(str1)
+// // write_line(result)
+// // result = parser_Ola(result.tail)
+// // write_line(result)
+
+// // var str2 = ""
+// // result = parser_Ola(str2)
+// // write_line(result)
+
+// // var str3 = "53_"
+// // result = parsec.digit(str3)
+// // write_line(result)
+
+// // var parser_a = parsec.make_string("a")
+// // var parser_b = parsec.make_string("b")
+// // var parser_a_or_b = parsec.And(parser_a, parser_b)
+// // write_line(parser_a_or_b("b2"))
+// // write_line(parser_a_or_b("aaa"))
+// // write_line(parser_a_or_b("ab"))
+
+// // var intr_sum = '
+// //         using System;
+// //         (vm) =>{
+// //             ValNumber opA = vm.StackPeek(0) as ValNumber;
+// //             ValNumber opB = vm.StackPeek(1) as ValNumber;
+// //             Console.WriteLine("in");
+// //             return new ValNumber(opA.content + opB.content);
+// //         }
+// // '
+// // var sum_intr = intrinsic("sum", 2, intr_sum)
+// // write_line(sum_intr(5, 6))
 
 
 
-// var ch = read()
-// while(ch != nil){
-//     write(ch)
-//     ch = read()
-// }
-// write_line("")
-// for (var ch = read(); ch != nil; ch = read()){
-//     write(ch)
-//     ch = read()
-// }
-// write_line("")
-// var n = read_number()
-// write_line(n)
+// // var ch = read()
+// // while(ch != nil){
+// //     write(ch)
+// //     ch = read()
+// // }
+// // write_line("")
+// // for (var ch = read(); ch != nil; ch = read()){
+// //     write(ch)
+// //     ch = read()
+// // }
+// // write_line("")
+// // var n = read_number()
+// // write_line(n)
 
