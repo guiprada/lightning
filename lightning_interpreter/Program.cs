@@ -148,7 +148,7 @@ namespace interpreter
                 VMResult result = vm.Run();
                 if (result.status != VMResultType.OK)
                     Console.WriteLine("Program returned ERROR");
-                else if (result.value != Value.Nil)
+                else if (result.value.value != Value.Nil)
                     Console.WriteLine("Program returned: " + result.value);
             }
             else

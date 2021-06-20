@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Runtime.InteropServices;
 using System.Collections.Generic;
 using System.Text;
 
@@ -12,6 +13,73 @@ using Operand = System.UInt16;
 
 namespace lightning
 {
+    public enum UnitType{
+        Number,
+        Value
+    }
+
+    //[StructLayout(LayoutKind.Explicit)]
+    public struct Unit{
+        //[FieldOffset(0)]
+        public Value value;
+        //[FieldOffset(0)]
+        public Number number;
+        //[FieldOffset(8)]
+        public UnitType type;
+
+        public Unit(Value p_value) : this()
+        {
+            value = p_value;
+            type = UnitType.Value;
+        }
+        public Unit(Number p_number) : this()
+        {
+            number = p_number;
+            type = UnitType.Number;
+        }
+
+        public Value GetValue(){
+            return value;
+        }
+
+        public override string ToString()
+        {
+            if (type == UnitType.Number){
+                return number.ToString();
+            }else{
+                return value.ToString();
+            }
+        }
+
+        public bool ToBool()
+        {
+            if (type == UnitType.Number){
+                Console.WriteLine("ERROR: Can not convert number to Bool.");
+                throw new NotImplementedException();
+            }else{
+                return value.ToBool();
+            }
+        }
+
+        public override bool Equals(object other){
+            if (type == UnitType.Number){
+                if (((Unit)other).type == UnitType.Number){
+                    return ((Unit)other).number == number;
+                }
+                return false;
+            }else{
+                return value.Equals(other);
+            }
+        }
+
+        public override int GetHashCode(){
+            if (type == UnitType.Number){
+                return number.GetHashCode();
+            }else{
+                return value.GetHashCode();
+            }
+        }
+    }
     public abstract class Value
     {
         static ValNil global_nil = new ValNil();
@@ -28,41 +96,6 @@ namespace lightning
 
         public abstract override bool Equals(object other);
         public abstract override int GetHashCode();
-    }
-
-    public class ValNumber : Value
-    {
-        public Number content;
-        public ValNumber(Number value)
-        {
-            content = value;
-        }
-
-        public override string ToString()
-        {
-            return content.ToString();
-        }
-
-        public override bool ToBool()
-        {
-            Console.WriteLine("ERROR: Can not convert number to Bool.");
-            throw new NotImplementedException();
-        }
-
-        public override bool Equals(object other)
-        {
-            if (other.GetType() == typeof(ValNumber))
-            {
-                if (((ValNumber)other).content == content) return true;
-                else return false;
-            }
-            else return false;
-        }
-
-        public override int GetHashCode()
-        {
-            return content.GetHashCode();
-        }
     }
 
     public class ValString : Value
@@ -86,11 +119,18 @@ namespace lightning
 
         public override bool Equals(object other)
         {
-            if (other.GetType() == typeof(ValString))
+            if (other.GetType() == typeof(Unit))
+            {
+                if(((Unit)other).value.GetType() == typeof(ValString))
+                    if(content == ((ValString)((Unit)(other)).value).content)
+                        return true;
+            }
+            if(other.GetType() == typeof(ValString))
             {
                 if (((ValString)other).content == content)
                     return true;
             }
+
             return false;
         }
 
@@ -121,6 +161,12 @@ namespace lightning
 
         public override bool Equals(object other)
         {
+            if (other.GetType() == typeof(Unit))
+            {
+                if(((Unit)other).value.GetType() == typeof(ValBool))
+                    if(content == ((ValBool)((Unit)(other)).value).content)
+                        return true;
+            }
             if (other.GetType() == typeof(ValBool))
             {
                 if (((ValBool)other).content == this.content) return true;
@@ -148,11 +194,16 @@ namespace lightning
 
         public override bool Equals(object other)
         {
+            if (other.GetType() == typeof(Unit))
+            {
+                if(((Unit)other).value.GetType() == typeof(ValNil))
+                    return true;
+            }
             if (other.GetType() == typeof(ValNil))
             {
                 return true;
             }
-            else return false;
+            return false;
         }
 
         public override int GetHashCode()
@@ -167,7 +218,7 @@ namespace lightning
         public Operand arity;
         public List<Instruction> body;
         public string module;
-        public Operand originalPosition;        
+        public Operand originalPosition;
 
         public ValFunction(string p_name, string p_module)
         {
@@ -194,6 +245,14 @@ namespace lightning
 
         public override bool Equals(object other)
         {
+            if (other.GetType() == typeof(Unit))
+            {
+                if(((Unit)other).value.GetType() == typeof(ValFunction))
+                {
+                    ValFunction other_val_func = (ValFunction)((Unit)(other)).value;
+                    if (other_val_func.name == this.name && other_val_func.module == this.module) return true;
+                }
+            }
             if (other.GetType() == typeof(ValFunction))
             {
                 ValFunction other_val_func = other as ValFunction;
@@ -211,10 +270,10 @@ namespace lightning
     public class ValIntrinsic : Value
     {
         public string name;
-        public Func<VM, Value> function;
+        public Func<VM, Unit> function;
         public int arity;
 
-        public ValIntrinsic(string p_name, Func<VM, Value> p_function, int p_arity)
+        public ValIntrinsic(string p_name, Func<VM, Unit> p_function, int p_arity)
         {
             name = p_name;
             function = p_function;
@@ -234,6 +293,13 @@ namespace lightning
 
         public override bool Equals(object other)
         {
+            if (other.GetType() == typeof(Unit))
+            {
+                if(((Unit)other).value.GetType() == typeof(ValIntrinsic))
+                {
+                    if (function == (((Unit)other).value as ValIntrinsic).function) return true;
+                }
+            }
             if (other.GetType() == typeof(ValIntrinsic))
             {
                 if (function == (other as ValIntrinsic).function) return true;
@@ -258,7 +324,7 @@ namespace lightning
             upValues = p_upValues;
         }
 
-        public void Register(List<Value> p_variables, int[] p_variablesBases)
+        public void Register(List<Unit> p_variables, int[] p_variablesBases)
         {
             foreach (ValUpValue u in upValues)
                 u.Attach(p_variables, p_variablesBases);
@@ -277,6 +343,13 @@ namespace lightning
 
         public override bool Equals(object other)
         {
+            if (other.GetType() == typeof(Unit))
+            {
+                if(((Unit)other).value.GetType() == typeof(ValClosure))
+                {
+                    if (this == ((Unit)other).value as ValClosure) return true;
+                }
+            }
             if (other.GetType() == typeof(ValClosure))
             {
                 if (other == this) return true;
@@ -295,10 +368,10 @@ namespace lightning
         public Operand address;
         public Operand env;
         bool isCaptured;
-        List<Value> variables;
+        List<Unit> variables;
         int[] variablesBases;
-        Value val;
-        public Value Val
+        Unit val;
+        public Unit Val
         {
             get
             {
@@ -338,10 +411,10 @@ namespace lightning
             isCaptured = false;
             variables = null;
             variablesBases = null;
-            val = null;
+            val = new Unit(Value.Nil);
         }
 
-        public void Attach(List<Value> p_variables, int[] p_variablesBases)
+        public void Attach(List<Unit> p_variables, int[] p_variablesBases)
         {
             variables = p_variables;
             variablesBases = p_variablesBases;
@@ -368,9 +441,16 @@ namespace lightning
 
         public override bool Equals(object other)
         {
+            if (other.GetType() == typeof(Unit))
+            {
+                if(((Unit)other).value.GetType() == typeof(ValUpValue))
+                {
+                    if (Val.Equals(((Unit)other).value)) return true;
+                }
+            }
             if (other.GetType() == typeof(ValUpValue))
             {
-                if ((other as ValUpValue).Val == Val) return true;
+                if (Val.Equals(other)) return true;
             }
             return false;
         }
@@ -384,32 +464,32 @@ namespace lightning
 
     public class ValTable : Value
     {
-        public List<Value> elements;
-        public Dictionary<ValString, Value> table;
+        public List<Unit> elements;
+        public Dictionary<ValString, Unit> table;
 
 
         public int ECount { get { return elements.Count; } }
         public int TCount { get { return table.Count; } }
         public int Count { get { return ECount + TCount; } }
-        public ValTable(List<Value> p_elements, Dictionary<ValString, Value> p_table)
+        public ValTable(List<Unit> p_elements, Dictionary<ValString, Unit> p_table)
         {
-            elements = p_elements ??= new List<Value>();
-            table = p_table ??= new Dictionary<ValString, Value>();
+            elements = p_elements ??= new List<Unit>();
+            table = p_table ??= new Dictionary<ValString, Unit>();
         }
 
-        public void ElementSet(int index, Value value)
+        public void ElementSet(int index, Unit value)
         {
             if (index > (ECount - 1))
                 ElementsStretch(index - (ECount - 1));
             elements[index] = value;
         }
 
-        public void ElementAdd(Value value)
+        public void ElementAdd(Unit value)
         {            
             elements.Add(value);
         }
 
-        public void TableSet(ValString index, Value value)
+        public void TableSet(ValString index, Unit value)
         {
             table[index] = value;
         }
@@ -418,7 +498,7 @@ namespace lightning
         {
             for (int i = 0; i < n; i++)
             {
-                elements.Add(Value.Nil);
+                elements.Add(new Unit(Value.Nil));
             }
         }
 
@@ -426,7 +506,7 @@ namespace lightning
         {
             string this_string = "table: ";
             int counter = 0;
-            foreach (Value v in elements)
+            foreach (Unit v in elements)
             {
                 if (counter == 0)
                 {
@@ -442,7 +522,7 @@ namespace lightning
             if (counter > 0)
                 this_string += " ";
             bool first = true;
-            foreach (KeyValuePair<ValString, Value> entry in table)
+            foreach (KeyValuePair<ValString, Unit> entry in table)
             {
                 if (first)
                 {
@@ -465,6 +545,13 @@ namespace lightning
 
         public override bool Equals(object other)
         {
+            if (other.GetType() == typeof(Unit))
+            {
+                if(((Unit)other).value.GetType() == typeof(ValTable))
+                {
+                    if (this == ((Unit)other).value as ValTable) return true;
+                }
+            }
             if (other.GetType() == typeof(ValTable))
             {
                 if (other == this) return true;
@@ -481,20 +568,27 @@ namespace lightning
     public class ValModule : ValTable
     {
         public string name;
-        public List<Value> globals;
-        public List<Value> constants;
+        public List<Unit> globals;
+        public List<Unit> constants;
         public Operand importIndex;
-        public ValModule(string p_name, List<Value> p_elements, Dictionary<ValString, Value> p_table, List<Value> p_globals, List<Value> p_constants)
+        public ValModule(string p_name, List<Unit> p_elements, Dictionary<ValString, Unit> p_table, List<Unit> p_globals, List<Unit> p_constants)
             : base(p_elements, p_table)
         {
             name = p_name;
-            globals = p_globals ??= new List<Value>();
-            constants = p_constants ??= new List<Value>();
+            globals = p_globals ??= new List<Unit>();
+            constants = p_constants ??= new List<Unit>();
             importIndex = 0;
         }
 
         public override bool Equals(object other)
         {
+            if (other.GetType() == typeof(Unit))
+            {
+                if(((Unit)other).value.GetType() == typeof(ValModule))
+                {
+                    if (this.name == (((Unit)other).value as ValModule).name) return true;
+                }
+            }
             if (other.GetType() == typeof(ValModule))
             {
                 if ((other as ValModule).name == this.name) return true;
@@ -528,6 +622,13 @@ namespace lightning
 
         public override bool Equals(object other)
         {
+            if (other.GetType() == typeof(Unit))
+            {
+                if(((Unit)other).value.GetType() == typeof(ValWrapper<T>))
+                {
+                    if (this.content == (((Unit)other).value as ValWrapper<T>).content) return true;
+                }
+            }
             if(other.GetType() == typeof(ValWrapper<T>))
             {
                 if(((ValWrapper<T>)other).content == this.content)

@@ -22,9 +22,9 @@ namespace lightning
     public struct VMResult
     {
         public VMResultType status;
-        public Value value;
+        public Unit value;
 
-        public VMResult(VMResultType p_status, Value p_value)
+        public VMResult(VMResultType p_status, Unit p_value)
         {
             status = p_status;
             value = p_value;
@@ -37,10 +37,10 @@ namespace lightning
         List<Instruction>[] instructionsStack;
         int executingInstructions;// contains the currently executing instructions
         ValFunction[] functionCallStack;
-        Value[] stack; // used for operations
+        Unit[] stack; // used for operations
         int stackTop;
-        List<Value> globals; // used for global variables
-        List<Value> variables; // used for scoped variables
+        List<Unit> globals; // used for global variables
+        List<Unit> variables; // used for scoped variables
         int variablesTop;
 
         int[] variablesBases; // used to control the address used by each scope
@@ -57,7 +57,7 @@ namespace lightning
         Operand[] ret;
         int ret_count;
         int[] funCallEnv;
-        Value[] stash;
+        Unit[] stash;
         int stashTop;
 
         Operand IP;
@@ -65,7 +65,6 @@ namespace lightning
         public Dictionary<string, int> loadedModules { get; private set; }
         public List<ValModule> modules;
 
-        Stack<ValNumber> valNumberPool;
         Stack<VM> vmPool;
         int function_deepness;
 
@@ -79,10 +78,10 @@ namespace lightning
             executingInstructions = 0;
             functionCallStack = new ValFunction[function_deepness];
 
-            stack = new Value[3 * function_deepness];
+            stack = new Unit[3 * function_deepness];
             stackTop = 0;
-            globals = new List<Value>();
-            variables = new List<Value>();
+            globals = new List<Unit>();
+            variables = new List<Unit>();
             variablesTop = 0;
 
             variablesBases = new int[3 * function_deepness];
@@ -104,24 +103,23 @@ namespace lightning
             ret[executingInstructions] = (Operand)(chunk.ProgramSize - 1);
             ret_count = 1;
             funCallEnv = new int[function_deepness];
-            stash = new Value[function_deepness];
+            stash = new Unit[function_deepness];
             stashTop = 0;
             IP = 0;
 
             Intrinsics = chunk.Prelude.intrinsics;
             foreach (ValIntrinsic v in Intrinsics)
             {
-                globals.Add(v);
+                globals.Add(new Unit(v));
             }
             foreach (KeyValuePair<string, ValTable> entry in chunk.Prelude.tables)
             {
-                globals.Add(entry.Value);
+                globals.Add(new Unit(entry.Value));
             }
 
             loadedModules = new Dictionary<string, int>();
             modules = new List<ValModule>();
 
-            valNumberPool = new Stack<ValNumber>();
             vmPool = new Stack<VM>();
         }
 
@@ -140,33 +138,7 @@ namespace lightning
             {
                 VM new_vm = new VM(chunk, function_deepness);
                 new_vm.globals = globals;
-                new_vm.valNumberPool = valNumberPool;
                 return new_vm;
-            }
-        }
-
-        void RecycleNumber(ValNumber v)
-        {
-            lock (valNumberPool)
-            {
-                valNumberPool.Push(v);
-            }
-        }
-
-        ValNumber GetValNumber(Number n)
-        {
-            lock (valNumberPool)
-            {
-                if (valNumberPool.Count > 0)
-                {
-                    ValNumber v = valNumberPool.Pop();
-                    v.content = n;
-                    return v;
-                }
-                else
-                {
-                    return new ValNumber(n);
-                }
             }
         }
 
@@ -182,42 +154,45 @@ namespace lightning
             return chunk;
         }
 
-        public Value GetGlobal(Operand address)
+        public Unit GetGlobal(Operand address)
         {
             return globals[address];
         }
 
-        void StackPush(Value p_value)
+        void StackPush(Unit p_value)
         {
             stack[stackTop] = p_value;
             stackTop++;
         }
 
-        Value StackPop()
+        Unit StackPop()
         {
             stackTop--;
-            Value popped = stack[stackTop];
+            Unit popped = stack[stackTop];
             return popped;
         }
 
-        Value StackPeek()
+        Unit StackPeek()
         {
             return stack[stackTop - 1];
         }
 
-        public Value StackPeek(int n)
+        public Unit StackPeek(int n)
         {
-            if (n < 0 || n > (stackTop - 1)) return null;
+            if (n < 0 || n > (stackTop - 1)){
+                Console.WriteLine("ERROR: tried to read empty stack!");
+                throw new Exception("Reading empty stack");
+            }
             return stack[stackTop - n - 1];
         }
 
-        Value VarAt(Operand address, Operand n_env)
+        Unit VarAt(Operand address, Operand n_env)
         {
             int this_BP = variablesBases[n_env];
             return variables[this_BP + address];
         }
 
-        void VarSet(Value new_value, Operand address, Operand n_env)
+        void VarSet(Unit new_value, Operand address, Operand n_env)
         {
             variables[address + variablesBases[n_env]] = new_value;
         }
@@ -266,12 +241,6 @@ namespace lightning
             }
             //upValuesRegistry.RemoveRange(upvalues_start, upValuesRegistry.Count - upvalues_start);
 
-            lock (valNumberPool)
-            {                
-                for(int i=0; i<(valNumberPool.Count*0.05 + 1); i++)
-                    if (valNumberPool.Count > 0)
-                        valNumberPool.Pop();
-            }
             for (int i = 0; i < (vmPool.Count * 0.05 + 1); i++)
                 if (vmPool.Count > 0)
                     vmPool.Pop();
@@ -324,19 +293,19 @@ namespace lightning
             }
         }
 
-        public Value CallFunction(Value this_callable, List<Value> args)
+        public Unit CallFunction(Unit this_callable, List<Unit> args)
         {
             if (args != null)
                 for (int i = args.Count - 1; i >= 0; i--)
                     StackPush(args[i]);
 
-            Type this_type = this_callable.GetType();
+            Type this_type = this_callable.value.GetType();
             ret[ret_count] = (Operand)(chunk.ProgramSize - 1);
             ret_count += 1;
             funCallEnv[executingInstructions + 1] = variablesBasesTop - 1;
             if (this_type == typeof(ValFunction))
             {
-                ValFunction this_func = (ValFunction)this_callable;
+                ValFunction this_func = (ValFunction)(this_callable.value);
                 instructionsStack[executingInstructions + 1] = this_func.body;
                 functionCallStack[executingInstructions + 1] = this_func;
                 executingInstructions = executingInstructions + 1;
@@ -344,7 +313,7 @@ namespace lightning
             }
             else if (this_type == typeof(ValClosure))
             {
-                ValClosure this_closure = (ValClosure)this_callable;
+                ValClosure this_closure = (ValClosure)(this_callable.value);
                 UpValuesPush();
 
                 foreach (ValUpValue u in this_closure.upValues)
@@ -358,15 +327,15 @@ namespace lightning
             }
             else if (this_type == typeof(ValIntrinsic))
             {
-                ValIntrinsic this_intrinsic = (ValIntrinsic)this_callable;
-                Value intrinsic_result = this_intrinsic.function(this);
+                ValIntrinsic this_intrinsic = (ValIntrinsic)(this_callable.value);
+                Unit intrinsic_result = this_intrinsic.function(this);
                 stackTop -= this_intrinsic.arity;
                 StackPush(intrinsic_result);
             }
             VMResult result = Run();
             if (result.status == VMResultType.OK)
                 return result.value;
-            return Value.Nil;
+            return new Unit(Value.Nil);
         }
 
         public VMResult Run()
@@ -385,19 +354,15 @@ namespace lightning
                     case OpCode.POP:
                         {
                             IP++;
-                            Value value = StackPop();
+                            Unit value = StackPop();
                             break;
                         }
                     case OpCode.LOADC:
                         {
                             IP++;
                             Operand address = instruction.opA;
-                            Value constant = chunk.GetConstant(address);
-                            //Console.WriteLine(constant);
-                            if (constant.GetType() == typeof(ValNumber))
-                                StackPush(GetValNumber(((ValNumber)constant).content));
-                            else
-                                StackPush(constant);
+                            Unit constant = chunk.GetConstant(address);
+                            StackPush(constant);
                             break;
                         }
                     case OpCode.LOADV:
@@ -413,7 +378,7 @@ namespace lightning
                         {
                             IP++;
                             Operand address = instruction.opA;
-                            Value global = globals[address];
+                            Unit global = globals[address];
                             StackPush(global);
                             break;
                         }
@@ -422,7 +387,7 @@ namespace lightning
                             IP++;
                             Operand address = instruction.opA;
                             Operand module = instruction.opB;
-                            Value global = modules[module].globals[address];
+                            Unit global = modules[module].globals[address];
                             StackPush(global);
                             break;
                         }
@@ -431,11 +396,9 @@ namespace lightning
                             IP++;
                             Operand address = instruction.opA;
                             Operand module = instruction.opB;
-                            Value constant = modules[module].constants[address];
-                            if (constant.GetType() == typeof(ValNumber))
-                                StackPush(GetValNumber(((ValNumber)constant).content));
-                            else
-                                StackPush(constant);
+                            Unit constant = modules[module].constants[address];
+                            
+                            StackPush(constant);
                             break;
                         }
                     case OpCode.LOADUPVAL:
@@ -449,37 +412,32 @@ namespace lightning
                     case OpCode.LOADNIL:
                         {
                             IP++;
-                            StackPush(Value.Nil);
+                            StackPush(new Unit(Value.Nil));
                             break;
                         }
                     case OpCode.LOADTRUE:
                         {
                             IP++;
-                            StackPush(Value.True);
+                            StackPush(new Unit(Value.True));
                             break;
                         }
                     case OpCode.LOADFALSE:
                         {
                             IP++;
-                            StackPush(Value.False);
+                            StackPush(new Unit(Value.False));
                             break;
                         }
                     case OpCode.LOADINTR:
                         {
                             IP++;
                             Operand value = instruction.opA;
-                            StackPush(Intrinsics[value]);
+                            StackPush(new Unit(Intrinsics[value]));
                             break;
                         }
                     case OpCode.VARDCL:
                         {
                             IP++;
-                            Value new_value = StackPop();
-
-                            if (new_value.GetType() == typeof(ValNumber))
-                            {
-                                new_value = GetValNumber(((ValNumber)new_value).content);
-                            }
+                            Unit new_value = StackPop();
 
                             if (variablesTop > (variables.Count - 1))
                             {
@@ -496,12 +454,7 @@ namespace lightning
                     case OpCode.GLOBALDCL:
                         {
                             IP++;
-                            Value new_value = StackPop();
-
-                            if (new_value.GetType() == typeof(ValNumber))
-                            {
-                                new_value = GetValNumber(((ValNumber)new_value).content);
-                            }
+                            Unit new_value = StackPop();
 
                             globals.Add(new_value);
                             break;
@@ -511,36 +464,36 @@ namespace lightning
                             IP++;
                             Operand env = instruction.opA;
                             Operand lambda = instruction.opB;
-                            Operand new_fun_address = instruction.opC;                            
-                            Value this_callable = chunk.GetConstant(new_fun_address);
-                            if (this_callable.GetType() == typeof(ValFunction))
+                            Operand new_fun_address = instruction.opC;
+                            Unit this_callable = chunk.GetConstant(new_fun_address);
+                            if (this_callable.value.GetType() == typeof(ValFunction))
                             {
-                                ValFunction this_function = (ValFunction)this_callable;
+                                //ValFunction this_function = (ValFunction)(this_callable.value);
                                 if (lambda == 0)
                                     if (env == 0)// Global
                                     {
-                                        globals.Add(this_function);
+                                        globals.Add(this_callable);
                                     }
                                     else
                                     {
                                         if (variablesTop >= (variables.Count))
                                         {
-                                            variables.Add(this_function);
+                                            variables.Add(this_callable);
                                             variablesTop++;
                                         }
                                         else
                                         {
-                                            variables[variablesTop] = this_function;
+                                            variables[variablesTop] = this_callable;
                                             variablesTop++;
                                         }
                                     }
                                 else
-                                    StackPush(this_function);
+                                    StackPush(this_callable);
                             }
                             else
                             {
                                 //Console.WriteLine(this_callable);
-                                ValClosure this_closure = (ValClosure)this_callable;
+                                ValClosure this_closure = (ValClosure)(this_callable.value);
 
                                 // new upvalues
                                 List<ValUpValue> new_upValues = new List<ValUpValue>();
@@ -558,27 +511,27 @@ namespace lightning
                                 {
                                     RegisterUpValue(u);
                                 }
-
+                                Unit new_closure_unit = new Unit(new_closure);
                                 if (lambda == 0)
                                     if (env == 0)// yes they exist!
                                     {
-                                        globals.Add(new_closure);
+                                        globals.Add(new_closure_unit);
                                     }
                                     else
                                     {
                                         if (variablesTop >= (variables.Count))
                                         {
-                                            variables.Add(new_closure);
+                                            variables.Add(new_closure_unit);
                                             variablesTop++;
                                         }
                                         else
                                         {
-                                            variables[variablesTop] = new_closure;
+                                            variables[variablesTop] = new_closure_unit;
                                             variablesTop++;
                                         }
                                     }
                                 else
-                                    StackPush(new_closure);
+                                    StackPush(new_closure_unit);
                             }
                             break;
                         }
@@ -588,29 +541,24 @@ namespace lightning
                             Operand address = instruction.opA;
                             Operand n_shift = instruction.opB;
                             Operand op = instruction.opC;
-                            Value new_value = StackPeek();
+                            Unit new_value = StackPeek();
                             if (op == 0)
                             {
-                                Value old_value = VarAt(address, (Operand)(variablesBasesTop - 1 - n_shift));
-                                if (old_value.GetType() == typeof(ValNumber))
-                                    RecycleNumber(old_value as ValNumber);
-                                if (new_value.GetType() == typeof(ValNumber))
-                                {
-                                    new_value = GetValNumber(((ValNumber)new_value).content);
-                                }
                                 VarSet(new_value, address, (Operand)(variablesBasesTop - 1 - n_shift));
                             }
                             else
                             {
-                                Value old_value = VarAt(address, (Operand)(variablesBasesTop - 1 - n_shift));
+                                Unit old_value = VarAt(address, (Operand)(variablesBasesTop - 1 - n_shift));
+                                Number result = 0;
                                 if (op == 1)
-                                    ((ValNumber)old_value).content += ((ValNumber)new_value).content;
+                                    result = old_value.number + new_value.number;
                                 else if (op == 2)
-                                    ((ValNumber)old_value).content -= ((ValNumber)new_value).content;
+                                    result = old_value.number - new_value.number;
                                 else if (op == 3)
-                                    ((ValNumber)old_value).content *= ((ValNumber)new_value).content;
+                                    result = old_value.number * new_value.number;
                                 else if (op == 4)
-                                    ((ValNumber)old_value).content /= ((ValNumber)new_value).content;
+                                    result = old_value.number / new_value.number;
+                                VarSet(new Unit(result), address, (Operand)(variablesBasesTop - 1 - n_shift));
                             }
                             break;
                         }
@@ -619,31 +567,24 @@ namespace lightning
                             IP++;
                             Operand address = instruction.opA;
                             Operand op = instruction.opB;
-                            Value new_value = StackPeek();
+                            Unit new_value = StackPeek();
                             if (op == 0)
                             {
-
-                                Value old_value = globals[address];
-                                if (old_value.GetType() == typeof(ValNumber))
-                                    RecycleNumber(old_value as ValNumber);
-                                if (new_value.GetType() == typeof(ValNumber))
-                                {
-                                    new_value = GetValNumber(((ValNumber)new_value).content);
-                                }
                                 globals[address] = new_value;
                             }
                             else
                             {
-                                Value old_value = globals[address];
+                                Unit old_value = globals[address];
+                                Number result = 0;
                                 if (op == 1)
-                                    ((ValNumber)old_value).content += ((ValNumber)new_value).content;
+                                    result = old_value.number + new_value.number;
                                 else if (op == 2)
-                                    ((ValNumber)old_value).content -= ((ValNumber)new_value).content;
+                                    result = old_value.number - new_value.number;
                                 else if (op == 3)
-                                    ((ValNumber)old_value).content *= ((ValNumber)new_value).content;
+                                    result = old_value.number * new_value.number;
                                 else if (op == 4)
-                                    ((ValNumber)old_value).content /= ((ValNumber)new_value).content;
-
+                                    result = old_value.number / new_value.number;
+                                globals[address] = new Unit(result);
                             }
                             break;
                         }
@@ -652,31 +593,25 @@ namespace lightning
                             IP++;
                             Operand address = instruction.opA;
                             Operand op = instruction.opB;
-                            ValUpValue this_value = UpValuesAt(address);
-                            Value new_value = StackPeek();
+                            ValUpValue this_upValue = UpValuesAt(address);
+                            Unit new_value = StackPeek();
                             if (op == 0)
                             {
-
-                                Value old_value = this_value.Val;
-                                if (old_value.GetType() == typeof(ValNumber))
-                                    RecycleNumber(old_value as ValNumber);
-                                if (new_value.GetType() == typeof(ValNumber))
-                                {
-                                    new_value = GetValNumber(((ValNumber)new_value).content);
-                                }
-                                this_value.Val = new_value;
+                                this_upValue.Val = new_value;
                             }
                             else
                             {
-                                Value old_value = this_value.Val;
+                                Unit old_value = this_upValue.Val;
+                                Number result = 0;
                                 if (op == 1)
-                                    ((ValNumber)old_value).content += ((ValNumber)new_value).content;
+                                    result = old_value.number + new_value.number;
                                 else if (op == 2)
-                                    ((ValNumber)old_value).content -= ((ValNumber)new_value).content;
+                                    result = old_value.number - new_value.number;
                                 else if (op == 3)
-                                    ((ValNumber)old_value).content *= ((ValNumber)new_value).content;
+                                    result = old_value.number * new_value.number;
                                 else if (op == 4)
-                                    ((ValNumber)old_value).content /= ((ValNumber)new_value).content;
+                                    result = old_value.number / new_value.number;
+                                this_upValue.Val = new Unit(result);
                             }
                             break;
                         }
@@ -685,20 +620,20 @@ namespace lightning
                             IP++;
                             Operand indexes_counter = instruction.opA;
 
-                            Value[] indexes = new Value[indexes_counter];
+                            Unit[] indexes = new Unit[indexes_counter];
                             for (int i = indexes_counter - 1; i >= 0; i--)
                                 indexes[i] = StackPop();
 
-                            Value value = StackPop();
-                            foreach (Value v in indexes)
+                            Unit value = StackPop();
+                            foreach (Unit v in indexes)
                             {
-                                if (v.GetType() == typeof(ValNumber))
+                                if (v.type == UnitType.Number)
                                 {
-                                    value = (value as ValTable).elements[(int)((ValNumber)v).content];
+                                    value = ((ValTable)(value.value)).elements[(int)v.number];
                                 }
                                 else
                                 {
-                                    value = (value as ValTable).table[(ValString)v];
+                                    value = ((ValTable)(value.value)).table[(ValString)v.value];
                                 }
                             }
                             StackPush(value);
@@ -711,75 +646,68 @@ namespace lightning
                             Operand indexes_counter = instruction.opA;
                             Operand op = instruction.opB;
 
-                            Value[] indexes = new Value[indexes_counter];
+                            Unit[] indexes = new Unit[indexes_counter];
                             for (int i = indexes_counter - 1; i >= 0; i--)
                                 indexes[i] = StackPop();
 
-                            Value this_table = StackPop();
+                            Unit this_table = StackPop();
 
                             for (int i = 0; i < indexes_counter - 1; i++)
                             {
-                                Value v = indexes[i];
-                                if (v.GetType() == typeof(ValNumber))
+                                Unit v = indexes[i];
+                                if (v.type == UnitType.Number)
                                 {
-                                    this_table = (this_table as ValTable).elements[(int)((ValNumber)v).content];
+                                    this_table = ((ValTable)(this_table.value)).elements[(int)v.number];
                                 }
                                 else
                                 {
-                                    this_table = (this_table as ValTable).table[(ValString)v];
+                                    this_table = ((ValTable)(this_table.value)).table[(ValString)v.value];
                                 }
                             }
-                            Value new_value = StackPeek();
+                            Unit new_value = StackPeek();
                             if (op == 0)
                             {
-                                if (indexes[indexes_counter - 1].GetType() == typeof(ValNumber))
+                                if (indexes[indexes_counter - 1].type == UnitType.Number)
                                 {
-                                    if ((this_table as ValTable).elements.Count - 1 >= ((int)((ValNumber)indexes[indexes_counter - 1]).content))
+                                    if (((ValTable)(this_table.value)).elements.Count - 1 >= ((int)(indexes[indexes_counter - 1].number)))
                                     {
-                                        Value old_value = (this_table as ValTable).elements[(int)((ValNumber)indexes[indexes_counter - 1]).content];
-                                        if (old_value.GetType() == typeof(ValNumber))
-                                            RecycleNumber(old_value as ValNumber);
+                                        Unit old_value = ((ValTable)(this_table.value)).elements[(int)(indexes[indexes_counter - 1].number)];
                                     }
-                                    if (new_value.GetType() == typeof(ValNumber))
-                                    {
-                                        new_value = GetValNumber(((ValNumber)new_value).content);
-                                    }
-                                    (this_table as ValTable).ElementSet((int)((ValNumber)indexes[indexes_counter - 1]).content, new_value);
+                                    ((ValTable)(this_table.value)).ElementSet((int)(indexes[indexes_counter - 1].number), new_value);
                                 }
                                 else
                                 {
-                                    if ((this_table as ValTable).table.ContainsKey((ValString)indexes[indexes_counter - 1]))
+                                    if (((ValTable)(this_table.value)).table.ContainsKey((ValString)indexes[indexes_counter - 1].value))
                                     {
-                                        Value old_value = (this_table as ValTable).table[(ValString)indexes[indexes_counter - 1]];
-                                        if (old_value.GetType() == typeof(ValNumber))
-                                            RecycleNumber(old_value as ValNumber);
+                                        Unit old_value = ((ValTable)(this_table.value)).table[(ValString)indexes[indexes_counter - 1].value];
                                     }
-                                    if (new_value.GetType() == typeof(ValNumber))
-                                    {
-                                        new_value = GetValNumber(((ValNumber)new_value).content);
-                                    }
-                                    (this_table as ValTable).TableSet((ValString)indexes[indexes_counter - 1], new_value);
+                                    ((ValTable)(this_table.value)).TableSet((ValString)indexes[indexes_counter - 1].value, new_value);
                                 }
                             }
                             else
                             {
-                                Value old_value;
-                                if (indexes[indexes_counter - 1].GetType() == typeof(ValNumber))
-                                    old_value = (this_table as ValTable).elements[(int)((ValNumber)indexes[indexes_counter - 1]).content];
+                                Unit old_value;
+                                if (indexes[indexes_counter - 1].type == UnitType.Number)
+                                    old_value = ((ValTable)(this_table.value)).elements[(int)(indexes[indexes_counter - 1].number)];
                                 else
-                                    old_value = (this_table as ValTable).table[(ValString)indexes[indexes_counter - 1]];
+                                    old_value = ((ValTable)(this_table.value)).table[(ValString)indexes[indexes_counter - 1].value];
 
+                                Number result = 0;
                                 if (op == 1)
-                                    ((ValNumber)old_value).content += ((ValNumber)new_value).content;
+                                    result = old_value.number + new_value.number;
                                 else if (op == 2)
-                                    ((ValNumber)old_value).content -= ((ValNumber)new_value).content;
+                                    result = old_value.number - new_value.number;
                                 else if (op == 3)
-                                    ((ValNumber)old_value).content *= ((ValNumber)new_value).content;
+                                    result = old_value.number * new_value.number;
                                 else if (op == 4)
-                                    ((ValNumber)old_value).content /= ((ValNumber)new_value).content;
+                                    result = old_value.number / new_value.number;
+
+                                if (indexes[indexes_counter - 1].type == UnitType.Number)
+                                    ((ValTable)(this_table.value)).elements[(int)(indexes[indexes_counter - 1].number)] = new Unit(result);
+                                else
+                                    ((ValTable)(this_table.value)).table[(ValString)indexes[indexes_counter - 1].value] = new Unit(result);
+
                             }
-
-
                             break;
                         }
                     case OpCode.JMP:
@@ -836,23 +764,22 @@ namespace lightning
                     case OpCode.ADD:
                         {
                             IP++;
-                            ValNumber opB = (ValNumber)StackPop();
-                            ValNumber opA = (ValNumber)StackPop();
+                            Number opB = StackPop().number;
+                            Number opA = StackPop().number;
 
-                            Number result = opA.content + opB.content;
-                            Value new_value = GetValNumber(result);
-                            StackPush(new_value);
+                            Number result = opA + opB;
+                            StackPush(new Unit(result));
 
                             break;
                         }
                     case OpCode.APP:
                         {
                             IP++;
-                            Value opB = StackPop();
-                            Value opA = StackPop();
+                            Unit opB = StackPop();
+                            Unit opA = StackPop();
 
                             string result = opA.ToString() + opB.ToString();
-                            Value new_value = new ValString(result);
+                            Unit new_value = new Unit(new ValString(result));
                             StackPush(new_value);
 
                             break;
@@ -860,67 +787,72 @@ namespace lightning
                     case OpCode.SUB:
                         {
                             IP++;
-                            ValNumber opB = (ValNumber)StackPop();
-                            ValNumber opA = (ValNumber)StackPop();
-                            Number result = opA.content - opB.content;
-                            Value new_value = GetValNumber(result);
-                            StackPush(new_value);
+                            Number opB = StackPop().number;
+                            Number opA = StackPop().number;
+
+                            Number result = opA - opB;
+                            StackPush(new Unit(result));
+
                             break;
                         }
                     case OpCode.MUL:
                         {
                             IP++;
-                            ValNumber opB = (ValNumber)StackPop();
-                            ValNumber opA = (ValNumber)StackPop();
-                            Number result = opA.content * opB.content;
-                            Value new_value = GetValNumber(result);
-                            StackPush(new_value);
+                            Number opB = StackPop().number;
+                            Number opA = StackPop().number;
+
+                            Number result = opA * opB;
+                            StackPush(new Unit(result));
+
                             break;
                         }
                     case OpCode.DIV:
                         {
                             IP++;
-                            ValNumber opB = (ValNumber)StackPop();
-                            ValNumber opA = (ValNumber)StackPop();
-                            Number result = opA.content / opB.content;
-                            Value new_value = GetValNumber(result);
-                            StackPush(new_value);
+                            Number opB = StackPop().number;
+                            Number opA = StackPop().number;
+
+                            Number result = opA / opB;
+                            StackPush(new Unit(result));
+
                             break;
                         }
                     case OpCode.NEG:
                         {
                             IP++;
-                            ValNumber opA = (ValNumber)StackPop();
-                            Value new_value = GetValNumber(opA.content * -1);
+                            Number opA = StackPop().number;
+                            Unit new_value = new Unit(-opA);
                             StackPush(new_value);
                             break;
                         }
                     case OpCode.INC:
                         {
                             IP++;
-                            ValNumber opA = (ValNumber)StackPeek();
-                            opA.content++;
+                            Number opA = StackPop().number;
+                            Unit new_value = new Unit(opA++);
+                            StackPush(new_value);
                             break;
                         }
                     case OpCode.DEC:
                         {
                             IP++;
-                            ValNumber opA = (ValNumber)StackPeek();
-                            opA.content--;
+                            Number opA = StackPop().number;
+                            Unit new_value = new Unit(opA--);
+                            StackPush(new_value);
                             break;
                         }
                     case OpCode.EQ:
                         {
                             IP++;
-                            Value opB = StackPop();
-                            Value opA = StackPop();
+                            Unit opB = StackPop();
+                            Unit opA = StackPop();
                             if (opA.Equals(opB))
                             {
-                                StackPush(Value.True);
+                                StackPush(new Unit(Value.True));
                             }
                             else
                             {
-                                StackPush(Value.False);
+                                StackPush(new Unit(Value.False));
                             }
 
                             break;
@@ -928,16 +860,16 @@ namespace lightning
                     case OpCode.NEQ:
                         {
                             IP++;
-                            Value opB = StackPop();
-                            Value opA = StackPop();
+                            Unit opB = StackPop();
+                            Unit opA = StackPop();
 
                             if (!opA.Equals(opB))
                             {
-                                StackPush(Value.True);
+                                StackPush(new Unit(Value.True));
                             }
                             else
                             {
-                                StackPush(Value.False);
+                                StackPush(new Unit(Value.False));
                             }
 
                             break;
@@ -945,79 +877,79 @@ namespace lightning
                     case OpCode.GTQ:
                         {
                             IP++;
-                            ValNumber opB = (ValNumber)StackPop();
-                            ValNumber opA = (ValNumber)StackPop();
-                            bool truthness = opA.content >= opB.content;
+                            Number opB = StackPop().number;
+                            Number opA = StackPop().number;
+                            bool truthness = opA >= opB;
                             if (truthness == true)
                             {
-                                StackPush(Value.True);
+                                StackPush(new Unit(Value.True));
                             }
                             else
                             {
-                                StackPush(Value.False);
+                                StackPush(new Unit(Value.False));
                             }
                             break;
                         }
                     case OpCode.LTQ:
                         {
                             IP++;
-                            ValNumber opB = (ValNumber)StackPop();
-                            ValNumber opA = (ValNumber)StackPop();
-                            bool truthness = opA.content <= opB.content;
+                            Number opB = StackPop().number;
+                            Number opA = StackPop().number;
+                            bool truthness = opA <= opB;
                             if (truthness == true)
                             {
-                                StackPush(Value.True);
+                                StackPush(new Unit(Value.True));
                             }
                             else
                             {
-                                StackPush(Value.False);
+                                StackPush(new Unit(Value.False));
                             }
                             break;
                         }
                     case OpCode.GT:
                         {
                             IP++;
-                            ValNumber opB = (ValNumber)StackPop();
-                            ValNumber opA = (ValNumber)StackPop();
-                            bool truthness = opA.content > opB.content;
+                            Number opB = StackPop().number;
+                            Number opA = StackPop().number;
+                            bool truthness = opA > opB;
                             if (truthness == true)
                             {
-                                StackPush(Value.True);
+                                StackPush(new Unit(Value.True));
                             }
                             else
                             {
-                                StackPush(Value.False);
+                                StackPush(new Unit(Value.False));
                             }
                             break;
                         }
                     case OpCode.LT:
                         {
                             IP++;
-                            ValNumber opB = (ValNumber)StackPop();
-                            ValNumber opA = (ValNumber)StackPop();
-                            bool truthness = opA.content < opB.content;
+                            Number opB = StackPop().number;
+                            Number opA = StackPop().number;
+                            bool truthness = opA < opB;
                             if (truthness == true)
                             {
-                                StackPush(Value.True);
+                                StackPush(new Unit(Value.True));
                             }
                             else
                             {
-                                StackPush(Value.False);
+                                StackPush(new Unit(Value.False));
                             }
                             break;
                         }
                     case OpCode.NOT:
                         {
                             IP++;
-                            Value opA = StackPop();
+                            Value opA = StackPop().value;
                             if (opA.ToBool() == true)
-                                StackPush(Value.False);
+                                StackPush(new Unit(Value.False));
                             else if (opA.ToBool() == false)
-                                StackPush(Value.True);
+                                StackPush(new Unit(Value.True));
                             else
                             {
                                 Error("NOT is insane!");
-                                return new VMResult(VMResultType.ERROR, Value.Nil);
+                                return new VMResult(VMResultType.ERROR, new Unit(Value.Nil));
                             }
 
                             break;
@@ -1025,97 +957,97 @@ namespace lightning
                     case OpCode.AND:
                         {
                             IP++;
-                            Value opB = StackPop();
-                            Value opA = StackPop();
+                            Value opB = StackPop().value;
+                            Value opA = StackPop().value;
                             bool result = opA.ToBool() && opB.ToBool();
                             if (result == true)
                             {
-                                StackPush(Value.True);
+                                StackPush(new Unit(Value.True));
                             }
                             else
                             {
-                                StackPush(Value.False);
+                                StackPush(new Unit(Value.False));
                             }
                             break;
                         }
                     case OpCode.OR:
                         {
                             IP++;
-                            Value opB = StackPop();
-                            Value opA = StackPop();
+                            Value opB = StackPop().value;
+                            Value opA = StackPop().value;
 
                             bool result = opA.ToBool() || opB.ToBool();
                             if (result == true)
                             {
-                                StackPush(Value.True);
+                                StackPush(new Unit(Value.True));
                             }
                             else
                             {
-                                StackPush(Value.False);
+                                StackPush(new Unit(Value.False));
                             }
                             break;
                         }
                     case OpCode.XOR:
                         {
                             IP++;
-                            Value opB = StackPop();
-                            Value opA = StackPop();
+                            Value opB = StackPop().value;
+                            Value opA = StackPop().value;
                             bool result = opA.ToBool() ^ opB.ToBool();
                             if (result == true)
                             {
-                                StackPush(Value.True);
+                                StackPush(new Unit(Value.True));
                             }
                             else
                             {
-                                StackPush(Value.False);
+                                StackPush(new Unit(Value.False));
                             }
                             break;
                         }
                     case OpCode.NAND:
                         {
                             IP++;
-                            Value opB = StackPop();
-                            Value opA = StackPop();
+                            Value opB = StackPop().value;
+                            Value opA = StackPop().value;
                             bool result = !(opA.ToBool() && opB.ToBool());
                             if (result == true)
                             {
-                                StackPush(Value.True);
+                                StackPush(new Unit(Value.True));
                             }
                             else
                             {
-                                StackPush(Value.False);
+                                StackPush(new Unit(Value.False));
                             }
                             break;
                         }
                     case OpCode.NOR:
                         {
                             IP++;
-                            Value opB = StackPop();
-                            Value opA = StackPop();
+                            Value opB = StackPop().value;
+                            Value opA = StackPop().value;
                             bool result = !(opA.ToBool() || opB.ToBool());
                             if (result == true)
                             {
-                                StackPush(Value.True);
+                                StackPush(new Unit(Value.True));
                             }
                             else
                             {
-                                StackPush(Value.False);
+                                StackPush(new Unit(Value.False));
                             }
                             break;
                         }
                     case OpCode.XNOR:
                         {
                             IP++;
-                            Value opB = StackPop();
-                            Value opA = StackPop();
+                            Value opB = StackPop().value;
+                            Value opA = StackPop().value;
                             bool result = !(opA.ToBool() ^ opB.ToBool());
                             if (result == true)
                             {
-                                StackPush(Value.True);
+                                StackPush(new Unit(Value.True));
                             }
                             else
                             {
-                                StackPush(Value.False);
+                                StackPush(new Unit(Value.False));
                             }
                             break;
                         }
@@ -1147,34 +1079,34 @@ namespace lightning
                             int n_table = instruction.opB;
                             for (int i = 0; i < n_table; i++)
                             {
-                                Value val = StackPop();
-                                Value key = StackPop();
-                                new_table.table.Add((ValString)key, val);
+                                Unit val = StackPop();
+                                Unit key = StackPop();
+                                new_table.table.Add((ValString)key.value, val);
                             }
 
                             int n_elements = instruction.opA;
                             for (int i = 0; i < n_elements; i++)
                             {
-                                Value new_value = StackPop();
+                                Unit new_value = StackPop();
                                 new_table.elements.Add(new_value);
                             }
 
-                            StackPush(new_table);
+                            StackPush(new Unit(new_table));
                             break;
                         }
                     case OpCode.CALL:
                         {
                             IP++;
 
-                            Value this_callable = StackPop();
-                            Type this_type = this_callable.GetType();
+                            Unit this_callable = StackPop();
+                            Type this_type = this_callable.value.GetType();
 
                             if (this_type == typeof(ValFunction))
                             {
                                 ret[ret_count] = IP;// add return address to stack
                                 ret_count += 1;
                                 funCallEnv[executingInstructions + 1] = variablesBasesTop - 1;// sets the return env to funclose/closureclose                                
-                                ValFunction this_func = (ValFunction)this_callable;
+                                ValFunction this_func = (ValFunction)this_callable.value;
                                 instructionsStack[executingInstructions + 1] = this_func.body;
                                 functionCallStack[executingInstructions + 1] = this_func;
                                 executingInstructions = executingInstructions + 1;
@@ -1186,7 +1118,7 @@ namespace lightning
                                 ret_count += 1;
                                 funCallEnv[executingInstructions + 1] = variablesBasesTop - 1;// sets the return env to funclose/closureclose 
 
-                                ValClosure this_closure = (ValClosure)this_callable;
+                                ValClosure this_closure = (ValClosure)this_callable.value;
                                 UpValuesPush();
 
                                 foreach (ValUpValue u in this_closure.upValues)
@@ -1200,16 +1132,16 @@ namespace lightning
                             }
                             else if (this_type == typeof(ValIntrinsic))
                             {
-                                ValIntrinsic this_intrinsic = (ValIntrinsic)this_callable;
-                                Value result = this_intrinsic.function(this);
+                                ValIntrinsic this_intrinsic = (ValIntrinsic)this_callable.value;
+                                Unit result = this_intrinsic.function(this);
                                 //stack.RemoveRange(stack.Count - this_intrinsic.arity, this_intrinsic.arity);
                                 stackTop -= this_intrinsic.arity;
                                 StackPush(result);
                             }
                             else
                             {
-                                Error("Trying to call a " + this_callable.GetType());
-                                return new VMResult(VMResultType.OK, Value.Nil);
+                                Error("Trying to call a " + this_callable.value.GetType());
+                                return new VMResult(VMResultType.OK, new Unit(Value.Nil));
                             }
                             break;
                         }
@@ -1231,8 +1163,8 @@ namespace lightning
                     case OpCode.FOREACH:
                         {
                             IP++;
-                            Value func = StackPop();
-                            ValTable table = StackPop() as ValTable;
+                            Unit func = StackPop();
+                            ValTable table = (ValTable)(StackPop().value);
 
                             int init = 0;
                             int end = table.ECount;
@@ -1243,9 +1175,9 @@ namespace lightning
                             }
                             System.Threading.Tasks.Parallel.For(init, end, (index) =>
                             {
-                                List<Value> args = new List<Value>();
-                                args.Add(GetValNumber(index));
-                                args.Add(table);
+                                List<Unit> args = new List<Unit>();
+                                args.Add(new Unit(index));
+                                args.Add(new Unit(table));
                                 vms[index].CallFunction(func, args);
                             });
                             for (int i = init; i < end; i++)
@@ -1257,11 +1189,11 @@ namespace lightning
                     case OpCode.RANGE:
                         {
                             IP++;
-                            Value func = StackPop();
-                            ValTable table = StackPop() as ValTable;
-                            ValNumber tasks = StackPop() as ValNumber;
+                            Unit func = StackPop();
+                            ValTable table = (ValTable)(StackPop().value);
+                            Number tasks = StackPop().number;
 
-                            int n_tasks = (int)tasks.content;
+                            int n_tasks = (int)tasks;
 
                             int init = 0;
                             int end = n_tasks;
@@ -1276,13 +1208,13 @@ namespace lightning
 
                             System.Threading.Tasks.Parallel.For(init, end, (index) =>
                             {
-                                List<Value> args = new List<Value>();
+                                List<Unit> args = new List<Unit>();
                                 int range_start = index * step;
-                                args.Add(GetValNumber(range_start));
+                                args.Add(new Unit(range_start));
                                 int range_end = range_start + step;
                                 if (range_end > count) range_end = count;
-                                args.Add(GetValNumber(range_end));
-                                args.Add(table);
+                                args.Add(new Unit(range_end));
+                                args.Add(new Unit(table));
                                 vms[index].CallFunction(func, args);
                             });
                             for (int i = 0; i < end; i++)
@@ -1293,15 +1225,14 @@ namespace lightning
                         }
                     case OpCode.EXIT:
                         {
-                            Value result = Value.Nil;
+                            Unit result = new Unit(Value.Nil);
                             if (stackTop > 0)
                                 result = StackPop();
-
                             return new VMResult(VMResultType.OK, result);
                         }
                     default:
                         Error("Unkown OpCode: " + instruction.opCode);
-                        return new VMResult(VMResultType.ERROR, Value.Nil);
+                        return new VMResult(VMResultType.ERROR, new Unit(Value.Nil));
                 }
             }
         }
