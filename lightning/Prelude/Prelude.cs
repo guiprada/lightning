@@ -650,7 +650,7 @@ namespace lightning
                 Unit stringCopy(VM vm)
                 {
                     Unit val_input_string = vm.StackPeek(0);
-                    if (val_input_string.value.GetType() == typeof(ValString))
+                    if (val_input_string.Type() == typeof(ValString))
                         return new Unit(new ValString(val_input_string.ToString()));
                     else
                         return new Unit(Value.Nil);
@@ -809,7 +809,7 @@ namespace lightning
                     VMResult result = imported_vm.Run();
                     if (result.status == VMResultType.OK)
                     {
-                        if (result.value.GetType() == typeof(ValTable) || result.value.GetType() == typeof(ValFunction))
+                        if (result.value.Type() == typeof(ValTable) || result.value.Type() == typeof(ValFunction))
                             MakeModule(result.value, eval_name, vm, imported_vm);
                         //vm.GetChunk().Print();
                         return result.value;
@@ -964,7 +964,7 @@ namespace lightning
             //////////////////////////////////////////////////////
             Unit type(VM vm)
             {
-                Type this_type = vm.StackPeek(0).value.GetType();
+                Type this_type = vm.StackPeek(0).Type();
                 return new Unit(new ValString(this_type.ToString()));
             }
             functions.Add(new ValIntrinsic("type", type, 1));
@@ -974,7 +974,7 @@ namespace lightning
             {
                 Unit first = vm.StackPeek(0);
                 Unit second = vm.StackPeek(1);
-                if (first.value.GetType() != typeof(ValNil))
+                if (first.Type() != typeof(ValNil))
                     return first;
                 else
                     return second;
@@ -1069,10 +1069,9 @@ namespace lightning
                 module,
                 (Operand)module_index);
 
-            Console.WriteLine(this_value.value.GetType());
-            if (this_value.value.GetType() == typeof(ValFunction)) RelocateFunction((ValFunction)this_value.value, relocationInfo);
-            else if (this_value.value.GetType() == typeof(ValClosure)) RelocateClosure((ValClosure)this_value.value, relocationInfo);
-            else if (this_value.value.GetType() == typeof(ValTable)) FindFunction((ValTable)this_value.value, relocationInfo);
+            if (this_value.Type() == typeof(ValFunction)) RelocateFunction((ValFunction)this_value.value, relocationInfo);
+            else if (this_value.Type() == typeof(ValClosure)) RelocateClosure((ValClosure)this_value.value, relocationInfo);
+            else if (this_value.Type() == typeof(ValTable)) FindFunction((ValTable)this_value.value, relocationInfo);
 
             return module;
         }
@@ -1084,10 +1083,9 @@ namespace lightning
                 relocationInfo.relocatedTables.Add(table.GetHashCode());
                 foreach (KeyValuePair<ValString, Unit> entry in table.table)
                 {
-                    Console.WriteLine(entry.Value.value.GetType());
-                    if (entry.Value.value.GetType() == typeof(ValFunction)) RelocateFunction((ValFunction)entry.Value.value, relocationInfo);
-                    else if (entry.Value.value.GetType() == typeof(ValClosure)) RelocateClosure((ValClosure)entry.Value.value, relocationInfo);
-                    else if (entry.Value.value.GetType() == typeof(ValTable)) FindFunction((ValTable)entry.Value.value, relocationInfo);
+                    if (entry.Value.Type() == typeof(ValFunction)) RelocateFunction((ValFunction)entry.Value.value, relocationInfo);
+                    else if (entry.Value.Type() == typeof(ValClosure)) RelocateClosure((ValClosure)entry.Value.value, relocationInfo);
+                    else if (entry.Value.Type() == typeof(ValTable)) FindFunction((ValTable)entry.Value.value, relocationInfo);
 
                     relocationInfo.module.TableSet(entry.Key, entry.Value);
                 }
@@ -1098,11 +1096,11 @@ namespace lightning
         {
             foreach (ValUpValue v in closure.upValues)
             {
-                if (v.Val.value.GetType() == typeof(ValClosure)/* && relocationInfo.module.name != closure.function.module*/)
+                if (v.Val.Type() == typeof(ValClosure)/* && relocationInfo.module.name != closure.function.module*/)
                 {
                     RelocateClosure((ValClosure)v.Val.value, relocationInfo);
                 }
-                else if (v.Val.value.GetType() == typeof(ValFunction)/* && relocationInfo.module.name != closure.function.module*/)
+                else if (v.Val.Type() == typeof(ValFunction)/* && relocationInfo.module.name != closure.function.module*/)
                 {
                     RelocateFunction((ValFunction)v.Val.value, relocationInfo);
                 }
@@ -1123,7 +1121,7 @@ namespace lightning
                 relocationInfo.module.globals.Add(new_value);
                 relocationInfo.relocatedGlobals.Add(relocationInfo.toBeRelocatedGlobals[i], (Operand)(relocationInfo.module.globals.Count - 1));
 
-                if (new_value.value.GetType() == typeof(ValTable)) relocation_stack.Add((ValTable)new_value.value);
+                if (new_value.Type() == typeof(ValTable)) relocation_stack.Add((ValTable)new_value.value);
             }
             relocationInfo.toBeRelocatedGlobals.Clear();
 
@@ -1134,7 +1132,7 @@ namespace lightning
                 relocationInfo.module.constants.Add(new_value);
                 relocationInfo.relocatedConstants.Add(relocationInfo.toBeRelocatedConstants[i], (Operand)(relocationInfo.module.constants.Count - 1));
 
-                if (new_value.value.GetType() == typeof(ValTable)) relocation_stack.Add((ValTable)new_value.value);
+                if (new_value.Type() == typeof(ValTable)) relocation_stack.Add((ValTable)new_value.value);
             }
             relocationInfo.toBeRelocatedConstants.Clear();
 
@@ -1267,7 +1265,7 @@ namespace lightning
         {
             foreach (KeyValuePair<ValString, Unit> entry in module.table)
             {
-                if (entry.Value.value.GetType() == typeof(ValFunction))
+                if (entry.Value.Type() == typeof(ValFunction))
                 {
                     ValFunction function = (ValFunction)entry.Value.value;
                     for (Operand i = 0; i < function.body.Count; i++)

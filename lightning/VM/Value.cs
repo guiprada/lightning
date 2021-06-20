@@ -17,14 +17,9 @@ namespace lightning
         Number,
         Value
     }
-
-    //[StructLayout(LayoutKind.Explicit)]
     public struct Unit{
-        //[FieldOffset(0)]
         public Value value;
-        //[FieldOffset(0)]
         public Number number;
-        //[FieldOffset(8)]
         public UnitType type;
 
         public Unit(Value p_value) : this()
@@ -38,8 +33,12 @@ namespace lightning
             type = UnitType.Number;
         }
 
-        public Value GetValue(){
-            return value;
+        public Type Type(){
+            if (type == UnitType.Number){
+                return typeof(Number);
+            }else{
+                return value.GetType();
+            }
         }
 
         public override string ToString()
@@ -63,8 +62,12 @@ namespace lightning
 
         public override bool Equals(object other){
             if (type == UnitType.Number){
-                if (((Unit)other).type == UnitType.Number){
+                Type other_type = other.GetType();
+                if (other_type == typeof(Unit) && ((Unit)other).type == UnitType.Number){
                     return ((Unit)other).number == number;
+                }
+                if (other_type == typeof(Number)){
+                    return (Number)other == number;
                 }
                 return false;
             }else{
@@ -119,13 +122,14 @@ namespace lightning
 
         public override bool Equals(object other)
         {
-            if (other.GetType() == typeof(Unit))
+            Type other_type = other.GetType();
+            if (other_type == typeof(Unit))
             {
-                if(((Unit)other).value.GetType() == typeof(ValString))
+                if(((Unit)other).Type() == typeof(ValString))
                     if(content == ((ValString)((Unit)(other)).value).content)
                         return true;
             }
-            if(other.GetType() == typeof(ValString))
+            if(other_type == typeof(ValString))
             {
                 if (((ValString)other).content == content)
                     return true;
@@ -161,13 +165,14 @@ namespace lightning
 
         public override bool Equals(object other)
         {
-            if (other.GetType() == typeof(Unit))
+            Type other_type = other.GetType();
+            if (other_type == typeof(Unit))
             {
-                if(((Unit)other).value.GetType() == typeof(ValBool))
+                if(((Unit)other).Type() == typeof(ValBool))
                     if(content == ((ValBool)((Unit)(other)).value).content)
                         return true;
             }
-            if (other.GetType() == typeof(ValBool))
+            if (other_type == typeof(ValBool))
             {
                 if (((ValBool)other).content == this.content) return true;
             }
@@ -194,12 +199,13 @@ namespace lightning
 
         public override bool Equals(object other)
         {
-            if (other.GetType() == typeof(Unit))
+            Type other_type = other.GetType();
+            if (other_type == typeof(Unit))
             {
-                if(((Unit)other).value.GetType() == typeof(ValNil))
+                if(((Unit)other).Type() == typeof(ValNil))
                     return true;
             }
-            if (other.GetType() == typeof(ValNil))
+            if (other_type == typeof(ValNil))
             {
                 return true;
             }
@@ -245,15 +251,16 @@ namespace lightning
 
         public override bool Equals(object other)
         {
-            if (other.GetType() == typeof(Unit))
+            Type other_type = other.GetType();
+            if (other_type == typeof(Unit))
             {
-                if(((Unit)other).value.GetType() == typeof(ValFunction))
+                if(((Unit)other).Type() == typeof(ValFunction))
                 {
                     ValFunction other_val_func = (ValFunction)((Unit)(other)).value;
                     if (other_val_func.name == this.name && other_val_func.module == this.module) return true;
                 }
             }
-            if (other.GetType() == typeof(ValFunction))
+            if (other_type == typeof(ValFunction))
             {
                 ValFunction other_val_func = other as ValFunction;
                 if (other_val_func.name == this.name && other_val_func.module == this.module) return true;
@@ -293,14 +300,15 @@ namespace lightning
 
         public override bool Equals(object other)
         {
-            if (other.GetType() == typeof(Unit))
+            Type other_type = other.GetType();
+            if (other_type == typeof(Unit))
             {
-                if(((Unit)other).value.GetType() == typeof(ValIntrinsic))
+                if(((Unit)other).Type() == typeof(ValIntrinsic))
                 {
                     if (function == (((Unit)other).value as ValIntrinsic).function) return true;
                 }
             }
-            if (other.GetType() == typeof(ValIntrinsic))
+            if (other_type == typeof(ValIntrinsic))
             {
                 if (function == (other as ValIntrinsic).function) return true;
             }
@@ -343,14 +351,15 @@ namespace lightning
 
         public override bool Equals(object other)
         {
-            if (other.GetType() == typeof(Unit))
+            Type other_type = other.GetType();
+            if (other_type == typeof(Unit))
             {
-                if(((Unit)other).value.GetType() == typeof(ValClosure))
+                if(((Unit)other).Type() == typeof(ValClosure))
                 {
                     if (this == ((Unit)other).value as ValClosure) return true;
                 }
             }
-            if (other.GetType() == typeof(ValClosure))
+            if (other_type == typeof(ValClosure))
             {
                 if (other == this) return true;
             }
@@ -441,14 +450,15 @@ namespace lightning
 
         public override bool Equals(object other)
         {
-            if (other.GetType() == typeof(Unit))
+            Type other_type = other.GetType();
+            if (other_type == typeof(Unit))
             {
-                if(((Unit)other).value.GetType() == typeof(ValUpValue))
+                if(((Unit)other).Type() == typeof(ValUpValue))
                 {
                     if (Val.Equals(((Unit)other).value)) return true;
                 }
             }
-            if (other.GetType() == typeof(ValUpValue))
+            if (other_type == typeof(ValUpValue))
             {
                 if (Val.Equals(other)) return true;
             }
@@ -545,14 +555,15 @@ namespace lightning
 
         public override bool Equals(object other)
         {
-            if (other.GetType() == typeof(Unit))
+            Type other_type = other.GetType();
+            if (other_type == typeof(Unit))
             {
-                if(((Unit)other).value.GetType() == typeof(ValTable))
+                if(((Unit)other).Type() == typeof(ValTable))
                 {
                     if (this == ((Unit)other).value as ValTable) return true;
                 }
             }
-            if (other.GetType() == typeof(ValTable))
+            if (other_type == typeof(ValTable))
             {
                 if (other == this) return true;
             }
@@ -582,17 +593,16 @@ namespace lightning
 
         public override bool Equals(object other)
         {
-            if (other.GetType() == typeof(Unit))
+            Type other_type = other.GetType();
+            if (other_type == typeof(Unit))
             {
-                if(((Unit)other).value.GetType() == typeof(ValModule))
-                {
-                    if (this.name == (((Unit)other).value as ValModule).name) return true;
-                }
+                if (this.name == (((Unit)other).value as ValModule).name) return true;
             }
-            if (other.GetType() == typeof(ValModule))
+            if (other_type == typeof(ValModule))
             {
                 if ((other as ValModule).name == this.name) return true;
             }
+
             return false;
         }
         public override string ToString()
@@ -622,14 +632,15 @@ namespace lightning
 
         public override bool Equals(object other)
         {
-            if (other.GetType() == typeof(Unit))
+            Type other_type = other.GetType();
+            if (other_type == typeof(Unit))
             {
-                if(((Unit)other).value.GetType() == typeof(ValWrapper<T>))
+                if(((Unit)other).Type() == typeof(ValWrapper<T>))
                 {
                     if (this.content == (((Unit)other).value as ValWrapper<T>).content) return true;
                 }
             }
-            if(other.GetType() == typeof(ValWrapper<T>))
+            if(other_type == typeof(ValWrapper<T>))
             {
                 if(((ValWrapper<T>)other).content == this.content)
                 {

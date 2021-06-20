@@ -299,7 +299,7 @@ namespace lightning
                 for (int i = args.Count - 1; i >= 0; i--)
                     StackPush(args[i]);
 
-            Type this_type = this_callable.value.GetType();
+            Type this_type = this_callable.Type();
             ret[ret_count] = (Operand)(chunk.ProgramSize - 1);
             ret_count += 1;
             funCallEnv[executingInstructions + 1] = variablesBasesTop - 1;
@@ -466,7 +466,7 @@ namespace lightning
                             Operand lambda = instruction.opB;
                             Operand new_fun_address = instruction.opC;
                             Unit this_callable = chunk.GetConstant(new_fun_address);
-                            if (this_callable.value.GetType() == typeof(ValFunction))
+                            if (this_callable.Type() == typeof(ValFunction))
                             {
                                 //ValFunction this_function = (ValFunction)(this_callable.value);
                                 if (lambda == 0)
@@ -829,7 +829,7 @@ namespace lightning
                         {
                             IP++;
                             Number opA = StackPop().number;
-                            Unit new_value = new Unit(opA++);
+                            Unit new_value = new Unit(opA + 1);
                             StackPush(new_value);
                             break;
                         }
@@ -837,7 +837,7 @@ namespace lightning
                         {
                             IP++;
                             Number opA = StackPop().number;
-                            Unit new_value = new Unit(opA--);
+                            Unit new_value = new Unit(opA - 1);
                             StackPush(new_value);
                             break;
                         }
@@ -1099,7 +1099,7 @@ namespace lightning
                             IP++;
 
                             Unit this_callable = StackPop();
-                            Type this_type = this_callable.value.GetType();
+                            Type this_type = this_callable.Type();
 
                             if (this_type == typeof(ValFunction))
                             {
@@ -1140,7 +1140,7 @@ namespace lightning
                             }
                             else
                             {
-                                Error("Trying to call a " + this_callable.value.GetType());
+                                Error("Trying to call a " + this_callable.Type());
                                 return new VMResult(VMResultType.OK, new Unit(Value.Nil));
                             }
                             break;
