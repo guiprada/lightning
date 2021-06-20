@@ -598,21 +598,25 @@ function clear_errors()
     list.clear(list_copy)
     assert(list.count(list_copy), 0, "Failed List test 7.")
 }
-{
-    // Testing inline Intrinsics
-    var intr_sum =
-    '
-        using System;
-        (vm) =>{
-            ValNumber opA = vm.StackPeek(0) as ValNumber;
-            ValNumber opB = vm.StackPeek(1) as ValNumber;
+// {
+//     // Testing inline Intrinsics
+//     var intr_sum =
+//     '
+//         using System;
+//         (vm) =>{
+//             ValNumber opA = vm.StackPeek(0) as ValNumber;
+//             ValNumber opB = vm.StackPeek(1) as ValNumber;
 
-            return new ValNumber(opA.content + opB.content);
-        }
-    '
-    // var sum_intr = intrinsic("sum", 2, intr_sum)
-    // assert(sum_intr(5, 6), 11, "Failed inline Intrinsic test 1.")
-}
+//             return new ValNumber(opA.content + opB.content);
+//         }
+//     '
+//     if (intrinsic != nil){
+//         var sum_intr = intrinsic("sum", 2, intr_sum)
+//         assert(sum_intr(5, 6), 11, "Failed inline Intrinsic test 1.")
+//     }else{
+//         write_line("No inline intrinsic support!")
+//     }
+// }
 {
     // Testing iterators
     var table1 = [ brazil:"Brasilia", eua:"Washington", australia:"Canberra"]
