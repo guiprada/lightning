@@ -6,14 +6,14 @@ using System.Text;
 using Operand = System.UInt16;
 
 #if ROSLYN
-    using Microsoft.CodeAnalysis.Scripting;
-    using Microsoft.CodeAnalysis.CSharp.Scripting;
+using Microsoft.CodeAnalysis.Scripting;
+using Microsoft.CodeAnalysis.CSharp.Scripting;
 #endif
 
 #if DOUBLE
     using Number = System.Double;
 #else
-    using Number = System.Single;
+using Number = System.Single;
 #endif
 
 namespace lightning
@@ -49,12 +49,34 @@ namespace lightning
 
         public static Library GetPrelude()
         {
-
-            ////////////////////////////////////////////////////////////////////////////////////////////////////////////
-            ///////////////////////////////////////////////////////////////////////////////////////////////////// Tables
-
             Dictionary<string, ValTable> tables = new Dictionary<string, ValTable>();
 
+            ////////////////////////////////////////////////////////////////////////////////////////////////////////////
+            ////////////////////////////////////////////////////////////////////////////////////////////////// intrinsic
+            {
+                ValTable intrinsic = new ValTable(null, null);
+#if ROSLYN
+                Value createIntrinsic(VM vm)
+                {
+                    ValString name = (ValString)vm.StackPeek(0);
+                    ValNumber arity = (ValNumber)vm.StackPeek(1);
+                    ValString val_body = (ValString)vm.StackPeek(2);
+                    string body = val_body.ToString();
+
+                    var options = ScriptOptions.Default.AddReferences(
+                        typeof(Value).Assembly,
+                        typeof(VM).Assembly).WithImports("lightning", "System");
+                    Func<VM, Value> new_intrinsic = CSharpScript.EvaluateAsync<Func<VM, Value>>(body, options)
+                        .GetAwaiter().GetResult();
+
+                    return new ValIntrinsic(name.ToString(), new_intrinsic, (int)arity.content);
+                }
+                intrinsic.TableSet(new ValString("create"), new ValIntrinsic("create", createIntrinsic, 3));
+#else
+                intrinsic.TableSet(new ValString("create"), Value.Nil);
+#endif
+                tables.Add("intrinsic", intrinsic);
+            }
             ////////////////////////////////////////////////////////////////////////////////////////////////////////////
             /////////////////////////////////////////////////////////////////////////////////////////////////////// rand
 
@@ -802,7 +824,7 @@ namespace lightning
             Value require(VM vm)
             {
                 string path = ((ValString)vm.StackPeek(0)).ToString();
-                foreach(ValModule v in vm.modules)// skip already imported modules
+                foreach (ValModule v in vm.modules)// skip already imported modules
                 {
                     if (v.name == path)
                         return v;
@@ -906,7 +928,7 @@ namespace lightning
             //////////////////////////////////////////////////////
             Value readNumber(VM vm)
             {
-                string read = Console.ReadLine();    
+                string read = Console.ReadLine();
                 if (Number.TryParse(read, out Number n))
                     return new ValNumber(n);
                 else
@@ -918,13 +940,14 @@ namespace lightning
             Value read(VM vm)
             {
                 int read = Console.Read();
-                if (read > 0) {
+                if (read > 0)
+                {
                     char next = Convert.ToChar(read);
                     if (next == '\n')
                         return Value.Nil;
                     else
                         return new ValString(Char.ToString(next));
-                 }
+                }
                 else
                     return Value.Nil;
             }
@@ -967,24 +990,6 @@ namespace lightning
             functions.Add(new ValIntrinsic("stats", stats, 0));
 
             //////////////////////////////////////////////////////
-#if ROSLYN
-            Value createIntrinsic(VM vm)
-            {
-                ValString name = (ValString)vm.StackPeek(0);
-                ValNumber arity = (ValNumber)vm.StackPeek(1);
-                ValString val_body = (ValString)vm.StackPeek(2); 
-                string body = val_body.ToString();
-
-                var options = ScriptOptions.Default.AddReferences(
-                    typeof(Value).Assembly,
-                    typeof(VM).Assembly).WithImports("lightning", "System");
-                Func<VM, Value> new_intrinsic = CSharpScript.EvaluateAsync<Func<VM, Value>>(body, options)
-                    .GetAwaiter().GetResult();
-
-                return new ValIntrinsic(name.ToString(), new_intrinsic, (int)arity.content);
-            }
-            functions.Add(new ValIntrinsic("intrinsic", createIntrinsic, 3));
-#endif            
 
             Library prelude = new Library(functions, tables);
 
@@ -1132,7 +1137,7 @@ namespace lightning
                 if (new_value.GetType() == typeof(ValTable)) relocation_stack.Add((ValTable)new_value);
             }
             relocationInfo.toBeRelocatedConstants.Clear();
-        
+
             foreach (ValTable v in relocation_stack)
             {
                 FindFunction(v, relocationInfo);
@@ -1142,9 +1147,9 @@ namespace lightning
         static void RelocateChunk(ValFunction function, RelocationInfo relocationInfo)
         {
             for (Operand i = 0; i < function.body.Count; i++)
-            {                
+            {
                 Instruction next = function.body[i];
-                
+
                 if (next.opCode == OpCode.LOADG)
                 {
                     if ((next.opCode == OpCode.LOADG && next.opA >= relocationInfo.importedVM.GetChunk().Prelude.intrinsics.Count))
@@ -1209,7 +1214,7 @@ namespace lightning
                     }
                 }
                 else if (next.opCode == OpCode.LOADGI)
-                {                    
+                {
                     if (relocationInfo.relocatedModules.ContainsKey(next.opB))
                     {
                         next.opB = relocationInfo.relocatedModules[next.opB];
@@ -1228,9 +1233,9 @@ namespace lightning
                         }
                         if (found == false)
                             Console.WriteLine("Can not find LOADGI index" + function.module);
-                    }                    
+                    }
                 }
-                else if ( next.opCode == OpCode.LOADCI)
+                else if (next.opCode == OpCode.LOADCI)
                 {
                     if (relocationInfo.relocatedModules.ContainsKey(next.opB))
                     {
