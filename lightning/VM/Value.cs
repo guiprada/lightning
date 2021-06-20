@@ -255,7 +255,7 @@ namespace lightning
         public ValClosure(ValFunction p_function, List<ValUpValue> p_upValues)
         {
             function = p_function;
-            upValues = p_upValues ?? new List<ValUpValue>();
+            upValues = p_upValues;
         }
 
         public void Register(List<Value> p_variables, int[] p_variablesBases)

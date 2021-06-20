@@ -1,0 +1,207 @@
+var lightning_parser = require("lightning_parser.ltn")
+var parsec = require("parsec.ltn")
+
+//var parsing_text = parsec.new("33")
+var parsing_text = []
+parsing_text.body = "33"
+parsing_text.match = nil
+parsing_text.nodes = []
+//write_line(parsing_text)
+
+// write_line(lightning_parser.number_parser)
+//write_line(lightning_parser.number_parser()(parsing_text))
+//write_line(lightning_parser.number_parser(parsing_text))
+
+write_line(parsec.apply(lightning_parser.number_parser(parsing_text),
+    function(input)
+    {
+        var new_node = []
+        new_node.value = input.match
+        new_node.type = "Number"
+        list.push(input.nodes, new_node)
+        input.match = nil
+    }))
+
+
+// var parsing_text = []
+// parsing_text.body = 'a1funcABAAABC'
+// parsing_text.nodes = []
+// parsing_text.match = nil
+// write_line(parsec.apply(parsec.alpha(parsing_text),
+//     function(input){
+//         var new_node = []
+//         new_node.value = input.match
+//         new_node.type = "char"
+//         list.push(input.nodes, new_node)
+//         input.match = nil        
+//     }))
+// write_line(parsec.apply(parsec.alpha(parsing_text),
+//     function(input){
+//         var new_node = []
+//         new_node.value = input.match
+//         new_node.type = "char"
+//         list.push(input.nodes, new_node)
+//         input.match = nil        
+//     }))
+// write_line(parsec.apply(parsec.digit(parsing_text),
+//     function(input){
+//         var new_node = []
+//         new_node.value = input.match
+//         new_node.type = "digit"
+//         list.push(input.nodes, new_node)
+//         input.match = nil        
+//     }))
+
+// var match_func = parsec.make_string_parser("func")
+
+// write_line(parsec.apply(match_func(parsing_text),
+//     function(input){
+//         var new_node = []
+//         new_node.value = input.match
+//         new_node.type = "function"
+//         list.push(input.nodes, new_node)
+//         input.match = nil        
+//     }))
+
+// var parser_A = parsec.make_string_parser("A")
+// var parser_B = parsec.make_string_parser("B")
+// var parser_A_Or_B = parsec.Or(parser_A, parser_B)
+// write_line(parsec.apply(parser_A_Or_B(parsing_text),
+//     function(input){
+//         var new_node = []
+//         new_node.value = input.match
+//         new_node.type = "A_Or_B"
+//         list.push(input.nodes, new_node)
+//         input.match = nil        
+//     }))
+// write_line(parsec.apply(parser_A_Or_B(parsing_text),
+//     function(input){
+//         var new_node = []
+//         new_node.value = input.match
+//         new_node.type = "A_Or_B"
+//         list.push(input.nodes, new_node)
+//         input.match = nil        
+//     }))
+
+
+// var parser_A_And_B = parsec.And(parser_A, parser_B)
+// write_line(parsec.apply(parser_A_And_B(parsing_text),
+//     function(input){
+//         var new_node = []
+//         new_node.value = input.match
+//         new_node.type = "A_And_B"
+//         list.push(input.nodes, new_node)
+//         input.match = nil        
+//     }))
+
+// write_line(parsec.apply(parser_A_And_B(parsing_text),
+//     function(input){
+//         var new_node = []
+//         new_node.value = input.match
+//         new_node.type = "A_And_B"
+//         list.push(input.nodes, new_node)
+//         input.match = nil        
+//     }))
+
+// var parser_many_A = parsec.Many(parser_A)
+// write_line(parsec.apply(parser_many_A(parsing_text),
+//     function(input){
+//         var new_node = []
+//         new_node.value = input.match
+//         new_node.type = "A*"
+//         list.push(input.nodes, new_node)
+//         input.match = nil        
+//     }))
+
+// write_line("reset")
+// parsing_text.body = "AAAAAAAAa"
+// var parser_at_least_one_A = parsec.At_least_one(parser_A)
+// write_line(parsec.apply(parser_at_least_one_A(parsing_text),
+//     function(input){
+//         var new_node = []
+//         new_node.value = input.match
+//         new_node.type = "A+"
+//         list.push(input.nodes, new_node)
+//         input.match = nil        
+//     }))
+
+// write_line("reset")
+// parsing_text.body = "BAA"
+// var parser_optional_A = parsec.Optional(parser_A)
+// write_line(parsec.apply(parser_optional_A(parsing_text),
+//     function(input){
+//         var new_node = []
+//         new_node.value = input.match
+//         new_node.type = "A?"
+//         list.push(input.nodes, new_node)
+//         input.match = nil        
+//     }))
+
+// write_line("reset")
+// parsing_text.body = "AA"
+// var parser_CC = parsec.make_string_parser("CC")
+// var parser_list = []
+// list.push(parser_list, parser_A)
+// list.push(parser_list, parser_B)
+// list.push(parser_list, parser_CC)
+
+// var parser_Any = parsec.Any(parser_list)
+// write_line(parsec.apply(parser_Any(parsing_text),
+//     function(input){
+//         var new_node = []
+//         new_node.value = input.match
+//         new_node.type = "Any"
+//         list.push(input.nodes, new_node)
+//         input.match = nil        
+//     }))
+
+
+// var str1 = "Ola mundo cruel"
+// var parser_Ola = parsec.make_string("Ola");
+// var result = parser_Ola(str1)
+// write_line(result)
+// result = parser_Ola(result.tail)
+// write_line(result)
+
+// var str2 = ""
+// result = parser_Ola(str2)
+// write_line(result)
+
+// var str3 = "53_"
+// result = parsec.digit(str3)
+// write_line(result)
+
+// var parser_a = parsec.make_string("a")
+// var parser_b = parsec.make_string("b")
+// var parser_a_or_b = parsec.And(parser_a, parser_b)
+// write_line(parser_a_or_b("b2"))
+// write_line(parser_a_or_b("aaa"))
+// write_line(parser_a_or_b("ab"))
+
+// var intr_sum = '
+//         using System;
+//         (vm) =>{
+//             ValNumber opA = vm.StackPeek(0) as ValNumber;
+//             ValNumber opB = vm.StackPeek(1) as ValNumber;
+//             Console.WriteLine("in");
+//             return new ValNumber(opA.content + opB.content);
+//         }
+// '
+// var sum_intr = intrinsic("sum", 2, intr_sum)
+// write_line(sum_intr(5, 6))
+
+
+
+// var ch = read()
+// while(ch != nil){
+//     write(ch)
+//     ch = read()
+// }
+// write_line("")
+// for (var ch = read(); ch != nil; ch = read()){
+//     write(ch)
+//     ch = read()
+// }
+// write_line("")
+// var n = read_number()
+// write_line(n)
