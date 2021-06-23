@@ -1,4 +1,4 @@
-﻿write_line("Welcome to lightning Zzz :)")
+﻿write_line("*** Welcome to lightning Zzz :) ***")
 write_line("Starting tests ..")
 var start_time = time.now()
 
@@ -7,8 +7,8 @@ var lib_assert_counter = require("assert_counter.ltn")
 var lib_assert_counter_not = require("assert_counter_not.ltn")
 var lib_assert = require("assert.ltn")
 
-lib_assert.assert(2,1,"assertion detects errors, OK!")
-
+write("assertion detects errors ..")
+lib_assert.assert(2,1," OK!")
 
 var assert = lib_assert_counter.assert
 var assert_not = lib_assert_counter_not.assert_not
@@ -25,8 +25,10 @@ function clear_errors()
 
 {
     // Assertions
-    assert(1,2,'assert(), OK!')
-    assert_not(1,1,"assert_not(), OK!")
+    write("assert() ..")
+    assert(1,2," OK!")
+    write("assert_not() ..")
+    assert_not(1,1," OK!")
 
     if (count_errors() == 2){
         write_line("Reseted error count.")
@@ -85,7 +87,7 @@ function clear_errors()
 
     var this_array = this_list
     this_array[0] = 100
-    this_array[99] = 0    
+    this_array[99] = 0
     assert(this_array[0], 100, "Failed Array test 1.")
     assert(this_array[1], nil, "Failed Array test 2.")
     assert(this_array[99], 0, "Failed Array test 3.")
@@ -268,7 +270,7 @@ function clear_errors()
     var j = 0
     var array = []
     while( j < 10)
-    {    
+    {
         array[j] = j
         j = i(1)
     }

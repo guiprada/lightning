@@ -10,7 +10,6 @@ namespace interpreter
     {
         static void Main(string[] args)
         {
-            //Console.WriteLine("Welcome to lightning Zzz :)");
             if (args.Length != 1)
             {
                 Console.WriteLine("Usage: lightning_interpreter [script]");
@@ -20,10 +19,6 @@ namespace interpreter
             {
                 RunFile(args[0]);
             }
-            //else
-            //{
-            //    RunPrompt();
-            //}
         }
  
         static int RunFile(string path)
@@ -45,38 +40,6 @@ namespace interpreter
                 return -1;
             }
         }
-
-        //static void RunPrompt()
-        //{
-        //    bool is_running = true;
-        //    Node prog_node = new ProgramNode(null, 0);
-        //    Chunker code_generator = new Chunker(prog_node, "main", Prelude.GetPrelude());
-        //    Chunk chunk = code_generator.Code;
-            
-        //    Value eval = chunk.GetFunction("eval");
-        //    if (eval == null)
-        //    {
-        //        throw(new Exception("Could not find eval function!"));
-
-        //    }
-        //    if (code_generator.HasChunked == true)
-        //    {
-        //        VM vm = new VM(chunk);
-        //        while (is_running)
-        //        {
-        //            Console.Write(">");
-        //            string input = Console.ReadLine();
-        //            if (input != "")
-        //            {
-        //                List<Value> stack = new List<Value>();
-        //                stack.Add(new ValString(input));
-        //                Value result = vm.CallFunction(eval, stack);
-        //                Console.WriteLine(result);
-        //            }
-        //        }
-        //        //VMResult result = vm.Run();                
-        //    }
-        //}
 
         static int Run(string input)
         {            
@@ -110,17 +73,18 @@ namespace interpreter
                     Console.WriteLine(error);
                 }
             }
+#if VERBOSE
+            Console.WriteLine("---------------------------------- Tokens:");
 
-            //Console.WriteLine("---------------------------------- Tokens:");
+            foreach (Token token in scanner.Tokens)
+            {
+               Console.WriteLine(token.ToString());
+            }
+            Console.WriteLine("\n---------------------------------- AST:");
 
-            //foreach (Token token in scanner.Tokens)
-            //{
-            //    Console.WriteLine(token.ToString());
-            //}
-            //Console.WriteLine("\n---------------------------------- AST:");
-
-            //PrettyPrinter astPrinter = new PrettyPrinter();
-            //astPrinter.Print(program);
+            PrettyPrinter astPrinter = new PrettyPrinter();
+            astPrinter.Print(program);
+#endif
 
             Chunker code_generator = new Chunker(program, "main", Prelude.GetPrelude());
             Chunk chunk = code_generator.Code;
@@ -135,14 +99,16 @@ namespace interpreter
             }
             if (code_generator.HasChunked == true)
             {
-                //Console.WriteLine("\n---------------------------------- Generated Chunk:");
-                //Console.WriteLine();
-                //chunk.Print();
+#if VERBOSE
+                Console.WriteLine("\n---------------------------------- Generated Chunk:");
+                Console.WriteLine();
+                chunk.Print();
 
-                //foreach(Value v in chunk.GetConstants())
-                //{
-                //    Console.WriteLine(v);
-                //}
+                foreach(Unit v in chunk.GetConstants())
+                {
+                   Console.WriteLine(v);
+                }
+#endif
 
                 VM vm = new VM(chunk);
                 VMResult result = vm.Run();
