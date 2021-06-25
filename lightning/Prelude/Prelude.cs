@@ -56,24 +56,24 @@ namespace lightning
             {
                 ValTable intrinsic = new ValTable(null, null);
 #if ROSLYN
-                Value createIntrinsic(VM vm)
+                Unit createIntrinsic(VM vm)
                 {
-                    ValString name = (ValString)vm.StackPeek(0);
-                    ValNumber arity = (ValNumber)vm.StackPeek(1);
-                    ValString val_body = (ValString)vm.StackPeek(2);
+                    ValString name = (ValString)vm.StackPeek(0).value;
+                    Number arity = vm.StackPeek(1).number;
+                    ValString val_body = (ValString)vm.StackPeek(2).value;
                     string body = val_body.ToString();
 
                     var options = ScriptOptions.Default.AddReferences(
-                        typeof(Value).Assembly,
+                        typeof(Unit).Assembly,
                         typeof(VM).Assembly).WithImports("lightning", "System");
-                    Func<VM, Value> new_intrinsic = CSharpScript.EvaluateAsync<Func<VM, Value>>(body, options)
+                    Func<VM, Unit> new_intrinsic = CSharpScript.EvaluateAsync<Func<VM, Unit>>(body, options)
                         .GetAwaiter().GetResult();
 
-                    return new ValIntrinsic(name.ToString(), new_intrinsic, (int)arity.content);
+                    return new Unit(new ValIntrinsic(name.ToString(), new_intrinsic, (int)arity));
                 }
-                intrinsic.TableSet(new ValString("create"), new ValIntrinsic("create", createIntrinsic, 3));
+                intrinsic.TableSet(new ValString("create"), new Unit(new ValIntrinsic("create", createIntrinsic, 3)));
 #else
-                intrinsic.TableSet(new ValString("create"), Value.Nil);
+                intrinsic.TableSet(new ValString("create"), new Unit(Value.Nil));
 #endif
                 tables.Add("intrinsic", intrinsic);
             }
@@ -85,18 +85,18 @@ namespace lightning
 
                 var rng = new Random();
 
-                Value nextInt(VM vm)
+                Unit nextInt(VM vm)
                 {
-                    int max = (int)((ValNumber)vm.StackPeek(0)).content;
-                    return new ValNumber(rng.Next(max + 1));
+                    int max = (int)(vm.StackPeek(0)).number;
+                    return new Unit(rng.Next(max + 1));
                 }
-                rand.TableSet(new ValString("int"), new ValIntrinsic("int", nextInt, 1));
+                rand.TableSet(new ValString("int"), new Unit(new ValIntrinsic("int", nextInt, 1)));
 
-                Value nextFloat(VM vm)
+                Unit nextFloat(VM vm)
                 {
-                    return new ValNumber((Number)rng.NextDouble());
+                    return new Unit((Number)rng.NextDouble());
                 }
-                rand.TableSet(new ValString("float"), new ValIntrinsic("float", nextFloat, 0));
+                rand.TableSet(new ValString("float"), new Unit(new ValIntrinsic("float", nextFloat, 0)));
 
                 tables.Add("rand", rand);
             }
@@ -107,34 +107,34 @@ namespace lightning
             {
                 ValTable list = new ValTable(null, null);
 
-                Value listPush(VM vm)
+                Unit listPush(VM vm)
                 {
-                    ValTable list = (ValTable)vm.StackPeek(0);
-                    Value value = vm.StackPeek(1);
+                    ValTable list = (ValTable)vm.StackPeek(0).value;
+                    Unit value = vm.StackPeek(1);
                     list.elements.Add(value);
 
-                    return Value.Nil;
+                    return new Unit(Value.Nil);
                 }
-                list.TableSet(new ValString("push"), new ValIntrinsic("push", listPush, 2));
+                list.TableSet(new ValString("push"), new Unit(new ValIntrinsic("push", listPush, 2)));
 
                 //////////////////////////////////////////////////////
-                Value listPop(VM vm)
+                Unit listPop(VM vm)
                 {
-                    ValTable list = (ValTable)vm.StackPeek(0);
-                    Value value = list.elements[^1];
+                    ValTable list = (ValTable)vm.StackPeek(0).value;
+                    Number value = list.elements[^1].number;
                     list.elements.RemoveRange(list.elements.Count - 1, 1);
 
-                    return value;
+                    return new Unit(value);
                 }
-                list.TableSet(new ValString("pop"), new ValIntrinsic("pop", listPop, 1));
+                list.TableSet(new ValString("pop"), new Unit(new ValIntrinsic("pop", listPop, 1)));
 
                 //////////////////////////////////////////////////////
-                Value listToString(VM vm)
+                Unit listToString(VM vm)
                 {
-                    ValTable this_table = (ValTable)vm.StackPeek(0);
+                    ValTable this_table = (ValTable)vm.StackPeek(0).value;
                     bool first = true;
                     string value = "";
-                    foreach (Value v in this_table.elements)
+                    foreach (Unit v in this_table.elements)
                     {
                         if (first)
                         {
@@ -146,143 +146,142 @@ namespace lightning
                             value += ", " + System.Text.RegularExpressions.Regex.Unescape(v.ToString());
                         }
                     }
-                    return new ValString(value);
+                    return new Unit(new ValString(value));
                 }
-                list.TableSet(new ValString("to_string"), new ValIntrinsic("to_string", listToString, 1));
+                list.TableSet(new ValString("to_string"), new Unit(new ValIntrinsic("to_string", listToString, 1)));
 
                 ////////////////////////////////////////////////////
-                Value listCount(VM vm)
+                Unit listCount(VM vm)
                 {
-                    ValTable this_table = (ValTable)vm.StackPeek(0);
+                    ValTable this_table = (ValTable)vm.StackPeek(0).value;
                     int count = this_table.ECount;
-                    return new ValNumber(count);
+                    return new Unit(count);
                 }
-                list.TableSet(new ValString("count"), new ValIntrinsic("count", listCount, 1));
+                list.TableSet(new ValString("count"), new Unit(new ValIntrinsic("count", listCount, 1)));
 
                 //////////////////////////////////////////////////////
-                Value listClear(VM vm)
+                Unit listClear(VM vm)
                 {
-                    ValTable list = (ValTable)vm.StackPeek(0);
+                    ValTable list = (ValTable)vm.StackPeek(0).value;
                     list.elements.Clear();
-                    return Value.Nil;
+                    return new Unit(Value.Nil);
                 }
-                list.TableSet(new ValString("clear"), new ValIntrinsic("clear", listClear, 1));
+                list.TableSet(new ValString("clear"), new Unit(new ValIntrinsic("clear", listClear, 1)));
 
                 //////////////////////////////////////////////////////
-                Value listRemoveRange(VM vm)
+                Unit listRemoveRange(VM vm)
                 {
-                    ValTable list = (ValTable)vm.StackPeek(0);
-                    int range_init = (int)((ValNumber)vm.StackPeek(1)).content;
-                    int range_end = (int)((ValNumber)vm.StackPeek(2)).content;
+                    ValTable list = (ValTable)vm.StackPeek(0).value;
+                    int range_init = (int)vm.StackPeek(1).number;
+                    int range_end = (int)vm.StackPeek(2).number;
                     list.elements.RemoveRange(range_init, range_end - range_init + 1);
 
-                    return Value.Nil;
+                    return new Unit(Value.Nil);
                 }
-                list.TableSet(new ValString("remove"), new ValIntrinsic("remove", listRemoveRange, 3));
+                list.TableSet(new ValString("remove"), new Unit(new ValIntrinsic("remove", listRemoveRange, 3)));
 
                 //////////////////////////////////////////////////////
-                Value listCopy(VM vm)
+                Unit listCopy(VM vm)
                 {
-                    ValTable list = (ValTable)vm.StackPeek(0);
-                    List<Value> new_list_elements = new List<Value>();
-                    foreach (Value v in list.elements)
+                    ValTable list = (ValTable)vm.StackPeek(0).value;
+                    List<Unit> new_list_elements = new List<Unit>();
+                    foreach (Unit v in list.elements)
                     {
                         new_list_elements.Add(v);
                     }
                     ValTable new_list = new ValTable(new_list_elements, null);
 
-                    return new_list;
+                    return new Unit(new_list);
                 }
-                list.TableSet(new ValString("copy"), new ValIntrinsic("copy", listCopy, 1));
+                list.TableSet(new ValString("copy"), new Unit(new ValIntrinsic("copy", listCopy, 1)));
 
                 //////////////////////////////////////////////////////
-                Value listSplit(VM vm)
+                Unit listSplit(VM vm)
                 {
-                    ValTable list = (ValTable)vm.StackPeek(0);
-                    int range_init = (int)((ValNumber)vm.StackPeek(1)).content;
-                    List<Value> new_list_elements = list.elements.GetRange(range_init, list.elements.Count - range_init);
+                    ValTable list = (ValTable)vm.StackPeek(0).value;
+                    int range_init = (int)vm.StackPeek(1).number;
+                    List<Unit> new_list_elements = list.elements.GetRange(range_init, list.elements.Count - range_init);
                     list.elements.RemoveRange(range_init, list.elements.Count - range_init);
                     ValTable new_list = new ValTable(new_list_elements, null);
 
-                    return new_list;
+                    return new Unit(new_list);
                 }
-                list.TableSet(new ValString("split"), new ValIntrinsic("split", listSplit, 2));
+                list.TableSet(new ValString("split"), new Unit(new ValIntrinsic("split", listSplit, 2)));
 
                 //////////////////////////////////////////////////////
-                Value listSlice(VM vm)
+                Unit listSlice(VM vm)
                 {
-                    ValTable list = (ValTable)vm.StackPeek(0);
-                    int range_init = (int)((ValNumber)vm.StackPeek(1)).content;
-                    int range_end = (int)((ValNumber)vm.StackPeek(2)).content;
+                    ValTable list = (ValTable)vm.StackPeek(0).value;
+                    int range_init = (int)vm.StackPeek(1).number;
+                    int range_end = (int)vm.StackPeek(2).number;
 
-                    List<Value> new_list_elements = list.elements.GetRange(range_init, range_end - range_init + 1);
+                    List<Unit> new_list_elements = list.elements.GetRange(range_init, range_end - range_init + 1);
                     list.elements.RemoveRange(range_init, range_end - range_init + 1);
                     ValTable new_list = new ValTable(new_list_elements, null);
 
-                    return new_list;
+                    return new Unit(new_list);
                 }
-                list.TableSet(new ValString("slice"), new ValIntrinsic("slice", listSlice, 3));
+                list.TableSet(new ValString("slice"), new Unit(new ValIntrinsic("slice", listSlice, 3)));
                 //////////////////////////////////////////////////////
-                Value listReverse(VM vm)
+                Unit listReverse(VM vm)
                 {
-                    ValTable list = (ValTable)vm.StackPeek(0);
+                    ValTable list = (ValTable)vm.StackPeek(0).value;
                     list.elements.Reverse();
 
-                    return Value.Nil;
+                    return new Unit(Value.Nil);
                 }
-                list.TableSet(new ValString("reverse"), new ValIntrinsic("reverse", listReverse, 1));
+                list.TableSet(new ValString("reverse"), new Unit(new ValIntrinsic("reverse", listReverse, 1)));
 
                 //////////////////////////////////////////////////////
 
-                Value makeIndexesIterator(VM vm)
+                Unit makeIndexesIterator(VM vm)
                 {
-                    ValTable this_table = (ValTable)vm.StackPeek(0);
+                    ValTable this_table = (ValTable)vm.StackPeek(0).value;
                     int i = -1;
-                    Value value = Value.Nil;
                     ValString value_string = new ValString("value");
                     ValString key_string = new ValString("key");
 
                     ValTable iterator = new ValTable(null, null);
-                    Value next(VM vm)
+                    Unit next(VM vm)
                     {
                         if (i < (this_table.ECount - 1))
                         {
                             i++;
-                            iterator.table[key_string] = new ValNumber(i);
+                            iterator.table[key_string] = new Unit(i);
                             iterator.table[value_string] = this_table.elements[i];
-                            return Value.True;
+                            return new Unit(Value.True);
                         }
-                        return Value.False;
+                        return new Unit(Value.False);
                     };
-                    iterator.TableSet(new ValString("next"), new ValIntrinsic("iterator_next", next, 0));
-                    return iterator;
+                    iterator.TableSet(new ValString("next"), new Unit(new ValIntrinsic("iterator_next", next, 0)));
+                    return new Unit(iterator);
                 }
-                list.TableSet(new ValString("index_iterator"), new ValIntrinsic("list_index_iterator", makeIndexesIterator, 1));
+                list.TableSet(new ValString("index_iterator"), new Unit(new ValIntrinsic("list_index_iterator", makeIndexesIterator, 1)));
 
                 //////////////////////////////////////////////////////
 
-                Value makeIterator(VM vm)
+                Unit makeIterator(VM vm)
                 {
-                    ValTable this_table = (ValTable)vm.StackPeek(0);
+                    ValTable this_table = (ValTable)vm.StackPeek(0).value;
                     int i = -1;
-                    Value value = Value.Nil;
+                    Unit value = new Unit(Value.Nil);
                     ValString value_string = new ValString("value");
 
                     ValTable iterator = new ValTable(null, null);
-                    Value next(VM vm)
+                    Unit next(VM vm)
                     {
                         if (i < (this_table.ECount - 1))
                         {
                             i++;
                             iterator.table[value_string] = this_table.elements[i];
-                            return Value.True;
+                            return new Unit(Value.True);
                         }
-                        return Value.False;
+                        return new Unit(Value.False);
                     };
-                    iterator.TableSet(new ValString("next"), new ValIntrinsic("iterator_next", next, 0));
-                    return iterator;
+                    iterator.TableSet(new ValString("next"), new Unit(new ValIntrinsic("iterator_next", next, 0)));
+                    return new Unit(iterator);
                 }
-                list.TableSet(new ValString("iterator"), new ValIntrinsic("list_iterator", makeIterator, 1));
+                list.TableSet(new ValString("iterator"), new Unit(new ValIntrinsic("list_iterator", makeIterator, 1)));
 
                 ////////////////////////////////////////////////////// 
 
@@ -296,87 +295,87 @@ namespace lightning
                 ValTable table = new ValTable(null, null);
 
                 //////////////////////////////////////////////////////
-                Value tableCount(VM vm)
+                Unit tableCount(VM vm)
                 {
-                    ValTable this_table = (ValTable)vm.StackPeek(0);
+                    ValTable this_table = (ValTable)vm.StackPeek(0).value;
                     int count = this_table.TCount;
-                    return new ValNumber(count);
+                    return new Unit(count);
                 }
-                table.TableSet(new ValString("count"), new ValIntrinsic("table_count", tableCount, 1));
+                table.TableSet(new ValString("count"), new Unit(new ValIntrinsic("table_count", tableCount, 1)));
 
                 //////////////////////////////////////////////////////
-                Value tableIndexes(VM vm)
+                Unit tableIndexes(VM vm)
                 {
-                    ValTable this_table = (ValTable)vm.StackPeek(0);
+                    ValTable this_table = (ValTable)vm.StackPeek(0).value;
                     ValTable indexes = new ValTable(null, null);
 
                     foreach (ValString v in this_table.table.Keys)
                     {
-                        indexes.elements.Add(v);
+                        indexes.elements.Add(new Unit(v));
                     }
 
-                    return indexes;
+                    return new Unit(indexes);
                 }
-                table.TableSet(new ValString("indexes"), new ValIntrinsic("indexes", tableIndexes, 1));
+                table.TableSet(new ValString("indexes"), new Unit(new ValIntrinsic("indexes", tableIndexes, 1)));
 
                 //////////////////////////////////////////////////////
-                Value tableCopy(VM vm)
+                Unit tableCopy(VM vm)
                 {
-                    ValTable this_table = (ValTable)vm.StackPeek(0);
-                    Dictionary<ValString, Value> table_copy = new Dictionary<ValString, Value>();
-                    foreach (KeyValuePair<ValString, Value> entry in this_table.table)
+                    ValTable this_table = (ValTable)vm.StackPeek(0).value;
+                    Dictionary<ValString, Unit> table_copy = new Dictionary<ValString, Unit>();
+                    foreach (KeyValuePair<ValString, Unit> entry in this_table.table)
                     {
                         table_copy.Add(entry.Key, entry.Value);
                     }
 
                     ValTable copy = new ValTable(null, table_copy);
 
-                    return copy;
+                    return new Unit(copy);
                 }
-                table.TableSet(new ValString("copy"), new ValIntrinsic("copy", tableCopy, 1));
+                table.TableSet(new ValString("copy"), new Unit(new ValIntrinsic("copy", tableCopy, 1)));
 
                 //////////////////////////////////////////////////////
-                Value tableClear(VM vm)
+                Unit tableClear(VM vm)
                 {
-                    ValTable this_table = (ValTable)vm.StackPeek(0);
-                    return Value.Nil;
+                    ValTable this_table = (ValTable)vm.StackPeek(0).value;
+                    return new Unit(Value.Nil);
                 }
-                table.TableSet(new ValString("clear"), new ValIntrinsic("clear", tableClear, 1));
+                table.TableSet(new ValString("clear"), new Unit(new ValIntrinsic("clear", tableClear, 1)));
 
-                Value makeIteratorTable(VM vm)
+                Unit makeIteratorTable(VM vm)
                 {
-                    ValTable this_table = (ValTable)vm.StackPeek(0);
+                    ValTable this_table = (ValTable)vm.StackPeek(0).value;
                     System.Collections.IDictionaryEnumerator enumerator = this_table.table.GetEnumerator();
 
                     ValString value_string = new ValString("value");
                     ValString key_string = new ValString("key");
                     ValTable iterator = new ValTable(null, null);
-                    iterator.table[key_string] = Value.Nil;
-                    iterator.table[value_string] = Value.Nil;
+                    iterator.table[key_string] = new Unit(Value.Nil);
+                    iterator.table[value_string] = new Unit(Value.Nil);
 
-                    Value next(VM vm)
+                    Unit next(VM vm)
                     {
                         if (enumerator.MoveNext())
                         {
-                            iterator.table[key_string] = (ValString)enumerator.Key;
-                            iterator.table[value_string] = (Value)enumerator.Value;
-                            return Value.True;
+                            iterator.table[key_string] = new Unit((ValString)enumerator.Key);
+                            iterator.table[value_string] = (Unit)enumerator.Value;
+                            return new Unit(Value.True);
                         }
-                        return Value.False;
+                        return new Unit(Value.False);
                     };
 
-                    iterator.TableSet(new ValString("next"), new ValIntrinsic("table_iterator_next", next, 0));
-                    return iterator;
+                    iterator.TableSet(new ValString("next"), new Unit(new ValIntrinsic("table_iterator_next", next, 0)));
+                    return new Unit(iterator);
                 }
-                table.TableSet(new ValString("iterator"), new ValIntrinsic("iterator_table", makeIteratorTable, 1));
+                table.TableSet(new ValString("iterator"), new Unit(new ValIntrinsic("iterator_table", makeIteratorTable, 1)));
 
                 //////////////////////////////////////////////////////
-                Value tableToString(VM vm)
+                Unit tableToString(VM vm)
                 {
-                    ValTable this_table = (ValTable)vm.StackPeek(0);
+                    ValTable this_table = (ValTable)vm.StackPeek(0).value;
                     string value = "";
                     bool first = true;
-                    foreach (KeyValuePair<ValString, Value> entry in this_table.table)
+                    foreach (KeyValuePair<ValString, Unit> entry in this_table.table)
                     {
                         if (first)
                         {
@@ -393,9 +392,9 @@ namespace lightning
                                 + " : " + System.Text.RegularExpressions.Regex.Unescape(entry.Value.ToString());
                         }
                     }
-                    return new ValString(value);
+                    return new Unit(new ValString(value));
                 }
-                table.TableSet(new ValString("to_string"), new ValIntrinsic("table_to_string", tableToString, 1));
+                table.TableSet(new ValString("to_string"), new Unit(new ValIntrinsic("table_to_string", tableToString, 1)));
 
                 tables.Add("table", table);
             }
@@ -405,173 +404,173 @@ namespace lightning
 
             {
                 ValTable math = new ValTable(null, null);
-                math.TableSet(new ValString("pi"), new ValNumber((Number)Math.PI));
-                math.TableSet(new ValString("e"), new ValNumber((Number)Math.E));
+                math.TableSet(new ValString("pi"), new Unit((Number)Math.PI));
+                math.TableSet(new ValString("e"), new Unit((Number)Math.E));
 #if DOUBLE
-                math.TableSet(new ValString("double"), Value.True);
+                math.TableSet(new ValString("double"), new Unit(Value.True));
 #else
-                math.TableSet(new ValString("double"), Value.False);
+                math.TableSet(new ValString("double"), new Unit(Value.False));
 #endif
 
                 //////////////////////////////////////////////////////
-                Value sin(VM vm)
+                Unit sin(VM vm)
                 {
-                    return new ValNumber((Number)Math.Sin(((ValNumber)vm.StackPeek(0)).content));
+                    return new Unit((Number)Math.Sin(vm.StackPeek(0).number));
                 }
-                math.TableSet(new ValString("sin"), new ValIntrinsic("sin", sin, 1));
+                math.TableSet(new ValString("sin"), new Unit(new ValIntrinsic("sin", sin, 1)));
 
                 //////////////////////////////////////////////////////
-                Value cos(VM vm)
+                Unit cos(VM vm)
                 {
-                    return new ValNumber((Number)Math.Cos(((ValNumber)vm.StackPeek(0)).content));
+                    return new Unit((Number)Math.Cos(vm.StackPeek(0).number));
                 }
-                math.TableSet(new ValString("cos"), new ValIntrinsic("cos", cos, 1));
+                math.TableSet(new ValString("cos"), new Unit(new ValIntrinsic("cos", cos, 1)));
 
                 //////////////////////////////////////////////////////
-                Value tan(VM vm)
+                Unit tan(VM vm)
                 {
-                    return new ValNumber((Number)Math.Tan(((ValNumber)vm.StackPeek(0)).content));
+                    return new Unit((Number)Math.Tan(vm.StackPeek(0).number));
                 }
-                math.TableSet(new ValString("tan"), new ValIntrinsic("tan", tan, 1));
+                math.TableSet(new ValString("tan"), new Unit(new ValIntrinsic("tan", tan, 1)));
 
                 //////////////////////////////////////////////////////
-                Value sec(VM vm)
+                Unit sec(VM vm)
                 {
-                    return new ValNumber((Number)(1 / Math.Cos(((ValNumber)vm.StackPeek(0)).content)));
+                    return new Unit((Number)(1 / Math.Cos(vm.StackPeek(0).number)));
                 }
-                math.TableSet(new ValString("sec"), new ValIntrinsic("sec", sec, 1));
+                math.TableSet(new ValString("sec"), new Unit(new ValIntrinsic("sec", sec, 1)));
 
                 //////////////////////////////////////////////////////
-                Value cosec(VM vm)
+                Unit cosec(VM vm)
                 {
-                    return new ValNumber((Number)(1 / Math.Sin(((ValNumber)vm.StackPeek(0)).content)));
+                    return new Unit((Number)(1 / Math.Sin(vm.StackPeek(0).number)));
                 }
-                math.TableSet(new ValString("cosec"), new ValIntrinsic("cosec", cosec, 1));
+                math.TableSet(new ValString("cosec"), new Unit(new ValIntrinsic("cosec", cosec, 1)));
 
                 //////////////////////////////////////////////////////
-                Value cotan(VM vm)
+                Unit cotan(VM vm)
                 {
-                    return new ValNumber((Number)(1 / Math.Tan(((ValNumber)vm.StackPeek(0)).content)));
+                    return new Unit((Number)(1 / Math.Tan(vm.StackPeek(0).number)));
                 }
-                math.TableSet(new ValString("cotan"), new ValIntrinsic("cotan", cotan, 1));
+                math.TableSet(new ValString("cotan"), new Unit(new ValIntrinsic("cotan", cotan, 1)));
 
                 //////////////////////////////////////////////////////
-                Value asin(VM vm)
+                Unit asin(VM vm)
                 {
-                    return new ValNumber((Number)Math.Asin(((ValNumber)vm.StackPeek(0)).content));
+                    return new Unit((Number)Math.Asin(vm.StackPeek(0).number));
                 }
-                math.TableSet(new ValString("asin"), new ValIntrinsic("asin", asin, 1));
+                math.TableSet(new ValString("asin"), new Unit(new ValIntrinsic("asin", asin, 1)));
 
                 //////////////////////////////////////////////////////
-                Value acos(VM vm)
+                Unit acos(VM vm)
                 {
-                    return new ValNumber((Number)Math.Acos(((ValNumber)vm.StackPeek(0)).content));
+                    return new Unit((Number)Math.Acos(vm.StackPeek(0).number));
                 }
-                math.TableSet(new ValString("acos"), new ValIntrinsic("acos", acos, 1));
+                math.TableSet(new ValString("acos"), new Unit(new ValIntrinsic("acos", acos, 1)));
 
                 //////////////////////////////////////////////////////
-                Value atan(VM vm)
+                Unit atan(VM vm)
                 {
-                    return new ValNumber((Number)Math.Atan(((ValNumber)vm.StackPeek(0)).content));
+                    return new Unit((Number)Math.Atan(vm.StackPeek(0).number));
                 }
-                math.TableSet(new ValString("atan"), new ValIntrinsic("atan", atan, 1));
+                math.TableSet(new ValString("atan"), new Unit(new ValIntrinsic("atan", atan, 1)));
 
                 //////////////////////////////////////////////////////
-                Value sinh(VM vm)
+                Unit sinh(VM vm)
                 {
-                    return new ValNumber((Number)Math.Sinh(((ValNumber)vm.StackPeek(0)).content));
+                    return new Unit((Number)Math.Sinh(vm.StackPeek(0).number));
                 }
-                math.TableSet(new ValString("sinh"), new ValIntrinsic("sinh", sinh, 1));
+                math.TableSet(new ValString("sinh"), new Unit(new ValIntrinsic("sinh", sinh, 1)));
 
                 //////////////////////////////////////////////////////
-                Value cosh(VM vm)
+                Unit cosh(VM vm)
                 {
-                    return new ValNumber((Number)Math.Cosh(((ValNumber)vm.StackPeek(0)).content));
+                    return new Unit((Number)Math.Cosh(vm.StackPeek(0).number));
                 }
-                math.TableSet(new ValString("cosh"), new ValIntrinsic("cosh", cosh, 1));
+                math.TableSet(new ValString("cosh"), new Unit(new ValIntrinsic("cosh", cosh, 1)));
 
                 //////////////////////////////////////////////////////
-                Value tanh(VM vm)
+                Unit tanh(VM vm)
                 {
-                    return new ValNumber((Number)Math.Tanh(((ValNumber)vm.StackPeek(0)).content));
+                    return new Unit((Number)Math.Tanh(vm.StackPeek(0).number));
                 }
-                math.TableSet(new ValString("tanh"), new ValIntrinsic("tanh", tanh, 1));
+                math.TableSet(new ValString("tanh"), new Unit(new ValIntrinsic("tanh", tanh, 1)));
 
                 //////////////////////////////////////////////////////
-                Value pow(VM vm)
+                Unit pow(VM vm)
                 {
-                    Number value = ((ValNumber)vm.StackPeek(0)).content;
-                    Number exponent = ((ValNumber)vm.StackPeek(1)).content;
-                    return new ValNumber((Number)Math.Pow(value, exponent));
+                    Number value = vm.StackPeek(0).number;
+                    Number exponent = vm.StackPeek(1).number;
+                    return new Unit((Number)Math.Pow(value, exponent));
                 }
-                math.TableSet(new ValString("pow"), new ValIntrinsic("pow", pow, 2));
+                math.TableSet(new ValString("pow"), new Unit(new ValIntrinsic("pow", pow, 2)));
 
                 //////////////////////////////////////////////////////
-                Value root(VM vm)
+                Unit root(VM vm)
                 {
-                    Number value = ((ValNumber)vm.StackPeek(0)).content;
-                    Number exponent = ((ValNumber)vm.StackPeek(1)).content;
-                    return new ValNumber((Number)Math.Pow(value, 1 / exponent));
+                    Number value = vm.StackPeek(0).number;
+                    Number exponent = vm.StackPeek(1).number;
+                    return new Unit((Number)Math.Pow(value, 1 / exponent));
                 }
-                math.TableSet(new ValString("root"), new ValIntrinsic("root", root, 2));
+                math.TableSet(new ValString("root"), new Unit(new ValIntrinsic("root", root, 2)));
 
                 //////////////////////////////////////////////////////
-                Value sqroot(VM vm)
+                Unit sqroot(VM vm)
                 {
-                    Number value = ((ValNumber)vm.StackPeek(0)).content;
-                    return new ValNumber((Number)Math.Sqrt(value));
+                    Number value = vm.StackPeek(0).number;
+                    return new Unit((Number)Math.Sqrt(value));
                 }
-                math.TableSet(new ValString("sqroot"), new ValIntrinsic("sqroot", sqroot, 1));
+                math.TableSet(new ValString("sqroot"), new Unit(new ValIntrinsic("sqroot", sqroot, 1)));
                 //////////////////////////////////////////////////////
-                Value exp(VM vm)
+                Unit exp(VM vm)
                 {
-                    Number exponent = ((ValNumber)vm.StackPeek(0)).content;
-                    return new ValNumber((Number)Math.Exp(exponent));
+                    Number exponent = vm.StackPeek(0).number;
+                    return new Unit((Number)Math.Exp(exponent));
                 }
-                math.TableSet(new ValString("exp"), new ValIntrinsic("exp", exp, 1));
+                math.TableSet(new ValString("exp"), new Unit(new ValIntrinsic("exp", exp, 1)));
 
                 //////////////////////////////////////////////////////
-                Value log(VM vm)
+                Unit log(VM vm)
                 {
-                    Number value = ((ValNumber)vm.StackPeek(0)).content;
-                    Number this_base = ((ValNumber)vm.StackPeek(1)).content;
-                    return new ValNumber((Number)Math.Log(value, this_base));
+                    Number value = vm.StackPeek(0).number;
+                    Number this_base = vm.StackPeek(1).number;
+                    return new Unit((Number)Math.Log(value, this_base));
                 }
-                math.TableSet(new ValString("log"), new ValIntrinsic("log", log, 2));
+                math.TableSet(new ValString("log"), new Unit(new ValIntrinsic("log", log, 2)));
 
                 //////////////////////////////////////////////////////
-                Value ln(VM vm)
+                Unit ln(VM vm)
                 {
-                    Number value = ((ValNumber)vm.StackPeek(0)).content;
-                    return new ValNumber((Number)Math.Log(value, Math.E));
+                    Number value = vm.StackPeek(0).number;
+                    return new Unit((Number)Math.Log(value, Math.E));
                 }
-                math.TableSet(new ValString("ln"), new ValIntrinsic("ln", ln, 1));
+                math.TableSet(new ValString("ln"), new Unit(new ValIntrinsic("ln", ln, 1)));
 
                 //////////////////////////////////////////////////////
-                Value log10(VM vm)
+                Unit log10(VM vm)
                 {
-                    Number value = ((ValNumber)vm.StackPeek(0)).content;
-                    return new ValNumber((Number)Math.Log(value, (Number)10));
+                    Number value = vm.StackPeek(0).number;
+                    return new Unit((Number)Math.Log(value, (Number)10));
                 }
-                math.TableSet(new ValString("log10"), new ValIntrinsic("log10", log10, 1));
+                math.TableSet(new ValString("log10"), new Unit(new ValIntrinsic("log10", log10, 1)));
 
                 //////////////////////////////////////////////////////
-                Value mod(VM vm)
+                Unit mod(VM vm)
                 {
-                    Number value1 = ((ValNumber)vm.StackPeek(0)).content;
-                    Number value2 = ((ValNumber)vm.StackPeek(1)).content;
-                    return new ValNumber((Number)value1 % value2);
+                    Number value1 = vm.StackPeek(0).number;
+                    Number value2 = vm.StackPeek(1).number;
+                    return new Unit((Number)value1 % value2);
                 }
-                math.TableSet(new ValString("mod"), new ValIntrinsic("mod", mod, 2));
+                math.TableSet(new ValString("mod"), new Unit(new ValIntrinsic("mod", mod, 2)));
 
                 //////////////////////////////////////////////////////
-                Value idiv(VM vm)
+                Unit idiv(VM vm)
                 {
-                    Number value1 = ((ValNumber)vm.StackPeek(0)).content;
-                    Number value2 = ((ValNumber)vm.StackPeek(1)).content;
-                    return new ValNumber((Number)(int)(value1 / value2));
+                    Number value1 = vm.StackPeek(0).number;
+                    Number value2 = vm.StackPeek(1).number;
+                    return new Unit((Number)(int)(value1 / value2));
                 }
-                math.TableSet(new ValString("idiv"), new ValIntrinsic("idiv", idiv, 2));
+                math.TableSet(new ValString("idiv"), new Unit(new ValIntrinsic("idiv", idiv, 2)));
 
                 tables.Add("math", math);
             }
@@ -581,19 +580,19 @@ namespace lightning
             {
                 ValTable time = new ValTable(null, null);
 
-                Value now(VM vm)
+                Unit now(VM vm)
                 {
-                    return new ValWrapper<long>(DateTime.Now.Ticks);
+                    return new Unit(new ValWrapper<long>(DateTime.Now.Ticks));
                 }
-                time.TableSet(new ValString("now"), new ValIntrinsic("now", now, 0));
+                time.TableSet(new ValString("now"), new Unit(new ValIntrinsic("now", now, 0)));
 
-                Value timeSpan(VM vm)
+                Unit timeSpan(VM vm)
                 {
-                    long timeStart = ((ValWrapper<long>)vm.StackPeek(0)).UnWrapp();
-                    long timeEnd = ((ValWrapper<long>)vm.StackPeek(1)).UnWrapp();
-                    return new ValNumber((Number)(new TimeSpan(timeEnd - timeStart).TotalMilliseconds));// Convert to milliseconds
+                    long timeStart = ((ValWrapper<long>)vm.StackPeek(0).value).UnWrapp();
+                    long timeEnd = ((ValWrapper<long>)vm.StackPeek(1).value).UnWrapp();
+                    return new Unit((Number)(new TimeSpan(timeEnd - timeStart).TotalMilliseconds));// Convert to milliseconds
                 }
-                time.TableSet(new ValString("span"), new ValIntrinsic("span", timeSpan, 2));
+                time.TableSet(new ValString("span"), new Unit(new ValIntrinsic("span", timeSpan, 2)));
 
                 tables.Add("time", time);
             }
@@ -603,60 +602,60 @@ namespace lightning
             {
                 ValTable string_table = new ValTable(null, null);
 
-                Value stringSlice(VM vm)
+                Unit stringSlice(VM vm)
                 {
-                    ValString val_input_string = (ValString)vm.StackPeek(0);
+                    ValString val_input_string = (ValString)vm.StackPeek(0).value;
                     string input_string = val_input_string.ToString();
-                    Number start = ((ValNumber)vm.StackPeek(1)).content;
-                    Number end = ((ValNumber)vm.StackPeek(2)).content;
+                    Number start = vm.StackPeek(1).number;
+                    Number end = vm.StackPeek(2).number;
 
                     if (end < input_string.Length)
                     {
                         string result = input_string.Substring((int)start, (int)(end - start));
-                        return new ValString(result);
+                        return new Unit(new ValString(result));
                     }
-                    return Value.Nil;
+                    return new Unit(Value.Nil);
                 }
-                string_table.TableSet(new ValString("slice"), new ValIntrinsic("string_slice", stringSlice, 3));
+                string_table.TableSet(new ValString("slice"), new Unit(new ValIntrinsic("string_slice", stringSlice, 3)));
 
                 //////////////////////////////////////////////////////
 
-                Value stringSplit(VM vm)
+                Unit stringSplit(VM vm)
                 {
-                    ValString val_input_string = (ValString)vm.StackPeek(0);
+                    ValString val_input_string = (ValString)vm.StackPeek(0).value;
                     string input_string = val_input_string.ToString();
-                    Number start = ((ValNumber)vm.StackPeek(1)).content;
+                    Number start = vm.StackPeek(1).number;
                     if (start < input_string.Length)
                     {
                         Number end = input_string.Length;
                         string result = input_string.Substring((int)start, (int)(end - start));
                         val_input_string.content = input_string.Substring(0, (int)start);
-                        return new ValString(result);
+                        return new Unit(new ValString(result));
                     }
-                    return Value.Nil;
+                    return new Unit(Value.Nil);
                 }
-                string_table.TableSet(new ValString("split"), new ValIntrinsic("string_split", stringSplit, 2));
+                string_table.TableSet(new ValString("split"), new Unit(new ValIntrinsic("string_split", stringSplit, 2)));
 
                 //////////////////////////////////////////////////////
 
-                Value stringLength(VM vm)
+                Unit stringLength(VM vm)
                 {
-                    ValString val_input_string = (ValString)vm.StackPeek(0);
-                    return new ValNumber(val_input_string.ToString().Length);
+                    ValString val_input_string = (ValString)vm.StackPeek(0).value;
+                    return new Unit(val_input_string.ToString().Length);
                 }
-                string_table.TableSet(new ValString("length"), new ValIntrinsic("string_length", stringLength, 1));
+                string_table.TableSet(new ValString("length"), new Unit(new ValIntrinsic("string_length", stringLength, 1)));
 
                 //////////////////////////////////////////////////////
 
-                Value stringCopy(VM vm)
+                Unit stringCopy(VM vm)
                 {
-                    Value val_input_string = vm.StackPeek(0);
-                    if (val_input_string.GetType() == typeof(ValString))
-                        return new ValString(val_input_string.ToString());
+                    Unit val_input_string = vm.StackPeek(0);
+                    if (val_input_string.Type() == typeof(ValString))
+                        return new Unit(new ValString(val_input_string.ToString()));
                     else
-                        return Value.Nil;
+                        return new Unit(Value.Nil);
                 }
-                string_table.TableSet(new ValString("copy"), new ValIntrinsic("string_copy", stringCopy, 1));
+                string_table.TableSet(new ValString("copy"), new Unit(new ValIntrinsic("string_copy", stringCopy, 1)));
 
                 //////////////////////////////////////////////////////
 
@@ -667,56 +666,56 @@ namespace lightning
             /////////////////////////////////////////////////////////////////////////////////////////////////////// char
             {
                 ValTable char_table = new ValTable(null, null);
-                Value charAt(VM vm)
+                Unit charAt(VM vm)
                 {
-                    ValString val_input_string = (ValString)vm.StackPeek(0);
-                    ValNumber index = (ValNumber)vm.StackPeek(1);
+                    ValString val_input_string = (ValString)vm.StackPeek(0).value;
+                    Number index = vm.StackPeek(1).number;
                     string input_string = val_input_string.ToString();
-                    if (index.content < input_string.Length)
+                    if (index < input_string.Length)
                     {
-                        char result = input_string[(int)index.content];
-                        return new ValString(result.ToString());
+                        char result = input_string[(int)index];
+                        return new Unit(new ValString(result.ToString()));
                     }
-                    return Value.Nil;
+                    return new Unit(Value.Nil);
                 }
-                char_table.TableSet(new ValString("at"), new ValIntrinsic("char_at", charAt, 2));
+                char_table.TableSet(new ValString("at"), new Unit(new ValIntrinsic("char_at", charAt, 2)));
 
                 //////////////////////////////////////////////////////
 
-                Value isAlpha(VM vm)
+                Unit isAlpha(VM vm)
                 {
-                    ValString val_input_string = (ValString)vm.StackPeek(0);
+                    ValString val_input_string = (ValString)vm.StackPeek(0).value;
                     string input_string = val_input_string.ToString();
                     if (1 <= input_string.Length)
                     {
                         char head = input_string[0];
                         if (Char.IsLetter(head))
                         {
-                            return Value.True;
+                            return new Unit(Value.True);
                         }
                     }
-                    return Value.False;
+                    return new Unit(Value.False);
                 }
-                char_table.TableSet(new ValString("is_alpha"), new ValIntrinsic("is_alpha", isAlpha, 1));
+                char_table.TableSet(new ValString("is_alpha"), new Unit(new ValIntrinsic("is_alpha", isAlpha, 1)));
 
                 //////////////////////////////////////////////////////
 
-                Value isDigit(VM vm)
+                Unit isDigit(VM vm)
                 {
-                    ValString val_input_string = (ValString)vm.StackPeek(0);
+                    ValString val_input_string = (ValString)vm.StackPeek(0).value;
                     string input_string = val_input_string.ToString();
                     if (1 <= input_string.Length)
                     {
                         char head = input_string[0];
                         if (Char.IsDigit(head))
                         {
-                            return Value.True;
+                            return new Unit(Value.True);
                         }
-                        return Value.False;
+                        return new Unit(Value.False);
                     }
-                    return Value.Nil;
+                    return new Unit(Value.Nil);
                 }
-                char_table.TableSet(new ValString("is_digit"), new ValIntrinsic("is_digit", isDigit, 1));
+                char_table.TableSet(new ValString("is_digit"), new Unit(new ValIntrinsic("is_digit", isDigit, 1)));
 
                 tables.Add("char", char_table);
             }
@@ -725,48 +724,48 @@ namespace lightning
             /////////////////////////////////////////////////////////////////////////////////////////////////////// file
             {
                 ValTable file = new ValTable(null, null);
-                Value loadFile(VM vm)
+                Unit loadFile(VM vm)
                 {
-                    string path = ((ValString)vm.StackPeek(0)).ToString();
+                    string path = (vm.StackPeek(0).value).ToString();
                     string input;
                     using (var sr = new StreamReader(path))
                     {
                         input = sr.ReadToEnd();
                     }
                     if (input != null)
-                        return new ValString(input);
+                        return new Unit(new ValString(input));
 
-                    return Value.Nil;
+                    return new Unit(Value.Nil);
                 }
-                file.TableSet(new ValString("load"), new ValIntrinsic("load_file", loadFile, 1));
+                file.TableSet(new ValString("load"), new Unit(new ValIntrinsic("load_file", loadFile, 1)));
 
                 //////////////////////////////////////////////////////
-                Value writeFile(VM vm)
+                Unit writeFile(VM vm)
                 {
-                    string path = ((ValString)vm.StackPeek(0)).ToString();
-                    string output = ((ValString)vm.StackPeek(1)).ToString();
+                    string path = (vm.StackPeek(0).value).ToString();
+                    string output = (vm.StackPeek(1).value).ToString();
                     using (System.IO.StreamWriter file = new System.IO.StreamWriter(path, false))
                     {
                         file.Write(output);
                     }
 
-                    return Value.Nil;
+                    return new Unit(Value.Nil);
                 }
-                file.TableSet(new ValString("write"), new ValIntrinsic("write_file", writeFile, 2));
+                file.TableSet(new ValString("write"), new Unit(new ValIntrinsic("write_file", writeFile, 2)));
 
                 //////////////////////////////////////////////////////
-                Value appendFile(VM vm)
+                Unit appendFile(VM vm)
                 {
-                    string path = ((ValString)vm.StackPeek(0)).ToString();
-                    string output = ((ValString)vm.StackPeek(1)).ToString();
+                    string path = (vm.StackPeek(0).value).ToString();
+                    string output = (vm.StackPeek(1).value).ToString();
                     using (System.IO.StreamWriter file = new System.IO.StreamWriter(path, true))
                     {
                         file.Write(output);
                     }
 
-                    return Value.Nil;
+                    return new Unit(Value.Nil);
                 }
-                file.TableSet(new ValString("append"), new ValIntrinsic("append_file", appendFile, 2));
+                file.TableSet(new ValString("append"), new Unit(new ValIntrinsic("append_file", appendFile, 2)));
 
                 tables.Add("file", file);
             }
@@ -776,9 +775,9 @@ namespace lightning
             List<ValIntrinsic> functions = new List<ValIntrinsic>();
 
             //////////////////////////////////////////////////////
-            Value eval(VM vm)
+            Unit eval(VM vm)
             {
-                string eval_code = ((ValString)vm.StackPeek(0)).ToString();
+                string eval_code = (vm.StackPeek(0).value).ToString();;
                 Scanner scanner = new Scanner(eval_code);
 
                 Parser parser = new Parser(scanner.Tokens);
@@ -789,7 +788,7 @@ namespace lightning
                     {
                         Console.WriteLine(error);
                     }
-                    return Value.Nil;
+                    return new Unit(Value.Nil);
                 }
 
                 Node program = parser.ParsedTree;
@@ -802,7 +801,7 @@ namespace lightning
                     Console.WriteLine("Code generation had errors:");
                     foreach (string error in code_generator.Errors)
                         Console.WriteLine(error);
-                    return Value.Nil;
+                    return new Unit(Value.Nil);
                 }
                 if (code_generator.HasChunked == true)
                 {
@@ -810,24 +809,24 @@ namespace lightning
                     VMResult result = imported_vm.Run();
                     if (result.status == VMResultType.OK)
                     {
-                        if (result.value.GetType() == typeof(ValTable) || result.value.GetType() == typeof(ValFunction))
+                        if (result.value.Type() == typeof(ValTable) || result.value.Type() == typeof(ValFunction))
                             MakeModule(result.value, eval_name, vm, imported_vm);
-                        //vm.GetChunk().Print();                    
+                        //vm.GetChunk().Print();
                         return result.value;
                     }
                 }
-                return Value.Nil;
+                return new Unit(Value.Nil);
             }
             functions.Add(new ValIntrinsic("eval", eval, 1));
 
             ////////////////////////////////////////////////////
-            Value require(VM vm)
+            Unit require(VM vm)
             {
-                string path = ((ValString)vm.StackPeek(0)).ToString();
+                string path = (vm.StackPeek(0).value).ToString();
                 foreach (ValModule v in vm.modules)// skip already imported modules
                 {
                     if (v.name == path)
-                        return v;
+                        return new Unit(v);
                 }
                 string module_code;
                 using (var sr = new StreamReader(path))
@@ -847,7 +846,7 @@ namespace lightning
                         {
                             Console.WriteLine(error);
                         }
-                        return Value.Nil;
+                        return new Unit(Value.Nil);
                     }
 
                     Node program = parser.ParsedTree;
@@ -859,7 +858,7 @@ namespace lightning
                         Console.WriteLine("Code generation had errors:");
                         foreach (string error in code_generator.Errors)
                             Console.WriteLine(error);
-                        return Value.Nil;
+                        return new Unit(Value.Nil);
                     }
 
                     if (code_generator.HasChunked == true)
@@ -874,12 +873,12 @@ namespace lightning
                         }
                     }
                 }
-                return Value.Nil;
+                return new Unit(Value.Nil);
             }
             functions.Add(new ValIntrinsic("require", require, 1));
 
             //////////////////////////////////////////////////////
-            Value modules(VM vm)
+            Unit modules(VM vm)
             {
                 string modules = "";
                 bool first = true;
@@ -896,86 +895,86 @@ namespace lightning
                     }
                 }
 
-                return new ValString(modules);
+                return new Unit(new ValString(modules));
             }
             functions.Add(new ValIntrinsic("modules", modules, 0));
 
             //////////////////////////////////////////////////////
 
-            Value writeLine(VM vm)
+            Unit writeLine(VM vm)
             {
                 Console.WriteLine(System.Text.RegularExpressions.Regex.Unescape(vm.StackPeek(0).ToString()));
-                return Value.Nil;
+                return new Unit(Value.Nil);
             }
             functions.Add(new ValIntrinsic("write_line", writeLine, 1));
 
             //////////////////////////////////////////////////////
-            Value write(VM vm)
+            Unit write(VM vm)
             {
                 Console.Write(System.Text.RegularExpressions.Regex.Unescape(vm.StackPeek(0).ToString()));
-                return Value.Nil;
+                return new Unit(Value.Nil);
             }
             functions.Add(new ValIntrinsic("write", write, 1));
 
             //////////////////////////////////////////////////////
-            Value readln(VM vm)
+            Unit readln(VM vm)
             {
                 string read = Console.ReadLine();
-                return new ValString(read);
+                return new Unit(new ValString(read));
             }
             functions.Add(new ValIntrinsic("read_line", readln, 0));
 
             //////////////////////////////////////////////////////
-            Value readNumber(VM vm)
+            Unit readNumber(VM vm)
             {
                 string read = Console.ReadLine();
                 if (Number.TryParse(read, out Number n))
-                    return new ValNumber(n);
+                    return new Unit(n);
                 else
-                    return Value.Nil;
+                    return new Unit(Value.Nil);
             }
             functions.Add(new ValIntrinsic("read_number", readNumber, 0));
 
             //////////////////////////////////////////////////////
-            Value read(VM vm)
+            Unit read(VM vm)
             {
                 int read = Console.Read();
                 if (read > 0)
                 {
                     char next = Convert.ToChar(read);
                     if (next == '\n')
-                        return Value.Nil;
+                        return new Unit(Value.Nil);
                     else
-                        return new ValString(Char.ToString(next));
+                        return new Unit(new ValString(Char.ToString(next)));
                 }
                 else
-                    return Value.Nil;
+                    return new Unit(Value.Nil);
             }
             functions.Add(new ValIntrinsic("read", read, 0));
 
             //////////////////////////////////////////////////////
-            Value count(VM vm)
+            Unit count(VM vm)
             {
-                ValTable this_table = (ValTable)vm.StackPeek(0);
+                ValTable this_table = (ValTable)vm.StackPeek(0).value;
                 int count = this_table.Count;
-                return new ValNumber(count);
+                return new Unit(count);
             }
             functions.Add(new ValIntrinsic("count_all", count, 1));
 
             //////////////////////////////////////////////////////
-            Value type(VM vm)
+            Unit type(VM vm)
             {
-                Type this_type = vm.StackPeek(0).GetType();
-                return new ValString(this_type.ToString());
+                Type this_type = vm.StackPeek(0).Type();
+                return new Unit(new ValString(this_type.ToString()));
             }
             functions.Add(new ValIntrinsic("type", type, 1));
 
             //////////////////////////////////////////////////////
-            Value maybe(VM vm)
+            Unit maybe(VM vm)
             {
-                Value first = vm.StackPeek(0);
-                Value second = vm.StackPeek(1);
-                if (first.GetType() != typeof(ValNil))
+                Unit first = vm.StackPeek(0);
+                Unit second = vm.StackPeek(1);
+                if (first.Type() != typeof(ValNil))
                     return first;
                 else
                     return second;
@@ -983,9 +982,9 @@ namespace lightning
             functions.Add(new ValIntrinsic("maybe", maybe, 2));
 
             //////////////////////////////////////////////////////
-            Value stats(VM vm)
+            Unit stats(VM vm)
             {
-                return new ValString(vm.Stats());
+                return new Unit(new ValString(vm.Stats()));
             }
             functions.Add(new ValIntrinsic("stats", stats, 0));
 
@@ -1036,7 +1035,7 @@ namespace lightning
             }
         }
 
-        static ValModule MakeModule(Value this_value, string name, VM importing_vm, VM imported_vm)
+        static ValModule MakeModule(Unit this_value, string name, VM importing_vm, VM imported_vm)
         {
             Dictionary<Operand, Operand> relocated_modules = new Dictionary<Operand, Operand>();
             foreach (ValModule m in imported_vm.modules)
@@ -1070,10 +1069,9 @@ namespace lightning
                 module,
                 (Operand)module_index);
 
-            if (this_value.GetType() == typeof(ValFunction)) RelocateFunction((ValFunction)this_value, relocationInfo);
-            else if (this_value.GetType() == typeof(ValClosure)) RelocateClosure((ValClosure)this_value, relocationInfo);
-            else if (this_value.GetType() == typeof(ValTable)) FindFunction((ValTable)this_value, relocationInfo);
-
+            if (this_value.Type() == typeof(ValFunction)) RelocateFunction((ValFunction)this_value.value, relocationInfo);
+            else if (this_value.Type() == typeof(ValClosure)) RelocateClosure((ValClosure)this_value.value, relocationInfo);
+            else if (this_value.Type() == typeof(ValTable)) FindFunction((ValTable)this_value.value, relocationInfo);
 
             return module;
         }
@@ -1083,11 +1081,11 @@ namespace lightning
             if (!relocationInfo.relocatedTables.Contains(table.GetHashCode()))
             {
                 relocationInfo.relocatedTables.Add(table.GetHashCode());
-                foreach (KeyValuePair<ValString, Value> entry in table.table)
+                foreach (KeyValuePair<ValString, Unit> entry in table.table)
                 {
-                    if (entry.Value.GetType() == typeof(ValFunction)) RelocateFunction((ValFunction)entry.Value, relocationInfo);
-                    else if (entry.Value.GetType() == typeof(ValClosure)) RelocateClosure((ValClosure)entry.Value, relocationInfo);
-                    else if (entry.Value.GetType() == typeof(ValTable)) FindFunction((ValTable)entry.Value, relocationInfo);
+                    if (entry.Value.Type() == typeof(ValFunction)) RelocateFunction((ValFunction)entry.Value.value, relocationInfo);
+                    else if (entry.Value.Type() == typeof(ValClosure)) RelocateClosure((ValClosure)entry.Value.value, relocationInfo);
+                    else if (entry.Value.Type() == typeof(ValTable)) FindFunction((ValTable)entry.Value.value, relocationInfo);
 
                     relocationInfo.module.TableSet(entry.Key, entry.Value);
                 }
@@ -1098,13 +1096,13 @@ namespace lightning
         {
             foreach (ValUpValue v in closure.upValues)
             {
-                if (v.Val.GetType() == typeof(ValClosure)/* && relocationInfo.module.name != closure.function.module*/)
+                if (v.Val.Type() == typeof(ValClosure)/* && relocationInfo.module.name != closure.function.module*/)
                 {
-                    RelocateClosure((ValClosure)v.Val, relocationInfo);
+                    RelocateClosure((ValClosure)v.Val.value, relocationInfo);
                 }
-                else if (v.Val.GetType() == typeof(ValFunction)/* && relocationInfo.module.name != closure.function.module*/)
+                else if (v.Val.Type() == typeof(ValFunction)/* && relocationInfo.module.name != closure.function.module*/)
                 {
-                    RelocateFunction((ValFunction)v.Val, relocationInfo);
+                    RelocateFunction((ValFunction)v.Val.value, relocationInfo);
                 }
             }
 
@@ -1118,23 +1116,23 @@ namespace lightning
 
             for (Operand i = 0; i < relocationInfo.toBeRelocatedGlobals.Count; i++)
             {
-                Value new_value = relocationInfo.importedVM.GetGlobal(relocationInfo.toBeRelocatedGlobals[i]);
+                Unit new_value = relocationInfo.importedVM.GetGlobal(relocationInfo.toBeRelocatedGlobals[i]);
 
                 relocationInfo.module.globals.Add(new_value);
                 relocationInfo.relocatedGlobals.Add(relocationInfo.toBeRelocatedGlobals[i], (Operand)(relocationInfo.module.globals.Count - 1));
 
-                if (new_value.GetType() == typeof(ValTable)) relocation_stack.Add((ValTable)new_value);
+                if (new_value.Type() == typeof(ValTable)) relocation_stack.Add((ValTable)new_value.value);
             }
             relocationInfo.toBeRelocatedGlobals.Clear();
 
             for (Operand i = 0; i < relocationInfo.toBeRelocatedConstants.Count; i++)
             {
-                Value new_value = relocationInfo.importedVM.GetChunk().GetConstant(relocationInfo.toBeRelocatedConstants[i]);
+                Unit new_value = relocationInfo.importedVM.GetChunk().GetConstant(relocationInfo.toBeRelocatedConstants[i]);
 
                 relocationInfo.module.constants.Add(new_value);
                 relocationInfo.relocatedConstants.Add(relocationInfo.toBeRelocatedConstants[i], (Operand)(relocationInfo.module.constants.Count - 1));
 
-                if (new_value.GetType() == typeof(ValTable)) relocation_stack.Add((ValTable)new_value);
+                if (new_value.Type() == typeof(ValTable)) relocation_stack.Add((ValTable)new_value.value);
             }
             relocationInfo.toBeRelocatedConstants.Clear();
 
@@ -1201,7 +1199,7 @@ namespace lightning
                 }
                 else if (next.opCode == OpCode.FUNDCL)
                 {
-                    Value this_value = relocationInfo.importedVM.GetChunk().GetConstant(next.opC);
+                    Unit this_value = relocationInfo.importedVM.GetChunk().GetConstant(next.opC);
                     if (relocationInfo.importingVM.GetChunk().GetConstants().Contains(this_value))
                     {
                         next.opC = (Operand)relocationInfo.importingVM.GetChunk().GetConstants().IndexOf(this_value);
@@ -1210,7 +1208,7 @@ namespace lightning
                     {
                         relocationInfo.importingVM.GetChunk().GetConstants().Add(this_value);
                         next.opC = (Operand)(relocationInfo.importingVM.GetChunk().GetConstants().Count - 1);
-                        RelocateChunk(((ValClosure)this_value).function, relocationInfo);
+                        RelocateChunk(((ValClosure)this_value.value).function, relocationInfo);
                     }
                 }
                 else if (next.opCode == OpCode.LOADGI)
@@ -1265,11 +1263,11 @@ namespace lightning
         }
         static void ImportModule(ValModule module, Operand new_index)
         {
-            foreach (KeyValuePair<ValString, Value> entry in module.table)
+            foreach (KeyValuePair<ValString, Unit> entry in module.table)
             {
-                if (entry.Value.GetType() == typeof(ValFunction))
+                if (entry.Value.Type() == typeof(ValFunction))
                 {
-                    ValFunction function = (ValFunction)entry.Value;
+                    ValFunction function = (ValFunction)entry.Value.value;
                     for (Operand i = 0; i < function.body.Count; i++)
                     {
                         Instruction next = function.body[i];

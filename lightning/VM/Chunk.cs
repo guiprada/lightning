@@ -106,8 +106,8 @@ namespace lightning
         LOADINTR,
         LOADNIL,
         LOADTRUE,
-        LOADFALSE,        
-        
+        LOADFALSE,
+
         GLOBALDCL,
         VARDCL,
         FUNDCL,
@@ -179,7 +179,7 @@ namespace lightning
         //}
 
         List<Instruction> program;
-        List<Value> constants;
+        List<Unit> constants;
         Dictionary<uint, uint> lines;
         public Library Prelude { get; private set; }
 
@@ -200,17 +200,17 @@ namespace lightning
         {
             program = new List<Instruction>();
             lines = new Dictionary<uint, uint>();
-            constants = new List<Value>();
-            Prelude = p_prelude;        
+            constants = new List<Unit>();
+            Prelude = p_prelude;
         }
 
         public void Print()
         {
 
             int constant_counter = 0;
-            foreach (Value v in constants)
+            foreach (Unit v in constants)
             {
-                if(v.GetType() == typeof(ValString))
+                if(v.Type() == typeof(ValString))
                     Console.WriteLine("Constant: " + constant_counter.ToString() + " \"" + v.ToString() + "\"");
                 else
                     Console.WriteLine("Constant: "+ constant_counter.ToString() + " " + v.ToString());
@@ -236,7 +236,7 @@ namespace lightning
             Console.Write(instruction.ToString());
         }
  
-        public ushort AddConstant(Value value)
+        public ushort AddConstant(Unit value)
         {
             constants.Add(value);
             return (ushort)(constants.Count -1);
@@ -250,8 +250,8 @@ namespace lightning
         }
 
         public void WriteInstruction(Instruction instruction)
-        {            
-            program.Add(instruction);            
+        {
+            program.Add(instruction);
         }
 
         void AddLine(uint line)
@@ -281,27 +281,27 @@ namespace lightning
 
         public Instruction ReadInstruction(Operand address)
         {
-           return program[address];           
+           return program[address];
         }
 
-        public Value GetConstant(Operand address)
+        public Unit GetConstant(Operand address)
         {
             return constants[address];
         }
 
-        public List<Value> GetConstants()
+        public List<Unit> GetConstants()
         {
             return constants;
         }
 
         public Value GetFunction(string name)
         {
-            foreach(Value v in constants)
+            foreach(Unit v in constants)
             {
-                if(v.GetType() == typeof(ValFunction))
-                    if((v as ValFunction).name == name)
+                if(v.Type() == typeof(ValFunction))
+                    if( ((ValFunction)(v.value)).name == name)
                     {
-                        return v as ValFunction;
+                        return (ValFunction)(v.value);
                     }
             }
             foreach (ValIntrinsic v in Prelude.intrinsics)
@@ -334,7 +334,7 @@ namespace lightning
                 opC ??= old_instruction.opC);
         }
 
-        public void SwapConstant(int address, Value new_value)
+        public void SwapConstant(int address, Unit new_value)
         {
             constants[address] = new_value;
         }        

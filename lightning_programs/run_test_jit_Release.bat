@@ -1,0 +1,1 @@
+..\lightning_interpreter\bin\Release\netcoreapp3.1\lightning_interpreter.exe .\test.ltn

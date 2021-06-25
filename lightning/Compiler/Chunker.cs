@@ -942,7 +942,7 @@ namespace lightning
                     new_upvalues.Add(new ValUpValue((Operand)v.address, (Operand)v.envIndex));
                 }
                 ValClosure new_closure = new ValClosure(new_function, new_upvalues);
-                code.SwapConstant(this_address, new_closure);
+                code.SwapConstant(this_address, new Unit(new_closure));
             }
             else
             {
@@ -1069,9 +1069,9 @@ namespace lightning
             {
                 constants.Add(p_string);
                 if (p_string == "Nil")
-                    code.AddConstant(Value.Nil);
+                    code.AddConstant(new Unit(Value.Nil));
                 else
-                    code.AddConstant(new ValString(p_string));
+                    code.AddConstant(new Unit(new ValString(p_string)));
 
                 return constants.Count - 1;
             }
@@ -1086,7 +1086,7 @@ namespace lightning
             else
             {
                 constants.Add(p_number);
-                code.AddConstant(new ValNumber(p_number));
+                code.AddConstant(new Unit(p_number));
                 return constants.Count - 1;
             }
         }
@@ -1108,7 +1108,7 @@ namespace lightning
         int AddConstant(ValFunction new_function)
         {
             constants.Add(new_function);
-            code.AddConstant(new_function);
+            code.AddConstant(new Unit(new_function));
             return constants.Count - 1;
         }
 

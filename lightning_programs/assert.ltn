@@ -10,7 +10,7 @@ lib.assert =
     }
 lib.assert_not =
     function (value1, value2, msg){
-        if(value1 == value2){            
+        if(value1 == value2){
             write_line(lib.header .. msg)
             return true
         }
