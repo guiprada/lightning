@@ -123,6 +123,19 @@ namespace lightning
             vmPool = new Stack<VM>();
         }
 
+        void ResoursesTrim(){
+            upValuesRegistry.TrimExcess();
+            variables.TrimExcess();
+            upValues.TrimExcess();
+        }
+        void ReleaseVMs(int count){
+            for (int i = 0; i < count; i++)
+                if (vmPool.Count > 0)
+                    vmPool.Pop();
+        }
+        void ReleaseVMs(){
+            vmPool.Clear();
+        }
         void RecycleVM(VM vm)
         {
             vmPool.Push(vm);
@@ -241,9 +254,6 @@ namespace lightning
             variables.RemoveRange(this_basePointer, variables.Count - this_basePointer);
             upValuesRegistry.RemoveRange(upvalues_start, upValuesRegistry.Count - upvalues_start);
 #endif
-            for (int i = 0; i < (vmPool.Count * 0.05 + 1); i++)
-                if (vmPool.Count > 0)
-                    vmPool.Pop();
         }
 
         void EnvSet(int target_env)
