@@ -544,7 +544,6 @@ var counter = 0
     {
         assert(table1[i].x, 1, "Failed Foreach Test " .. i .. ".")
     }
-    write_line(counter)
     assert(counter, 100, "Failed Global Lock Test 1.")
 
     table1 = []

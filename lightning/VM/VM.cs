@@ -169,11 +169,6 @@ namespace lightning
 
         public Unit GetGlobal(Operand address)
         {
-            // Unit global;
-            // lock(globals){
-            //     global = globals[address];
-            // }
-            // return global;
             return globals[address];
         }
 
@@ -376,9 +371,7 @@ namespace lightning
                             IP++;
                             Operand address = instruction.opA;
                             Unit global;
-                            lock(globals){
-                                global = globals[address];
-                            }
+                            global = globals[address];
                             StackPush(global);
                             break;
                         }
@@ -471,9 +464,7 @@ namespace lightning
                                 if (lambda == 0)
                                     if (env == 0)// Global
                                     {
-                                        lock(globals){
-                                            globals.Add(this_callable);
-                                        }
+                                        globals.Add(this_callable);
                                     }
                                     else
                                     {
@@ -514,9 +505,7 @@ namespace lightning
                                 if (lambda == 0)
                                     if (env == 0)// yes they exist!
                                     {
-                                        lock(globals){
-                                            globals.Add(new_closure_unit);
-                                        }
+                                        globals.Add(new_closure_unit);
                                     }
                                     else
                                     {
