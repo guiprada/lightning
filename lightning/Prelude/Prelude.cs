@@ -989,6 +989,31 @@ namespace lightning
             functions.Add(new ValIntrinsic("stats", stats, 0));
 
             //////////////////////////////////////////////////////
+            Unit resourcesTrim(VM vm)
+            {
+                vm.ResoursesTrim();
+                return new Unit(Value.Nil);
+            }
+            functions.Add(new ValIntrinsic("trim", resourcesTrim, 0));
+
+            //////////////////////////////////////////////////////
+            Unit releaseAllVMs(VM vm)
+            {
+                vm.ReleaseVMs();
+                return new Unit(Value.Nil);
+            }
+            functions.Add(new ValIntrinsic("release_all_vms", releaseAllVMs, 0));
+
+            //////////////////////////////////////////////////////
+            Unit releaseVMs(VM vm)
+            {
+                Unit count = vm.StackPeek(0);
+                vm.ReleaseVMs((int)count.number);
+                return new Unit(Value.Nil);
+            }
+            functions.Add(new ValIntrinsic("release_vms", releaseVMs, 1));
+
+            //////////////////////////////////////////////////////
 
             Library prelude = new Library(functions, tables);
 

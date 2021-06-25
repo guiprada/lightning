@@ -123,17 +123,17 @@ namespace lightning
             vmPool = new Stack<VM>();
         }
 
-        void ResoursesTrim(){
+        public void ResoursesTrim(){
             upValuesRegistry.TrimExcess();
             variables.TrimExcess();
             upValues.TrimExcess();
         }
-        void ReleaseVMs(int count){
+        public void ReleaseVMs(int count){
             for (int i = 0; i < count; i++)
                 if (vmPool.Count > 0)
                     vmPool.Pop();
         }
-        void ReleaseVMs(){
+        public void ReleaseVMs(){
             vmPool.Clear();
         }
         void RecycleVM(VM vm)
@@ -169,6 +169,11 @@ namespace lightning
 
         public Unit GetGlobal(Operand address)
         {
+            // Unit global;
+            // lock(globals){
+            //     global = globals[address];
+            // }
+            // return global;
             return globals[address];
         }
 
@@ -370,7 +375,10 @@ namespace lightning
                         {
                             IP++;
                             Operand address = instruction.opA;
-                            Unit global = globals[address];
+                            Unit global;
+                            lock(globals){
+                                global = globals[address];
+                            }
                             StackPush(global);
                             break;
                         }
@@ -447,8 +455,8 @@ namespace lightning
                         {
                             IP++;
                             Unit new_value = StackPop();
-
                             globals.Add(new_value);
+
                             break;
                         }
                     case OpCode.FUNDCL:
@@ -463,7 +471,9 @@ namespace lightning
                                 if (lambda == 0)
                                     if (env == 0)// Global
                                     {
-                                        globals.Add(this_callable);
+                                        lock(globals){
+                                            globals.Add(this_callable);
+                                        }
                                     }
                                     else
                                     {
@@ -504,7 +514,9 @@ namespace lightning
                                 if (lambda == 0)
                                     if (env == 0)// yes they exist!
                                     {
-                                        globals.Add(new_closure_unit);
+                                        lock(globals){
+                                            globals.Add(new_closure_unit);
+                                        }
                                     }
                                     else
                                     {
@@ -559,23 +571,26 @@ namespace lightning
                             Unit new_value = StackPeek();
                             if (op == 0)
                             {
-                                lock(globals[address].value){
+                                lock(globals){
                                     globals[address] = new_value;
                                 }
                             }
                             else
                             {
-                                Unit old_value = globals[address];
-                                Number result = 0;
-                                if (op == 1)
-                                    result = old_value.number + new_value.number;
-                                else if (op == 2)
-                                    result = old_value.number - new_value.number;
-                                else if (op == 3)
-                                    result = old_value.number * new_value.number;
-                                else if (op == 4)
-                                    result = old_value.number / new_value.number;
-                                lock(globals[address].value){
+                                Unit old_value;
+                                lock(globals){
+                                    old_value = globals[address];
+                                
+                                    Number result = 0;
+                                    if (op == 1)
+                                        result = old_value.number + new_value.number;
+                                    else if (op == 2)
+                                        result = old_value.number - new_value.number;
+                                    else if (op == 3)
+                                        result = old_value.number * new_value.number;
+                                    else if (op == 4)
+                                        result = old_value.number / new_value.number;
+
                                     globals[address] = new Unit(result);
                                 }
                             }
