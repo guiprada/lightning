@@ -1,5 +1,8 @@
 ﻿todo
-
+	- Add Release VMs and ResourcesTrim to prelude.
+	- Move Env out of VM.
+	- Thread execution.
+	- Code Cleanup
 	- add loading Value.Nil for missing parameters on function call, emit a warning
 	- elide more stuff on parser
 	- parser generators and combinators 

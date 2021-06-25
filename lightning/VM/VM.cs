@@ -238,22 +238,8 @@ namespace lightning
             variablesBasesTop--;
             variablesTop = this_basePointer;
 
-#if SLOW_RESOURCES_RELEASE
-            // Returning Resources, slowly :)
-            if (this_basePointer < (variables.Count * 0.5))
-            {
-                int medium = (this_basePointer + variables.Count) / 2;
-                variables.RemoveRange(medium, variables.Count - medium);
-            }
-            if (upvalues_start < (upValuesRegistry.Count * 0.5))
-            {
-                int medium = (upvalues_start + upValuesRegistry.Count) / 2;
-                upValuesRegistry.RemoveRange(medium, upValuesRegistry.Count - medium);
-            }
-#else
             variables.RemoveRange(this_basePointer, variables.Count - this_basePointer);
             upValuesRegistry.RemoveRange(upvalues_start, upValuesRegistry.Count - upvalues_start);
-#endif
         }
 
         void EnvSet(int target_env)
@@ -274,15 +260,8 @@ namespace lightning
         {
             int this_UpvaluesBase = upValuesBases[upValuesBasesTop - 1];
             upValuesBasesTop--;
-#if SLOW_RESOURCES_RELEASE
-            if (this_UpvaluesBase < (upValues.Count * 0.5))
-            {
-                int medium = (this_UpvaluesBase + upValues.Count) / 2;
-                upValues.RemoveRange(medium, upValues.Count - medium);
-            }
-#else
+
             upValues.RemoveRange(this_UpvaluesBase, upValues.Count - this_UpvaluesBase);
-#endif
         }
 
         ValUpValue UpValuesAt(int address)
