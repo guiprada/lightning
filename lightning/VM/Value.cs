@@ -18,18 +18,43 @@ namespace lightning
         Value
     }
     public struct Unit{
-        public Value value;
-        public Number number;
+        public object content;
         public UnitType type;
+
+        public Number number{
+            get{
+#if DEBUG
+                if(type == UnitType.Number)
+                    return (Number)content;
+                else
+                    throw new Exception("Tried to get a Number from a UnitType.Value!");
+#else
+                return (Number)content;
+#endif
+            }
+        }
+
+        public Value value{
+            get{
+#if DEBUG
+                if(type == UnitType.Value)
+                    return (Value)content;
+                else
+                    throw new Exception("Tried to get a Value from a UnitType.Number!");
+#else
+                return (Value)content;
+#endif
+            }
+        }
 
         public Unit(Value p_value) : this()
         {
-            value = p_value;
+            content = p_value;
             type = UnitType.Value;
         }
         public Unit(Number p_number) : this()
         {
-            number = p_number;
+            content = p_number;
             type = UnitType.Number;
         }
 
@@ -37,16 +62,16 @@ namespace lightning
             if (type == UnitType.Number){
                 return typeof(Number);
             }else{
-                return value.GetType();
+                return content.GetType();
             }
         }
 
         public override string ToString()
         {
             if (type == UnitType.Number){
-                return number.ToString();
+                return content.ToString();
             }else{
-                return value.ToString();
+                return content.ToString();
             }
         }
 
@@ -385,10 +410,7 @@ namespace lightning
             get
             {
                 if (isCaptured)
-                {
-                    //Console.WriteLine("get " + val);
                     return val;
-                }
                 else
                 {
                     int this_BP = variablesBases[env];
@@ -398,17 +420,11 @@ namespace lightning
             set
             {
                 if (isCaptured)
-                {
-                    //Console.WriteLine("captured received " + value);
                     val = value;
-                    //Console.WriteLine("set to " +  val);
-                }
                 else
                 {
-                    //Console.WriteLine("not captured received " + value);
                     int this_BP = variablesBases[env];
                     variables[this_BP + address] = value;
-                    //Console.WriteLine("set to " + Val);
                 }
             }
         }

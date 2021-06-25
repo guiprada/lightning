@@ -225,22 +225,22 @@ namespace lightning
             variablesBasesTop--;
             variablesTop = this_basePointer;
 
+#if SLOW_RESOURCES_RELEASE
             // Returning Resources, slowly :)
-
-            if (this_basePointer < (variables.Count * 0.25))
+            if (this_basePointer < (variables.Count * 0.5))
             {
                 int medium = (this_basePointer + variables.Count) / 2;
                 variables.RemoveRange(medium, variables.Count - medium);
             }
-            //variables.RemoveRange(this_basePointer, variables.Count - this_basePointer);
-
-            if (upvalues_start < (upValuesRegistry.Count * 0.25))
+            if (upvalues_start < (upValuesRegistry.Count * 0.5))
             {
                 int medium = (upvalues_start + upValuesRegistry.Count) / 2;
                 upValuesRegistry.RemoveRange(medium, upValuesRegistry.Count - medium);
             }
-            //upValuesRegistry.RemoveRange(upvalues_start, upValuesRegistry.Count - upvalues_start);
-
+#else
+            variables.RemoveRange(this_basePointer, variables.Count - this_basePointer);
+            upValuesRegistry.RemoveRange(upvalues_start, upValuesRegistry.Count - upvalues_start);
+#endif
             for (int i = 0; i < (vmPool.Count * 0.05 + 1); i++)
                 if (vmPool.Count > 0)
                     vmPool.Pop();
@@ -264,12 +264,15 @@ namespace lightning
         {
             int this_UpvaluesBase = upValuesBases[upValuesBasesTop - 1];
             upValuesBasesTop--;
-            if (this_UpvaluesBase < (upValues.Count * 0.25))
+#if SLOW_RESOURCES_RELEASE
+            if (this_UpvaluesBase < (upValues.Count * 0.5))
             {
                 int medium = (this_UpvaluesBase + upValues.Count) / 2;
                 upValues.RemoveRange(medium, upValues.Count - medium);
             }
-            //upValues.RemoveRange(this_UpvaluesBase, upValues.Count - this_UpvaluesBase);
+#else
+            upValues.RemoveRange(this_UpvaluesBase, upValues.Count - this_UpvaluesBase);
+#endif
         }
 
         ValUpValue UpValuesAt(int address)
@@ -468,7 +471,6 @@ namespace lightning
                             Unit this_callable = chunk.GetConstant(new_fun_address);
                             if (this_callable.Type() == typeof(ValFunction))
                             {
-                                //ValFunction this_function = (ValFunction)(this_callable.value);
                                 if (lambda == 0)
                                     if (env == 0)// Global
                                     {
@@ -492,7 +494,6 @@ namespace lightning
                             }
                             else
                             {
-                                //Console.WriteLine(this_callable);
                                 ValClosure this_closure = (ValClosure)(this_callable.value);
 
                                 // new upvalues
@@ -501,7 +502,6 @@ namespace lightning
                                 {
                                     // here we convert env from shift based to absolute based
                                     ValUpValue new_upvalue = new ValUpValue(u.address, (Operand)(variablesBasesTop - u.env));
-                                    //VarAt(u.address, (Operand)(variablesBasesTop -u.env)).references++;
                                     new_upValues.Add(new_upvalue);
                                 }
                                 ValClosure new_closure = new ValClosure(this_closure.function, new_upValues);
@@ -1105,7 +1105,7 @@ namespace lightning
                             {
                                 ret[ret_count] = IP;// add return address to stack
                                 ret_count += 1;
-                                funCallEnv[executingInstructions + 1] = variablesBasesTop - 1;// sets the return env to funclose/closureclose                                
+                                funCallEnv[executingInstructions + 1] = variablesBasesTop - 1;// sets the return env to funclose/closureclose
                                 ValFunction this_func = (ValFunction)this_callable.value;
                                 instructionsStack[executingInstructions + 1] = this_func.body;
                                 functionCallStack[executingInstructions + 1] = this_func;
@@ -1116,7 +1116,7 @@ namespace lightning
                             {
                                 ret[ret_count] = IP;// add return address to stack
                                 ret_count += 1;
-                                funCallEnv[executingInstructions + 1] = variablesBasesTop - 1;// sets the return env to funclose/closureclose 
+                                funCallEnv[executingInstructions + 1] = variablesBasesTop - 1;// sets the return env to funclose/closureclose
 
                                 ValClosure this_closure = (ValClosure)this_callable.value;
                                 UpValuesPush();
@@ -1134,7 +1134,6 @@ namespace lightning
                             {
                                 ValIntrinsic this_intrinsic = (ValIntrinsic)this_callable.value;
                                 Unit result = this_intrinsic.function(this);
-                                //stack.RemoveRange(stack.Count - this_intrinsic.arity, this_intrinsic.arity);
                                 stackTop -= this_intrinsic.arity;
                                 StackPush(result);
                             }
@@ -1287,7 +1286,6 @@ namespace lightning
             {
                 statsValue += "Upvalues empty :)\n";
             }
-
             return statsValue;
         }
     }
