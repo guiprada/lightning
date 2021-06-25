@@ -523,7 +523,6 @@ function clear_errors()
         assert(table1[i], i, "Failed Range Test " .. i .. ".")
     }
 }
-var counter = 0
 {
     // Testing foreach
     var table1 = []
@@ -537,14 +536,12 @@ var counter = 0
     {
         collection[index] = []
         collection[index].x = 1
-        counter++;
     }
     foreach(table1, many)
     for (var i = 0; i< 100; i++)
     {
         assert(table1[i].x, 1, "Failed Foreach Test " .. i .. ".")
     }
-    assert(counter, 100, "Failed Global Lock Test 1.")
 
     table1 = []
     table1[99] = nil
@@ -568,6 +565,38 @@ var counter = 0
     {
         assert(table1[i], 100 - i, "Failed Foreach Test " .. (99+i) .. ".")
     }
+}
+// Testing Global Lock
+var global_lock_test_counter = 0
+{
+    var n = 1000
+    function many(index, collection)
+    {
+        global_lock_test_counter++;
+    }
+    range(n, [], many)
+    assert(global_lock_test_counter, n, "Failed Global Lock Test 1.")
+}
+{
+    // Testing UpValue Lock
+    var n = 1000
+    var upvalue_lock_test_counter
+    function many(index, collection)
+    {
+        upvalue_lock_test_counter++;
+    }
+    range(n, [], many)
+    assert(upvalue_lock_test_counter, n, "Failed UpValue Lock Test 1.")
+}
+{
+    // Testing VMs management
+    var totalVMs = count_vms()
+    var halth = math.idiv(totalVMs, 2)
+    release_vms(halth)
+    assert(count_vms(), totalVMs - halth, "Failed VMs management Test 1.")
+
+    release_all_vms()
+    assert(count_vms(), 0, "Failed VMs management Test 0.")
 }
 {
     // Testing increment and decrement
@@ -653,8 +682,7 @@ var counter = 0
     }
 }
 trim()
-release_vms(5)
-release_all_vms()
+
 var end_time = time.now()
 write_line("-- Finished tests! --")
 if (count_errors() == 0){

@@ -68,7 +68,7 @@ namespace lightning
         Stack<VM> vmPool;
         int function_deepness;
 
-        public VM(Chunk p_chunk, int p_function_deepness = 25)
+        public VM(Chunk p_chunk, int p_function_deepness = 25, List<Unit> p_globals = null)
         {
             chunk = p_chunk;
             function_deepness = p_function_deepness;
@@ -80,7 +80,7 @@ namespace lightning
 
             stack = new Unit[3 * function_deepness];
             stackTop = 0;
-            globals = new List<Unit>();
+            globals = p_globals ?? new List<Unit>();
             variables = new List<Unit>();
             variablesTop = 0;
 
@@ -107,14 +107,16 @@ namespace lightning
             stashTop = 0;
             IP = 0;
 
-            Intrinsics = chunk.Prelude.intrinsics;
-            foreach (ValIntrinsic v in Intrinsics)
-            {
-                globals.Add(new Unit(v));
-            }
-            foreach (KeyValuePair<string, ValTable> entry in chunk.Prelude.tables)
-            {
-                globals.Add(new Unit(entry.Value));
+            if(p_globals == null){
+                Intrinsics = chunk.Prelude.intrinsics;
+                foreach (ValIntrinsic v in Intrinsics)
+                {
+                    globals.Add(new Unit(v));
+                }
+                foreach (KeyValuePair<string, ValTable> entry in chunk.Prelude.tables)
+                {
+                    globals.Add(new Unit(entry.Value));
+                }
             }
 
             loadedModules = new Dictionary<string, int>();
@@ -132,9 +134,15 @@ namespace lightning
             for (int i = 0; i < count; i++)
                 if (vmPool.Count > 0)
                     vmPool.Pop();
+                vmPool.TrimExcess();
         }
         public void ReleaseVMs(){
             vmPool.Clear();
+            vmPool.TrimExcess();
+        }
+
+        public int CountVMs(){
+            return vmPool.Count;
         }
         void RecycleVM(VM vm)
         {
@@ -149,8 +157,7 @@ namespace lightning
             }
             else
             {
-                VM new_vm = new VM(chunk, function_deepness);
-                new_vm.globals = globals;
+                VM new_vm = new VM(chunk, function_deepness, globals);
                 return new_vm;
             }
         }
@@ -594,21 +601,25 @@ namespace lightning
                             Unit new_value = StackPeek();
                             if (op == 0)
                             {
-                                this_upValue.Val = new_value;
+                                lock(this_upValue){
+                                    this_upValue.Val = new_value;
+                                }
                             }
                             else
                             {
-                                Unit old_value = this_upValue.Val;
-                                Number result = 0;
-                                if (op == 1)
-                                    result = old_value.number + new_value.number;
-                                else if (op == 2)
-                                    result = old_value.number - new_value.number;
-                                else if (op == 3)
-                                    result = old_value.number * new_value.number;
-                                else if (op == 4)
-                                    result = old_value.number / new_value.number;
-                                this_upValue.Val = new Unit(result);
+                                lock(this_upValue){
+                                    Unit old_value = this_upValue.Val;
+                                    Number result = 0;
+                                    if (op == 1)
+                                        result = old_value.number + new_value.number;
+                                    else if (op == 2)
+                                        result = old_value.number - new_value.number;
+                                    else if (op == 3)
+                                        result = old_value.number * new_value.number;
+                                    else if (op == 4)
+                                        result = old_value.number / new_value.number;
+                                    this_upValue.Val = new Unit(result);
+                                }
                             }
                             break;
                         }
@@ -1283,6 +1294,8 @@ namespace lightning
             {
                 statsValue += "Upvalues empty :)\n";
             }
+
+            statsValue += "vmPool count: " + vmPool.Count + "\n";
             return statsValue;
         }
     }

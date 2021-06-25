@@ -1,6 +1,4 @@
 ﻿todo
-	- Add Release VMs and ResourcesTrim to prelude.
-	- Global lock tests.
 	- Move Env out of VM.
 	- Coroutines.
 	- Code Cleanup
@@ -81,17 +79,6 @@ done
 	- read intrinsic
 	- char at intrinsic
 	- string slice intrincic
+	- Add Release VMs and ResourcesTrim to prelude.
+	- Global lock tests.
 
---
-where do we create references
-	-create
-	-assign
-	-put on stack
-	-create table
-	-assign table
-
-where do we destroy references
-	-assign
-	-pop off stack
-	-assign table
-	-intrinsics return( we pop the stack off manually)

@@ -138,13 +138,13 @@
 		{
 			"captures": {
 				"1": {
-					"name": "keyword.control.goto.lightning"
+					"name": "keyword.control.var.lightning"
 				},
 				"2": {
 					"name": "constant.other.placeholder.lightning"
 				}
 			},
-			"match": "\\b(goto)\\s+([a-zA-Z_][a-zA-Z0-9_]*)"
+			"match": "\\b(var)\\s+([a-zA-Z_][a-zA-Z0-9_]*)"
 		},
 		{
 			"captures": {
@@ -163,7 +163,7 @@
 			"name": "keyword.control.lightning"
 		},
 		{
-			"match": "(?<![^.]\\.|:)\\b(false|null|true|_G|_VERSION|math\\.(pi|huge))\\b|(?<![.])\\.{3}(?!\\.)",
+			"match": "(?<![^.]\\.|:)\\b(false|nil|true|var|math\\.(pi|e))\\b|(?<![.])\\.{3}(?!\\.)",
 			"name": "constant.language.lightning"
 		},
 		{

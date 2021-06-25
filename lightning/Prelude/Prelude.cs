@@ -1014,6 +1014,13 @@ namespace lightning
             functions.Add(new ValIntrinsic("release_vms", releaseVMs, 1));
 
             //////////////////////////////////////////////////////
+            Unit countVMs(VM vm)
+            {
+                return new Unit(vm.CountVMs());
+            }
+            functions.Add(new ValIntrinsic("count_vms", countVMs, 0));
+
+            //////////////////////////////////////////////////////
 
             Library prelude = new Library(functions, tables);
 
