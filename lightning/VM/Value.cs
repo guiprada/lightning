@@ -18,43 +18,18 @@ namespace lightning
         Value
     }
     public struct Unit{
-        public object content;
+        public Number number;
+        public Value value;
         public UnitType type;
-
-        public Number number{
-            get{
-#if DEBUG
-                if(type == UnitType.Number)
-                    return (Number)content;
-                else
-                    throw new Exception("Tried to get a Number from a UnitType.Value!");
-#else
-                return (Number)content;
-#endif
-            }
-        }
-
-        public Value value{
-            get{
-#if DEBUG
-                if(type == UnitType.Value)
-                    return (Value)content;
-                else
-                    throw new Exception("Tried to get a Value from a UnitType.Number!");
-#else
-                return (Value)content;
-#endif
-            }
-        }
 
         public Unit(Value p_value) : this()
         {
-            content = p_value;
+            value = p_value;
             type = UnitType.Value;
         }
         public Unit(Number p_number) : this()
         {
-            content = p_number;
+            number = p_number;
             type = UnitType.Number;
         }
 
@@ -62,16 +37,16 @@ namespace lightning
             if (type == UnitType.Number){
                 return typeof(Number);
             }else{
-                return content.GetType();
+                return value.GetType();
             }
         }
 
         public override string ToString()
         {
             if (type == UnitType.Number){
-                return content.ToString();
+                return number.ToString();
             }else{
-                return content.ToString();
+                return value.ToString();
             }
         }
 

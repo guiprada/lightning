@@ -570,7 +570,9 @@ namespace lightning
                             Unit new_value = StackPeek();
                             if (op == 0)
                             {
-                                globals[address] = new_value;
+                                lock(globals[address].value){
+                                    globals[address] = new_value;
+                                }
                             }
                             else
                             {
@@ -584,7 +586,9 @@ namespace lightning
                                     result = old_value.number * new_value.number;
                                 else if (op == 4)
                                     result = old_value.number / new_value.number;
-                                globals[address] = new Unit(result);
+                                lock(globals[address].value){
+                                    globals[address] = new Unit(result);
+                                }
                             }
                             break;
                         }
