@@ -39,8 +39,8 @@ function clear_errors()
 
     lib_assert.header = "ERROR: "
 
-    assert(nil, nil, "Failed nil sanity check 1.")
-    assert_not(1, nil, "Failed nil sanity check 2.")
+    assert(null, null, "Failed null sanity check 1.")
+    assert_not(1, null, "Failed null sanity check 2.")
     assert(true, true, "Failed true sanity check 3.")
     assert(false, false, "Failed false sanity check 4.")
     assert_not(true, false, "Failed boolean sanity check 5.")
@@ -89,7 +89,7 @@ function clear_errors()
     this_array[0] = 100
     this_array[99] = 0
     assert(this_array[0], 100, "Failed Array test 1.")
-    assert(this_array[1], nil, "Failed Array test 2.")
+    assert(this_array[1], null, "Failed Array test 2.")
     assert(this_array[99], 0, "Failed Array test 3.")
     assert(count_all(this_list), 102, "Failed Array test 4")
     assert(list.count(this_array), 100, "Failed Array test 5.")
@@ -406,7 +406,7 @@ function clear_errors()
     table1[2] = 3
     assert(table2[2], 3, "Failed Transient Test 5.")
 
-    table2 = nil
+    table2 = null
     assert(table1[2], 3, "Failed Transient Test 6.")
 
     var truthy
@@ -416,10 +416,10 @@ function clear_errors()
     assert(falsy, false, "Failed Transient Test 7.")
 
     var something
-    var nothing = nil
+    var nothing = null
     something = nothing
     something = 1
-    assert(nothing, nil, "Failed Transient Test 8.")
+    assert(nothing, null, "Failed Transient Test 8.")
 
     var list1 = [0,1,2]
     var list2 = list1
@@ -464,9 +464,9 @@ function clear_errors()
 }
 {
     // Testing Maybe init
-    var a = nil
-    var b = nil
-    var c = nil
+    var a = null
+    var b = null
+    var c = null
     var d = 3
     var e = maybe(maybe(maybe(a, b), c), d)
     d = 1
@@ -491,7 +491,7 @@ function clear_errors()
 {
     // Testing range
     var table1 = []
-    table1[99] = nil
+    table1[99] = null
     function many_for (start, end, this_table)
     {
         for (var i = start; i<end; i++)
@@ -526,7 +526,7 @@ function clear_errors()
 {
     // Testing foreach
     var table1 = []
-    table1[99] = nil
+    table1[99] = null
     // for (var i = 0; i< 100; i++)
     // {
     //     table1[i] = []
@@ -544,7 +544,7 @@ function clear_errors()
     }
 
     table1 = []
-    table1[99] = nil
+    table1[99] = null
     function many_number(index, collection)
     {
         collection[index] = 1
@@ -556,7 +556,7 @@ function clear_errors()
     }
 
     table1 = []
-    table1[99] = nil
+    table1[99] = null
     foreach(table1, function(index, collection)
     {
         collection[index] = 100 - index
@@ -642,7 +642,7 @@ var global_lock_test_counter = 5
             return new ValNumber(opA.content + opB.content);
         }
     '
-    if (intrinsic.create != nil){
+    if (intrinsic.create != null){
         var sum_intr = intrinsic.create("sum", 2, intr_sum)
         assert(sum_intr(5, 6), 11, "Failed inline Intrinsic test 1.")
     }else{

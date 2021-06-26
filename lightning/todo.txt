@@ -1,5 +1,4 @@
 ﻿todo
-	- Move Env out of VM.
 	- Coroutines.
 	- Code Cleanup
 	- add loading Value.Nil for missing parameters on function call, emit a warning
@@ -81,4 +80,5 @@ done
 	- string slice intrincic
 	- Add Release VMs and ResourcesTrim to prelude.
 	- Global lock tests.
+	- Move Env out of VM.
 

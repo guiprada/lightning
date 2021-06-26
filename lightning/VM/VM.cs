@@ -43,7 +43,6 @@ namespace lightning
         Memory<Unit> variables; // used for scoped variables
 
         Memory<ValUpValue> upValues;
-
         Memory<ValUpValue> upValuesRegistry;
 
         Operand[] ret;
@@ -344,7 +343,7 @@ namespace lightning
                             Operand address = instruction.opA;
                             Operand module = instruction.opB;
                             Unit constant = modules[module].constants[address];
-                            
+
                             StackPush(constant);
                             break;
                         }

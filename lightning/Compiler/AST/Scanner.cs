@@ -21,7 +21,7 @@ namespace lightning
             {"foreach", TokenType.FOREACH},
             {"function", TokenType.FUN},
             {"if", TokenType.IF},
-            {"nil", TokenType.NIL},
+            {"null", TokenType.NIL},
             {"return", TokenType.RETURN},
             {"true", TokenType.TRUE},
             {"var", TokenType.VAR},
@@ -32,15 +32,14 @@ namespace lightning
             {"nand", TokenType.NAND},
             {"nor", TokenType.NOR},
             {"xnor", TokenType.XNOR},
-       };
-
+        };
 
         char[] source;
         int line;
         int start;
         int current;
-        
-        public List<string> Errors { get; private set; }
+
+        public List<string> Errors { get; private set;}
 
         List<Token> tokens;
         bool hasScanned;
@@ -100,7 +99,7 @@ namespace lightning
                 case '}': tokens.Add(new Token(TokenType.RIGHT_BRACE, line)); break;
                 case '[': tokens.Add(new Token(TokenType.LEFT_BRACKET, line)); break;
                 case ']': tokens.Add(new Token(TokenType.RIGHT_BRACKET, line)); break;
-                case ',': tokens.Add(new Token(TokenType.COMMA, line)); break;                
+                case ',': tokens.Add(new Token(TokenType.COMMA, line)); break;
                 case '-':
                     if (Match('='))
                     {
@@ -127,7 +126,7 @@ namespace lightning
                     else
                     {
                         tokens.Add(new Token(TokenType.PLUS, line));
-                    }                    
+                    }
                     break;
                 case ';': tokens.Add(new Token(TokenType.SEMICOLON, line)); break;
                 case ':': tokens.Add(new Token(TokenType.COLON, line)); break;
@@ -141,13 +140,13 @@ namespace lightning
                     tokens.Add(Match('=') ? new Token(TokenType.BANG_EQUAL, line) : new Token(TokenType.BANG, line));
                     break;
                 case '=':
-                    tokens.Add(Match('=') ? new Token(TokenType.EQUAL_EQUAL, line) : new Token(TokenType.EQUAL, line));                    
+                    tokens.Add(Match('=') ? new Token(TokenType.EQUAL_EQUAL, line) : new Token(TokenType.EQUAL, line));
                     break;
                 case '<':
-                    tokens.Add(Match('=') ? new Token(TokenType.LESS_EQUAL, line) : new Token(TokenType.LESS, line));                    
+                    tokens.Add(Match('=') ? new Token(TokenType.LESS_EQUAL, line) : new Token(TokenType.LESS, line));
                     break;
                 case '>':
-                    tokens.Add(Match('=') ? new Token(TokenType.GREATER_EQUAL, line) : new Token(TokenType.GREATER, line));                    
+                    tokens.Add(Match('=') ? new Token(TokenType.GREATER_EQUAL, line) : new Token(TokenType.GREATER, line));
                     break;
                 case '/':
                     if (Match('/'))
@@ -208,7 +207,7 @@ namespace lightning
 
         private char Peek()
         {
-            if (IsAtEnd()) return '\0';    
+            if (IsAtEnd()) return '\0';
             return source[current];
         }
 
@@ -220,7 +219,7 @@ namespace lightning
 
         private bool IsAtEnd()
         {
-            bool is_end = current >= source.Length;            
+            bool is_end = current >= source.Length;
             return is_end;
         }
 
@@ -285,7 +284,7 @@ namespace lightning
             Advance();
 
             // Trim the surrounding quotes.
-            //int this_lenght = (current - 1) - (start + 1);            
+            //int this_lenght = (current - 1) - (start + 1);
             String new_string = new string(source, start + 1, current - start - 2);
 
             return new_string;
