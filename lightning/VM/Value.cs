@@ -16,51 +16,67 @@ namespace lightning
     public enum UnitType{
         Number,
         Null,
+        Boolean,
 
         HeapValue
     }
     public struct Unit{
-        public Number number;
-        public HeapValue value;
+        public Number unitValue;
+        public HeapValue heapValue;
         public UnitType type;
 
         public Unit(HeapValue p_value) : this()
         {
-            value = p_value;
+            heapValue = p_value;
             type = UnitType.HeapValue;
         }
         public Unit(Number p_number) : this()
         {
-            number = p_number;
+            unitValue = p_number;
             type = UnitType.Number;
         }
 
-        public Unit(String name) : this()
+        public Unit(bool p_value) : this(){
+            if(p_value == true){
+                unitValue = 1;
+            }else{
+                unitValue = 0;
+            }
+            type = UnitType.Boolean;
+        }
+
+        public Unit(String p_string) : this()
         {
-            if(name == "null")
+            if(p_string == "null")
             {
                 type = UnitType.Null;
             }
             else
             {
-                throw new Exception("Trying to create a Unit with invalid string: " + name);
+                throw new Exception("Trying to create a Unit with invalid string: " + p_string);
             }
         }
 
         public Type HeapValueType(){
             if(type == UnitType.HeapValue)
-                return value.GetType();
+                return heapValue.GetType();
             return null;
         }
 
         public override string ToString()
         {
             if (type == UnitType.Number){
-                return number.ToString();
+                return unitValue.ToString();
             }else if(type == UnitType.Null){
                 return "null";
+            }else if(type == UnitType.Boolean){
+                if(unitValue == 0)
+                    return "false";
+                if(unitValue == 1)
+                    return "true";
+                throw new Exception("Trying to get String of Invalid Boolean");
             }else{
-                return value.ToString();
+                return heapValue.ToString();
             }
         }
 
@@ -71,47 +87,53 @@ namespace lightning
                 throw new NotImplementedException();
             }else if(type == UnitType.Null){
                 return false;
+            }else if(type == UnitType.Boolean){
+                if(unitValue == 0)
+                    return false;
+                if(unitValue == 1)
+                    return true;
+                throw new Exception("Trying to get Value of Invalid Boolean");
             }else{
-                return value.ToBool();
+                return heapValue.ToBool();
             }
         }
 
         public override bool Equals(object other){
+            if(other.GetType() != typeof(Unit))
+                throw new Exception("Trying to compare Unit to non Unit type");
             if (type == UnitType.Number){
                 Type other_type = other.GetType();
-                if (other_type == typeof(Unit) && ((Unit)other).type == UnitType.Number){
-                    return ((Unit)other).number == number;
+                if (((Unit)other).type == UnitType.Number){
+                    return ((Unit)other).unitValue == unitValue;
                 }
                 return false;
             }else if(type == UnitType.Null){
                 Type other_type = other.GetType();
-                if (other_type == typeof(Unit) && ((Unit)other).type == UnitType.Null){
+                if (((Unit)other).type == UnitType.Null){
                     return true;
                 }
                 return false;
+            }else if(type == UnitType.Boolean){
+                return ToBool() == ((Unit)other).ToBool();
             }else{
-                return value.Equals(other);
+                return heapValue.Equals(other);
             }
         }
 
         public override int GetHashCode(){
             if (type == UnitType.Number){
-                return number.GetHashCode();
+                return unitValue.GetHashCode();
             }else if(type == UnitType.Null){
                 return UnitType.Null.GetHashCode();
+            }else if(type == UnitType.Boolean){
+                return ToBool().GetHashCode();
             }else{
-                return value.GetHashCode();
+                return heapValue.GetHashCode();
             }
         }
     }
     public abstract class HeapValue
     {
-        static ValBool global_false = new ValBool(false);
-        public static ValBool False { get { return global_false; } }
-
-        static ValBool global_true = new ValBool(true);
-        public static ValBool True { get { return global_true; } }
-
         public abstract override string ToString();
         public abstract bool ToBool();
 
@@ -144,7 +166,7 @@ namespace lightning
             if (other_type == typeof(Unit))
             {
                 if(((Unit)other).HeapValueType() == typeof(ValString))
-                    if(content == ((ValString)((Unit)(other)).value).content)
+                    if(content == ((ValString)((Unit)(other)).heapValue).content)
                         return true;
             }
             if(other_type == typeof(ValString))
@@ -153,47 +175,6 @@ namespace lightning
                     return true;
             }
 
-            return false;
-        }
-
-        public override int GetHashCode()
-        {
-            return content.GetHashCode();
-        }
-    }
-
-    public class ValBool : HeapValue
-    {
-        bool content;
-
-        public ValBool(bool value)
-        {
-            content = value;
-        }
-
-        public override string ToString()
-        {
-            return content.ToString();
-        }
-
-        public override bool ToBool()
-        {
-            return content;
-        }
-
-        public override bool Equals(object other)
-        {
-            Type other_type = other.GetType();
-            if (other_type == typeof(Unit))
-            {
-                if(((Unit)other).HeapValueType() == typeof(ValBool))
-                    if(content == ((ValBool)((Unit)(other)).value).content)
-                        return true;
-            }
-            if (other_type == typeof(ValBool))
-            {
-                if (((ValBool)other).content == this.content) return true;
-            }
             return false;
         }
 
@@ -241,7 +222,7 @@ namespace lightning
             {
                 if(((Unit)other).HeapValueType() == typeof(ValFunction))
                 {
-                    ValFunction other_val_func = (ValFunction)((Unit)(other)).value;
+                    ValFunction other_val_func = (ValFunction)((Unit)(other)).heapValue;
                     if (other_val_func.name == this.name && other_val_func.module == this.module) return true;
                 }
             }
@@ -290,7 +271,7 @@ namespace lightning
             {
                 if(((Unit)other).HeapValueType() == typeof(ValIntrinsic))
                 {
-                    if (function == (((Unit)other).value as ValIntrinsic).function) return true;
+                    if (function == (((Unit)other).heapValue as ValIntrinsic).function) return true;
                 }
             }
             if (other_type == typeof(ValIntrinsic))
@@ -341,7 +322,7 @@ namespace lightning
             {
                 if(((Unit)other).HeapValueType() == typeof(ValClosure))
                 {
-                    if (this == ((Unit)other).value as ValClosure) return true;
+                    if (this == ((Unit)other).heapValue as ValClosure) return true;
                 }
             }
             if (other_type == typeof(ValClosure))
@@ -421,7 +402,7 @@ namespace lightning
             {
                 if(((Unit)other).HeapValueType() == typeof(ValUpValue))
                 {
-                    if (Val.Equals(((Unit)other).value)) return true;
+                    if (Val.Equals(((Unit)other).heapValue)) return true;
                 }
             }
             if (other_type == typeof(ValUpValue))
@@ -526,7 +507,7 @@ namespace lightning
             {
                 if(((Unit)other).HeapValueType() == typeof(ValTable))
                 {
-                    if (this == ((Unit)other).value as ValTable) return true;
+                    if (this == ((Unit)other).heapValue as ValTable) return true;
                 }
             }
             if (other_type == typeof(ValTable))
@@ -562,7 +543,7 @@ namespace lightning
             Type other_type = other.GetType();
             if (other_type == typeof(Unit))
             {
-                if (this.name == (((Unit)other).value as ValModule).name) return true;
+                if (this.name == (((Unit)other).heapValue as ValModule).name) return true;
             }
             if (other_type == typeof(ValModule))
             {
@@ -603,7 +584,7 @@ namespace lightning
             {
                 if(((Unit)other).HeapValueType() == typeof(ValWrapper<T>))
                 {
-                    if (this.content == (((Unit)other).value as ValWrapper<T>).content) return true;
+                    if (this.content == (((Unit)other).heapValue as ValWrapper<T>).content) return true;
                 }
             }
             if(other_type == typeof(ValWrapper<T>))

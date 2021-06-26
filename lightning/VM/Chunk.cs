@@ -299,9 +299,9 @@ namespace lightning
             foreach(Unit v in constants)
             {
                 if(v.HeapValueType() == typeof(ValFunction))
-                    if( ((ValFunction)(v.value)).name == name)
+                    if( ((ValFunction)(v.heapValue)).name == name)
                     {
-                        return (ValFunction)(v.value);
+                        return (ValFunction)(v.heapValue);
                     }
             }
             foreach (ValIntrinsic v in Prelude.intrinsics)
