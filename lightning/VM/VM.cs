@@ -48,9 +48,7 @@ namespace lightning
 
         Memory<ValUpValue> upValues;
 
-        List<ValUpValue> upValuesRegistry;
-        int[] upValuesRegistryBases;
-        int upValuesRegistryBasesTop;
+        Memory<ValUpValue> upValuesRegistry;
 
         Operand[] ret;
         int ret_count;
@@ -89,9 +87,7 @@ namespace lightning
 
             upValues = new Memory<ValUpValue>();
 
-            upValuesRegistry = new List<ValUpValue>();
-            upValuesRegistryBases = new int[function_deepness];
-            upValuesRegistryBasesTop = 0;
+            upValuesRegistry = new Memory<ValUpValue>();
 
             ret = new Operand[2 * function_deepness];
             ret[executingInstructions] = (Operand)(chunk.ProgramSize - 1);
@@ -120,7 +116,7 @@ namespace lightning
         }
 
         public void ResoursesTrim(){
-            upValuesRegistry.TrimExcess();
+            upValuesRegistry.Trim();
             variables.TrimExcess();
             upValues.Trim();
         }
@@ -220,27 +216,25 @@ namespace lightning
         {
             variablesBases[variablesBasesTop] = variablesTop;
             variablesBasesTop++;
-            upValuesRegistryBases[upValuesRegistryBasesTop] = upValuesRegistry.Count;
-            upValuesRegistryBasesTop++;
+            upValuesRegistry.PushEnv();
         }
 
         void EnvPop()
         {
             // capture closures
-            int upvalues_start = upValuesRegistryBases[upValuesRegistryBasesTop - 1];
-            upValuesRegistryBasesTop--;
+            int upvalues_start = upValuesRegistry.Marker;
             int upvalues_end = upValuesRegistry.Count;
             for (int i = upvalues_start; i < upvalues_end; i++)
             {
-                upValuesRegistry[i].Capture();
+                upValuesRegistry.Get(i).Capture();
             }
+            upValuesRegistry.PopEnv();
 
             int this_basePointer = variablesBases[variablesBasesTop - 1];
             variablesBasesTop--;
             variablesTop = this_basePointer;
 
             variables.RemoveRange(this_basePointer, variables.Count - this_basePointer);
-            upValuesRegistry.RemoveRange(upvalues_start, upValuesRegistry.Count - upvalues_start);
         }
 
         void EnvSet(int target_env)

@@ -8,6 +8,18 @@ namespace lightning
         List<int> markers;
         int marker;
 
+		public int Marker{
+			get{
+				return marker;
+			}
+		}
+
+		public int Count{
+			get{
+				return values.Count;
+			}
+		}
+
         public Memory(){
             values = new List<T>();
             markers = new List<int>();
@@ -56,10 +68,6 @@ namespace lightning
             marker = markers[last_index];
             markers.RemoveAt(last_index);
         }
-
-		public int Count(){
-			return values.Count;
-		}
 	}
 	public class GlobalMemory{
         List<Unit> values;
