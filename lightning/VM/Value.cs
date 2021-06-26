@@ -15,17 +15,17 @@ namespace lightning
 {
     public enum UnitType{
         Number,
-        Value
+        HeapValue
     }
     public struct Unit{
         public Number number;
-        public Value value;
+        public HeapValue value;
         public UnitType type;
 
-        public Unit(Value p_value) : this()
+        public Unit(HeapValue p_value) : this()
         {
             value = p_value;
-            type = UnitType.Value;
+            type = UnitType.HeapValue;
         }
         public Unit(Number p_number) : this()
         {
@@ -83,7 +83,7 @@ namespace lightning
             }
         }
     }
-    public abstract class Value
+    public abstract class HeapValue
     {
         static ValNil global_nil = new ValNil();
         public static ValNil Nil { get { return global_nil; } }
@@ -101,7 +101,7 @@ namespace lightning
         public abstract override int GetHashCode();
     }
 
-    public class ValString : Value
+    public class ValString : HeapValue
     {
         public string content;
 
@@ -144,7 +144,7 @@ namespace lightning
         }
     }
 
-    public class ValBool : Value
+    public class ValBool : HeapValue
     {
         bool content;
 
@@ -185,11 +185,11 @@ namespace lightning
         }
     }
 
-    public class ValNil : Value
+    public class ValNil : HeapValue
     {
         public override string ToString()
         {
-            return "nil";
+            return "null";
         }
 
         public override bool ToBool()
@@ -218,7 +218,7 @@ namespace lightning
         }
     }
 
-    public class ValFunction : Value
+    public class ValFunction : HeapValue
     {
         public string name;
         public Operand arity;
@@ -274,7 +274,7 @@ namespace lightning
         }
     }
 
-    public class ValIntrinsic : Value
+    public class ValIntrinsic : HeapValue
     {
         public string name;
         public Func<VM, Unit> function;
@@ -321,7 +321,7 @@ namespace lightning
         }
     }
 
-    public class ValClosure : Value
+    public class ValClosure : HeapValue
     {
         public ValFunction function;
         public List<ValUpValue> upValues;
@@ -372,7 +372,7 @@ namespace lightning
         }
     }
 
-    public class ValUpValue : Value
+    public class ValUpValue : HeapValue
     {
         public Operand address;
         public Operand env;
@@ -403,7 +403,7 @@ namespace lightning
             env = p_env;
             isCaptured = false;
             variables = null;
-            val = new Unit(Value.Nil);
+            val = new Unit(HeapValue.Nil);
         }
 
         public void Attach(Memory<Unit> p_variables)
@@ -421,7 +421,7 @@ namespace lightning
         }
         public override string ToString()
         {
-            return new string("upvalue " + address + " on env " + env + " Value: " + Val.ToString());
+            return new string("upvalue " + address + " on env " + env + " HeapValue: " + Val.ToString());
         }
 
         public override bool ToBool()
@@ -453,7 +453,7 @@ namespace lightning
 
     }
 
-    public class ValTable : Value
+    public class ValTable : HeapValue
     {
         public List<Unit> elements;
         public Dictionary<ValString, Unit> table;
@@ -489,7 +489,7 @@ namespace lightning
         {
             for (int i = 0; i < n; i++)
             {
-                elements.Add(new Unit(Value.Nil));
+                elements.Add(new Unit(HeapValue.Nil));
             }
         }
 
@@ -597,7 +597,7 @@ namespace lightning
         }
     }
 
-    public class ValWrapper<T> : Value
+    public class ValWrapper<T> : HeapValue
     {
         public object content;
 

@@ -862,7 +862,7 @@ namespace lightning
             if (globals.Contains(p_node.Name))
                 Error("Local functions cant have the same name as global ones, yet :)", p_node.Line);
             Nullable<Variable> maybe_name = SetVar(p_node.Name);
-            //Console.WriteLine("fun dcl " + p_node.Name + " " + maybe_name.Value.address + " " + maybe_name.Value.envIndex + " " + maybe_name.Value.type + " we are in:" + (env.Count - 1));
+            //Console.WriteLine("fun dcl " + p_node.Name + " " + maybe_name.HeapValue.address + " " + maybe_name.HeapValue.envIndex + " " + maybe_name.HeapValue.type + " we are in:" + (env.Count - 1));
 
             if (maybe_name.HasValue)
             {
@@ -1069,7 +1069,7 @@ namespace lightning
             {
                 constants.Add(p_string);
                 if (p_string == "Nil")
-                    code.AddConstant(new Unit(Value.Nil));
+                    code.AddConstant(new Unit(HeapValue.Nil));
                 else
                     code.AddConstant(new Unit(new ValString(p_string)));
 

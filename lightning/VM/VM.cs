@@ -281,7 +281,7 @@ namespace lightning
             VMResult result = Run();
             if (result.status == VMResultType.OK)
                 return result.value;
-            return new Unit(Value.Nil);
+            return new Unit(HeapValue.Nil);
         }
 
         public VMResult Run()
@@ -359,19 +359,19 @@ namespace lightning
                     case OpCode.LOADNIL:
                         {
                             IP++;
-                            StackPush(new Unit(Value.Nil));
+                            StackPush(new Unit(HeapValue.Nil));
                             break;
                         }
                     case OpCode.LOADTRUE:
                         {
                             IP++;
-                            StackPush(new Unit(Value.True));
+                            StackPush(new Unit(HeapValue.True));
                             break;
                         }
                     case OpCode.LOADFALSE:
                         {
                             IP++;
-                            StackPush(new Unit(Value.False));
+                            StackPush(new Unit(HeapValue.False));
                             break;
                         }
                     case OpCode.LOADINTR:
@@ -782,11 +782,11 @@ namespace lightning
                             Unit opA = StackPop();
                             if (opA.Equals(opB))
                             {
-                                StackPush(new Unit(Value.True));
+                                StackPush(new Unit(HeapValue.True));
                             }
                             else
                             {
-                                StackPush(new Unit(Value.False));
+                                StackPush(new Unit(HeapValue.False));
                             }
 
                             break;
@@ -799,11 +799,11 @@ namespace lightning
 
                             if (!opA.Equals(opB))
                             {
-                                StackPush(new Unit(Value.True));
+                                StackPush(new Unit(HeapValue.True));
                             }
                             else
                             {
-                                StackPush(new Unit(Value.False));
+                                StackPush(new Unit(HeapValue.False));
                             }
 
                             break;
@@ -816,11 +816,11 @@ namespace lightning
                             bool truthness = opA >= opB;
                             if (truthness == true)
                             {
-                                StackPush(new Unit(Value.True));
+                                StackPush(new Unit(HeapValue.True));
                             }
                             else
                             {
-                                StackPush(new Unit(Value.False));
+                                StackPush(new Unit(HeapValue.False));
                             }
                             break;
                         }
@@ -832,11 +832,11 @@ namespace lightning
                             bool truthness = opA <= opB;
                             if (truthness == true)
                             {
-                                StackPush(new Unit(Value.True));
+                                StackPush(new Unit(HeapValue.True));
                             }
                             else
                             {
-                                StackPush(new Unit(Value.False));
+                                StackPush(new Unit(HeapValue.False));
                             }
                             break;
                         }
@@ -848,11 +848,11 @@ namespace lightning
                             bool truthness = opA > opB;
                             if (truthness == true)
                             {
-                                StackPush(new Unit(Value.True));
+                                StackPush(new Unit(HeapValue.True));
                             }
                             else
                             {
-                                StackPush(new Unit(Value.False));
+                                StackPush(new Unit(HeapValue.False));
                             }
                             break;
                         }
@@ -864,26 +864,26 @@ namespace lightning
                             bool truthness = opA < opB;
                             if (truthness == true)
                             {
-                                StackPush(new Unit(Value.True));
+                                StackPush(new Unit(HeapValue.True));
                             }
                             else
                             {
-                                StackPush(new Unit(Value.False));
+                                StackPush(new Unit(HeapValue.False));
                             }
                             break;
                         }
                     case OpCode.NOT:
                         {
                             IP++;
-                            Value opA = StackPop().value;
+                            HeapValue opA = StackPop().value;
                             if (opA.ToBool() == true)
-                                StackPush(new Unit(Value.False));
+                                StackPush(new Unit(HeapValue.False));
                             else if (opA.ToBool() == false)
-                                StackPush(new Unit(Value.True));
+                                StackPush(new Unit(HeapValue.True));
                             else
                             {
                                 Error("NOT is insane!");
-                                return new VMResult(VMResultType.ERROR, new Unit(Value.Nil));
+                                return new VMResult(VMResultType.ERROR, new Unit(HeapValue.Nil));
                             }
 
                             break;
@@ -891,97 +891,97 @@ namespace lightning
                     case OpCode.AND:
                         {
                             IP++;
-                            Value opB = StackPop().value;
-                            Value opA = StackPop().value;
+                            HeapValue opB = StackPop().value;
+                            HeapValue opA = StackPop().value;
                             bool result = opA.ToBool() && opB.ToBool();
                             if (result == true)
                             {
-                                StackPush(new Unit(Value.True));
+                                StackPush(new Unit(HeapValue.True));
                             }
                             else
                             {
-                                StackPush(new Unit(Value.False));
+                                StackPush(new Unit(HeapValue.False));
                             }
                             break;
                         }
                     case OpCode.OR:
                         {
                             IP++;
-                            Value opB = StackPop().value;
-                            Value opA = StackPop().value;
+                            HeapValue opB = StackPop().value;
+                            HeapValue opA = StackPop().value;
 
                             bool result = opA.ToBool() || opB.ToBool();
                             if (result == true)
                             {
-                                StackPush(new Unit(Value.True));
+                                StackPush(new Unit(HeapValue.True));
                             }
                             else
                             {
-                                StackPush(new Unit(Value.False));
+                                StackPush(new Unit(HeapValue.False));
                             }
                             break;
                         }
                     case OpCode.XOR:
                         {
                             IP++;
-                            Value opB = StackPop().value;
-                            Value opA = StackPop().value;
+                            HeapValue opB = StackPop().value;
+                            HeapValue opA = StackPop().value;
                             bool result = opA.ToBool() ^ opB.ToBool();
                             if (result == true)
                             {
-                                StackPush(new Unit(Value.True));
+                                StackPush(new Unit(HeapValue.True));
                             }
                             else
                             {
-                                StackPush(new Unit(Value.False));
+                                StackPush(new Unit(HeapValue.False));
                             }
                             break;
                         }
                     case OpCode.NAND:
                         {
                             IP++;
-                            Value opB = StackPop().value;
-                            Value opA = StackPop().value;
+                            HeapValue opB = StackPop().value;
+                            HeapValue opA = StackPop().value;
                             bool result = !(opA.ToBool() && opB.ToBool());
                             if (result == true)
                             {
-                                StackPush(new Unit(Value.True));
+                                StackPush(new Unit(HeapValue.True));
                             }
                             else
                             {
-                                StackPush(new Unit(Value.False));
+                                StackPush(new Unit(HeapValue.False));
                             }
                             break;
                         }
                     case OpCode.NOR:
                         {
                             IP++;
-                            Value opB = StackPop().value;
-                            Value opA = StackPop().value;
+                            HeapValue opB = StackPop().value;
+                            HeapValue opA = StackPop().value;
                             bool result = !(opA.ToBool() || opB.ToBool());
                             if (result == true)
                             {
-                                StackPush(new Unit(Value.True));
+                                StackPush(new Unit(HeapValue.True));
                             }
                             else
                             {
-                                StackPush(new Unit(Value.False));
+                                StackPush(new Unit(HeapValue.False));
                             }
                             break;
                         }
                     case OpCode.XNOR:
                         {
                             IP++;
-                            Value opB = StackPop().value;
-                            Value opA = StackPop().value;
+                            HeapValue opB = StackPop().value;
+                            HeapValue opA = StackPop().value;
                             bool result = !(opA.ToBool() ^ opB.ToBool());
                             if (result == true)
                             {
-                                StackPush(new Unit(Value.True));
+                                StackPush(new Unit(HeapValue.True));
                             }
                             else
                             {
-                                StackPush(new Unit(Value.False));
+                                StackPush(new Unit(HeapValue.False));
                             }
                             break;
                         }
@@ -1074,7 +1074,7 @@ namespace lightning
                             else
                             {
                                 Error("Trying to call a " + this_callable.Type());
-                                return new VMResult(VMResultType.OK, new Unit(Value.Nil));
+                                return new VMResult(VMResultType.OK, new Unit(HeapValue.Nil));
                             }
                             break;
                         }
@@ -1158,14 +1158,14 @@ namespace lightning
                         }
                     case OpCode.EXIT:
                         {
-                            Unit result = new Unit(Value.Nil);
+                            Unit result = new Unit(HeapValue.Nil);
                             if (stackTop > 0)
                                 result = StackPop();
                             return new VMResult(VMResultType.OK, result);
                         }
                     default:
                         Error("Unkown OpCode: " + instruction.opCode);
-                        return new VMResult(VMResultType.ERROR, new Unit(Value.Nil));
+                        return new VMResult(VMResultType.ERROR, new Unit(HeapValue.Nil));
                 }
             }
         }
@@ -1210,7 +1210,7 @@ namespace lightning
             //     {
             //         statsValue += "Upvalues:\n";
             //     }
-            //     foreach (Value v in upValues)
+            //     foreach (HeapValue v in upValues)
             //     {
             //         statsValue += counter.ToString() + ": " + upValues[i].ToString() + '\n';
             //         counter++;

@@ -114,7 +114,7 @@ namespace interpreter
                 VMResult result = vm.Run();
                 if (result.status != VMResultType.OK)
                     Console.WriteLine("Program returned ERROR");
-                else if (result.value.value != Value.Nil)
+                else if (result.value.value != HeapValue.Nil)
                     Console.WriteLine("Program returned: " + result.value);
             }
             else
@@ -128,11 +128,11 @@ namespace interpreter
                 }
             }
             //ValFunction my_func = chunk.GetFunction("append");
-            //List<Value> stack = new List<Value>();
+            //List<HeapValue> stack = new List<HeapValue>();
             //stack.Add(new ValString("hello"));
             //stack.Add(new ValString("hello!"));
             //stack.Add(new ValString("Failed--------------------------------"));
-            //Value call_result = vm.CallFunction(my_func, stack);
+            //HeapValue call_result = vm.CallFunction(my_func, stack);
             //Console.WriteLine(call_result);
 
             return 0;

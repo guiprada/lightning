@@ -100,7 +100,7 @@ namespace lightning
         }
         public override string ToString()
         {
-            return Type.ToString() + " Value: " + value + " line: " + Line.ToString();
+            return Type.ToString() + " HeapValue: " + value + " line: " + Line.ToString();
         }
     }
 
@@ -114,7 +114,7 @@ namespace lightning
 
         public override string ToString()
         {
-            return Type.ToString() + " Value: " + value.ToString() + " line: " + Line.ToString();
+            return Type.ToString() + " HeapValue: " + value.ToString() + " line: " + Line.ToString();
         }
     }
 }

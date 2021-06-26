@@ -73,7 +73,7 @@ namespace lightning
                 }
                 intrinsic.TableSet(new ValString("create"), new Unit(new ValIntrinsic("create", createIntrinsic, 3)));
 #else
-                intrinsic.TableSet(new ValString("create"), new Unit(Value.Nil));
+                intrinsic.TableSet(new ValString("create"), new Unit(HeapValue.Nil));
 #endif
                 tables.Add("intrinsic", intrinsic);
             }
@@ -113,7 +113,7 @@ namespace lightning
                     Unit value = vm.StackPeek(1);
                     list.elements.Add(value);
 
-                    return new Unit(Value.Nil);
+                    return new Unit(HeapValue.Nil);
                 }
                 list.TableSet(new ValString("push"), new Unit(new ValIntrinsic("push", listPush, 2)));
 
@@ -164,7 +164,7 @@ namespace lightning
                 {
                     ValTable list = (ValTable)vm.StackPeek(0).value;
                     list.elements.Clear();
-                    return new Unit(Value.Nil);
+                    return new Unit(HeapValue.Nil);
                 }
                 list.TableSet(new ValString("clear"), new Unit(new ValIntrinsic("clear", listClear, 1)));
 
@@ -176,7 +176,7 @@ namespace lightning
                     int range_end = (int)vm.StackPeek(2).number;
                     list.elements.RemoveRange(range_init, range_end - range_init + 1);
 
-                    return new Unit(Value.Nil);
+                    return new Unit(HeapValue.Nil);
                 }
                 list.TableSet(new ValString("remove"), new Unit(new ValIntrinsic("remove", listRemoveRange, 3)));
 
@@ -228,7 +228,7 @@ namespace lightning
                     ValTable list = (ValTable)vm.StackPeek(0).value;
                     list.elements.Reverse();
 
-                    return new Unit(Value.Nil);
+                    return new Unit(HeapValue.Nil);
                 }
                 list.TableSet(new ValString("reverse"), new Unit(new ValIntrinsic("reverse", listReverse, 1)));
 
@@ -249,9 +249,9 @@ namespace lightning
                             i++;
                             iterator.table[key_string] = new Unit(i);
                             iterator.table[value_string] = this_table.elements[i];
-                            return new Unit(Value.True);
+                            return new Unit(HeapValue.True);
                         }
-                        return new Unit(Value.False);
+                        return new Unit(HeapValue.False);
                     };
                     iterator.TableSet(new ValString("next"), new Unit(new ValIntrinsic("iterator_next", next, 0)));
                     return new Unit(iterator);
@@ -264,7 +264,7 @@ namespace lightning
                 {
                     ValTable this_table = (ValTable)vm.StackPeek(0).value;
                     int i = -1;
-                    Unit value = new Unit(Value.Nil);
+                    Unit value = new Unit(HeapValue.Nil);
                     ValString value_string = new ValString("value");
 
                     ValTable iterator = new ValTable(null, null);
@@ -274,9 +274,9 @@ namespace lightning
                         {
                             i++;
                             iterator.table[value_string] = this_table.elements[i];
-                            return new Unit(Value.True);
+                            return new Unit(HeapValue.True);
                         }
-                        return new Unit(Value.False);
+                        return new Unit(HeapValue.False);
                     };
                     iterator.TableSet(new ValString("next"), new Unit(new ValIntrinsic("iterator_next", next, 0)));
                     return new Unit(iterator);
@@ -338,7 +338,7 @@ namespace lightning
                 Unit tableClear(VM vm)
                 {
                     ValTable this_table = (ValTable)vm.StackPeek(0).value;
-                    return new Unit(Value.Nil);
+                    return new Unit(HeapValue.Nil);
                 }
                 table.TableSet(new ValString("clear"), new Unit(new ValIntrinsic("clear", tableClear, 1)));
 
@@ -350,8 +350,8 @@ namespace lightning
                     ValString value_string = new ValString("value");
                     ValString key_string = new ValString("key");
                     ValTable iterator = new ValTable(null, null);
-                    iterator.table[key_string] = new Unit(Value.Nil);
-                    iterator.table[value_string] = new Unit(Value.Nil);
+                    iterator.table[key_string] = new Unit(HeapValue.Nil);
+                    iterator.table[value_string] = new Unit(HeapValue.Nil);
 
                     Unit next(VM vm)
                     {
@@ -359,9 +359,9 @@ namespace lightning
                         {
                             iterator.table[key_string] = new Unit((ValString)enumerator.Key);
                             iterator.table[value_string] = (Unit)enumerator.Value;
-                            return new Unit(Value.True);
+                            return new Unit(HeapValue.True);
                         }
-                        return new Unit(Value.False);
+                        return new Unit(HeapValue.False);
                     };
 
                     iterator.TableSet(new ValString("next"), new Unit(new ValIntrinsic("table_iterator_next", next, 0)));
@@ -407,7 +407,7 @@ namespace lightning
                 math.TableSet(new ValString("pi"), new Unit((Number)Math.PI));
                 math.TableSet(new ValString("e"), new Unit((Number)Math.E));
 #if DOUBLE
-                math.TableSet(new ValString("double"), new Unit(Value.True));
+                math.TableSet(new ValString("double"), new Unit(HeapValue.True));
 #else
                 math.TableSet(new ValString("double"), new Unit(Value.False));
 #endif
@@ -614,7 +614,7 @@ namespace lightning
                         string result = input_string.Substring((int)start, (int)(end - start));
                         return new Unit(new ValString(result));
                     }
-                    return new Unit(Value.Nil);
+                    return new Unit(HeapValue.Nil);
                 }
                 string_table.TableSet(new ValString("slice"), new Unit(new ValIntrinsic("string_slice", stringSlice, 3)));
 
@@ -632,7 +632,7 @@ namespace lightning
                         val_input_string.content = input_string.Substring(0, (int)start);
                         return new Unit(new ValString(result));
                     }
-                    return new Unit(Value.Nil);
+                    return new Unit(HeapValue.Nil);
                 }
                 string_table.TableSet(new ValString("split"), new Unit(new ValIntrinsic("string_split", stringSplit, 2)));
 
@@ -653,7 +653,7 @@ namespace lightning
                     if (val_input_string.Type() == typeof(ValString))
                         return new Unit(new ValString(val_input_string.ToString()));
                     else
-                        return new Unit(Value.Nil);
+                        return new Unit(HeapValue.Nil);
                 }
                 string_table.TableSet(new ValString("copy"), new Unit(new ValIntrinsic("string_copy", stringCopy, 1)));
 
@@ -676,7 +676,7 @@ namespace lightning
                         char result = input_string[(int)index];
                         return new Unit(new ValString(result.ToString()));
                     }
-                    return new Unit(Value.Nil);
+                    return new Unit(HeapValue.Nil);
                 }
                 char_table.TableSet(new ValString("at"), new Unit(new ValIntrinsic("char_at", charAt, 2)));
 
@@ -691,10 +691,10 @@ namespace lightning
                         char head = input_string[0];
                         if (Char.IsLetter(head))
                         {
-                            return new Unit(Value.True);
+                            return new Unit(HeapValue.True);
                         }
                     }
-                    return new Unit(Value.False);
+                    return new Unit(HeapValue.False);
                 }
                 char_table.TableSet(new ValString("is_alpha"), new Unit(new ValIntrinsic("is_alpha", isAlpha, 1)));
 
@@ -709,11 +709,11 @@ namespace lightning
                         char head = input_string[0];
                         if (Char.IsDigit(head))
                         {
-                            return new Unit(Value.True);
+                            return new Unit(HeapValue.True);
                         }
-                        return new Unit(Value.False);
+                        return new Unit(HeapValue.False);
                     }
-                    return new Unit(Value.Nil);
+                    return new Unit(HeapValue.Nil);
                 }
                 char_table.TableSet(new ValString("is_digit"), new Unit(new ValIntrinsic("is_digit", isDigit, 1)));
 
@@ -735,7 +735,7 @@ namespace lightning
                     if (input != null)
                         return new Unit(new ValString(input));
 
-                    return new Unit(Value.Nil);
+                    return new Unit(HeapValue.Nil);
                 }
                 file.TableSet(new ValString("load"), new Unit(new ValIntrinsic("load_file", loadFile, 1)));
 
@@ -749,7 +749,7 @@ namespace lightning
                         file.Write(output);
                     }
 
-                    return new Unit(Value.Nil);
+                    return new Unit(HeapValue.Nil);
                 }
                 file.TableSet(new ValString("write"), new Unit(new ValIntrinsic("write_file", writeFile, 2)));
 
@@ -763,7 +763,7 @@ namespace lightning
                         file.Write(output);
                     }
 
-                    return new Unit(Value.Nil);
+                    return new Unit(HeapValue.Nil);
                 }
                 file.TableSet(new ValString("append"), new Unit(new ValIntrinsic("append_file", appendFile, 2)));
 
@@ -788,7 +788,7 @@ namespace lightning
                     {
                         Console.WriteLine(error);
                     }
-                    return new Unit(Value.Nil);
+                    return new Unit(HeapValue.Nil);
                 }
 
                 Node program = parser.ParsedTree;
@@ -801,7 +801,7 @@ namespace lightning
                     Console.WriteLine("Code generation had errors:");
                     foreach (string error in code_generator.Errors)
                         Console.WriteLine(error);
-                    return new Unit(Value.Nil);
+                    return new Unit(HeapValue.Nil);
                 }
                 if (code_generator.HasChunked == true)
                 {
@@ -815,7 +815,7 @@ namespace lightning
                         return result.value;
                     }
                 }
-                return new Unit(Value.Nil);
+                return new Unit(HeapValue.Nil);
             }
             functions.Add(new ValIntrinsic("eval", eval, 1));
 
@@ -846,7 +846,7 @@ namespace lightning
                         {
                             Console.WriteLine(error);
                         }
-                        return new Unit(Value.Nil);
+                        return new Unit(HeapValue.Nil);
                     }
 
                     Node program = parser.ParsedTree;
@@ -858,7 +858,7 @@ namespace lightning
                         Console.WriteLine("Code generation had errors:");
                         foreach (string error in code_generator.Errors)
                             Console.WriteLine(error);
-                        return new Unit(Value.Nil);
+                        return new Unit(HeapValue.Nil);
                     }
 
                     if (code_generator.HasChunked == true)
@@ -873,7 +873,7 @@ namespace lightning
                         }
                     }
                 }
-                return new Unit(Value.Nil);
+                return new Unit(HeapValue.Nil);
             }
             functions.Add(new ValIntrinsic("require", require, 1));
 
@@ -904,7 +904,7 @@ namespace lightning
             Unit writeLine(VM vm)
             {
                 Console.WriteLine(System.Text.RegularExpressions.Regex.Unescape(vm.StackPeek(0).ToString()));
-                return new Unit(Value.Nil);
+                return new Unit(HeapValue.Nil);
             }
             functions.Add(new ValIntrinsic("write_line", writeLine, 1));
 
@@ -912,7 +912,7 @@ namespace lightning
             Unit write(VM vm)
             {
                 Console.Write(System.Text.RegularExpressions.Regex.Unescape(vm.StackPeek(0).ToString()));
-                return new Unit(Value.Nil);
+                return new Unit(HeapValue.Nil);
             }
             functions.Add(new ValIntrinsic("write", write, 1));
 
@@ -931,7 +931,7 @@ namespace lightning
                 if (Number.TryParse(read, out Number n))
                     return new Unit(n);
                 else
-                    return new Unit(Value.Nil);
+                    return new Unit(HeapValue.Nil);
             }
             functions.Add(new ValIntrinsic("read_number", readNumber, 0));
 
@@ -943,12 +943,12 @@ namespace lightning
                 {
                     char next = Convert.ToChar(read);
                     if (next == '\n')
-                        return new Unit(Value.Nil);
+                        return new Unit(HeapValue.Nil);
                     else
                         return new Unit(new ValString(Char.ToString(next)));
                 }
                 else
-                    return new Unit(Value.Nil);
+                    return new Unit(HeapValue.Nil);
             }
             functions.Add(new ValIntrinsic("read", read, 0));
 
@@ -992,7 +992,7 @@ namespace lightning
             Unit resourcesTrim(VM vm)
             {
                 vm.ResoursesTrim();
-                return new Unit(Value.Nil);
+                return new Unit(HeapValue.Nil);
             }
             functions.Add(new ValIntrinsic("trim", resourcesTrim, 0));
 
@@ -1000,7 +1000,7 @@ namespace lightning
             Unit releaseAllVMs(VM vm)
             {
                 vm.ReleaseVMs();
-                return new Unit(Value.Nil);
+                return new Unit(HeapValue.Nil);
             }
             functions.Add(new ValIntrinsic("release_all_vms", releaseAllVMs, 0));
 
@@ -1009,7 +1009,7 @@ namespace lightning
             {
                 Unit count = vm.StackPeek(0);
                 vm.ReleaseVMs((int)count.number);
-                return new Unit(Value.Nil);
+                return new Unit(HeapValue.Nil);
             }
             functions.Add(new ValIntrinsic("release_vms", releaseVMs, 1));
 

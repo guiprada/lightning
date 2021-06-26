@@ -294,7 +294,7 @@ namespace lightning
             return constants;
         }
 
-        public Value GetFunction(string name)
+        public HeapValue GetFunction(string name)
         {
             foreach(Unit v in constants)
             {
