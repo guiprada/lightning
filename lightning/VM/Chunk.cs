@@ -210,7 +210,7 @@ namespace lightning
             int constant_counter = 0;
             foreach (Unit v in constants)
             {
-                if(v.Type() == typeof(ValString))
+                if(v.HeapValueType() == typeof(ValString))
                     Console.WriteLine("Constant: " + constant_counter.ToString() + " \"" + v.ToString() + "\"");
                 else
                     Console.WriteLine("Constant: "+ constant_counter.ToString() + " " + v.ToString());
@@ -298,7 +298,7 @@ namespace lightning
         {
             foreach(Unit v in constants)
             {
-                if(v.Type() == typeof(ValFunction))
+                if(v.HeapValueType() == typeof(ValFunction))
                     if( ((ValFunction)(v.value)).name == name)
                     {
                         return (ValFunction)(v.value);

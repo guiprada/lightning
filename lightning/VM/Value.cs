@@ -15,6 +15,8 @@ namespace lightning
 {
     public enum UnitType{
         Number,
+        Null,
+
         HeapValue
     }
     public struct Unit{
@@ -33,18 +35,30 @@ namespace lightning
             type = UnitType.Number;
         }
 
-        public Type Type(){
-            if (type == UnitType.Number){
-                return typeof(Number);
-            }else{
-                return value.GetType();
+        public Unit(String name) : this()
+        {
+            if(name == "null")
+            {
+                type = UnitType.Null;
             }
+            else
+            {
+                throw new Exception("Trying to create a Unit with invalid string: " + name);
+            }
+        }
+
+        public Type HeapValueType(){
+            if(type == UnitType.HeapValue)
+                return value.GetType();
+            return null;
         }
 
         public override string ToString()
         {
             if (type == UnitType.Number){
                 return number.ToString();
+            }else if(type == UnitType.Null){
+                return "null";
             }else{
                 return value.ToString();
             }
@@ -55,6 +69,8 @@ namespace lightning
             if (type == UnitType.Number){
                 Console.WriteLine("ERROR: Can not convert number to Bool.");
                 throw new NotImplementedException();
+            }else if(type == UnitType.Null){
+                return false;
             }else{
                 return value.ToBool();
             }
@@ -66,8 +82,11 @@ namespace lightning
                 if (other_type == typeof(Unit) && ((Unit)other).type == UnitType.Number){
                     return ((Unit)other).number == number;
                 }
-                if (other_type == typeof(Number)){
-                    return (Number)other == number;
+                return false;
+            }else if(type == UnitType.Null){
+                Type other_type = other.GetType();
+                if (other_type == typeof(Unit) && ((Unit)other).type == UnitType.Null){
+                    return true;
                 }
                 return false;
             }else{
@@ -78,6 +97,8 @@ namespace lightning
         public override int GetHashCode(){
             if (type == UnitType.Number){
                 return number.GetHashCode();
+            }else if(type == UnitType.Null){
+                return UnitType.Null.GetHashCode();
             }else{
                 return value.GetHashCode();
             }
@@ -85,9 +106,6 @@ namespace lightning
     }
     public abstract class HeapValue
     {
-        static ValNil global_nil = new ValNil();
-        public static ValNil Nil { get { return global_nil; } }
-
         static ValBool global_false = new ValBool(false);
         public static ValBool False { get { return global_false; } }
 
@@ -125,7 +143,7 @@ namespace lightning
             Type other_type = other.GetType();
             if (other_type == typeof(Unit))
             {
-                if(((Unit)other).Type() == typeof(ValString))
+                if(((Unit)other).HeapValueType() == typeof(ValString))
                     if(content == ((ValString)((Unit)(other)).value).content)
                         return true;
             }
@@ -168,7 +186,7 @@ namespace lightning
             Type other_type = other.GetType();
             if (other_type == typeof(Unit))
             {
-                if(((Unit)other).Type() == typeof(ValBool))
+                if(((Unit)other).HeapValueType() == typeof(ValBool))
                     if(content == ((ValBool)((Unit)(other)).value).content)
                         return true;
             }
@@ -182,39 +200,6 @@ namespace lightning
         public override int GetHashCode()
         {
             return content.GetHashCode();
-        }
-    }
-
-    public class ValNil : HeapValue
-    {
-        public override string ToString()
-        {
-            return "null";
-        }
-
-        public override bool ToBool()
-        {
-            return false;
-        }
-
-        public override bool Equals(object other)
-        {
-            Type other_type = other.GetType();
-            if (other_type == typeof(Unit))
-            {
-                if(((Unit)other).Type() == typeof(ValNil))
-                    return true;
-            }
-            if (other_type == typeof(ValNil))
-            {
-                return true;
-            }
-            return false;
-        }
-
-        public override int GetHashCode()
-        {
-            return this.GetHashCode();
         }
     }
 
@@ -254,7 +239,7 @@ namespace lightning
             Type other_type = other.GetType();
             if (other_type == typeof(Unit))
             {
-                if(((Unit)other).Type() == typeof(ValFunction))
+                if(((Unit)other).HeapValueType() == typeof(ValFunction))
                 {
                     ValFunction other_val_func = (ValFunction)((Unit)(other)).value;
                     if (other_val_func.name == this.name && other_val_func.module == this.module) return true;
@@ -303,7 +288,7 @@ namespace lightning
             Type other_type = other.GetType();
             if (other_type == typeof(Unit))
             {
-                if(((Unit)other).Type() == typeof(ValIntrinsic))
+                if(((Unit)other).HeapValueType() == typeof(ValIntrinsic))
                 {
                     if (function == (((Unit)other).value as ValIntrinsic).function) return true;
                 }
@@ -354,7 +339,7 @@ namespace lightning
             Type other_type = other.GetType();
             if (other_type == typeof(Unit))
             {
-                if(((Unit)other).Type() == typeof(ValClosure))
+                if(((Unit)other).HeapValueType() == typeof(ValClosure))
                 {
                     if (this == ((Unit)other).value as ValClosure) return true;
                 }
@@ -403,7 +388,7 @@ namespace lightning
             env = p_env;
             isCaptured = false;
             variables = null;
-            val = new Unit(HeapValue.Nil);
+            val = new Unit("null");
         }
 
         public void Attach(Memory<Unit> p_variables)
@@ -434,7 +419,7 @@ namespace lightning
             Type other_type = other.GetType();
             if (other_type == typeof(Unit))
             {
-                if(((Unit)other).Type() == typeof(ValUpValue))
+                if(((Unit)other).HeapValueType() == typeof(ValUpValue))
                 {
                     if (Val.Equals(((Unit)other).value)) return true;
                 }
@@ -476,7 +461,7 @@ namespace lightning
         }
 
         public void ElementAdd(Unit value)
-        {            
+        {
             elements.Add(value);
         }
 
@@ -489,7 +474,7 @@ namespace lightning
         {
             for (int i = 0; i < n; i++)
             {
-                elements.Add(new Unit(HeapValue.Nil));
+                elements.Add(new Unit("null"));
             }
         }
 
@@ -539,7 +524,7 @@ namespace lightning
             Type other_type = other.GetType();
             if (other_type == typeof(Unit))
             {
-                if(((Unit)other).Type() == typeof(ValTable))
+                if(((Unit)other).HeapValueType() == typeof(ValTable))
                 {
                     if (this == ((Unit)other).value as ValTable) return true;
                 }
@@ -616,7 +601,7 @@ namespace lightning
             Type other_type = other.GetType();
             if (other_type == typeof(Unit))
             {
-                if(((Unit)other).Type() == typeof(ValWrapper<T>))
+                if(((Unit)other).HeapValueType() == typeof(ValWrapper<T>))
                 {
                     if (this.content == (((Unit)other).value as ValWrapper<T>).content) return true;
                 }

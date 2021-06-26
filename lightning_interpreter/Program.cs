@@ -20,7 +20,7 @@ namespace interpreter
                 RunFile(args[0]);
             }
         }
- 
+
         static int RunFile(string path)
         {
             string input;
@@ -42,7 +42,7 @@ namespace interpreter
         }
 
         static int Run(string input)
-        {            
+        {
             Scanner scanner = new Scanner(input);
             if (scanner.Errors.Count > 0)
             {
@@ -53,7 +53,7 @@ namespace interpreter
                 }
                 return 0;
             }
-            
+
             Parser parser = new Parser(scanner.Tokens);
             Node program = parser.ParsedTree;
             if (parser.Errors.Count > 0)
@@ -114,7 +114,7 @@ namespace interpreter
                 VMResult result = vm.Run();
                 if (result.status != VMResultType.OK)
                     Console.WriteLine("Program returned ERROR");
-                else if (result.value.value != HeapValue.Nil)
+                else if (result.value.HeapValueType() != null)
                     Console.WriteLine("Program returned: " + result.value);
             }
             else

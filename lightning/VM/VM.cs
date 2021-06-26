@@ -245,7 +245,7 @@ namespace lightning
                 for (int i = args.Count - 1; i >= 0; i--)
                     StackPush(args[i]);
 
-            Type this_type = this_callable.Type();
+            Type this_type = this_callable.HeapValueType();
             returnAdress[returnAdressCounter] = (Operand)(chunk.ProgramSize - 1);
             returnAdressCounter += 1;
             funCallEnv[executingInstructions + 1] = variables.Env;
@@ -281,7 +281,7 @@ namespace lightning
             VMResult result = Run();
             if (result.status == VMResultType.OK)
                 return result.value;
-            return new Unit(HeapValue.Nil);
+            return new Unit("null");
         }
 
         public VMResult Run()
@@ -359,7 +359,7 @@ namespace lightning
                     case OpCode.LOADNIL:
                         {
                             IP++;
-                            StackPush(new Unit(HeapValue.Nil));
+                            StackPush(new Unit("null"));
                             break;
                         }
                     case OpCode.LOADTRUE:
@@ -403,7 +403,7 @@ namespace lightning
                             Operand lambda = instruction.opB;
                             Operand new_fun_address = instruction.opC;
                             Unit this_callable = chunk.GetConstant(new_fun_address);
-                            if (this_callable.Type() == typeof(ValFunction))
+                            if (this_callable.HeapValueType() == typeof(ValFunction))
                             {
                                 if (lambda == 0)
                                     if (env == 0)// Global
@@ -883,7 +883,7 @@ namespace lightning
                             else
                             {
                                 Error("NOT is insane!");
-                                return new VMResult(VMResultType.ERROR, new Unit(HeapValue.Nil));
+                                return new VMResult(VMResultType.ERROR, new Unit("null"));
                             }
 
                             break;
@@ -1033,7 +1033,7 @@ namespace lightning
                             IP++;
 
                             Unit this_callable = StackPop();
-                            Type this_type = this_callable.Type();
+                            Type this_type = this_callable.HeapValueType();
 
                             if (this_type == typeof(ValFunction))
                             {
@@ -1073,8 +1073,8 @@ namespace lightning
                             }
                             else
                             {
-                                Error("Trying to call a " + this_callable.Type());
-                                return new VMResult(VMResultType.OK, new Unit(HeapValue.Nil));
+                                Error("Trying to call a " + this_callable.HeapValueType());
+                                return new VMResult(VMResultType.OK, new Unit("null"));
                             }
                             break;
                         }
@@ -1158,14 +1158,14 @@ namespace lightning
                         }
                     case OpCode.EXIT:
                         {
-                            Unit result = new Unit(HeapValue.Nil);
+                            Unit result = new Unit("null");
                             if (stackTop > 0)
                                 result = StackPop();
                             return new VMResult(VMResultType.OK, result);
                         }
                     default:
                         Error("Unkown OpCode: " + instruction.opCode);
-                        return new VMResult(VMResultType.ERROR, new Unit(HeapValue.Nil));
+                        return new VMResult(VMResultType.ERROR, new Unit("null"));
                 }
             }
         }

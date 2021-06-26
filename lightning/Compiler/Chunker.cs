@@ -53,7 +53,7 @@ namespace lightning
                     catch(Exception e)
                     {
                         Console.WriteLine(e.ToString());
-                    }                    
+                    }
                 }
                 return code;
             }
@@ -179,7 +179,7 @@ namespace lightning
         }
 
         void ChunkProgram(ProgramNode p_node)
-        {               
+        {
             int line = p_node.Line;
             if (p_node.Statements != null)
             {
@@ -187,9 +187,9 @@ namespace lightning
                 {
                     ChunkIt(n);
                 }
-                      
+
                 if (p_node.Statements.Count > 1)
-                    line = p_node.Statements[p_node.Statements.Count - 1].Line;    
+                    line = p_node.Statements[p_node.Statements.Count - 1].Line;
             }
             Add(OpCode.EXIT, line);
         }
@@ -268,7 +268,7 @@ namespace lightning
                     Add(this_opcode, p_node.Line);
                     break;
                 default:
-                    Error("Unkown Unary operator " + p_node.Op.ToString(), p_node.Line);                    
+                    Error("Unkown Unary operator " + p_node.Op.ToString(), p_node.Line);
                     break;
             }
         }
@@ -913,7 +913,7 @@ namespace lightning
             // env
             env.Add(new List<string>());
             Add(OpCode.NENV, line);
-            //Add funStartEnv 
+            //Add funStartEnv
             funStartEnv.Push(env.Count - 1);
 
             int exit_instruction_address = instructionCounter;
@@ -989,7 +989,7 @@ namespace lightning
                             Variable this_upvalue = GetOrSetInUpValue(name, this_env.IndexOf(name), top_index - i, this_upvalues);
                             return this_upvalue;
                         }
-                        // local var                        
+                        // local var
                         return new Variable(name, this_env.IndexOf(name), top_index - i, ValType.Local);
                     }
                     if (isGlobal && globals.Contains(name))// Sanity check
@@ -1069,7 +1069,7 @@ namespace lightning
             {
                 constants.Add(p_string);
                 if (p_string == "Nil")
-                    code.AddConstant(new Unit(HeapValue.Nil));
+                    code.AddConstant(new Unit("null"));
                 else
                     code.AddConstant(new Unit(new ValString(p_string)));
 

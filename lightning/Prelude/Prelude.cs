@@ -73,7 +73,7 @@ namespace lightning
                 }
                 intrinsic.TableSet(new ValString("create"), new Unit(new ValIntrinsic("create", createIntrinsic, 3)));
 #else
-                intrinsic.TableSet(new ValString("create"), new Unit(HeapValue.Nil));
+                intrinsic.TableSet(new ValString("create"), new Unit("null"));
 #endif
                 tables.Add("intrinsic", intrinsic);
             }
@@ -113,7 +113,7 @@ namespace lightning
                     Unit value = vm.StackPeek(1);
                     list.elements.Add(value);
 
-                    return new Unit(HeapValue.Nil);
+                    return new Unit("null");
                 }
                 list.TableSet(new ValString("push"), new Unit(new ValIntrinsic("push", listPush, 2)));
 
@@ -164,7 +164,7 @@ namespace lightning
                 {
                     ValTable list = (ValTable)vm.StackPeek(0).value;
                     list.elements.Clear();
-                    return new Unit(HeapValue.Nil);
+                    return new Unit("null");
                 }
                 list.TableSet(new ValString("clear"), new Unit(new ValIntrinsic("clear", listClear, 1)));
 
@@ -176,7 +176,7 @@ namespace lightning
                     int range_end = (int)vm.StackPeek(2).number;
                     list.elements.RemoveRange(range_init, range_end - range_init + 1);
 
-                    return new Unit(HeapValue.Nil);
+                    return new Unit("null");
                 }
                 list.TableSet(new ValString("remove"), new Unit(new ValIntrinsic("remove", listRemoveRange, 3)));
 
@@ -228,7 +228,7 @@ namespace lightning
                     ValTable list = (ValTable)vm.StackPeek(0).value;
                     list.elements.Reverse();
 
-                    return new Unit(HeapValue.Nil);
+                    return new Unit("null");
                 }
                 list.TableSet(new ValString("reverse"), new Unit(new ValIntrinsic("reverse", listReverse, 1)));
 
@@ -264,7 +264,7 @@ namespace lightning
                 {
                     ValTable this_table = (ValTable)vm.StackPeek(0).value;
                     int i = -1;
-                    Unit value = new Unit(HeapValue.Nil);
+                    Unit value = new Unit("null");
                     ValString value_string = new ValString("value");
 
                     ValTable iterator = new ValTable(null, null);
@@ -283,7 +283,7 @@ namespace lightning
                 }
                 list.TableSet(new ValString("iterator"), new Unit(new ValIntrinsic("list_iterator", makeIterator, 1)));
 
-                ////////////////////////////////////////////////////// 
+                //////////////////////////////////////////////////////
 
                 tables.Add("list", list);
             }
@@ -338,7 +338,7 @@ namespace lightning
                 Unit tableClear(VM vm)
                 {
                     ValTable this_table = (ValTable)vm.StackPeek(0).value;
-                    return new Unit(HeapValue.Nil);
+                    return new Unit("null");
                 }
                 table.TableSet(new ValString("clear"), new Unit(new ValIntrinsic("clear", tableClear, 1)));
 
@@ -350,8 +350,8 @@ namespace lightning
                     ValString value_string = new ValString("value");
                     ValString key_string = new ValString("key");
                     ValTable iterator = new ValTable(null, null);
-                    iterator.table[key_string] = new Unit(HeapValue.Nil);
-                    iterator.table[value_string] = new Unit(HeapValue.Nil);
+                    iterator.table[key_string] = new Unit("null");
+                    iterator.table[value_string] = new Unit("null");
 
                     Unit next(VM vm)
                     {
@@ -614,7 +614,7 @@ namespace lightning
                         string result = input_string.Substring((int)start, (int)(end - start));
                         return new Unit(new ValString(result));
                     }
-                    return new Unit(HeapValue.Nil);
+                    return new Unit("null");
                 }
                 string_table.TableSet(new ValString("slice"), new Unit(new ValIntrinsic("string_slice", stringSlice, 3)));
 
@@ -632,7 +632,7 @@ namespace lightning
                         val_input_string.content = input_string.Substring(0, (int)start);
                         return new Unit(new ValString(result));
                     }
-                    return new Unit(HeapValue.Nil);
+                    return new Unit("null");
                 }
                 string_table.TableSet(new ValString("split"), new Unit(new ValIntrinsic("string_split", stringSplit, 2)));
 
@@ -650,10 +650,10 @@ namespace lightning
                 Unit stringCopy(VM vm)
                 {
                     Unit val_input_string = vm.StackPeek(0);
-                    if (val_input_string.Type() == typeof(ValString))
+                    if (val_input_string.HeapValueType() == typeof(ValString))
                         return new Unit(new ValString(val_input_string.ToString()));
                     else
-                        return new Unit(HeapValue.Nil);
+                        return new Unit("null");
                 }
                 string_table.TableSet(new ValString("copy"), new Unit(new ValIntrinsic("string_copy", stringCopy, 1)));
 
@@ -676,7 +676,7 @@ namespace lightning
                         char result = input_string[(int)index];
                         return new Unit(new ValString(result.ToString()));
                     }
-                    return new Unit(HeapValue.Nil);
+                    return new Unit("null");
                 }
                 char_table.TableSet(new ValString("at"), new Unit(new ValIntrinsic("char_at", charAt, 2)));
 
@@ -713,7 +713,7 @@ namespace lightning
                         }
                         return new Unit(HeapValue.False);
                     }
-                    return new Unit(HeapValue.Nil);
+                    return new Unit("null");
                 }
                 char_table.TableSet(new ValString("is_digit"), new Unit(new ValIntrinsic("is_digit", isDigit, 1)));
 
@@ -735,7 +735,7 @@ namespace lightning
                     if (input != null)
                         return new Unit(new ValString(input));
 
-                    return new Unit(HeapValue.Nil);
+                    return new Unit("null");
                 }
                 file.TableSet(new ValString("load"), new Unit(new ValIntrinsic("load_file", loadFile, 1)));
 
@@ -749,7 +749,7 @@ namespace lightning
                         file.Write(output);
                     }
 
-                    return new Unit(HeapValue.Nil);
+                    return new Unit("null");
                 }
                 file.TableSet(new ValString("write"), new Unit(new ValIntrinsic("write_file", writeFile, 2)));
 
@@ -763,7 +763,7 @@ namespace lightning
                         file.Write(output);
                     }
 
-                    return new Unit(HeapValue.Nil);
+                    return new Unit("null");
                 }
                 file.TableSet(new ValString("append"), new Unit(new ValIntrinsic("append_file", appendFile, 2)));
 
@@ -788,7 +788,7 @@ namespace lightning
                     {
                         Console.WriteLine(error);
                     }
-                    return new Unit(HeapValue.Nil);
+                    return new Unit("null");
                 }
 
                 Node program = parser.ParsedTree;
@@ -801,7 +801,7 @@ namespace lightning
                     Console.WriteLine("Code generation had errors:");
                     foreach (string error in code_generator.Errors)
                         Console.WriteLine(error);
-                    return new Unit(HeapValue.Nil);
+                    return new Unit("null");
                 }
                 if (code_generator.HasChunked == true)
                 {
@@ -809,13 +809,13 @@ namespace lightning
                     VMResult result = imported_vm.Run();
                     if (result.status == VMResultType.OK)
                     {
-                        if (result.value.Type() == typeof(ValTable) || result.value.Type() == typeof(ValFunction))
+                        if (result.value.HeapValueType() == typeof(ValTable) || result.value.HeapValueType() == typeof(ValFunction))
                             MakeModule(result.value, eval_name, vm, imported_vm);
                         //vm.GetChunk().Print();
                         return result.value;
                     }
                 }
-                return new Unit(HeapValue.Nil);
+                return new Unit("null");
             }
             functions.Add(new ValIntrinsic("eval", eval, 1));
 
@@ -846,7 +846,7 @@ namespace lightning
                         {
                             Console.WriteLine(error);
                         }
-                        return new Unit(HeapValue.Nil);
+                        return new Unit("null");
                     }
 
                     Node program = parser.ParsedTree;
@@ -858,7 +858,7 @@ namespace lightning
                         Console.WriteLine("Code generation had errors:");
                         foreach (string error in code_generator.Errors)
                             Console.WriteLine(error);
-                        return new Unit(HeapValue.Nil);
+                        return new Unit("null");
                     }
 
                     if (code_generator.HasChunked == true)
@@ -873,7 +873,7 @@ namespace lightning
                         }
                     }
                 }
-                return new Unit(HeapValue.Nil);
+                return new Unit("null");
             }
             functions.Add(new ValIntrinsic("require", require, 1));
 
@@ -904,7 +904,7 @@ namespace lightning
             Unit writeLine(VM vm)
             {
                 Console.WriteLine(System.Text.RegularExpressions.Regex.Unescape(vm.StackPeek(0).ToString()));
-                return new Unit(HeapValue.Nil);
+                return new Unit("null");
             }
             functions.Add(new ValIntrinsic("write_line", writeLine, 1));
 
@@ -912,7 +912,7 @@ namespace lightning
             Unit write(VM vm)
             {
                 Console.Write(System.Text.RegularExpressions.Regex.Unescape(vm.StackPeek(0).ToString()));
-                return new Unit(HeapValue.Nil);
+                return new Unit("null");
             }
             functions.Add(new ValIntrinsic("write", write, 1));
 
@@ -931,7 +931,7 @@ namespace lightning
                 if (Number.TryParse(read, out Number n))
                     return new Unit(n);
                 else
-                    return new Unit(HeapValue.Nil);
+                    return new Unit("null");
             }
             functions.Add(new ValIntrinsic("read_number", readNumber, 0));
 
@@ -943,12 +943,12 @@ namespace lightning
                 {
                     char next = Convert.ToChar(read);
                     if (next == '\n')
-                        return new Unit(HeapValue.Nil);
+                        return new Unit("null");
                     else
                         return new Unit(new ValString(Char.ToString(next)));
                 }
                 else
-                    return new Unit(HeapValue.Nil);
+                    return new Unit("null");
             }
             functions.Add(new ValIntrinsic("read", read, 0));
 
@@ -964,7 +964,7 @@ namespace lightning
             //////////////////////////////////////////////////////
             Unit type(VM vm)
             {
-                Type this_type = vm.StackPeek(0).Type();
+                Type this_type = vm.StackPeek(0).HeapValueType();
                 return new Unit(new ValString(this_type.ToString()));
             }
             functions.Add(new ValIntrinsic("type", type, 1));
@@ -974,7 +974,7 @@ namespace lightning
             {
                 Unit first = vm.StackPeek(0);
                 Unit second = vm.StackPeek(1);
-                if (first.Type() != typeof(ValNil))
+                if (first.HeapValueType() != null)
                     return first;
                 else
                     return second;
@@ -992,7 +992,7 @@ namespace lightning
             Unit resourcesTrim(VM vm)
             {
                 vm.ResoursesTrim();
-                return new Unit(HeapValue.Nil);
+                return new Unit("null");
             }
             functions.Add(new ValIntrinsic("trim", resourcesTrim, 0));
 
@@ -1000,7 +1000,7 @@ namespace lightning
             Unit releaseAllVMs(VM vm)
             {
                 vm.ReleaseVMs();
-                return new Unit(HeapValue.Nil);
+                return new Unit("null");
             }
             functions.Add(new ValIntrinsic("release_all_vms", releaseAllVMs, 0));
 
@@ -1009,7 +1009,7 @@ namespace lightning
             {
                 Unit count = vm.StackPeek(0);
                 vm.ReleaseVMs((int)count.number);
-                return new Unit(HeapValue.Nil);
+                return new Unit("null");
             }
             functions.Add(new ValIntrinsic("release_vms", releaseVMs, 1));
 
@@ -1101,9 +1101,9 @@ namespace lightning
                 module,
                 (Operand)module_index);
 
-            if (this_value.Type() == typeof(ValFunction)) RelocateFunction((ValFunction)this_value.value, relocationInfo);
-            else if (this_value.Type() == typeof(ValClosure)) RelocateClosure((ValClosure)this_value.value, relocationInfo);
-            else if (this_value.Type() == typeof(ValTable)) FindFunction((ValTable)this_value.value, relocationInfo);
+            if (this_value.HeapValueType() == typeof(ValFunction)) RelocateFunction((ValFunction)this_value.value, relocationInfo);
+            else if (this_value.HeapValueType() == typeof(ValClosure)) RelocateClosure((ValClosure)this_value.value, relocationInfo);
+            else if (this_value.HeapValueType() == typeof(ValTable)) FindFunction((ValTable)this_value.value, relocationInfo);
 
             return module;
         }
@@ -1115,9 +1115,9 @@ namespace lightning
                 relocationInfo.relocatedTables.Add(table.GetHashCode());
                 foreach (KeyValuePair<ValString, Unit> entry in table.table)
                 {
-                    if (entry.Value.Type() == typeof(ValFunction)) RelocateFunction((ValFunction)entry.Value.value, relocationInfo);
-                    else if (entry.Value.Type() == typeof(ValClosure)) RelocateClosure((ValClosure)entry.Value.value, relocationInfo);
-                    else if (entry.Value.Type() == typeof(ValTable)) FindFunction((ValTable)entry.Value.value, relocationInfo);
+                    if (entry.Value.HeapValueType() == typeof(ValFunction)) RelocateFunction((ValFunction)entry.Value.value, relocationInfo);
+                    else if (entry.Value.HeapValueType() == typeof(ValClosure)) RelocateClosure((ValClosure)entry.Value.value, relocationInfo);
+                    else if (entry.Value.HeapValueType() == typeof(ValTable)) FindFunction((ValTable)entry.Value.value, relocationInfo);
 
                     relocationInfo.module.TableSet(entry.Key, entry.Value);
                 }
@@ -1128,11 +1128,11 @@ namespace lightning
         {
             foreach (ValUpValue v in closure.upValues)
             {
-                if (v.Val.Type() == typeof(ValClosure)/* && relocationInfo.module.name != closure.function.module*/)
+                if (v.Val.HeapValueType() == typeof(ValClosure)/* && relocationInfo.module.name != closure.function.module*/)
                 {
                     RelocateClosure((ValClosure)v.Val.value, relocationInfo);
                 }
-                else if (v.Val.Type() == typeof(ValFunction)/* && relocationInfo.module.name != closure.function.module*/)
+                else if (v.Val.HeapValueType() == typeof(ValFunction)/* && relocationInfo.module.name != closure.function.module*/)
                 {
                     RelocateFunction((ValFunction)v.Val.value, relocationInfo);
                 }
@@ -1153,7 +1153,7 @@ namespace lightning
                 relocationInfo.module.globals.Add(new_value);
                 relocationInfo.relocatedGlobals.Add(relocationInfo.toBeRelocatedGlobals[i], (Operand)(relocationInfo.module.globals.Count - 1));
 
-                if (new_value.Type() == typeof(ValTable)) relocation_stack.Add((ValTable)new_value.value);
+                if (new_value.HeapValueType() == typeof(ValTable)) relocation_stack.Add((ValTable)new_value.value);
             }
             relocationInfo.toBeRelocatedGlobals.Clear();
 
@@ -1164,7 +1164,7 @@ namespace lightning
                 relocationInfo.module.constants.Add(new_value);
                 relocationInfo.relocatedConstants.Add(relocationInfo.toBeRelocatedConstants[i], (Operand)(relocationInfo.module.constants.Count - 1));
 
-                if (new_value.Type() == typeof(ValTable)) relocation_stack.Add((ValTable)new_value.value);
+                if (new_value.HeapValueType() == typeof(ValTable)) relocation_stack.Add((ValTable)new_value.value);
             }
             relocationInfo.toBeRelocatedConstants.Clear();
 
@@ -1297,7 +1297,7 @@ namespace lightning
         {
             foreach (KeyValuePair<ValString, Unit> entry in module.table)
             {
-                if (entry.Value.Type() == typeof(ValFunction))
+                if (entry.Value.HeapValueType() == typeof(ValFunction))
                 {
                     ValFunction function = (ValFunction)entry.Value.value;
                     for (Operand i = 0; i < function.body.Count; i++)

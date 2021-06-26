@@ -470,7 +470,7 @@ function clear_errors()
     var d = 3
     var e = maybe(maybe(maybe(a, b), c), d)
     d = 1
-    assert(e, 3, "Failed Or init test 1.")
+    assert(e, 3, "Failed maybe init test 1.")
 }
 {
     // Testing Math
