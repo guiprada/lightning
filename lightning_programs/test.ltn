@@ -567,7 +567,7 @@ function clear_errors()
     }
 }
 // Testing Global Lock
-var global_lock_test_counter = 0
+var global_lock_test_counter = 5
 {
     var n = 1000
     function many(index, collection)
@@ -575,18 +575,18 @@ var global_lock_test_counter = 0
         global_lock_test_counter++;
     }
     range(n, [], many)
-    assert(global_lock_test_counter, n, "Failed Global Lock Test 1.")
+    assert(global_lock_test_counter, n + 5, "Failed Global Lock Test 1.")
 }
 {
     // Testing UpValue Lock
     var n = 1000
-    var upvalue_lock_test_counter
+    var upvalue_lock_test_counter = 5
     function many(index, collection)
     {
         upvalue_lock_test_counter++;
     }
     range(n, [], many)
-    assert(upvalue_lock_test_counter, n, "Failed UpValue Lock Test 1.")
+    assert(upvalue_lock_test_counter, n + 5, "Failed UpValue Lock Test 1.")
 }
 {
     // Testing VMs management

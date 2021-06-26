@@ -39,16 +39,14 @@ namespace lightning
         ValFunction[] functionCallStack;
         Unit[] stack; // used for operations
         int stackTop;
-        List<Unit> globals; // used for global variables
+        GlobalMemory globals; // used for global variables
         List<Unit> variables; // used for scoped variables
         int variablesTop;
 
         int[] variablesBases; // used to control the address used by each scope
         int variablesBasesTop;
 
-        List<ValUpValue> upValues; // used to store upvalues
-        int[] upValuesBases; //
-        int upValuesBasesTop;
+        Memory<ValUpValue> upValues;
 
         List<ValUpValue> upValuesRegistry;
         int[] upValuesRegistryBases;
@@ -68,7 +66,7 @@ namespace lightning
         Stack<VM> vmPool;
         int function_deepness;
 
-        public VM(Chunk p_chunk, int p_function_deepness = 25, List<Unit> p_globals = null)
+        public VM(Chunk p_chunk, int p_function_deepness = 25, GlobalMemory p_globals = null)
         {
             chunk = p_chunk;
             function_deepness = p_function_deepness;
@@ -80,7 +78,7 @@ namespace lightning
 
             stack = new Unit[3 * function_deepness];
             stackTop = 0;
-            globals = p_globals ?? new List<Unit>();
+            globals = p_globals ?? new GlobalMemory();
             variables = new List<Unit>();
             variablesTop = 0;
 
@@ -89,11 +87,7 @@ namespace lightning
             variablesBases[variablesBasesTop] = 0;
             variablesBasesTop++;
 
-            upValues = new List<ValUpValue>();
-            upValuesBases = new int[function_deepness];
-            upValuesBasesTop = 0;
-            upValuesBases[upValuesBasesTop] = 0;
-            upValuesBasesTop++;
+            upValues = new Memory<ValUpValue>();
 
             upValuesRegistry = new List<ValUpValue>();
             upValuesRegistryBases = new int[function_deepness];
@@ -128,7 +122,7 @@ namespace lightning
         public void ResoursesTrim(){
             upValuesRegistry.TrimExcess();
             variables.TrimExcess();
-            upValues.TrimExcess();
+            upValues.Trim();
         }
         public void ReleaseVMs(int count){
             for (int i = 0; i < count; i++)
@@ -176,7 +170,7 @@ namespace lightning
 
         public Unit GetGlobal(Operand address)
         {
-            return globals[address];
+            return globals.Get(address);
         }
 
         void StackPush(Unit p_value)
@@ -257,26 +251,6 @@ namespace lightning
             }
         }
 
-        void UpValuesPush()
-        {
-            upValuesBases[upValuesBasesTop] = upValues.Count;
-            upValuesBasesTop++;
-        }
-
-        void UpValuesPop()
-        {
-            int this_UpvaluesBase = upValuesBases[upValuesBasesTop - 1];
-            upValuesBasesTop--;
-
-            upValues.RemoveRange(this_UpvaluesBase, upValues.Count - this_UpvaluesBase);
-        }
-
-        ValUpValue UpValuesAt(int address)
-        {
-            int this_UpvalueBasePointer = upValuesBases[upValuesBasesTop - 1];
-            return upValues[this_UpvalueBasePointer + address];
-        }
-
         void Error(string msg)
         {
             if (executingInstructions == 0)
@@ -313,7 +287,7 @@ namespace lightning
             else if (this_type == typeof(ValClosure))
             {
                 ValClosure this_closure = (ValClosure)(this_callable.value);
-                UpValuesPush();
+                upValues.PushEnv();
 
                 foreach (ValUpValue u in this_closure.upValues)
                 {
@@ -378,7 +352,7 @@ namespace lightning
                             IP++;
                             Operand address = instruction.opA;
                             Unit global;
-                            global = globals[address];
+                            global = globals.Get(address);
                             StackPush(global);
                             break;
                         }
@@ -405,7 +379,7 @@ namespace lightning
                         {
                             IP++;
                             Operand address = instruction.opA;
-                            ValUpValue up_val = UpValuesAt(address);
+                            ValUpValue up_val = upValues.GetAt(address);
                             StackPush(up_val.Val);
                             break;
                         }
@@ -565,30 +539,20 @@ namespace lightning
                             Operand address = instruction.opA;
                             Operand op = instruction.opB;
                             Unit new_value = StackPeek();
-                            if (op == 0)
+                             if (op == 0)
                             {
-                                lock(globals){
-                                    globals[address] = new_value;
-                                }
+                                globals.AtomicSet(new_value, address);
                             }
                             else
                             {
-                                Unit old_value;
-                                lock(globals){
-                                    old_value = globals[address];
-                                
-                                    Number result = 0;
-                                    if (op == 1)
-                                        result = old_value.number + new_value.number;
-                                    else if (op == 2)
-                                        result = old_value.number - new_value.number;
-                                    else if (op == 3)
-                                        result = old_value.number * new_value.number;
-                                    else if (op == 4)
-                                        result = old_value.number / new_value.number;
-
-                                    globals[address] = new Unit(result);
-                                }
+                                if (op == 1)
+                                    globals.AtomicInc(new_value, address);
+                                else if (op == 2)
+                                    globals.AtomicDec(new_value, address);
+                                else if (op == 3)
+                                    globals.AtomicMult(new_value, address);
+                                else if (op == 4)
+                                    globals.AtomicDiv(new_value, address);
                             }
                             break;
                         }
@@ -597,7 +561,7 @@ namespace lightning
                             IP++;
                             Operand address = instruction.opA;
                             Operand op = instruction.opB;
-                            ValUpValue this_upValue = UpValuesAt(address);
+                            ValUpValue this_upValue = upValues.GetAt(address);
                             Unit new_value = StackPeek();
                             if (op == 0)
                             {
@@ -1061,7 +1025,7 @@ namespace lightning
                         }
                     case OpCode.CLOSURECLOSE:
                         {
-                            UpValuesPop();
+                            upValues.PopEnv();
                             int target_env = funCallEnv[executingInstructions];
                             EnvSet(target_env);
                             IP = ret[ret_count - 1];
@@ -1127,7 +1091,7 @@ namespace lightning
                                 funCallEnv[executingInstructions + 1] = variablesBasesTop - 1;// sets the return env to funclose/closureclose
 
                                 ValClosure this_closure = (ValClosure)this_callable.value;
-                                UpValuesPush();
+                                upValues.PushEnv();
 
                                 foreach (ValUpValue u in this_closure.upValues)
                                 {
@@ -1277,19 +1241,19 @@ namespace lightning
                 statsValue += "Variables empty :)\n";
             }
 
-            counter = 0;
-            for (int i = 0; i < upValuesBases[upValuesBasesTop - 1]; i++)
-            {
-                if (i == 0)
-                {
-                    statsValue += "Upvalues:\n";
-                }
-                foreach (Value v in upValues)
-                {
-                    statsValue += counter.ToString() + ": " + upValues[i].ToString() + '\n';
-                    counter++;
-                }
-            }
+            // counter = 0;
+            // for (int i = 0; i < upValuesBases[upValuesBasesTop - 1]; i++)
+            // {
+            //     if (i == 0)
+            //     {
+            //         statsValue += "Upvalues:\n";
+            //     }
+            //     foreach (Value v in upValues)
+            //     {
+            //         statsValue += counter.ToString() + ": " + upValues[i].ToString() + '\n';
+            //         counter++;
+            //     }
+            // }
             if (counter == 0)
             {
                 statsValue += "Upvalues empty :)\n";
