@@ -3,63 +3,19 @@ using System.Collections.Generic;
 using Operand = System.UInt16;
 namespace lightning
 {
-    public class Variables{
-        List<Unit> values; // used for scoped variables
-
-        List<int> markers; // used to control the address used by each scope
+    public class Memory<T>{
+        List<T> values;
+        List<int> markers;
 
         public int Env{
             get{
                 return markers.Count - 1;
             }
         }
-
-        public Variables(int p_function_deepness){
-            values = new List<Unit>();
-            markers = new List<int>();
-            PushEnv();
-        }
-
-        public void Trim(){
-            values.TrimExcess();
-        }
-
-        public Unit GetAt(Operand address, Operand n_env)
-        {
-            int this_BP = markers[n_env];
-            return values[this_BP + address];
-        }
-
-        public void SetAt(Unit new_value, Operand address, Operand n_env)
-        {
-            values[address + markers[n_env]] = new_value;
-        }
-
-        public void PushEnv(){
-            markers.Add(values.Count);
-        }
-
-        public void PopEnv(){
-            int last_index = markers.Count -1;
-            int this_basePointer = markers[last_index];
-            markers.RemoveAt(last_index);
-            values.RemoveRange(this_basePointer, values.Count - this_basePointer);
-        }
-
-        public void Add(Unit new_value){
-            values.Add(new_value);
-        }
-
-    }
-    public class Memory<T>{
-        List<T> values;
-
-        List<int> markers;
-        int marker;
-
+        
         public int Marker{
             get{
-                return marker;
+                return markers[^1];
             }
         }
 
@@ -69,17 +25,15 @@ namespace lightning
             }
         }
 
-        public int Env{
-            get{
-                return markers.Count - 1;
-            }
-        }
-
         public Memory(){
             values = new List<T>();
             markers = new List<int>();
-            marker = 0;
             PushEnv();
+        }
+
+        public void Trim(){
+            markers.TrimExcess();
+            values.TrimExcess();
         }
 
         public T Get(int index){
@@ -92,7 +46,7 @@ namespace lightning
         }
 
         public T GetAt(int index){
-            return values[marker + index];
+            return values[Marker + index];
         }
 
         public void SetAt(T new_value, int index, int env){
@@ -108,19 +62,14 @@ namespace lightning
             values.Add(new_value);
             return values.Count - 1;
         }
-        public void Trim(){
-            markers.TrimExcess();
-            values.TrimExcess();
-        }
+
         public void PushEnv(){
-            markers.Add(marker);
-            marker = values.Count;
+            markers.Add(values.Count);
         }
 
         public void PopEnv(){
-            values.RemoveRange(marker, values.Count - marker);
             int last_index = markers.Count -1;
-            marker = markers[last_index];
+            values.RemoveRange(markers[last_index], values.Count - markers[last_index]);
             markers.RemoveAt(last_index);
         }
     }

@@ -40,7 +40,7 @@ namespace lightning
         Unit[] stack; // used for operations
         int stackTop;
         GlobalMemory globals; // used for global variables
-        Variables variables; // used for scoped variables
+        Memory<Unit> variables; // used for scoped variables
 
         Memory<ValUpValue> upValues;
 
@@ -73,7 +73,7 @@ namespace lightning
             stack = new Unit[3 * function_deepness];
             stackTop = 0;
             globals = p_globals ?? new GlobalMemory();
-            variables = new Variables(function_deepness);
+            variables = new Memory<Unit>();
             upValues = new Memory<ValUpValue>();
             upValuesRegistry = new Memory<ValUpValue>();
 

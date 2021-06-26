@@ -332,7 +332,7 @@ namespace lightning
             upValues = p_upValues;
         }
 
-        public void Register(Variables p_variables)
+        public void Register(Memory<Unit> p_variables)
         {
             foreach (ValUpValue u in upValues)
                 u.Attach(p_variables);
@@ -377,7 +377,7 @@ namespace lightning
         public Operand address;
         public Operand env;
         bool isCaptured;
-        Variables variables;
+        Memory<Unit> variables;
         Unit val;
         public Unit Val
         {
@@ -406,7 +406,7 @@ namespace lightning
             val = new Unit(Value.Nil);
         }
 
-        public void Attach(Variables p_variables)
+        public void Attach(Memory<Unit> p_variables)
         {
             variables = p_variables;
         }
