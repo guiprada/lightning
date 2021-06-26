@@ -7,8 +7,10 @@ using Operand = System.UInt16;
 
 #if DOUBLE
     using Number = System.Double;
+    using Integer = System.Int64;
 #else
     using Number = System.Single;
+    using Integer = System.Int32;
 #endif
 
 namespace lightning
@@ -20,14 +22,64 @@ namespace lightning
 
         HeapValue
     }
-    public struct Unit{
-        public Number unitValue;
-        public HeapValue heapValue;
-        public UnitType type;
 
+    public class vHeap{
+        Dictionary<Integer,WeakReference> values;
+        Stack<Integer> freed;
+        Integer top;
+        public vHeap(){
+            values = new Dictionary<Integer, WeakReference>();
+            freed = new Stack<Integer>();
+            top = 0;
+        }
+        public Integer Add(HeapValue p_value){
+            Integer this_index;
+            lock(values){
+                if(freed.Count > 0)
+                    this_index = freed.Pop();
+                else{
+                    this_index = top;
+                    top++;
+                }
+                values.Add(this_index, new WeakReference(p_value));
+            }
+            return this_index;
+        }
+
+        public void Free(Integer p_index){
+            Console.WriteLine("******************************* Werks ********************************");
+            lock(values){
+                values.Remove(p_index);
+                freed.Push(p_index);
+            }
+        }
+        public HeapValue Get(Integer p_index){
+            return (HeapValue)values[p_index].Target;
+        }
+    }
+
+    [StructLayout(LayoutKind.Explicit)]
+    public struct Unit{
+        [FieldOffset(0)]
+        public Number unitValue;
+        [FieldOffset(0)]
+        public Integer heapValueIndex;
+
+#if DOUBLE
+        [FieldOffset(8)]
+#else
+        [FieldOffset(4)]
+#endif
+        public UnitType type;
+        public HeapValue heapValue {
+            get{
+                return HeapValue.Heap.Get(heapValueIndex);
+            }
+        }
         public Unit(HeapValue p_value) : this()
         {
-            heapValue = p_value;
+            heapValueIndex = HeapValue.Heap.Add(p_value);
+            p_value.vHeapIndex = heapValueIndex;
             type = UnitType.HeapValue;
         }
         public Unit(Number p_number) : this()
@@ -134,6 +186,9 @@ namespace lightning
     }
     public abstract class HeapValue
     {
+        public static vHeap Heap = new vHeap();
+        public Integer vHeapIndex;
+
         public abstract override string ToString();
         public abstract bool ToBool();
 
@@ -181,6 +236,10 @@ namespace lightning
         public override int GetHashCode()
         {
             return content.GetHashCode();
+        }
+
+        ~ValString(){
+            Heap.Free(vHeapIndex);
         }
     }
 
@@ -238,6 +297,10 @@ namespace lightning
         {
             return name.GetHashCode() + module.GetHashCode();
         }
+
+        ~ValFunction(){
+            Heap.Free(vHeapIndex);
+        }
     }
 
     public class ValIntrinsic : HeapValue
@@ -284,6 +347,10 @@ namespace lightning
         public override int GetHashCode()
         {
             return name.GetHashCode();
+        }
+
+        ~ValIntrinsic(){
+            Heap.Free(vHeapIndex);
         }
     }
 
@@ -335,6 +402,10 @@ namespace lightning
         public override int GetHashCode()
         {
             return upValues.GetHashCode() + function.GetHashCode();
+        }
+
+        ~ValClosure(){
+            Heap.Free(vHeapIndex);
         }
     }
 
@@ -417,6 +488,9 @@ namespace lightning
             return Val.GetHashCode();
         }
 
+        ~ValUpValue(){
+            Heap.Free(vHeapIndex);
+        }
     }
 
     public class ValTable : HeapValue
@@ -521,6 +595,10 @@ namespace lightning
         {
             return elements.GetHashCode() + table.GetHashCode();
         }
+
+        ~ValTable(){
+            Heap.Free(vHeapIndex);
+        }
     }
 
     public class ValModule : ValTable
@@ -560,6 +638,10 @@ namespace lightning
         public override int GetHashCode()
         {
             return name.GetHashCode();
+        }
+
+        ~ValModule(){
+            Heap.Free(vHeapIndex);
         }
     }
 
@@ -618,6 +700,10 @@ namespace lightning
             {
                 throw new Exception("UnWrapp<>() type Error!");
             }
+        }
+
+        ~ValWrapper(){
+            Heap.Free(vHeapIndex);
         }
     }
 }
