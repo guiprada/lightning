@@ -1,7 +1,72 @@
 
 using System.Collections.Generic;
+using Operand = System.UInt16;
 namespace lightning
 {
+	public class Variables{
+		List<Unit> values; // used for scoped variables
+        int variablesTop;
+
+        int[] variablesBases; // used to control the address used by each scope
+        int variablesBasesTop;
+
+		public int BasesTop{
+			get{
+				return variablesBasesTop;
+			}
+		}
+
+		public Variables(int p_function_deepness){
+            values = new List<Unit>();
+			variablesTop = 0;
+            variablesBases = new int[3 * p_function_deepness];
+            variablesBasesTop = 0;
+            variablesBases[variablesBasesTop] = 0;
+            variablesBasesTop++;
+		}
+
+		public void Trim(){
+			values.TrimExcess();
+		}
+
+		public Unit VarAt(Operand address, Operand n_env)
+        {
+            int this_BP = variablesBases[n_env];
+            return values[this_BP + address];
+        }
+
+        public void VarSet(Unit new_value, Operand address, Operand n_env)
+        {
+            values[address + variablesBases[n_env]] = new_value;
+        }
+
+		public void PushEnv(){
+			variablesBases[variablesBasesTop] = variablesTop;
+			variablesBasesTop++;
+		}
+
+		public void PopEnv(){
+			int this_basePointer = variablesBases[variablesBasesTop - 1];
+            variablesBasesTop--;
+            variablesTop = this_basePointer;
+
+            values.RemoveRange(this_basePointer, values.Count - this_basePointer);
+		}
+
+        public void Add(Unit new_value){
+            if (variablesTop >= (values.Count))
+            {
+                values.Add(new_value);
+                variablesTop++;
+            }
+            else
+            {
+                values[variablesTop] = new_value;
+                variablesTop++;
+            }
+        }
+
+	}
 	public class Memory<T>{
 		List<T> values;
 
@@ -17,6 +82,12 @@ namespace lightning
 		public int Count{
 			get{
 				return values.Count;
+			}
+		}
+
+		public int Env{
+			get{
+				return markers.Count - 1;
 			}
 		}
 

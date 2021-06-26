@@ -332,10 +332,10 @@ namespace lightning
             upValues = p_upValues;
         }
 
-        public void Register(List<Unit> p_variables, int[] p_variablesBases)
+        public void Register(Variables p_variables)
         {
             foreach (ValUpValue u in upValues)
-                u.Attach(p_variables, p_variablesBases);
+                u.Attach(p_variables);
         }
 
         public override string ToString()
@@ -377,8 +377,7 @@ namespace lightning
         public Operand address;
         public Operand env;
         bool isCaptured;
-        List<Unit> variables;
-        int[] variablesBases;
+        Variables variables;
         Unit val;
         public Unit Val
         {
@@ -387,20 +386,14 @@ namespace lightning
                 if (isCaptured)
                     return val;
                 else
-                {
-                    int this_BP = variablesBases[env];
-                    return variables[this_BP + address];
-                }
+                    return variables.VarAt(address, env);
             }
             set
             {
                 if (isCaptured)
                     val = value;
                 else
-                {
-                    int this_BP = variablesBases[env];
-                    variables[this_BP + address] = value;
-                }
+                    variables.VarSet(value, address, env);
             }
         }
 
@@ -410,14 +403,12 @@ namespace lightning
             env = p_env;
             isCaptured = false;
             variables = null;
-            variablesBases = null;
             val = new Unit(Value.Nil);
         }
 
-        public void Attach(List<Unit> p_variables, int[] p_variablesBases)
+        public void Attach(Variables p_variables)
         {
             variables = p_variables;
-            variablesBases = p_variablesBases;
         }
 
         public void Capture()
@@ -425,8 +416,7 @@ namespace lightning
             if (isCaptured == false)
             {
                 isCaptured = true;
-                int this_BP = variablesBases[env];
-                val = variables[this_BP + address];
+                val = variables.VarAt(address, env);
             }
         }
         public override string ToString()

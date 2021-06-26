@@ -40,11 +40,7 @@ namespace lightning
         Unit[] stack; // used for operations
         int stackTop;
         GlobalMemory globals; // used for global variables
-        List<Unit> variables; // used for scoped variables
-        int variablesTop;
-
-        int[] variablesBases; // used to control the address used by each scope
-        int variablesBasesTop;
+        Variables variables; // used for scoped variables
 
         Memory<ValUpValue> upValues;
 
@@ -77,16 +73,8 @@ namespace lightning
             stack = new Unit[3 * function_deepness];
             stackTop = 0;
             globals = p_globals ?? new GlobalMemory();
-            variables = new List<Unit>();
-            variablesTop = 0;
-
-            variablesBases = new int[3 * function_deepness];
-            variablesBasesTop = 0;
-            variablesBases[variablesBasesTop] = 0;
-            variablesBasesTop++;
-
+            variables = new Variables(function_deepness);
             upValues = new Memory<ValUpValue>();
-
             upValuesRegistry = new Memory<ValUpValue>();
 
             ret = new Operand[2 * function_deepness];
@@ -117,7 +105,7 @@ namespace lightning
 
         public void ResoursesTrim(){
             upValuesRegistry.Trim();
-            variables.TrimExcess();
+            variables.Trim();
             upValues.Trim();
         }
         public void ReleaseVMs(int count){
@@ -196,17 +184,6 @@ namespace lightning
             return stack[stackTop - n - 1];
         }
 
-        Unit VarAt(Operand address, Operand n_env)
-        {
-            int this_BP = variablesBases[n_env];
-            return variables[this_BP + address];
-        }
-
-        void VarSet(Unit new_value, Operand address, Operand n_env)
-        {
-            variables[address + variablesBases[n_env]] = new_value;
-        }
-
         void RegisterUpValue(ValUpValue u)
         {
             upValuesRegistry.Add(u);
@@ -214,8 +191,7 @@ namespace lightning
 
         void EnvPush()
         {
-            variablesBases[variablesBasesTop] = variablesTop;
-            variablesBasesTop++;
+            variables.PushEnv();
             upValuesRegistry.PushEnv();
         }
 
@@ -229,17 +205,12 @@ namespace lightning
                 upValuesRegistry.Get(i).Capture();
             }
             upValuesRegistry.PopEnv();
-
-            int this_basePointer = variablesBases[variablesBasesTop - 1];
-            variablesBasesTop--;
-            variablesTop = this_basePointer;
-
-            variables.RemoveRange(this_basePointer, variables.Count - this_basePointer);
+            variables.PopEnv();
         }
 
         void EnvSet(int target_env)
         {
-            while ((variablesBasesTop - 1) > target_env)
+            while ((variables.BasesTop - 1) > target_env)
             {
                 EnvPop();
             }
@@ -269,7 +240,7 @@ namespace lightning
             Type this_type = this_callable.Type();
             ret[ret_count] = (Operand)(chunk.ProgramSize - 1);
             ret_count += 1;
-            funCallEnv[executingInstructions + 1] = variablesBasesTop - 1;
+            funCallEnv[executingInstructions + 1] = variables.BasesTop - 1;
             if (this_type == typeof(ValFunction))
             {
                 ValFunction this_func = (ValFunction)(this_callable.value);
@@ -337,7 +308,7 @@ namespace lightning
                             IP++;
                             Operand address = instruction.opA;
                             Operand n_shift = instruction.opB;
-                            var variable = VarAt(address, (Operand)(variablesBasesTop - 1 - n_shift));
+                            var variable = variables.VarAt(address, (Operand)(variables.BasesTop - 1 - n_shift));
                             StackPush(variable);
                             break;
                         }
@@ -406,17 +377,7 @@ namespace lightning
                         {
                             IP++;
                             Unit new_value = StackPop();
-
-                            if (variablesTop > (variables.Count - 1))
-                            {
-                                variables.Add(new_value);
-                                variablesTop++;
-                            }
-                            else
-                            {
-                                variables[variablesTop] = new_value;
-                                variablesTop++;
-                            }
+                            variables.Add(new_value);
                             break;
                         }
                     case OpCode.GLOBALDCL:
@@ -443,16 +404,7 @@ namespace lightning
                                     }
                                     else
                                     {
-                                        if (variablesTop >= (variables.Count))
-                                        {
-                                            variables.Add(this_callable);
-                                            variablesTop++;
-                                        }
-                                        else
-                                        {
-                                            variables[variablesTop] = this_callable;
-                                            variablesTop++;
-                                        }
+                                        variables.Add(this_callable);
                                     }
                                 else
                                     StackPush(this_callable);
@@ -466,12 +418,12 @@ namespace lightning
                                 foreach (ValUpValue u in this_closure.upValues)
                                 {
                                     // here we convert env from shift based to absolute based
-                                    ValUpValue new_upvalue = new ValUpValue(u.address, (Operand)(variablesBasesTop - u.env));
+                                    ValUpValue new_upvalue = new ValUpValue(u.address, (Operand)(variables.BasesTop - u.env));
                                     new_upValues.Add(new_upvalue);
                                 }
                                 ValClosure new_closure = new ValClosure(this_closure.function, new_upValues);
 
-                                new_closure.Register(variables, variablesBases);
+                                new_closure.Register(variables);
                                 foreach (ValUpValue u in new_closure.upValues)
                                 {
                                     RegisterUpValue(u);
@@ -484,16 +436,7 @@ namespace lightning
                                     }
                                     else
                                     {
-                                        if (variablesTop >= (variables.Count))
-                                        {
-                                            variables.Add(new_closure_unit);
-                                            variablesTop++;
-                                        }
-                                        else
-                                        {
-                                            variables[variablesTop] = new_closure_unit;
-                                            variablesTop++;
-                                        }
+                                        variables.Add(new_closure_unit);
                                     }
                                 else
                                     StackPush(new_closure_unit);
@@ -509,11 +452,11 @@ namespace lightning
                             Unit new_value = StackPeek();
                             if (op == 0)
                             {
-                                VarSet(new_value, address, (Operand)(variablesBasesTop - 1 - n_shift));
+                                variables.VarSet(new_value, address, (Operand)(variables.BasesTop - 1 - n_shift));
                             }
                             else
                             {
-                                Unit old_value = VarAt(address, (Operand)(variablesBasesTop - 1 - n_shift));
+                                Unit old_value = variables.VarAt(address, (Operand)(variables.BasesTop - 1 - n_shift));
                                 Number result = 0;
                                 if (op == 1)
                                     result = old_value.number + new_value.number;
@@ -523,7 +466,7 @@ namespace lightning
                                     result = old_value.number * new_value.number;
                                 else if (op == 4)
                                     result = old_value.number / new_value.number;
-                                VarSet(new Unit(result), address, (Operand)(variablesBasesTop - 1 - n_shift));
+                                variables.VarSet(new Unit(result), address, (Operand)(variables.BasesTop - 1 - n_shift));
                             }
                             break;
                         }
@@ -1071,7 +1014,7 @@ namespace lightning
                             {
                                 ret[ret_count] = IP;// add return address to stack
                                 ret_count += 1;
-                                funCallEnv[executingInstructions + 1] = variablesBasesTop - 1;// sets the return env to funclose/closureclose
+                                funCallEnv[executingInstructions + 1] = variables.BasesTop - 1;// sets the return env to funclose/closureclose
                                 ValFunction this_func = (ValFunction)this_callable.value;
                                 instructionsStack[executingInstructions + 1] = this_func.body;
                                 functionCallStack[executingInstructions + 1] = this_func;
@@ -1082,7 +1025,7 @@ namespace lightning
                             {
                                 ret[ret_count] = IP;// add return address to stack
                                 ret_count += 1;
-                                funCallEnv[executingInstructions + 1] = variablesBasesTop - 1;// sets the return env to funclose/closureclose
+                                funCallEnv[executingInstructions + 1] = variables.BasesTop - 1;// sets the return env to funclose/closureclose
 
                                 ValClosure this_closure = (ValClosure)this_callable.value;
                                 upValues.PushEnv();
@@ -1220,20 +1163,20 @@ namespace lightning
                 statsValue += "Stack empty :)\n";
             }
 
-            counter = 0;
-            for (int i = 0; i < variablesTop; i++)
-            {
-                if (i == 0)
-                {
-                    statsValue = statsValue + "Variables:\n";
-                }
-                statsValue += counter.ToString() + ": " + variables[i].ToString() + '\n';
-                counter++;
-            }
-            if (counter == 0)
-            {
-                statsValue += "Variables empty :)\n";
-            }
+            // counter = 0;
+            // for (int i = 0; i < variablesTop; i++)
+            // {
+            //     if (i == 0)
+            //     {
+            //         statsValue = statsValue + "Variables:\n";
+            //     }
+            //     statsValue += counter.ToString() + ": " + variables[i].ToString() + '\n';
+            //     counter++;
+            // }
+            // if (counter == 0)
+            // {
+            //     statsValue += "Variables empty :)\n";
+            // }
 
             // counter = 0;
             // for (int i = 0; i < upValuesBases[upValuesBasesTop - 1]; i++)
