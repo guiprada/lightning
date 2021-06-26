@@ -569,7 +569,7 @@ function clear_errors()
 // Testing Global Lock
 var global_lock_test_counter = 5
 {
-    var n = 1000
+    var n = 100
     function many(index, collection)
     {
         global_lock_test_counter++;
@@ -579,7 +579,7 @@ var global_lock_test_counter = 5
 }
 {
     // Testing UpValue Lock
-    var n = 1000
+    var n = 100
     var upvalue_lock_test_counter = 5
     function many(index, collection)
     {

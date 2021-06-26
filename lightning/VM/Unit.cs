@@ -24,24 +24,24 @@ namespace lightning
     }
 
     public class vHeap{
-        Dictionary<Integer,WeakReference> values;
-        Stack<Integer> freed;
-        Integer top;
+        List<WeakReference> values;
+        Stack<int> freed;
         public vHeap(){
-            values = new Dictionary<Integer, WeakReference>();
-            freed = new Stack<Integer>();
-            top = 0;
+            values = new List<WeakReference>();
+            freed = new Stack<int>();
         }
         public Integer Add(HeapValue p_value){
-            Integer this_index;
-            lock(values){
-                if(freed.Count > 0)
-                    this_index = freed.Pop();
-                else{
-                    this_index = top;
-                    top++;
+            int this_index;
+            if(freed.Count > 0){
+                this_index = freed.Pop();
+                lock(values){
+                    values[this_index] = new WeakReference(p_value);
                 }
-                values.Add(this_index, new WeakReference(p_value));
+            }else{
+                lock(values){
+                    this_index = values.Count;
+                    values.Add(new WeakReference(p_value));
+                }
             }
             return this_index;
         }
@@ -49,12 +49,11 @@ namespace lightning
         public void Free(Integer p_index){
             Console.WriteLine("******************************* Werks ********************************");
             lock(values){
-                values.Remove(p_index);
-                freed.Push(p_index);
+                freed.Push((int)p_index);
             }
         }
         public HeapValue Get(Integer p_index){
-            return (HeapValue)values[p_index].Target;
+            return (HeapValue)values[(int)p_index].Target;
         }
     }
 
