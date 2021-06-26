@@ -70,7 +70,6 @@ namespace lightning
 
             stack = new Unit[3 * functionDeepness];
             stackTop = 0;
-            globals = p_globals ?? new Memory<Unit>();
             variables = new Memory<Unit>();
             upValues = new Memory<ValUpValue>();
             upValuesRegistry = new Memory<ValUpValue>();
@@ -84,6 +83,7 @@ namespace lightning
             IP = 0;
 
             if(p_globals == null){
+                globals = new Memory<Unit>();
                 Intrinsics = chunk.Prelude.intrinsics;
                 foreach (ValIntrinsic v in Intrinsics)
                 {
@@ -94,6 +94,8 @@ namespace lightning
                     globals.Add(new Unit(entry.Value));
                 }
             }
+            else
+                globals = p_globals;
 
             loadedModules = new Dictionary<string, int>();
             modules = new List<ValModule>();
@@ -141,7 +143,7 @@ namespace lightning
             }
             else
             {
-                VM new_vm = new VM(chunk, 10, globals);
+                VM new_vm = new VM(chunk, 5, globals);
                 return new_vm;
             }
         }
