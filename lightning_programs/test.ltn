@@ -2,7 +2,7 @@
 write_line("Starting tests ..")
 var start_time = time.now()
 
-// Lets use some modules
+// Let's use some modules
 var lib_assert_counter = require("assert_counter.ltn")
 var lib_assert_counter_not = require("assert_counter_not.ltn")
 var lib_assert = require("assert.ltn")
@@ -291,7 +291,7 @@ function clear_errors()
         player.position["y"] = 0
 
         player.move = function (self, x, y)
-        {        
+        {
             self.position.x = self.position.x + x;
             self.position.y = self.position.y + y;
             return self.position
@@ -437,7 +437,7 @@ function clear_errors()
         var str_global = "global"
         {
             var str_upvalue = "up"
-            table1.append = 
+            table1.append =
                 function (value1, value2, value3){
                     return str_global .. value1  .. value2 .. value3 .. str_upvalue
                 }
@@ -446,7 +446,7 @@ function clear_errors()
     '
     var a = eval(my_prog1)
     //var a = require("prog1.ltn")
-    
+
     assert(a.append("a","b","c"),"globalabcup", "Failed Eval test 1.")
 
     var my_prog2 = '

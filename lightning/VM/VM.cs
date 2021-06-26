@@ -58,7 +58,7 @@ namespace lightning
         Stack<VM> vmPool;
         int functionDeepness;
 
-        public VM(Chunk p_chunk, int p_function_deepness = 25, Memory<Unit> p_globals = null)
+        public VM(Chunk p_chunk, int p_function_deepness = 100, Memory<Unit> p_globals = null)
         {
             chunk = p_chunk;
             functionDeepness = p_function_deepness;
@@ -141,7 +141,7 @@ namespace lightning
             }
             else
             {
-                VM new_vm = new VM(chunk, functionDeepness, globals);
+                VM new_vm = new VM(chunk, 10, globals);
                 return new_vm;
             }
         }
