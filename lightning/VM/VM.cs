@@ -39,14 +39,14 @@ namespace lightning
         ValFunction[] functionCallStack;
         Unit[] stack; // used for operations
         int stackTop;
-        GlobalMemory globals; // used for global variables
+        Memory<Unit> globals; // used for global variables
         Memory<Unit> variables; // used for scoped variables
 
         Memory<ValUpValue> upValues;
         Memory<ValUpValue> upValuesRegistry;
 
-        Operand[] ret;
-        int ret_count;
+        Operand[] returnAdress;
+        int returnAdressCounter;
         int[] funCallEnv;
         Unit[] stash;
         int stashTop;
@@ -55,32 +55,31 @@ namespace lightning
         List<ValIntrinsic> Intrinsics { get; set; }
         public Dictionary<string, int> loadedModules { get; private set; }
         public List<ValModule> modules;
-
         Stack<VM> vmPool;
-        int function_deepness;
+        int functionDeepness;
 
-        public VM(Chunk p_chunk, int p_function_deepness = 25, GlobalMemory p_globals = null)
+        public VM(Chunk p_chunk, int p_function_deepness = 25, Memory<Unit> p_globals = null)
         {
             chunk = p_chunk;
-            function_deepness = p_function_deepness;
+            functionDeepness = p_function_deepness;
 
-            instructionsStack = new List<Instruction>[function_deepness];
+            instructionsStack = new List<Instruction>[functionDeepness];
             instructionsStack[0] = chunk.Program;
             executingInstructions = 0;
-            functionCallStack = new ValFunction[function_deepness];
+            functionCallStack = new ValFunction[functionDeepness];
 
-            stack = new Unit[3 * function_deepness];
+            stack = new Unit[3 * functionDeepness];
             stackTop = 0;
-            globals = p_globals ?? new GlobalMemory();
+            globals = p_globals ?? new Memory<Unit>();
             variables = new Memory<Unit>();
             upValues = new Memory<ValUpValue>();
             upValuesRegistry = new Memory<ValUpValue>();
 
-            ret = new Operand[2 * function_deepness];
-            ret[executingInstructions] = (Operand)(chunk.ProgramSize - 1);
-            ret_count = 1;
-            funCallEnv = new int[function_deepness];
-            stash = new Unit[function_deepness];
+            returnAdress = new Operand[2 * functionDeepness];
+            returnAdress[executingInstructions] = (Operand)(chunk.ProgramSize - 1);
+            returnAdressCounter = 1;
+            funCallEnv = new int[functionDeepness];
+            stash = new Unit[functionDeepness];
             stashTop = 0;
             IP = 0;
 
@@ -142,7 +141,7 @@ namespace lightning
             }
             else
             {
-                VM new_vm = new VM(chunk, function_deepness, globals);
+                VM new_vm = new VM(chunk, functionDeepness, globals);
                 return new_vm;
             }
         }
@@ -245,8 +244,8 @@ namespace lightning
                     StackPush(args[i]);
 
             Type this_type = this_callable.Type();
-            ret[ret_count] = (Operand)(chunk.ProgramSize - 1);
-            ret_count += 1;
+            returnAdress[returnAdressCounter] = (Operand)(chunk.ProgramSize - 1);
+            returnAdressCounter += 1;
             funCallEnv[executingInstructions + 1] = variables.Env;
             if (this_type == typeof(ValFunction))
             {
@@ -483,20 +482,34 @@ namespace lightning
                             Operand address = instruction.opA;
                             Operand op = instruction.opB;
                             Unit new_value = StackPeek();
-                             if (op == 0)
+                            if (op == 0)
                             {
-                                globals.AtomicSet(new_value, address);
+                                lock(globals){
+                                    globals.Set(new_value, address);
+                                }
                             }
                             else
                             {
                                 if (op == 1)
-                                    globals.AtomicInc(new_value, address);
+                                    lock(globals){
+                                        Unit result = new Unit(globals.Get(address).number + new_value.number);
+                                        globals.Set(result, address);
+                                    }
                                 else if (op == 2)
-                                    globals.AtomicDec(new_value, address);
+                                    lock(globals){
+                                        Unit result = new Unit(globals.Get(address).number - new_value.number);
+                                        globals.Set(result, address);
+                                    }
                                 else if (op == 3)
-                                    globals.AtomicMult(new_value, address);
+                                    lock(globals){
+                                        Unit result = new Unit(globals.Get(address).number * new_value.number);
+                                        globals.Set(result, address);
+                                    }
                                 else if (op == 4)
-                                    globals.AtomicDiv(new_value, address);
+                                    lock(globals){
+                                        Unit result = new Unit(globals.Get(address).number / new_value.number);
+                                        globals.Set(result, address);
+                                    }
                             }
                             break;
                         }
@@ -515,19 +528,22 @@ namespace lightning
                             }
                             else
                             {
-                                lock(this_upValue){
-                                    Unit old_value = this_upValue.Val;
-                                    Number result = 0;
-                                    if (op == 1)
-                                        result = old_value.number + new_value.number;
-                                    else if (op == 2)
-                                        result = old_value.number - new_value.number;
-                                    else if (op == 3)
-                                        result = old_value.number * new_value.number;
-                                    else if (op == 4)
-                                        result = old_value.number / new_value.number;
-                                    this_upValue.Val = new Unit(result);
-                                }
+                                if (op == 1)
+                                    lock(this_upValue){
+                                        this_upValue.Val = new Unit(this_upValue.Val.number + new_value.number);
+                                    }
+                                else if (op == 2)
+                                    lock(this_upValue){
+                                        this_upValue.Val = new Unit(this_upValue.Val.number - new_value.number);
+                                    }
+                                else if (op == 3)
+                                    lock(this_upValue){
+                                        this_upValue.Val = new Unit(this_upValue.Val.number * new_value.number);
+                                    }
+                                else if (op == 4)
+                                    lock(this_upValue){
+                                        this_upValue.Val = new Unit(this_upValue.Val.number / new_value.number);
+                                    }
                             }
                             break;
                         }
@@ -665,15 +681,15 @@ namespace lightning
                         }
                     case OpCode.RET:
                         {
-                            IP = ret[ret_count - 1];
-                            ret_count -= 1;
+                            IP = returnAdress[returnAdressCounter - 1];
+                            returnAdressCounter -= 1;
                             break;
                         }
                     case OpCode.RETSREL:
                         {
                             Operand value = instruction.opA;
-                            ret[ret_count] = ((Operand)(value + IP));
-                            ret_count += 1;
+                            returnAdress[returnAdressCounter] = ((Operand)(value + IP));
+                            returnAdressCounter += 1;
                             IP++;
                             break;
                         }
@@ -972,8 +988,8 @@ namespace lightning
                             upValues.PopEnv();
                             int target_env = funCallEnv[executingInstructions];
                             EnvSet(target_env);
-                            IP = ret[ret_count - 1];
-                            ret_count -= 1;
+                            IP = returnAdress[returnAdressCounter - 1];
+                            returnAdressCounter -= 1;
                             executingInstructions = executingInstructions - 1;
                             break;
                         }
@@ -981,8 +997,8 @@ namespace lightning
                         {
                             int target_env = funCallEnv[executingInstructions];
                             EnvSet(target_env);
-                            IP = ret[ret_count - 1];
-                            ret_count -= 1;
+                            IP = returnAdress[returnAdressCounter - 1];
+                            returnAdressCounter -= 1;
                             executingInstructions = executingInstructions - 1;
                             break;
                         }
@@ -1019,8 +1035,8 @@ namespace lightning
 
                             if (this_type == typeof(ValFunction))
                             {
-                                ret[ret_count] = IP;// add return address to stack
-                                ret_count += 1;
+                                returnAdress[returnAdressCounter] = IP;// add return address to stack
+                                returnAdressCounter += 1;
                                 funCallEnv[executingInstructions + 1] = variables.Env;// sets the return env to funclose/closureclose
                                 ValFunction this_func = (ValFunction)this_callable.value;
                                 instructionsStack[executingInstructions + 1] = this_func.body;
@@ -1030,8 +1046,8 @@ namespace lightning
                             }
                             else if (this_type == typeof(ValClosure))
                             {
-                                ret[ret_count] = IP;// add return address to stack
-                                ret_count += 1;
+                                returnAdress[returnAdressCounter] = IP;// add return address to stack
+                                returnAdressCounter += 1;
                                 funCallEnv[executingInstructions + 1] = variables.Env;// sets the return env to funclose/closureclose
 
                                 ValClosure this_closure = (ValClosure)this_callable.value;
