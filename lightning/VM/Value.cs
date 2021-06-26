@@ -386,14 +386,14 @@ namespace lightning
                 if (isCaptured)
                     return val;
                 else
-                    return variables.VarAt(address, env);
+                    return variables.GetAt(address, env);
             }
             set
             {
                 if (isCaptured)
                     val = value;
                 else
-                    variables.VarSet(value, address, env);
+                    variables.SetAt(value, address, env);
             }
         }
 
@@ -416,7 +416,7 @@ namespace lightning
             if (isCaptured == false)
             {
                 isCaptured = true;
-                val = variables.VarAt(address, env);
+                val = variables.GetAt(address, env);
             }
         }
         public override string ToString()

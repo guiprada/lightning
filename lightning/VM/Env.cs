@@ -3,124 +3,108 @@ using System.Collections.Generic;
 using Operand = System.UInt16;
 namespace lightning
 {
-	public class Variables{
-		List<Unit> values; // used for scoped variables
-        int variablesTop;
+    public class Variables{
+        List<Unit> values; // used for scoped variables
 
-        int[] variablesBases; // used to control the address used by each scope
-        int variablesBasesTop;
+        List<int> markers; // used to control the address used by each scope
 
-		public int BasesTop{
-			get{
-				return variablesBasesTop;
-			}
-		}
+        public int Env{
+            get{
+                return markers.Count - 1;
+            }
+        }
 
-		public Variables(int p_function_deepness){
+        public Variables(int p_function_deepness){
             values = new List<Unit>();
-			variablesTop = 0;
-            variablesBases = new int[3 * p_function_deepness];
-            variablesBasesTop = 0;
-            variablesBases[variablesBasesTop] = 0;
-            variablesBasesTop++;
-		}
+            markers = new List<int>();
+            PushEnv();
+        }
 
-		public void Trim(){
-			values.TrimExcess();
-		}
+        public void Trim(){
+            values.TrimExcess();
+        }
 
-		public Unit VarAt(Operand address, Operand n_env)
+        public Unit GetAt(Operand address, Operand n_env)
         {
-            int this_BP = variablesBases[n_env];
+            int this_BP = markers[n_env];
             return values[this_BP + address];
         }
 
-        public void VarSet(Unit new_value, Operand address, Operand n_env)
+        public void SetAt(Unit new_value, Operand address, Operand n_env)
         {
-            values[address + variablesBases[n_env]] = new_value;
+            values[address + markers[n_env]] = new_value;
         }
 
-		public void PushEnv(){
-			variablesBases[variablesBasesTop] = variablesTop;
-			variablesBasesTop++;
-		}
+        public void PushEnv(){
+            markers.Add(values.Count);
+        }
 
-		public void PopEnv(){
-			int this_basePointer = variablesBases[variablesBasesTop - 1];
-            variablesBasesTop--;
-            variablesTop = this_basePointer;
-
+        public void PopEnv(){
+            int last_index = markers.Count -1;
+            int this_basePointer = markers[last_index];
+            markers.RemoveAt(last_index);
             values.RemoveRange(this_basePointer, values.Count - this_basePointer);
-		}
+        }
 
         public void Add(Unit new_value){
-            if (variablesTop >= (values.Count))
-            {
-                values.Add(new_value);
-                variablesTop++;
-            }
-            else
-            {
-                values[variablesTop] = new_value;
-                variablesTop++;
-            }
+            values.Add(new_value);
         }
 
-	}
-	public class Memory<T>{
-		List<T> values;
+    }
+    public class Memory<T>{
+        List<T> values;
 
         List<int> markers;
         int marker;
 
-		public int Marker{
-			get{
-				return marker;
-			}
-		}
+        public int Marker{
+            get{
+                return marker;
+            }
+        }
 
-		public int Count{
-			get{
-				return values.Count;
-			}
-		}
+        public int Count{
+            get{
+                return values.Count;
+            }
+        }
 
-		public int Env{
-			get{
-				return markers.Count - 1;
-			}
-		}
+        public int Env{
+            get{
+                return markers.Count - 1;
+            }
+        }
 
         public Memory(){
             values = new List<T>();
             markers = new List<int>();
             marker = 0;
-			PushEnv();
+            PushEnv();
         }
 
         public T Get(int index){
             return values[index];
         }
 
-		public T GetAt(int index, int env){
-			int this_base = markers[env];
-			return values[this_base + index];
-		}
+        public T GetAt(int index, int env){
+            int this_base = markers[env];
+            return values[this_base + index];
+        }
 
-		public T GetAt(int index){
-			return values[marker + index];
-		}
+        public T GetAt(int index){
+            return values[marker + index];
+        }
 
-		public void SetAt(T new_value, int index, int env){
-			int this_base = markers[env];
-			values[this_base + index] = new_value;
-		}
+        public void SetAt(T new_value, int index, int env){
+            int this_base = markers[env];
+            values[this_base + index] = new_value;
+        }
 
         public void Set(T new_value, int index){
             values[index] = new_value;
         }
 
-		public int Add(T new_value){
+        public int Add(T new_value){
             values.Add(new_value);
             return values.Count - 1;
         }
@@ -139,8 +123,8 @@ namespace lightning
             marker = markers[last_index];
             markers.RemoveAt(last_index);
         }
-	}
-	public class GlobalMemory{
+    }
+    public class GlobalMemory{
         List<Unit> values;
 
         List<int> markers;
@@ -191,8 +175,8 @@ namespace lightning
             values.TrimExcess();
         }
 
-		public int Count(){
-			return values.Count;
-		}
+        public int Count(){
+            return values.Count;
+        }
     }
 }

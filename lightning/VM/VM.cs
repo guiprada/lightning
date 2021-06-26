@@ -103,6 +103,14 @@ namespace lightning
             vmPool = new Stack<VM>();
         }
 
+        Operand CalculateEnvShift(Operand n_shift){
+            return (Operand)(variables.Env - n_shift);
+        }
+
+        Operand CalculateEnvShiftUpVal(Operand env){
+            return (Operand)(variables.Env + 1 - env);
+        }
+
         public void ResoursesTrim(){
             upValuesRegistry.Trim();
             variables.Trim();
@@ -210,7 +218,7 @@ namespace lightning
 
         void EnvSet(int target_env)
         {
-            while ((variables.BasesTop - 1) > target_env)
+            while ((variables.Env) > target_env)
             {
                 EnvPop();
             }
@@ -240,7 +248,7 @@ namespace lightning
             Type this_type = this_callable.Type();
             ret[ret_count] = (Operand)(chunk.ProgramSize - 1);
             ret_count += 1;
-            funCallEnv[executingInstructions + 1] = variables.BasesTop - 1;
+            funCallEnv[executingInstructions + 1] = variables.Env;
             if (this_type == typeof(ValFunction))
             {
                 ValFunction this_func = (ValFunction)(this_callable.value);
@@ -308,7 +316,7 @@ namespace lightning
                             IP++;
                             Operand address = instruction.opA;
                             Operand n_shift = instruction.opB;
-                            var variable = variables.VarAt(address, (Operand)(variables.BasesTop - 1 - n_shift));
+                            var variable = variables.GetAt(address, CalculateEnvShift(n_shift));
                             StackPush(variable);
                             break;
                         }
@@ -418,7 +426,7 @@ namespace lightning
                                 foreach (ValUpValue u in this_closure.upValues)
                                 {
                                     // here we convert env from shift based to absolute based
-                                    ValUpValue new_upvalue = new ValUpValue(u.address, (Operand)(variables.BasesTop - u.env));
+                                    ValUpValue new_upvalue = new ValUpValue(u.address, CalculateEnvShiftUpVal(u.env));
                                     new_upValues.Add(new_upvalue);
                                 }
                                 ValClosure new_closure = new ValClosure(this_closure.function, new_upValues);
@@ -452,11 +460,11 @@ namespace lightning
                             Unit new_value = StackPeek();
                             if (op == 0)
                             {
-                                variables.VarSet(new_value, address, (Operand)(variables.BasesTop - 1 - n_shift));
+                                variables.SetAt(new_value, address, CalculateEnvShift(n_shift));
                             }
                             else
                             {
-                                Unit old_value = variables.VarAt(address, (Operand)(variables.BasesTop - 1 - n_shift));
+                                Unit old_value = variables.GetAt(address, CalculateEnvShift(n_shift));
                                 Number result = 0;
                                 if (op == 1)
                                     result = old_value.number + new_value.number;
@@ -466,7 +474,7 @@ namespace lightning
                                     result = old_value.number * new_value.number;
                                 else if (op == 4)
                                     result = old_value.number / new_value.number;
-                                variables.VarSet(new Unit(result), address, (Operand)(variables.BasesTop - 1 - n_shift));
+                                variables.SetAt(new Unit(result), address, CalculateEnvShift(n_shift));
                             }
                             break;
                         }
@@ -1014,7 +1022,7 @@ namespace lightning
                             {
                                 ret[ret_count] = IP;// add return address to stack
                                 ret_count += 1;
-                                funCallEnv[executingInstructions + 1] = variables.BasesTop - 1;// sets the return env to funclose/closureclose
+                                funCallEnv[executingInstructions + 1] = variables.Env;// sets the return env to funclose/closureclose
                                 ValFunction this_func = (ValFunction)this_callable.value;
                                 instructionsStack[executingInstructions + 1] = this_func.body;
                                 functionCallStack[executingInstructions + 1] = this_func;
@@ -1025,7 +1033,7 @@ namespace lightning
                             {
                                 ret[ret_count] = IP;// add return address to stack
                                 ret_count += 1;
-                                funCallEnv[executingInstructions + 1] = variables.BasesTop - 1;// sets the return env to funclose/closureclose
+                                funCallEnv[executingInstructions + 1] = variables.Env;// sets the return env to funclose/closureclose
 
                                 ValClosure this_closure = (ValClosure)this_callable.value;
                                 upValues.PushEnv();
