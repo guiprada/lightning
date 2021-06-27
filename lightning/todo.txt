@@ -1,6 +1,14 @@
 ﻿todo
+	coroutines
+	compilador self_hosted
+	adicionar variaveis internas a tabela
+	adicionar properties
+	adicionar interfaces
+	retorno multiplo
+	sobrecarga de metodos
+	tabelas da valtable devem ser criados somentw quando utilizados
+
 	- Stats intrincic
-	- Coroutines.
 	- Code Cleanup
 	- add loading Value.Nil for missing parameters on function call, emit a warning
 	- elide more stuff on parser
