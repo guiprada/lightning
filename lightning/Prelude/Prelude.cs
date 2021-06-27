@@ -409,7 +409,7 @@ namespace lightning
 #if DOUBLE
                 math.TableSet(new ValString("double"), new Unit(true));
 #else
-                math.TableSet(new ValString("double"), new Unit(Value.False));
+                math.TableSet(new ValString("double"), new Unit(false));
 #endif
 
                 //////////////////////////////////////////////////////
