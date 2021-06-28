@@ -6,7 +6,7 @@ namespace lightning{
     public struct Instructions
     {
         List<Instruction>[] stack;
-        List<Instruction> cachedRunningInstructions;
+
         int runningInstructionsIndex;// contains the currently executing instructions
         FunctionUnit[] functionCallStack;
         int returnAdressTop;
