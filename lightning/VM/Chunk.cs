@@ -210,7 +210,7 @@ namespace lightning
             int constant_counter = 0;
             foreach (Unit v in constants)
             {
-                if(v.HeapValueType() == typeof(ValString))
+                if(v.HeapValueType() == typeof(StringUnit))
                     Console.WriteLine("Constant: " + constant_counter.ToString() + " \"" + v.ToString() + "\"");
                 else
                     Console.WriteLine("Constant: "+ constant_counter.ToString() + " " + v.ToString());
@@ -294,17 +294,17 @@ namespace lightning
             return constants;
         }
 
-        public HeapValue GetFunction(string name)
+        public HeapUnit GetFunction(string name)
         {
             foreach(Unit v in constants)
             {
-                if(v.HeapValueType() == typeof(ValFunction))
-                    if( ((ValFunction)(v.heapValue)).name == name)
+                if(v.HeapValueType() == typeof(FunctionUnit))
+                    if( ((FunctionUnit)(v.heapValue)).name == name)
                     {
-                        return (ValFunction)(v.heapValue);
+                        return (FunctionUnit)(v.heapValue);
                     }
             }
-            foreach (ValIntrinsic v in Prelude.intrinsics)
+            foreach (IntrinsicUnit v in Prelude.intrinsics)
             {
                 if (v.name == name)
                 {

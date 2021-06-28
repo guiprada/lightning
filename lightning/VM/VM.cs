@@ -36,14 +36,14 @@ namespace lightning
         Chunk chunk;
         List<Instruction>[] instructionsStack;
         int executingInstructions;// contains the currently executing instructions
-        ValFunction[] functionCallStack;
+        FunctionUnit[] functionCallStack;
         Unit[] stack; // used for operations
         int stackTop;
         Memory<Unit> globals; // used for global variables
         Memory<Unit> variables; // used for scoped variables
 
-        Memory<ValUpValue> upValues;
-        Memory<ValUpValue> upValuesRegistry;
+        Memory<UpValueUnit> upValues;
+        Memory<UpValueUnit> upValuesRegistry;
 
         Operand[] returnAdress;
         int returnAdressCounter;
@@ -52,9 +52,9 @@ namespace lightning
         int stashTop;
 
         Operand IP;
-        List<ValIntrinsic> Intrinsics { get; set; }
+        List<IntrinsicUnit> Intrinsics { get; set; }
         public Dictionary<string, int> loadedModules { get; private set; }
-        public List<ValModule> modules;
+        public List<ModuleUnit> modules;
         Stack<VM> vmPool;
         int functionDeepness;
 
@@ -66,13 +66,13 @@ namespace lightning
             instructionsStack = new List<Instruction>[functionDeepness];
             instructionsStack[0] = chunk.Program;
             executingInstructions = 0;
-            functionCallStack = new ValFunction[functionDeepness];
+            functionCallStack = new FunctionUnit[functionDeepness];
 
             stack = new Unit[3 * functionDeepness];
             stackTop = 0;
             variables = new Memory<Unit>();
-            upValues = new Memory<ValUpValue>();
-            upValuesRegistry = new Memory<ValUpValue>();
+            upValues = new Memory<UpValueUnit>();
+            upValuesRegistry = new Memory<UpValueUnit>();
 
             returnAdress = new Operand[2 * functionDeepness];
             returnAdress[executingInstructions] = (Operand)(chunk.ProgramSize - 1);
@@ -85,11 +85,11 @@ namespace lightning
             if(p_globals == null){
                 globals = new Memory<Unit>();
                 Intrinsics = chunk.Prelude.intrinsics;
-                foreach (ValIntrinsic v in Intrinsics)
+                foreach (IntrinsicUnit v in Intrinsics)
                 {
                     globals.Add(new Unit(v));
                 }
-                foreach (KeyValuePair<string, ValTable> entry in chunk.Prelude.tables)
+                foreach (KeyValuePair<string, TableUnit> entry in chunk.Prelude.tables)
                 {
                     globals.Add(new Unit(entry.Value));
                 }
@@ -98,7 +98,7 @@ namespace lightning
                 globals = p_globals;
 
             loadedModules = new Dictionary<string, int>();
-            modules = new List<ValModule>();
+            modules = new List<ModuleUnit>();
 
             vmPool = new Stack<VM>();
         }
@@ -148,7 +148,7 @@ namespace lightning
             }
         }
 
-        public Operand AddModule(ValModule this_module)
+        public Operand AddModule(ModuleUnit this_module)
         {
             loadedModules.Add(this_module.name, loadedModules.Count);
             modules.Add(this_module);
@@ -192,7 +192,7 @@ namespace lightning
             return stack[stackTop - n - 1];
         }
 
-        void RegisterUpValue(ValUpValue u)
+        void RegisterUpValue(UpValueUnit u)
         {
             upValuesRegistry.Add(u);
         }
@@ -249,20 +249,20 @@ namespace lightning
             returnAdress[returnAdressCounter] = (Operand)(chunk.ProgramSize - 1);
             returnAdressCounter += 1;
             funCallEnv[executingInstructions + 1] = variables.Env;
-            if (this_type == typeof(ValFunction))
+            if (this_type == typeof(FunctionUnit))
             {
-                ValFunction this_func = (ValFunction)(this_callable.heapValue);
+                FunctionUnit this_func = (FunctionUnit)(this_callable.heapValue);
                 instructionsStack[executingInstructions + 1] = this_func.body;
                 functionCallStack[executingInstructions + 1] = this_func;
                 executingInstructions = executingInstructions + 1;
                 IP = 0;
             }
-            else if (this_type == typeof(ValClosure))
+            else if (this_type == typeof(ClosureUnit))
             {
-                ValClosure this_closure = (ValClosure)(this_callable.heapValue);
+                ClosureUnit this_closure = (ClosureUnit)(this_callable.heapValue);
                 upValues.PushEnv();
 
-                foreach (ValUpValue u in this_closure.upValues)
+                foreach (UpValueUnit u in this_closure.upValues)
                 {
                     upValues.Add(u);
                 }
@@ -271,9 +271,9 @@ namespace lightning
                 executingInstructions = executingInstructions + 1;
                 IP = 0;
             }
-            else if (this_type == typeof(ValIntrinsic))
+            else if (this_type == typeof(IntrinsicUnit))
             {
-                ValIntrinsic this_intrinsic = (ValIntrinsic)(this_callable.heapValue);
+                IntrinsicUnit this_intrinsic = (IntrinsicUnit)(this_callable.heapValue);
                 Unit intrinsic_result = this_intrinsic.function(this);
                 stackTop -= this_intrinsic.arity;
                 StackPush(intrinsic_result);
@@ -352,7 +352,7 @@ namespace lightning
                         {
                             IP++;
                             Operand address = instruction.opA;
-                            ValUpValue up_val = upValues.GetAt(address);
+                            UpValueUnit up_val = upValues.GetAt(address);
                             StackPush(up_val.Val);
                             break;
                         }
@@ -403,7 +403,7 @@ namespace lightning
                             Operand lambda = instruction.opB;
                             Operand new_fun_address = instruction.opC;
                             Unit this_callable = chunk.GetConstant(new_fun_address);
-                            if (this_callable.HeapValueType() == typeof(ValFunction))
+                            if (this_callable.HeapValueType() == typeof(FunctionUnit))
                             {
                                 if (lambda == 0)
                                     if (env == 0)// Global
@@ -419,20 +419,20 @@ namespace lightning
                             }
                             else
                             {
-                                ValClosure this_closure = (ValClosure)(this_callable.heapValue);
+                                ClosureUnit this_closure = (ClosureUnit)(this_callable.heapValue);
 
                                 // new upvalues
-                                List<ValUpValue> new_upValues = new List<ValUpValue>();
-                                foreach (ValUpValue u in this_closure.upValues)
+                                List<UpValueUnit> new_upValues = new List<UpValueUnit>();
+                                foreach (UpValueUnit u in this_closure.upValues)
                                 {
                                     // here we convert env from shift based to absolute based
-                                    ValUpValue new_upvalue = new ValUpValue(u.address, CalculateEnvShiftUpVal(u.env));
+                                    UpValueUnit new_upvalue = new UpValueUnit(u.address, CalculateEnvShiftUpVal(u.env));
                                     new_upValues.Add(new_upvalue);
                                 }
-                                ValClosure new_closure = new ValClosure(this_closure.function, new_upValues);
+                                ClosureUnit new_closure = new ClosureUnit(this_closure.function, new_upValues);
 
                                 new_closure.Register(variables);
-                                foreach (ValUpValue u in new_closure.upValues)
+                                foreach (UpValueUnit u in new_closure.upValues)
                                 {
                                     RegisterUpValue(u);
                                 }
@@ -520,7 +520,7 @@ namespace lightning
                             IP++;
                             Operand address = instruction.opA;
                             Operand op = instruction.opB;
-                            ValUpValue this_upValue = upValues.GetAt(address);
+                            UpValueUnit this_upValue = upValues.GetAt(address);
                             Unit new_value = StackPeek();
                             if (op == 0)
                             {
@@ -563,11 +563,11 @@ namespace lightning
                             {
                                 if (v.type == UnitType.Number)
                                 {
-                                    value = ((ValTable)(value.heapValue)).elements[(int)v.unitValue];
+                                    value = ((TableUnit)(value.heapValue)).elements[(int)v.unitValue];
                                 }
                                 else
                                 {
-                                    value = ((ValTable)(value.heapValue)).table[(ValString)v.heapValue];
+                                    value = ((TableUnit)(value.heapValue)).table[(StringUnit)v.heapValue];
                                 }
                             }
                             StackPush(value);
@@ -591,11 +591,11 @@ namespace lightning
                                 Unit v = indexes[i];
                                 if (v.type == UnitType.Number)
                                 {
-                                    this_table = ((ValTable)(this_table.heapValue)).elements[(int)v.unitValue];
+                                    this_table = ((TableUnit)(this_table.heapValue)).elements[(int)v.unitValue];
                                 }
                                 else
                                 {
-                                    this_table = ((ValTable)(this_table.heapValue)).table[(ValString)v.heapValue];
+                                    this_table = ((TableUnit)(this_table.heapValue)).table[(StringUnit)v.heapValue];
                                 }
                             }
                             Unit new_value = StackPeek();
@@ -603,28 +603,28 @@ namespace lightning
                             {
                                 if (indexes[indexes_counter - 1].type == UnitType.Number)
                                 {
-                                    if (((ValTable)(this_table.heapValue)).elements.Count - 1 >= ((int)(indexes[indexes_counter - 1].unitValue)))
+                                    if (((TableUnit)(this_table.heapValue)).elements.Count - 1 >= ((int)(indexes[indexes_counter - 1].unitValue)))
                                     {
-                                        Unit old_value = ((ValTable)(this_table.heapValue)).elements[(int)(indexes[indexes_counter - 1].unitValue)];
+                                        Unit old_value = ((TableUnit)(this_table.heapValue)).elements[(int)(indexes[indexes_counter - 1].unitValue)];
                                     }
-                                    ((ValTable)(this_table.heapValue)).ElementSet((int)(indexes[indexes_counter - 1].unitValue), new_value);
+                                    ((TableUnit)(this_table.heapValue)).ElementSet((int)(indexes[indexes_counter - 1].unitValue), new_value);
                                 }
                                 else
                                 {
-                                    if (((ValTable)(this_table.heapValue)).table.ContainsKey((ValString)indexes[indexes_counter - 1].heapValue))
+                                    if (((TableUnit)(this_table.heapValue)).table.ContainsKey((StringUnit)indexes[indexes_counter - 1].heapValue))
                                     {
-                                        Unit old_value = ((ValTable)(this_table.heapValue)).table[(ValString)indexes[indexes_counter - 1].heapValue];
+                                        Unit old_value = ((TableUnit)(this_table.heapValue)).table[(StringUnit)indexes[indexes_counter - 1].heapValue];
                                     }
-                                    ((ValTable)(this_table.heapValue)).TableSet((ValString)indexes[indexes_counter - 1].heapValue, new_value);
+                                    ((TableUnit)(this_table.heapValue)).TableSet((StringUnit)indexes[indexes_counter - 1].heapValue, new_value);
                                 }
                             }
                             else
                             {
                                 Unit old_value;
                                 if (indexes[indexes_counter - 1].type == UnitType.Number)
-                                    old_value = ((ValTable)(this_table.heapValue)).elements[(int)(indexes[indexes_counter - 1].unitValue)];
+                                    old_value = ((TableUnit)(this_table.heapValue)).elements[(int)(indexes[indexes_counter - 1].unitValue)];
                                 else
-                                    old_value = ((ValTable)(this_table.heapValue)).table[(ValString)indexes[indexes_counter - 1].heapValue];
+                                    old_value = ((TableUnit)(this_table.heapValue)).table[(StringUnit)indexes[indexes_counter - 1].heapValue];
 
                                 Number result = 0;
                                 if (op == 1)
@@ -637,9 +637,9 @@ namespace lightning
                                     result = old_value.unitValue / new_value.unitValue;
 
                                 if (indexes[indexes_counter - 1].type == UnitType.Number)
-                                    ((ValTable)(this_table.heapValue)).elements[(int)(indexes[indexes_counter - 1].unitValue)] = new Unit(result);
+                                    ((TableUnit)(this_table.heapValue)).elements[(int)(indexes[indexes_counter - 1].unitValue)] = new Unit(result);
                                 else
-                                    ((ValTable)(this_table.heapValue)).table[(ValString)indexes[indexes_counter - 1].heapValue] = new Unit(result);
+                                    ((TableUnit)(this_table.heapValue)).table[(StringUnit)indexes[indexes_counter - 1].heapValue] = new Unit(result);
 
                             }
                             break;
@@ -713,7 +713,7 @@ namespace lightning
                             Unit opA = StackPop();
 
                             string result = opA.ToString() + opB.ToString();
-                            Unit new_value = new Unit(new ValString(result));
+                            Unit new_value = new Unit(new StringUnit(result));
                             StackPush(new_value);
 
                             break;
@@ -1008,14 +1008,14 @@ namespace lightning
                         {
                             IP++;
 
-                            ValTable new_table = new ValTable(null, null);
+                            TableUnit new_table = new TableUnit(null, null);
 
                             int n_table = instruction.opB;
                             for (int i = 0; i < n_table; i++)
                             {
                                 Unit val = StackPop();
                                 Unit key = StackPop();
-                                new_table.table.Add((ValString)key.heapValue, val);
+                                new_table.table.Add((StringUnit)key.heapValue, val);
                             }
 
                             int n_elements = instruction.opA;
@@ -1035,27 +1035,27 @@ namespace lightning
                             Unit this_callable = StackPop();
                             Type this_type = this_callable.HeapValueType();
 
-                            if (this_type == typeof(ValFunction))
+                            if (this_type == typeof(FunctionUnit))
                             {
                                 returnAdress[returnAdressCounter] = IP;// add return address to stack
                                 returnAdressCounter += 1;
                                 funCallEnv[executingInstructions + 1] = variables.Env;// sets the return env to funclose/closureclose
-                                ValFunction this_func = (ValFunction)this_callable.heapValue;
+                                FunctionUnit this_func = (FunctionUnit)this_callable.heapValue;
                                 instructionsStack[executingInstructions + 1] = this_func.body;
                                 functionCallStack[executingInstructions + 1] = this_func;
                                 executingInstructions = executingInstructions + 1;
                                 IP = 0;
                             }
-                            else if (this_type == typeof(ValClosure))
+                            else if (this_type == typeof(ClosureUnit))
                             {
                                 returnAdress[returnAdressCounter] = IP;// add return address to stack
                                 returnAdressCounter += 1;
                                 funCallEnv[executingInstructions + 1] = variables.Env;// sets the return env to funclose/closureclose
 
-                                ValClosure this_closure = (ValClosure)this_callable.heapValue;
+                                ClosureUnit this_closure = (ClosureUnit)this_callable.heapValue;
                                 upValues.PushEnv();
 
-                                foreach (ValUpValue u in this_closure.upValues)
+                                foreach (UpValueUnit u in this_closure.upValues)
                                 {
                                     upValues.Add(u);
                                 }
@@ -1064,9 +1064,9 @@ namespace lightning
                                 executingInstructions = executingInstructions + 1;
                                 IP = 0;
                             }
-                            else if (this_type == typeof(ValIntrinsic))
+                            else if (this_type == typeof(IntrinsicUnit))
                             {
-                                ValIntrinsic this_intrinsic = (ValIntrinsic)this_callable.heapValue;
+                                IntrinsicUnit this_intrinsic = (IntrinsicUnit)this_callable.heapValue;
                                 Unit result = this_intrinsic.function(this);
                                 stackTop -= this_intrinsic.arity;
                                 StackPush(result);
@@ -1097,7 +1097,7 @@ namespace lightning
                         {
                             IP++;
                             Unit func = StackPop();
-                            ValTable table = (ValTable)(StackPop().heapValue);
+                            TableUnit table = (TableUnit)(StackPop().heapValue);
 
                             int init = 0;
                             int end = table.ECount;
@@ -1123,7 +1123,7 @@ namespace lightning
                         {
                             IP++;
                             Unit func = StackPop();
-                            ValTable table = (ValTable)(StackPop().heapValue);
+                            TableUnit table = (TableUnit)(StackPop().heapValue);
                             Number tasks = StackPop().unitValue;
 
                             int n_tasks = (int)tasks;

@@ -13,7 +13,7 @@ using Operand = System.UInt16;
 
 namespace lightning
 {
-    public abstract class HeapValue
+    public abstract class HeapUnit
     {
         public abstract override string ToString();
         public abstract bool ToBool();
@@ -22,11 +22,11 @@ namespace lightning
         public abstract override int GetHashCode();
     }
 
-    public class ValString : HeapValue
+    public class StringUnit : HeapUnit
     {
         public string content;
 
-        public ValString(string value)
+        public StringUnit(string value)
         {
             content = value;
         }
@@ -46,13 +46,13 @@ namespace lightning
             Type other_type = other.GetType();
             if (other_type == typeof(Unit))
             {
-                if(((Unit)other).HeapValueType() == typeof(ValString))
-                    if(content == ((ValString)((Unit)(other)).heapValue).content)
+                if(((Unit)other).HeapValueType() == typeof(StringUnit))
+                    if(content == ((StringUnit)((Unit)(other)).heapValue).content)
                         return true;
             }
-            if(other_type == typeof(ValString))
+            if(other_type == typeof(StringUnit))
             {
-                if (((ValString)other).content == content)
+                if (((StringUnit)other).content == content)
                     return true;
             }
 
@@ -65,7 +65,7 @@ namespace lightning
         }
     }
 
-    public class ValFunction : HeapValue
+    public class FunctionUnit : HeapUnit
     {
         public string name;
         public Operand arity;
@@ -73,7 +73,7 @@ namespace lightning
         public string module;
         public Operand originalPosition;
 
-        public ValFunction(string p_name, string p_module)
+        public FunctionUnit(string p_name, string p_module)
         {
             name = p_name;
             arity = 0;
@@ -101,15 +101,15 @@ namespace lightning
             Type other_type = other.GetType();
             if (other_type == typeof(Unit))
             {
-                if(((Unit)other).HeapValueType() == typeof(ValFunction))
+                if(((Unit)other).HeapValueType() == typeof(FunctionUnit))
                 {
-                    ValFunction other_val_func = (ValFunction)((Unit)(other)).heapValue;
+                    FunctionUnit other_val_func = (FunctionUnit)((Unit)(other)).heapValue;
                     if (other_val_func.name == this.name && other_val_func.module == this.module) return true;
                 }
             }
-            if (other_type == typeof(ValFunction))
+            if (other_type == typeof(FunctionUnit))
             {
-                ValFunction other_val_func = other as ValFunction;
+                FunctionUnit other_val_func = other as FunctionUnit;
                 if (other_val_func.name == this.name && other_val_func.module == this.module) return true;
             }
             return false;
@@ -121,13 +121,13 @@ namespace lightning
         }
     }
 
-    public class ValIntrinsic : HeapValue
+    public class IntrinsicUnit : HeapUnit
     {
         public string name;
         public Func<VM, Unit> function;
         public int arity;
 
-        public ValIntrinsic(string p_name, Func<VM, Unit> p_function, int p_arity)
+        public IntrinsicUnit(string p_name, Func<VM, Unit> p_function, int p_arity)
         {
             name = p_name;
             function = p_function;
@@ -150,14 +150,14 @@ namespace lightning
             Type other_type = other.GetType();
             if (other_type == typeof(Unit))
             {
-                if(((Unit)other).HeapValueType() == typeof(ValIntrinsic))
+                if(((Unit)other).HeapValueType() == typeof(IntrinsicUnit))
                 {
-                    if (function == (((Unit)other).heapValue as ValIntrinsic).function) return true;
+                    if (function == (((Unit)other).heapValue as IntrinsicUnit).function) return true;
                 }
             }
-            if (other_type == typeof(ValIntrinsic))
+            if (other_type == typeof(IntrinsicUnit))
             {
-                if (function == (other as ValIntrinsic).function) return true;
+                if (function == (other as IntrinsicUnit).function) return true;
             }
             return false;
         }
@@ -168,12 +168,12 @@ namespace lightning
         }
     }
 
-    public class ValClosure : HeapValue
+    public class ClosureUnit : HeapUnit
     {
-        public ValFunction function;
-        public List<ValUpValue> upValues;
+        public FunctionUnit function;
+        public List<UpValueUnit> upValues;
 
-        public ValClosure(ValFunction p_function, List<ValUpValue> p_upValues)
+        public ClosureUnit(FunctionUnit p_function, List<UpValueUnit> p_upValues)
         {
             function = p_function;
             upValues = p_upValues;
@@ -181,7 +181,7 @@ namespace lightning
 
         public void Register(Memory<Unit> p_variables)
         {
-            foreach (ValUpValue u in upValues)
+            foreach (UpValueUnit u in upValues)
                 u.Attach(p_variables);
         }
 
@@ -201,12 +201,12 @@ namespace lightning
             Type other_type = other.GetType();
             if (other_type == typeof(Unit))
             {
-                if(((Unit)other).HeapValueType() == typeof(ValClosure))
+                if(((Unit)other).HeapValueType() == typeof(ClosureUnit))
                 {
-                    if (this == ((Unit)other).heapValue as ValClosure) return true;
+                    if (this == ((Unit)other).heapValue as ClosureUnit) return true;
                 }
             }
-            if (other_type == typeof(ValClosure))
+            if (other_type == typeof(ClosureUnit))
             {
                 if (other == this) return true;
             }
@@ -219,7 +219,7 @@ namespace lightning
         }
     }
 
-    public class ValUpValue : HeapValue
+    public class UpValueUnit : HeapUnit
     {
         public Operand address;
         public Operand env;
@@ -244,7 +244,7 @@ namespace lightning
             }
         }
 
-        public ValUpValue(Operand p_address, Operand p_env)
+        public UpValueUnit(Operand p_address, Operand p_env)
         {
             address = p_address;
             env = p_env;
@@ -281,12 +281,12 @@ namespace lightning
             Type other_type = other.GetType();
             if (other_type == typeof(Unit))
             {
-                if(((Unit)other).HeapValueType() == typeof(ValUpValue))
+                if(((Unit)other).HeapValueType() == typeof(UpValueUnit))
                 {
                     if (Val.Equals(((Unit)other).heapValue)) return true;
                 }
             }
-            if (other_type == typeof(ValUpValue))
+            if (other_type == typeof(UpValueUnit))
             {
                 if (Val.Equals(other)) return true;
             }
@@ -300,19 +300,19 @@ namespace lightning
 
     }
 
-    public class ValTable : HeapValue
+    public class TableUnit : HeapUnit
     {
         public List<Unit> elements;
-        public Dictionary<ValString, Unit> table;
+        public Dictionary<StringUnit, Unit> table;
 
 
         public int ECount { get { return elements.Count; } }
         public int TCount { get { return table.Count; } }
         public int Count { get { return ECount + TCount; } }
-        public ValTable(List<Unit> p_elements, Dictionary<ValString, Unit> p_table)
+        public TableUnit(List<Unit> p_elements, Dictionary<StringUnit, Unit> p_table)
         {
             elements = p_elements ??= new List<Unit>();
-            table = p_table ??= new Dictionary<ValString, Unit>();
+            table = p_table ??= new Dictionary<StringUnit, Unit>();
         }
 
         public void ElementSet(int index, Unit value)
@@ -327,7 +327,7 @@ namespace lightning
             elements.Add(value);
         }
 
-        public void TableSet(ValString index, Unit value)
+        public void TableSet(StringUnit index, Unit value)
         {
             table[index] = value;
         }
@@ -360,7 +360,7 @@ namespace lightning
             if (counter > 0)
                 this_string += " ";
             bool first = true;
-            foreach (KeyValuePair<ValString, Unit> entry in table)
+            foreach (KeyValuePair<StringUnit, Unit> entry in table)
             {
                 if (first)
                 {
@@ -386,12 +386,12 @@ namespace lightning
             Type other_type = other.GetType();
             if (other_type == typeof(Unit))
             {
-                if(((Unit)other).HeapValueType() == typeof(ValTable))
+                if(((Unit)other).HeapValueType() == typeof(TableUnit))
                 {
-                    if (this == ((Unit)other).heapValue as ValTable) return true;
+                    if (this == ((Unit)other).heapValue as TableUnit) return true;
                 }
             }
-            if (other_type == typeof(ValTable))
+            if (other_type == typeof(TableUnit))
             {
                 if (other == this) return true;
             }
@@ -404,13 +404,13 @@ namespace lightning
         }
     }
 
-    public class ValModule : ValTable
+    public class ModuleUnit : TableUnit
     {
         public string name;
         public List<Unit> globals;
         public List<Unit> constants;
         public Operand importIndex;
-        public ValModule(string p_name, List<Unit> p_elements, Dictionary<ValString, Unit> p_table, List<Unit> p_globals, List<Unit> p_constants)
+        public ModuleUnit(string p_name, List<Unit> p_elements, Dictionary<StringUnit, Unit> p_table, List<Unit> p_globals, List<Unit> p_constants)
             : base(p_elements, p_table)
         {
             name = p_name;
@@ -424,11 +424,11 @@ namespace lightning
             Type other_type = other.GetType();
             if (other_type == typeof(Unit))
             {
-                if (this.name == (((Unit)other).heapValue as ValModule).name) return true;
+                if (this.name == (((Unit)other).heapValue as ModuleUnit).name) return true;
             }
-            if (other_type == typeof(ValModule))
+            if (other_type == typeof(ModuleUnit))
             {
-                if ((other as ValModule).name == this.name) return true;
+                if ((other as ModuleUnit).name == this.name) return true;
             }
 
             return false;
@@ -444,11 +444,11 @@ namespace lightning
         }
     }
 
-    public class ValWrapper<T> : HeapValue
+    public class WrapperUnit<T> : HeapUnit
     {
         public object content;
 
-        public ValWrapper(object content)
+        public WrapperUnit(object content)
         {
             this.content = content;
         }
@@ -463,14 +463,14 @@ namespace lightning
             Type other_type = other.GetType();
             if (other_type == typeof(Unit))
             {
-                if(((Unit)other).HeapValueType() == typeof(ValWrapper<T>))
+                if(((Unit)other).HeapValueType() == typeof(WrapperUnit<T>))
                 {
-                    if (this.content == (((Unit)other).heapValue as ValWrapper<T>).content) return true;
+                    if (this.content == (((Unit)other).heapValue as WrapperUnit<T>).content) return true;
                 }
             }
-            if(other_type == typeof(ValWrapper<T>))
+            if(other_type == typeof(WrapperUnit<T>))
             {
-                if(((ValWrapper<T>)other).content == this.content)
+                if(((WrapperUnit<T>)other).content == this.content)
                 {
                     return true;
                 }

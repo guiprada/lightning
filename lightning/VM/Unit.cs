@@ -23,11 +23,11 @@ namespace lightning
 
     public struct Unit{
         public Number unitValue;
-        public HeapValue heapValue;
+        public HeapUnit heapValue;
 
         public UnitType type;
 
-        public Unit(HeapValue p_value) : this()
+        public Unit(HeapUnit p_value) : this()
         {
             heapValue = p_value;
             type = UnitType.HeapValue;

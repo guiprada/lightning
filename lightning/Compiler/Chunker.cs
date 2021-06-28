@@ -87,13 +87,13 @@ namespace lightning
             lambdaCounter = 0;
 
             // place prelude functions on constans
-            foreach (ValIntrinsic v in prelude.intrinsics)
+            foreach (IntrinsicUnit v in prelude.intrinsics)
             {
                 SetGlobalVar(v.name);
             }
 
             // load prelude tables
-            foreach (KeyValuePair<string, ValTable> entry in prelude.tables)
+            foreach (KeyValuePair<string, TableUnit> entry in prelude.tables)
             {
                 SetGlobalVar(entry.Key);
 
@@ -887,7 +887,7 @@ namespace lightning
         void CompileFunction(string name, int line, FunctionExpressionNode p_node, bool isGlobal)
         {
 
-            ValFunction new_function = new ValFunction(name, module_name);
+            FunctionUnit new_function = new FunctionUnit(name, module_name);
             Operand this_address = (Operand)AddConstant(new_function);
 
             if (p_node.GetType() == typeof(FunctionExpressionNode))
@@ -936,12 +936,12 @@ namespace lightning
             {
                 is_closure = true;
                 List<Variable> this_variables = upvalueStack.Pop();
-                List<ValUpValue> new_upvalues = new List<ValUpValue>();
+                List<UpValueUnit> new_upvalues = new List<UpValueUnit>();
                 foreach (Variable v in this_variables)
                 {
-                    new_upvalues.Add(new ValUpValue((Operand)v.address, (Operand)v.envIndex));
+                    new_upvalues.Add(new UpValueUnit((Operand)v.address, (Operand)v.envIndex));
                 }
-                ValClosure new_closure = new ValClosure(new_function, new_upvalues);
+                ClosureUnit new_closure = new ClosureUnit(new_function, new_upvalues);
                 code.SwapConstant(this_address, new Unit(new_closure));
             }
             else
@@ -1071,7 +1071,7 @@ namespace lightning
                 if (p_string == "Nil")
                     code.AddConstant(new Unit("null"));
                 else
-                    code.AddConstant(new Unit(new ValString(p_string)));
+                    code.AddConstant(new Unit(new StringUnit(p_string)));
 
                 return constants.Count - 1;
             }
@@ -1105,7 +1105,7 @@ namespace lightning
         //    }
         //}
 
-        int AddConstant(ValFunction new_function)
+        int AddConstant(FunctionUnit new_function)
         {
             constants.Add(new_function);
             code.AddConstant(new Unit(new_function));
