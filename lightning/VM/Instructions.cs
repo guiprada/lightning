@@ -6,47 +6,46 @@ namespace lightning{
     public struct Instructions
     {
         List<Instruction>[] stack;
-
-        int runningInstructionsIndex;// contains the currently executing instructions
-        FunctionUnit[] functionCallStack;
+        int currentInstructionsIndex;
+        FunctionUnit[] functions;
         int returnAdressTop;
         Operand[] returnAdress;
         int[] funCallEnv;
 
         public int TargetEnv{
             get{
-                return funCallEnv[runningInstructionsIndex];
+                return funCallEnv[currentInstructionsIndex];
             }
         }
 
-        public FunctionUnit RunningFunction{
+        public FunctionUnit ExecutingFunction{
             get {
-                return functionCallStack[runningInstructionsIndex];
+                return functions[currentInstructionsIndex];
             }
         }
 
-        public List<Instruction> RunningInstructions{
+        public List<Instruction> ExecutingInstructions{
             get{
-                return stack[runningInstructionsIndex];
+                return stack[currentInstructionsIndex];
             }
         }
 
-        public int RunningInstructionsIndex{
+        public int ExecutingInstructionsIndex{
             get{
-                return runningInstructionsIndex;
+                return currentInstructionsIndex;
             }
         }
 
         public Instructions(int p_function_deepness, Chunk p_chunk){
             stack = new List<Instruction>[p_function_deepness];
-            functionCallStack = new FunctionUnit[p_function_deepness];
+            functions = new FunctionUnit[p_function_deepness];
             returnAdress = new Operand[2 * p_function_deepness];
             funCallEnv = new int[p_function_deepness];
 
             returnAdressTop = 0;
 
             stack[0] = p_chunk.Program;
-            runningInstructionsIndex = 0;
+            currentInstructionsIndex = 0;
 
             returnAdress[returnAdressTop] = (Operand)(p_chunk.ProgramSize - 1);
             returnAdressTop++;
@@ -55,17 +54,17 @@ namespace lightning{
         public Operand PopFunction(){
             returnAdressTop--;
 
-            runningInstructionsIndex--;
+            currentInstructionsIndex--;
 
             return returnAdress[returnAdressTop];
         }
 
         public void PushFunction(FunctionUnit p_function, int p_env){
-            runningInstructionsIndex++;
+            currentInstructionsIndex++;
 
-            funCallEnv[runningInstructionsIndex] = p_env;
-            stack[runningInstructionsIndex] = p_function.body;
-            functionCallStack[runningInstructionsIndex] = p_function;
+            funCallEnv[currentInstructionsIndex] = p_env;
+            stack[currentInstructionsIndex] = p_function.body;
+            functions[currentInstructionsIndex] = p_function;
         }
 
         public Operand PopRET(){

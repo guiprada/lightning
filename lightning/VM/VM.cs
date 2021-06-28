@@ -37,6 +37,7 @@ namespace lightning
         Operand IP;
 
         Instructions instructions;
+        List<Instruction> instructionsCache;
 
         Memory<Unit> globals; // used for global variables
         Memory<Unit> variables; // used for scoped variables
@@ -65,6 +66,7 @@ namespace lightning
             functionDeepness = p_function_deepness;
 
             instructions = new Instructions(functionDeepness, chunk);
+            instructionsCache = instructions.ExecutingInstructions;
 
             stack = new Stack(functionDeepness);
 
@@ -189,14 +191,14 @@ namespace lightning
 
         void Error(string msg)
         {
-            if (instructions.RunningInstructionsIndex == 0)
+            if (instructions.ExecutingInstructionsIndex == 0)
                 Console.WriteLine("Error: " + msg + chunk.GetLine(IP));
             else
             {
                 Console.Write("Error: " + msg);
-                Console.Write(" on function: " + instructions.RunningFunction.name);
-                Console.Write(" from module: " + instructions.RunningFunction.module);
-                Console.WriteLine(" on line: " + chunk.GetLine(IP + instructions.RunningFunction.originalPosition));
+                Console.Write(" on function: " + instructions.ExecutingFunction.name);
+                Console.Write(" from module: " + instructions.ExecutingFunction.module);
+                Console.WriteLine(" on line: " + chunk.GetLine(IP + instructions.ExecutingFunction.originalPosition));
             }
         }
 
@@ -213,6 +215,7 @@ namespace lightning
             {
                 FunctionUnit this_func = (FunctionUnit)(this_callable.heapUnitValue);
                 instructions.PushFunction(this_func, Env);
+                instructionsCache = instructions.ExecutingInstructions;
 
                 IP = 0;
             }
@@ -227,6 +230,7 @@ namespace lightning
                     upValues.Add(u);
                 }
                 instructions.PushFunction(this_closure.function, Env);
+                instructionsCache = instructions.ExecutingInstructions;
 
                 IP = 0;
             }
@@ -249,7 +253,7 @@ namespace lightning
 
             while (true)
             {
-                instruction = instructions.RunningInstructions[IP];
+                instruction = instructionsCache[IP];
 
                 switch (instruction.opCode)
                 {
@@ -947,6 +951,7 @@ namespace lightning
                             int target_env = instructions.TargetEnv;
                             EnvSet(target_env);
                             IP = instructions.PopFunction();
+                            instructionsCache = instructions.ExecutingInstructions;
 
                             break;
                         }
@@ -955,6 +960,7 @@ namespace lightning
                             int target_env = instructions.TargetEnv;
                             EnvSet(target_env);
                             IP = instructions.PopFunction();
+                            instructionsCache = instructions.ExecutingInstructions;
 
                             break;
                         }
@@ -995,6 +1001,7 @@ namespace lightning
 
                                 instructions.PushRET(IP);
                                 instructions.PushFunction(this_func, Env);
+                                instructionsCache = instructions.ExecutingInstructions;
 
                                 IP = 0;
                             }
@@ -1011,6 +1018,7 @@ namespace lightning
 
                                 instructions.PushRET(IP);
                                 instructions.PushFunction(this_closure.function, Env);
+                                instructionsCache = instructions.ExecutingInstructions;
 
                                 IP = 0;
                             }
