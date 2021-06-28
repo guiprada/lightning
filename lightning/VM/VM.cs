@@ -39,11 +39,10 @@ namespace lightning
         Instructions instructions;
         List<Instruction> instructionsCache;
 
+        Env env;
         Memory<Unit> globals; // used for global variables
-        Memory<Unit> variables; // used for scoped variables
 
         public Stack stack;
-
         Memory<UpValueUnit> upValues;
         Memory<UpValueUnit> upValuesRegistry;
 
@@ -52,12 +51,6 @@ namespace lightning
         public List<ModuleUnit> modules;
         Stack<VM> vmPool;
         int functionDeepness;
-
-        int Env{
-            get{
-                return variables.Env;
-            }
-        }
 
         public VM(Chunk p_chunk, int p_function_deepness = 100, Memory<Unit> p_globals = null)
         {
@@ -69,7 +62,9 @@ namespace lightning
 
             stack = new Stack(functionDeepness);
 
-            variables = new Memory<Unit>();
+            env = new Env(new Memory<Unit>());
+
+
             upValues = new Memory<UpValueUnit>();
             upValuesRegistry = new Memory<UpValueUnit>();
 
@@ -94,19 +89,12 @@ namespace lightning
             vmPool = new Stack<VM>();
         }
 
-        Operand CalculateEnvShift(Operand n_shift){
-            return (Operand)(variables.Env - n_shift);
-        }
-
-        Operand CalculateEnvShiftUpVal(Operand env){
-            return (Operand)(variables.Env + 1 - env);
-        }
-
         public void ResoursesTrim(){
+            env.ResourcesTrim();
             upValuesRegistry.Trim();
-            variables.Trim();
             upValues.Trim();
         }
+
         public void ReleaseVMs(int count){
             for (int i = 0; i < count; i++)
                 if (vmPool.Count > 0)
@@ -163,7 +151,7 @@ namespace lightning
 
         void EnvPush()
         {
-            variables.PushEnv();
+            env.Push();
             upValuesRegistry.PushEnv();
         }
 
@@ -177,12 +165,13 @@ namespace lightning
                 upValuesRegistry.Get(i).Capture();
             }
             upValuesRegistry.PopEnv();
-            variables.PopEnv();
+
+            env.Pop();
         }
 
         void EnvSet(int target_env)
         {
-            while ((variables.Env) > target_env)
+            while ((env.Current) > target_env)
             {
                 EnvPop();
             }
@@ -213,7 +202,7 @@ namespace lightning
             if (this_type == typeof(FunctionUnit))
             {
                 FunctionUnit this_func = (FunctionUnit)(this_callable.heapUnitValue);
-                instructions.PushFunction(this_func, Env, out instructionsCache);
+                instructions.PushFunction(this_func, env.Current, out instructionsCache);
 
                 IP = 0;
             }
@@ -227,7 +216,7 @@ namespace lightning
                 {
                     upValues.Add(u);
                 }
-                instructions.PushFunction(this_closure.function, Env, out instructionsCache);
+                instructions.PushFunction(this_closure.function, env.Current, out instructionsCache);
 
                 IP = 0;
             }
@@ -273,7 +262,7 @@ namespace lightning
                             IP++;
                             Operand address = instruction.opA;
                             Operand n_shift = instruction.opB;
-                            var variable = variables.GetAt(address, CalculateEnvShift(n_shift));
+                            var variable = env.GetVarAt(address, n_shift);
                             stack.Push(variable);
                             break;
                         }
@@ -342,7 +331,7 @@ namespace lightning
                         {
                             IP++;
                             Unit new_value = stack.Pop();
-                            variables.Add(new_value);
+                            env.AddVar(new_value);
                             break;
                         }
                     case OpCode.GLOBALDCL:
@@ -356,20 +345,20 @@ namespace lightning
                     case OpCode.FUNDCL:
                         {
                             IP++;
-                            Operand env = instruction.opA;
+                            Operand fun_env = instruction.opA;
                             Operand lambda = instruction.opB;
                             Operand new_fun_address = instruction.opC;
                             Unit this_callable = chunk.GetConstant(new_fun_address);
                             if (this_callable.HeapUnitType() == typeof(FunctionUnit))
                             {
                                 if (lambda == 0)
-                                    if (env == 0)// Global
+                                    if (fun_env == 0)// Global
                                     {
                                         globals.Add(this_callable);
                                     }
                                     else
                                     {
-                                        variables.Add(this_callable);
+                                        env.AddVar(this_callable);
                                     }
                                 else
                                     stack.Push(this_callable);
@@ -383,25 +372,25 @@ namespace lightning
                                 foreach (UpValueUnit u in this_closure.upValues)
                                 {
                                     // here we convert env from shift based to absolute based
-                                    UpValueUnit new_upvalue = new UpValueUnit(u.address, CalculateEnvShiftUpVal(u.env));
+                                    UpValueUnit new_upvalue = new UpValueUnit(u.address, env.CalculateShiftUpVal(u.env));
                                     new_upValues.Add(new_upvalue);
                                 }
                                 ClosureUnit new_closure = new ClosureUnit(this_closure.function, new_upValues);
 
-                                new_closure.Register(variables);
+                                new_closure.Register(env.Variables);
                                 foreach (UpValueUnit u in new_closure.upValues)
                                 {
                                     RegisterUpValue(u);
                                 }
                                 Unit new_closure_unit = new Unit(new_closure);
                                 if (lambda == 0)
-                                    if (env == 0)// yes they exist!
+                                    if (fun_env == 0)// yes they exist!
                                     {
                                         globals.Add(new_closure_unit);
                                     }
                                     else
                                     {
-                                        variables.Add(new_closure_unit);
+                                        env.AddVar(new_closure_unit);
                                     }
                                 else
                                     stack.Push(new_closure_unit);
@@ -417,11 +406,11 @@ namespace lightning
                             Unit new_value = stack.Peek();
                             if (op == 0)
                             {
-                                variables.SetAt(new_value, address, CalculateEnvShift(n_shift));
+                                env.SetVarAt(new_value, address, n_shift);
                             }
                             else
                             {
-                                Unit old_value = variables.GetAt(address, CalculateEnvShift(n_shift));
+                                Unit old_value = env.GetVarAt(address, n_shift);
                                 Number result = 0;
                                 if (op == 1)
                                     result = old_value.unitValue + new_value.unitValue;
@@ -431,7 +420,7 @@ namespace lightning
                                     result = old_value.unitValue * new_value.unitValue;
                                 else if (op == 4)
                                     result = old_value.unitValue / new_value.unitValue;
-                                variables.SetAt(new Unit(result), address, CalculateEnvShift(n_shift));
+                                env.SetVarAt(new Unit(result), address, n_shift);
                             }
                             break;
                         }
@@ -995,7 +984,7 @@ namespace lightning
                                 FunctionUnit this_func = (FunctionUnit)this_callable.heapUnitValue;
 
                                 instructions.PushRET(IP);
-                                instructions.PushFunction(this_func, Env, out instructionsCache);
+                                instructions.PushFunction(this_func, env.Current, out instructionsCache);
 
                                 IP = 0;
                             }
@@ -1011,7 +1000,7 @@ namespace lightning
                                 }
 
                                 instructions.PushRET(IP);
-                                instructions.PushFunction(this_closure.function, Env, out instructionsCache);
+                                instructions.PushFunction(this_closure.function, env.Current, out instructionsCache);
 
                                 IP = 0;
                             }
