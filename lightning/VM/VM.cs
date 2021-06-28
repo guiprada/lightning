@@ -214,8 +214,7 @@ namespace lightning
             if (this_type == typeof(FunctionUnit))
             {
                 FunctionUnit this_func = (FunctionUnit)(this_callable.heapUnitValue);
-                instructions.PushFunction(this_func, Env);
-                instructionsCache = instructions.ExecutingInstructions;
+                instructionsCache = instructions.PushFunction(this_func, Env);
 
                 IP = 0;
             }
@@ -229,8 +228,7 @@ namespace lightning
                 {
                     upValues.Add(u);
                 }
-                instructions.PushFunction(this_closure.function, Env);
-                instructionsCache = instructions.ExecutingInstructions;
+                instructionsCache = instructions.PushFunction(this_closure.function, Env);
 
                 IP = 0;
             }
@@ -1000,8 +998,7 @@ namespace lightning
                                 FunctionUnit this_func = (FunctionUnit)this_callable.heapUnitValue;
 
                                 instructions.PushRET(IP);
-                                instructions.PushFunction(this_func, Env);
-                                instructionsCache = instructions.ExecutingInstructions;
+                                instructionsCache = instructions.PushFunction(this_func, Env);
 
                                 IP = 0;
                             }
@@ -1017,8 +1014,7 @@ namespace lightning
                                 }
 
                                 instructions.PushRET(IP);
-                                instructions.PushFunction(this_closure.function, Env);
-                                instructionsCache = instructions.ExecutingInstructions;
+                                instructionsCache = instructions.PushFunction(this_closure.function, Env);
 
                                 IP = 0;
                             }

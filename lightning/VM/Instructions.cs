@@ -59,12 +59,14 @@ namespace lightning{
             return returnAdress[returnAdressTop];
         }
 
-        public void PushFunction(FunctionUnit p_function, int p_env){
+        public List<Instruction> PushFunction(FunctionUnit p_function, int p_env){
             currentInstructionsIndex++;
 
             funCallEnv[currentInstructionsIndex] = p_env;
             stack[currentInstructionsIndex] = p_function.body;
             functions[currentInstructionsIndex] = p_function;
+
+            return ExecutingInstructions;
         }
 
         public Operand PopRET(){
