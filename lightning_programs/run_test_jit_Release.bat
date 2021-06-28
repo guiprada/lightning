@@ -1,1 +1,1 @@
-..\lightning_interpreter\bin\Release\netcoreapp3.1\lightning_interpreter.exe .\test.ltn
+..\lightning_interpreter\bin\Release\netcoreapp5.0\lightning_interpreter.exe .\test.ltn

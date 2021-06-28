@@ -36,12 +36,7 @@ namespace lightning
         Chunk chunk;
         Operand IP;
 
-        List<Instruction>[] instructionsStack;
-        int executingInstructions;// contains the currently executing instructions
-        FunctionUnit[] functionCallStack;
-        int returnAdressTop;
-        Operand[] returnAdress;
-        int[] funCallEnv;
+        Instructions instructions;
 
         Memory<Unit> globals; // used for global variables
         Memory<Unit> variables; // used for scoped variables
@@ -57,22 +52,19 @@ namespace lightning
         Stack<VM> vmPool;
         int functionDeepness;
 
+        int Env{
+            get{
+                return variables.Env;
+            }
+        }
+
         public VM(Chunk p_chunk, int p_function_deepness = 100, Memory<Unit> p_globals = null)
         {
             chunk = p_chunk;
             IP = 0;
             functionDeepness = p_function_deepness;
 
-            instructionsStack = new List<Instruction>[functionDeepness];
-            instructionsStack[0] = chunk.Program;
-            executingInstructions = 0;
-            functionCallStack = new FunctionUnit[functionDeepness];
-            returnAdress = new Operand[2 * functionDeepness];
-            returnAdressTop = 0;
-            returnAdress[executingInstructions] = (Operand)(chunk.ProgramSize - 1);
-            returnAdressTop++;
-
-            funCallEnv = new int[functionDeepness];
+            instructions = new Instructions(functionDeepness, chunk);
 
             stack = new Stack(functionDeepness);
 
@@ -197,16 +189,14 @@ namespace lightning
 
         void Error(string msg)
         {
-            if (executingInstructions == 0)
+            if (instructions.RunningInstructionsIndex == 0)
                 Console.WriteLine("Error: " + msg + chunk.GetLine(IP));
             else
             {
                 Console.Write("Error: " + msg);
-                Console.Write(" on function: " + functionCallStack[executingInstructions].name);
-                Console.Write(" from module: " + functionCallStack[executingInstructions].module);
-                Console.WriteLine(
-                    " on line: "
-                    + chunk.GetLine(IP + functionCallStack[executingInstructions].originalPosition));
+                Console.Write(" on function: " + instructions.RunningFunction.name);
+                Console.Write(" from module: " + instructions.RunningFunction.module);
+                Console.WriteLine(" on line: " + chunk.GetLine(IP + instructions.RunningFunction.originalPosition));
             }
         }
 
@@ -217,29 +207,27 @@ namespace lightning
                     stack.Push(args[i]);
 
             Type this_type = this_callable.HeapUnitType();
-            returnAdress[returnAdressTop] = (Operand)(chunk.ProgramSize - 1);
-            returnAdressTop += 1;
-            funCallEnv[executingInstructions + 1] = variables.Env;
+
+            instructions.PushRET((Operand)(chunk.ProgramSize - 1));
             if (this_type == typeof(FunctionUnit))
             {
                 FunctionUnit this_func = (FunctionUnit)(this_callable.heapUnitValue);
-                instructionsStack[executingInstructions + 1] = this_func.body;
-                functionCallStack[executingInstructions + 1] = this_func;
-                executingInstructions = executingInstructions + 1;
+                instructions.PushFunction(this_func, Env);
+
                 IP = 0;
             }
             else if (this_type == typeof(ClosureUnit))
             {
                 ClosureUnit this_closure = (ClosureUnit)(this_callable.heapUnitValue);
+
                 upValues.PushEnv();
 
                 foreach (UpValueUnit u in this_closure.upValues)
                 {
                     upValues.Add(u);
                 }
-                instructionsStack[executingInstructions + 1] = this_closure.function.body;
-                functionCallStack[executingInstructions + 1] = this_closure.function;
-                executingInstructions = executingInstructions + 1;
+                instructions.PushFunction(this_closure.function, Env);
+
                 IP = 0;
             }
             else if (this_type == typeof(IntrinsicUnit))
@@ -258,14 +246,11 @@ namespace lightning
         public VMResult Run()
         {
             Instruction instruction;
-            //Console.WriteLine(System.Runtime.InteropServices.Marshal.SizeOf(chunk.ReadInstruction(IP)));
-            //Console.WriteLine("All set, let's go!\n");
+
             while (true)
             {
-                instruction = instructionsStack[executingInstructions][IP];
-                //Console.Write(IP + " ");
-                //Chunk.PrintInstruction(instruction);
-                //Console.WriteLine();
+                instruction = instructions.RunningInstructions[IP];
+
                 switch (instruction.opCode)
                 {
                     case OpCode.POP:
@@ -654,15 +639,14 @@ namespace lightning
                         }
                     case OpCode.RET:
                         {
-                            IP = returnAdress[returnAdressTop - 1];
-                            returnAdressTop -= 1;
+                            IP = instructions.PopRET();
                             break;
                         }
-                    case OpCode.RETSREL:
+                    case OpCode.SETRET:
                         {
                             Operand value = instruction.opA;
-                            returnAdress[returnAdressTop] = ((Operand)(value + IP));
-                            returnAdressTop += 1;
+                            instructions.PushRET((Operand)(value + IP));
+
                             IP++;
                             break;
                         }
@@ -959,20 +943,19 @@ namespace lightning
                     case OpCode.CLOSURECLOSE:
                         {
                             upValues.PopEnv();
-                            int target_env = funCallEnv[executingInstructions];
+
+                            int target_env = instructions.TargetEnv;
                             EnvSet(target_env);
-                            IP = returnAdress[returnAdressTop - 1];
-                            returnAdressTop -= 1;
-                            executingInstructions = executingInstructions - 1;
+                            IP = instructions.PopFunction();
+
                             break;
                         }
                     case OpCode.FUNCLOSE:
                         {
-                            int target_env = funCallEnv[executingInstructions];
+                            int target_env = instructions.TargetEnv;
                             EnvSet(target_env);
-                            IP = returnAdress[returnAdressTop - 1];
-                            returnAdressTop -= 1;
-                            executingInstructions = executingInstructions - 1;
+                            IP = instructions.PopFunction();
+
                             break;
                         }
                     case OpCode.NTABLE:
@@ -1008,31 +991,27 @@ namespace lightning
 
                             if (this_type == typeof(FunctionUnit))
                             {
-                                returnAdress[returnAdressTop] = IP;// add return address to stack
-                                returnAdressTop += 1;
-                                funCallEnv[executingInstructions + 1] = variables.Env;// sets the return env to funclose/closureclose
                                 FunctionUnit this_func = (FunctionUnit)this_callable.heapUnitValue;
-                                instructionsStack[executingInstructions + 1] = this_func.body;
-                                functionCallStack[executingInstructions + 1] = this_func;
-                                executingInstructions = executingInstructions + 1;
+
+                                instructions.PushRET(IP);
+                                instructions.PushFunction(this_func, Env);
+
                                 IP = 0;
                             }
                             else if (this_type == typeof(ClosureUnit))
                             {
-                                returnAdress[returnAdressTop] = IP;// add return address to stack
-                                returnAdressTop += 1;
-                                funCallEnv[executingInstructions + 1] = variables.Env;// sets the return env to funclose/closureclose
-
                                 ClosureUnit this_closure = (ClosureUnit)this_callable.heapUnitValue;
+
                                 upValues.PushEnv();
 
                                 foreach (UpValueUnit u in this_closure.upValues)
                                 {
                                     upValues.Add(u);
                                 }
-                                instructionsStack[executingInstructions + 1] = this_closure.function.body;
-                                functionCallStack[executingInstructions + 1] = this_closure.function;
-                                executingInstructions = executingInstructions + 1;
+
+                                instructions.PushRET(IP);
+                                instructions.PushFunction(this_closure.function, Env);
+
                                 IP = 0;
                             }
                             else if (this_type == typeof(IntrinsicUnit))

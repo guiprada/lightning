@@ -74,7 +74,7 @@ namespace lightning
                 case OpCode.JMP:
                 case OpCode.JNT:
                 case OpCode.JMPB:
-                case OpCode.RETSREL:
+                case OpCode.SETRET:
                 case OpCode.TABLEGET:
                     return op.ToString() + " " + this.opA;
                 // 2 op
@@ -128,7 +128,7 @@ namespace lightning
         NENV,   // Open new env
         CENV,   // Close env
         RET,
-        RETSREL,
+        SETRET,
 
         ADD, // Float
         APP, // String

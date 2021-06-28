@@ -917,7 +917,7 @@ namespace lightning
             funStartEnv.Push(env.Count - 1);
 
             int exit_instruction_address = instructionCounter;
-            Add(OpCode.RETSREL, 0, line);
+            Add(OpCode.SETRET, 0, line);
 
             foreach (string p in p_node.Parameters)
             {
