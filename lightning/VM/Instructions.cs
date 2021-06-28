@@ -47,7 +47,6 @@ namespace lightning{
 
             stack[0] = p_chunk.Program;
             runningInstructionsIndex = 0;
-            cachedRunningInstructions = stack[runningInstructionsIndex];
 
             returnAdress[returnAdressTop] = (Operand)(p_chunk.ProgramSize - 1);
             returnAdressTop++;
