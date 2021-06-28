@@ -65,8 +65,7 @@ namespace lightning
             IP = 0;
             functionDeepness = p_function_deepness;
 
-            instructions = new Instructions(functionDeepness, chunk);
-            instructionsCache = instructions.ExecutingInstructions;
+            instructions = new Instructions(functionDeepness, chunk, out instructionsCache);
 
             stack = new Stack(functionDeepness);
 
@@ -214,7 +213,7 @@ namespace lightning
             if (this_type == typeof(FunctionUnit))
             {
                 FunctionUnit this_func = (FunctionUnit)(this_callable.heapUnitValue);
-                instructionsCache = instructions.PushFunction(this_func, Env);
+                instructions.PushFunction(this_func, Env, out instructionsCache);
 
                 IP = 0;
             }
@@ -228,7 +227,7 @@ namespace lightning
                 {
                     upValues.Add(u);
                 }
-                instructionsCache = instructions.PushFunction(this_closure.function, Env);
+                instructions.PushFunction(this_closure.function, Env, out instructionsCache);
 
                 IP = 0;
             }
@@ -948,8 +947,7 @@ namespace lightning
 
                             int target_env = instructions.TargetEnv;
                             EnvSet(target_env);
-                            IP = instructions.PopFunction();
-                            instructionsCache = instructions.ExecutingInstructions;
+                            IP = instructions.PopFunction(out instructionsCache);
 
                             break;
                         }
@@ -957,8 +955,7 @@ namespace lightning
                         {
                             int target_env = instructions.TargetEnv;
                             EnvSet(target_env);
-                            IP = instructions.PopFunction();
-                            instructionsCache = instructions.ExecutingInstructions;
+                            IP = instructions.PopFunction(out instructionsCache);
 
                             break;
                         }
@@ -998,7 +995,7 @@ namespace lightning
                                 FunctionUnit this_func = (FunctionUnit)this_callable.heapUnitValue;
 
                                 instructions.PushRET(IP);
-                                instructionsCache = instructions.PushFunction(this_func, Env);
+                                instructions.PushFunction(this_func, Env, out instructionsCache);
 
                                 IP = 0;
                             }
@@ -1014,7 +1011,7 @@ namespace lightning
                                 }
 
                                 instructions.PushRET(IP);
-                                instructionsCache = instructions.PushFunction(this_closure.function, Env);
+                                instructions.PushFunction(this_closure.function, Env, out instructionsCache);
 
                                 IP = 0;
                             }

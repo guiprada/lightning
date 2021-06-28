@@ -36,7 +36,7 @@ namespace lightning{
             }
         }
 
-        public Instructions(int p_function_deepness, Chunk p_chunk){
+        public Instructions(int p_function_deepness, Chunk p_chunk, out List<Instruction> p_instructions_cache){
             stack = new List<Instruction>[p_function_deepness];
             functions = new FunctionUnit[p_function_deepness];
             returnAdress = new Operand[2 * p_function_deepness];
@@ -49,24 +49,27 @@ namespace lightning{
 
             returnAdress[returnAdressTop] = (Operand)(p_chunk.ProgramSize - 1);
             returnAdressTop++;
+
+            p_instructions_cache = ExecutingInstructions;
         }
 
-        public Operand PopFunction(){
+        public Operand PopFunction(out List<Instruction> p_instructions_cache){
             returnAdressTop--;
-
             currentInstructionsIndex--;
+
+            p_instructions_cache = ExecutingInstructions;
 
             return returnAdress[returnAdressTop];
         }
 
-        public List<Instruction> PushFunction(FunctionUnit p_function, int p_env){
+        public void PushFunction(FunctionUnit p_function, int p_env, out List<Instruction> p_instructions_cache){
             currentInstructionsIndex++;
 
             funCallEnv[currentInstructionsIndex] = p_env;
             stack[currentInstructionsIndex] = p_function.body;
             functions[currentInstructionsIndex] = p_function;
 
-            return ExecutingInstructions;
+            p_instructions_cache = ExecutingInstructions;
         }
 
         public Operand PopRET(){
