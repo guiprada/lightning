@@ -46,8 +46,8 @@ namespace lightning
             Type other_type = other.GetType();
             if (other_type == typeof(Unit))
             {
-                if(((Unit)other).HeapValueType() == typeof(StringUnit))
-                    if(content == ((StringUnit)((Unit)(other)).heapValue).content)
+                if(((Unit)other).HeapUnitType() == typeof(StringUnit))
+                    if(content == ((StringUnit)((Unit)(other)).heapUnitValue).content)
                         return true;
             }
             if(other_type == typeof(StringUnit))
@@ -101,9 +101,9 @@ namespace lightning
             Type other_type = other.GetType();
             if (other_type == typeof(Unit))
             {
-                if(((Unit)other).HeapValueType() == typeof(FunctionUnit))
+                if(((Unit)other).HeapUnitType() == typeof(FunctionUnit))
                 {
-                    FunctionUnit other_val_func = (FunctionUnit)((Unit)(other)).heapValue;
+                    FunctionUnit other_val_func = (FunctionUnit)((Unit)(other)).heapUnitValue;
                     if (other_val_func.name == this.name && other_val_func.module == this.module) return true;
                 }
             }
@@ -150,9 +150,9 @@ namespace lightning
             Type other_type = other.GetType();
             if (other_type == typeof(Unit))
             {
-                if(((Unit)other).HeapValueType() == typeof(IntrinsicUnit))
+                if(((Unit)other).HeapUnitType() == typeof(IntrinsicUnit))
                 {
-                    if (function == (((Unit)other).heapValue as IntrinsicUnit).function) return true;
+                    if (function == (((Unit)other).heapUnitValue as IntrinsicUnit).function) return true;
                 }
             }
             if (other_type == typeof(IntrinsicUnit))
@@ -201,9 +201,9 @@ namespace lightning
             Type other_type = other.GetType();
             if (other_type == typeof(Unit))
             {
-                if(((Unit)other).HeapValueType() == typeof(ClosureUnit))
+                if(((Unit)other).HeapUnitType() == typeof(ClosureUnit))
                 {
-                    if (this == ((Unit)other).heapValue as ClosureUnit) return true;
+                    if (this == ((Unit)other).heapUnitValue as ClosureUnit) return true;
                 }
             }
             if (other_type == typeof(ClosureUnit))
@@ -268,7 +268,7 @@ namespace lightning
         }
         public override string ToString()
         {
-            return new string("upvalue " + address + " on env " + env + " HeapValue: " + Val.ToString());
+            return new string("upvalue " + address + " on env " + env + " HeapUnit: " + Val.ToString());
         }
 
         public override bool ToBool()
@@ -281,9 +281,9 @@ namespace lightning
             Type other_type = other.GetType();
             if (other_type == typeof(Unit))
             {
-                if(((Unit)other).HeapValueType() == typeof(UpValueUnit))
+                if(((Unit)other).HeapUnitType() == typeof(UpValueUnit))
                 {
-                    if (Val.Equals(((Unit)other).heapValue)) return true;
+                    if (Val.Equals(((Unit)other).heapUnitValue)) return true;
                 }
             }
             if (other_type == typeof(UpValueUnit))
@@ -386,9 +386,9 @@ namespace lightning
             Type other_type = other.GetType();
             if (other_type == typeof(Unit))
             {
-                if(((Unit)other).HeapValueType() == typeof(TableUnit))
+                if(((Unit)other).HeapUnitType() == typeof(TableUnit))
                 {
-                    if (this == ((Unit)other).heapValue as TableUnit) return true;
+                    if (this == ((Unit)other).heapUnitValue as TableUnit) return true;
                 }
             }
             if (other_type == typeof(TableUnit))
@@ -424,7 +424,7 @@ namespace lightning
             Type other_type = other.GetType();
             if (other_type == typeof(Unit))
             {
-                if (this.name == (((Unit)other).heapValue as ModuleUnit).name) return true;
+                if (this.name == (((Unit)other).heapUnitValue as ModuleUnit).name) return true;
             }
             if (other_type == typeof(ModuleUnit))
             {
@@ -463,9 +463,9 @@ namespace lightning
             Type other_type = other.GetType();
             if (other_type == typeof(Unit))
             {
-                if(((Unit)other).HeapValueType() == typeof(WrapperUnit<T>))
+                if(((Unit)other).HeapUnitType() == typeof(WrapperUnit<T>))
                 {
-                    if (this.content == (((Unit)other).heapValue as WrapperUnit<T>).content) return true;
+                    if (this.content == (((Unit)other).heapUnitValue as WrapperUnit<T>).content) return true;
                 }
             }
             if(other_type == typeof(WrapperUnit<T>))

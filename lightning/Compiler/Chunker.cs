@@ -802,7 +802,7 @@ namespace lightning
                 // Is it a compound call?
                 for (int i = 1; i < p_node.Calls.Count; i++)
                 {
-                    Add(OpCode.STASHTOP, p_node.Line);
+                    Add(OpCode.PUSHSTASH, p_node.Line);
 
                     p_node.Calls[i].Reverse();
                     foreach (Node n in p_node.Calls[i])
@@ -862,7 +862,7 @@ namespace lightning
             if (globals.Contains(p_node.Name))
                 Error("Local functions cant have the same name as global ones, yet :)", p_node.Line);
             Nullable<Variable> maybe_name = SetVar(p_node.Name);
-            //Console.WriteLine("fun dcl " + p_node.Name + " " + maybe_name.HeapValue.address + " " + maybe_name.HeapValue.envIndex + " " + maybe_name.HeapValue.type + " we are in:" + (env.Count - 1));
+            //Console.WriteLine("fun dcl " + p_node.Name + " " + maybe_name.HeapUnit.address + " " + maybe_name.HeapUnit.envIndex + " " + maybe_name.HeapUnit.type + " we are in:" + (env.Count - 1));
 
             if (maybe_name.HasValue)
             {

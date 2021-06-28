@@ -18,19 +18,19 @@ namespace lightning
         Null,
         Boolean,
 
-        HeapValue
+        HeapUnit
     }
 
     public struct Unit{
         public Number unitValue;
-        public HeapUnit heapValue;
+        public HeapUnit heapUnitValue;
 
         public UnitType type;
 
         public Unit(HeapUnit p_value) : this()
         {
-            heapValue = p_value;
-            type = UnitType.HeapValue;
+            heapUnitValue = p_value;
+            type = UnitType.HeapUnit;
         }
         public Unit(Number p_number) : this()
         {
@@ -59,9 +59,9 @@ namespace lightning
             }
         }
 
-        public Type HeapValueType(){
-            if(type == UnitType.HeapValue)
-                return heapValue.GetType();
+        public Type HeapUnitType(){
+            if(type == UnitType.HeapUnit)
+                return heapUnitValue.GetType();
             return null;
         }
 
@@ -78,7 +78,7 @@ namespace lightning
                     return "true";
                 throw new Exception("Trying to get String of Invalid Boolean");
             }else{
-                return heapValue.ToString();
+                return heapUnitValue.ToString();
             }
         }
 
@@ -96,7 +96,7 @@ namespace lightning
                     return true;
                 throw new Exception("Trying to get Value of Invalid Boolean");
             }else{
-                return heapValue.ToBool();
+                return heapUnitValue.ToBool();
             }
         }
 
@@ -118,7 +118,7 @@ namespace lightning
             }else if(type == UnitType.Boolean){
                 return ToBool() == ((Unit)other).ToBool();
             }else{
-                return heapValue.Equals(other);
+                return heapUnitValue.Equals(other);
             }
         }
 
@@ -130,7 +130,7 @@ namespace lightning
             }else if(type == UnitType.Boolean){
                 return ToBool().GetHashCode();
             }else{
-                return heapValue.GetHashCode();
+                return heapUnitValue.GetHashCode();
             }
         }
     }

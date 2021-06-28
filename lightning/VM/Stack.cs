@@ -4,11 +4,15 @@ namespace lightning{
 	{
 		Unit[] values;
 		public int top;
+		Unit[] stash;
+        int stashTop;
 
-		public Stack(int p_size)
+		public Stack(int p_function_deepness)
 		{
-			values = new Unit[p_size];
+			values = new Unit[3 * p_function_deepness];
 			top = 0;
+			stash = new Unit[p_function_deepness];
+            stashTop = 0;
 		}
 
 		public void Push(Unit p_value)
@@ -35,6 +39,16 @@ namespace lightning{
 				throw new Exception("Atempt to read empty stack");
 			}
 			return values[top - n - 1];
+		}
+
+		public void PushStash(){
+			stash[stashTop] = Pop();
+			stashTop++;
+		}
+
+		public void PopStash(){
+			Push(stash[stashTop - 1]);
+			stashTop--;
 		}
 	}
 }

@@ -34,9 +34,14 @@ namespace lightning
     public class VM
     {
         Chunk chunk;
+        Operand IP;
+
         List<Instruction>[] instructionsStack;
         int executingInstructions;// contains the currently executing instructions
         FunctionUnit[] functionCallStack;
+        int returnAdressTop;
+        Operand[] returnAdress;
+        int[] funCallEnv;
 
         Memory<Unit> globals; // used for global variables
         Memory<Unit> variables; // used for scoped variables
@@ -46,13 +51,6 @@ namespace lightning
         Memory<UpValueUnit> upValues;
         Memory<UpValueUnit> upValuesRegistry;
 
-        Operand[] returnAdress;
-        int returnAdressCounter;
-        int[] funCallEnv;
-        Unit[] stash;
-        int stashTop;
-
-        Operand IP;
         List<IntrinsicUnit> Intrinsics { get; set; }
         public Dictionary<string, int> loadedModules { get; private set; }
         public List<ModuleUnit> modules;
@@ -62,26 +60,25 @@ namespace lightning
         public VM(Chunk p_chunk, int p_function_deepness = 100, Memory<Unit> p_globals = null)
         {
             chunk = p_chunk;
+            IP = 0;
             functionDeepness = p_function_deepness;
 
             instructionsStack = new List<Instruction>[functionDeepness];
             instructionsStack[0] = chunk.Program;
             executingInstructions = 0;
             functionCallStack = new FunctionUnit[functionDeepness];
+            returnAdress = new Operand[2 * functionDeepness];
+            returnAdressTop = 0;
+            returnAdress[executingInstructions] = (Operand)(chunk.ProgramSize - 1);
+            returnAdressTop++;
 
-            stack = new Stack(3 * functionDeepness);
+            funCallEnv = new int[functionDeepness];
+
+            stack = new Stack(functionDeepness);
 
             variables = new Memory<Unit>();
             upValues = new Memory<UpValueUnit>();
             upValuesRegistry = new Memory<UpValueUnit>();
-
-            returnAdress = new Operand[2 * functionDeepness];
-            returnAdress[executingInstructions] = (Operand)(chunk.ProgramSize - 1);
-            returnAdressCounter = 1;
-            funCallEnv = new int[functionDeepness];
-            stash = new Unit[functionDeepness];
-            stashTop = 0;
-            IP = 0;
 
             if(p_globals == null){
                 globals = new Memory<Unit>();
@@ -219,13 +216,13 @@ namespace lightning
                 for (int i = args.Count - 1; i >= 0; i--)
                     stack.Push(args[i]);
 
-            Type this_type = this_callable.HeapValueType();
-            returnAdress[returnAdressCounter] = (Operand)(chunk.ProgramSize - 1);
-            returnAdressCounter += 1;
+            Type this_type = this_callable.HeapUnitType();
+            returnAdress[returnAdressTop] = (Operand)(chunk.ProgramSize - 1);
+            returnAdressTop += 1;
             funCallEnv[executingInstructions + 1] = variables.Env;
             if (this_type == typeof(FunctionUnit))
             {
-                FunctionUnit this_func = (FunctionUnit)(this_callable.heapValue);
+                FunctionUnit this_func = (FunctionUnit)(this_callable.heapUnitValue);
                 instructionsStack[executingInstructions + 1] = this_func.body;
                 functionCallStack[executingInstructions + 1] = this_func;
                 executingInstructions = executingInstructions + 1;
@@ -233,7 +230,7 @@ namespace lightning
             }
             else if (this_type == typeof(ClosureUnit))
             {
-                ClosureUnit this_closure = (ClosureUnit)(this_callable.heapValue);
+                ClosureUnit this_closure = (ClosureUnit)(this_callable.heapUnitValue);
                 upValues.PushEnv();
 
                 foreach (UpValueUnit u in this_closure.upValues)
@@ -247,7 +244,7 @@ namespace lightning
             }
             else if (this_type == typeof(IntrinsicUnit))
             {
-                IntrinsicUnit this_intrinsic = (IntrinsicUnit)(this_callable.heapValue);
+                IntrinsicUnit this_intrinsic = (IntrinsicUnit)(this_callable.heapUnitValue);
                 Unit intrinsic_result = this_intrinsic.function(this);
                 stack.top -= this_intrinsic.arity;
                 stack.Push(intrinsic_result);
@@ -377,7 +374,7 @@ namespace lightning
                             Operand lambda = instruction.opB;
                             Operand new_fun_address = instruction.opC;
                             Unit this_callable = chunk.GetConstant(new_fun_address);
-                            if (this_callable.HeapValueType() == typeof(FunctionUnit))
+                            if (this_callable.HeapUnitType() == typeof(FunctionUnit))
                             {
                                 if (lambda == 0)
                                     if (env == 0)// Global
@@ -393,7 +390,7 @@ namespace lightning
                             }
                             else
                             {
-                                ClosureUnit this_closure = (ClosureUnit)(this_callable.heapValue);
+                                ClosureUnit this_closure = (ClosureUnit)(this_callable.heapUnitValue);
 
                                 // new upvalues
                                 List<UpValueUnit> new_upValues = new List<UpValueUnit>();
@@ -537,11 +534,11 @@ namespace lightning
                             {
                                 if (v.type == UnitType.Number)
                                 {
-                                    value = ((TableUnit)(value.heapValue)).elements[(int)v.unitValue];
+                                    value = ((TableUnit)(value.heapUnitValue)).elements[(int)v.unitValue];
                                 }
                                 else
                                 {
-                                    value = ((TableUnit)(value.heapValue)).table[(StringUnit)v.heapValue];
+                                    value = ((TableUnit)(value.heapUnitValue)).table[(StringUnit)v.heapUnitValue];
                                 }
                             }
                             stack.Push(value);
@@ -565,11 +562,11 @@ namespace lightning
                                 Unit v = indexes[i];
                                 if (v.type == UnitType.Number)
                                 {
-                                    this_table = ((TableUnit)(this_table.heapValue)).elements[(int)v.unitValue];
+                                    this_table = ((TableUnit)(this_table.heapUnitValue)).elements[(int)v.unitValue];
                                 }
                                 else
                                 {
-                                    this_table = ((TableUnit)(this_table.heapValue)).table[(StringUnit)v.heapValue];
+                                    this_table = ((TableUnit)(this_table.heapUnitValue)).table[(StringUnit)v.heapUnitValue];
                                 }
                             }
                             Unit new_value = stack.Peek();
@@ -577,28 +574,28 @@ namespace lightning
                             {
                                 if (indexes[indexes_counter - 1].type == UnitType.Number)
                                 {
-                                    if (((TableUnit)(this_table.heapValue)).elements.Count - 1 >= ((int)(indexes[indexes_counter - 1].unitValue)))
+                                    if (((TableUnit)(this_table.heapUnitValue)).elements.Count - 1 >= ((int)(indexes[indexes_counter - 1].unitValue)))
                                     {
-                                        Unit old_value = ((TableUnit)(this_table.heapValue)).elements[(int)(indexes[indexes_counter - 1].unitValue)];
+                                        Unit old_value = ((TableUnit)(this_table.heapUnitValue)).elements[(int)(indexes[indexes_counter - 1].unitValue)];
                                     }
-                                    ((TableUnit)(this_table.heapValue)).ElementSet((int)(indexes[indexes_counter - 1].unitValue), new_value);
+                                    ((TableUnit)(this_table.heapUnitValue)).ElementSet((int)(indexes[indexes_counter - 1].unitValue), new_value);
                                 }
                                 else
                                 {
-                                    if (((TableUnit)(this_table.heapValue)).table.ContainsKey((StringUnit)indexes[indexes_counter - 1].heapValue))
+                                    if (((TableUnit)(this_table.heapUnitValue)).table.ContainsKey((StringUnit)indexes[indexes_counter - 1].heapUnitValue))
                                     {
-                                        Unit old_value = ((TableUnit)(this_table.heapValue)).table[(StringUnit)indexes[indexes_counter - 1].heapValue];
+                                        Unit old_value = ((TableUnit)(this_table.heapUnitValue)).table[(StringUnit)indexes[indexes_counter - 1].heapUnitValue];
                                     }
-                                    ((TableUnit)(this_table.heapValue)).TableSet((StringUnit)indexes[indexes_counter - 1].heapValue, new_value);
+                                    ((TableUnit)(this_table.heapUnitValue)).TableSet((StringUnit)indexes[indexes_counter - 1].heapUnitValue, new_value);
                                 }
                             }
                             else
                             {
                                 Unit old_value;
                                 if (indexes[indexes_counter - 1].type == UnitType.Number)
-                                    old_value = ((TableUnit)(this_table.heapValue)).elements[(int)(indexes[indexes_counter - 1].unitValue)];
+                                    old_value = ((TableUnit)(this_table.heapUnitValue)).elements[(int)(indexes[indexes_counter - 1].unitValue)];
                                 else
-                                    old_value = ((TableUnit)(this_table.heapValue)).table[(StringUnit)indexes[indexes_counter - 1].heapValue];
+                                    old_value = ((TableUnit)(this_table.heapUnitValue)).table[(StringUnit)indexes[indexes_counter - 1].heapUnitValue];
 
                                 Number result = 0;
                                 if (op == 1)
@@ -611,9 +608,9 @@ namespace lightning
                                     result = old_value.unitValue / new_value.unitValue;
 
                                 if (indexes[indexes_counter - 1].type == UnitType.Number)
-                                    ((TableUnit)(this_table.heapValue)).elements[(int)(indexes[indexes_counter - 1].unitValue)] = new Unit(result);
+                                    ((TableUnit)(this_table.heapUnitValue)).elements[(int)(indexes[indexes_counter - 1].unitValue)] = new Unit(result);
                                 else
-                                    ((TableUnit)(this_table.heapValue)).table[(StringUnit)indexes[indexes_counter - 1].heapValue] = new Unit(result);
+                                    ((TableUnit)(this_table.heapUnitValue)).table[(StringUnit)indexes[indexes_counter - 1].heapUnitValue] = new Unit(result);
 
                             }
                             break;
@@ -657,15 +654,15 @@ namespace lightning
                         }
                     case OpCode.RET:
                         {
-                            IP = returnAdress[returnAdressCounter - 1];
-                            returnAdressCounter -= 1;
+                            IP = returnAdress[returnAdressTop - 1];
+                            returnAdressTop -= 1;
                             break;
                         }
                     case OpCode.RETSREL:
                         {
                             Operand value = instruction.opA;
-                            returnAdress[returnAdressCounter] = ((Operand)(value + IP));
-                            returnAdressCounter += 1;
+                            returnAdress[returnAdressTop] = ((Operand)(value + IP));
+                            returnAdressTop += 1;
                             IP++;
                             break;
                         }
@@ -964,8 +961,8 @@ namespace lightning
                             upValues.PopEnv();
                             int target_env = funCallEnv[executingInstructions];
                             EnvSet(target_env);
-                            IP = returnAdress[returnAdressCounter - 1];
-                            returnAdressCounter -= 1;
+                            IP = returnAdress[returnAdressTop - 1];
+                            returnAdressTop -= 1;
                             executingInstructions = executingInstructions - 1;
                             break;
                         }
@@ -973,8 +970,8 @@ namespace lightning
                         {
                             int target_env = funCallEnv[executingInstructions];
                             EnvSet(target_env);
-                            IP = returnAdress[returnAdressCounter - 1];
-                            returnAdressCounter -= 1;
+                            IP = returnAdress[returnAdressTop - 1];
+                            returnAdressTop -= 1;
                             executingInstructions = executingInstructions - 1;
                             break;
                         }
@@ -989,7 +986,7 @@ namespace lightning
                             {
                                 Unit val = stack.Pop();
                                 Unit key = stack.Pop();
-                                new_table.table.Add((StringUnit)key.heapValue, val);
+                                new_table.table.Add((StringUnit)key.heapUnitValue, val);
                             }
 
                             int n_elements = instruction.opA;
@@ -1007,14 +1004,14 @@ namespace lightning
                             IP++;
 
                             Unit this_callable = stack.Pop();
-                            Type this_type = this_callable.HeapValueType();
+                            Type this_type = this_callable.HeapUnitType();
 
                             if (this_type == typeof(FunctionUnit))
                             {
-                                returnAdress[returnAdressCounter] = IP;// add return address to stack
-                                returnAdressCounter += 1;
+                                returnAdress[returnAdressTop] = IP;// add return address to stack
+                                returnAdressTop += 1;
                                 funCallEnv[executingInstructions + 1] = variables.Env;// sets the return env to funclose/closureclose
-                                FunctionUnit this_func = (FunctionUnit)this_callable.heapValue;
+                                FunctionUnit this_func = (FunctionUnit)this_callable.heapUnitValue;
                                 instructionsStack[executingInstructions + 1] = this_func.body;
                                 functionCallStack[executingInstructions + 1] = this_func;
                                 executingInstructions = executingInstructions + 1;
@@ -1022,11 +1019,11 @@ namespace lightning
                             }
                             else if (this_type == typeof(ClosureUnit))
                             {
-                                returnAdress[returnAdressCounter] = IP;// add return address to stack
-                                returnAdressCounter += 1;
+                                returnAdress[returnAdressTop] = IP;// add return address to stack
+                                returnAdressTop += 1;
                                 funCallEnv[executingInstructions + 1] = variables.Env;// sets the return env to funclose/closureclose
 
-                                ClosureUnit this_closure = (ClosureUnit)this_callable.heapValue;
+                                ClosureUnit this_closure = (ClosureUnit)this_callable.heapUnitValue;
                                 upValues.PushEnv();
 
                                 foreach (UpValueUnit u in this_closure.upValues)
@@ -1040,38 +1037,35 @@ namespace lightning
                             }
                             else if (this_type == typeof(IntrinsicUnit))
                             {
-                                IntrinsicUnit this_intrinsic = (IntrinsicUnit)this_callable.heapValue;
+                                IntrinsicUnit this_intrinsic = (IntrinsicUnit)this_callable.heapUnitValue;
                                 Unit result = this_intrinsic.function(this);
                                 stack.top -= this_intrinsic.arity;
                                 stack.Push(result);
                             }
                             else
                             {
-                                Error("Trying to call a " + this_callable.HeapValueType());
+                                Error("Trying to call a " + this_callable.HeapUnitType());
                                 return new VMResult(VMResultType.OK, new Unit("null"));
                             }
                             break;
                         }
-                    case OpCode.STASHTOP:
+                    case OpCode.PUSHSTASH:
                         {
                             IP++;
-
-                            stash[stashTop] = stack.Pop();
-                            stashTop++;
+                            stack.PushStash();
                             break;
                         }
                     case OpCode.POPSTASH:
                         {
                             IP++;
-                            stack.Push(stash[stashTop - 1]);
-                            stashTop--;
+                            stack.PopStash();
                             break;
                         }
                     case OpCode.FOREACH:
                         {
                             IP++;
                             Unit func = stack.Pop();
-                            TableUnit table = (TableUnit)(stack.Pop().heapValue);
+                            TableUnit table = (TableUnit)(stack.Pop().heapUnitValue);
 
                             int init = 0;
                             int end = table.ECount;
@@ -1097,7 +1091,7 @@ namespace lightning
                         {
                             IP++;
                             Unit func = stack.Pop();
-                            TableUnit table = (TableUnit)(stack.Pop().heapValue);
+                            TableUnit table = (TableUnit)(stack.Pop().heapUnitValue);
                             Number tasks = stack.Pop().unitValue;
 
                             int n_tasks = (int)tasks;
@@ -1184,7 +1178,7 @@ namespace lightning
             //     {
             //         statsValue += "Upvalues:\n";
             //     }
-            //     foreach (HeapValue v in upValues)
+            //     foreach (HeapUnit v in upValues)
             //     {
             //         statsValue += counter.ToString() + ": " + upValues[i].ToString() + '\n';
             //         counter++;

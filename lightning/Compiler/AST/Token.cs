@@ -81,7 +81,7 @@ namespace lightning
         public Token(TokenType p_type, int p_Line)
         {
             //Console.WriteLine(p_type.ToString() + " " + p_Line);
-            Type = p_type;            
+            Type = p_type;
             Line = p_Line;
         }
 
@@ -100,7 +100,7 @@ namespace lightning
         }
         public override string ToString()
         {
-            return Type.ToString() + " HeapValue: " + value + " line: " + Line.ToString();
+            return Type.ToString() + " HeapUnit: " + value + " line: " + Line.ToString();
         }
     }
 
@@ -114,7 +114,7 @@ namespace lightning
 
         public override string ToString()
         {
-            return Type.ToString() + " HeapValue: " + value.ToString() + " line: " + Line.ToString();
+            return Type.ToString() + " HeapUnit: " + value.ToString() + " line: " + Line.ToString();
         }
     }
 }

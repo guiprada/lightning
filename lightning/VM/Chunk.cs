@@ -5,7 +5,7 @@ using System.Text;
 using Operand = System.UInt16;
 
 namespace lightning
-{   
+{
     public struct Instruction
     {
         public OpCode opCode;
@@ -55,7 +55,7 @@ namespace lightning
                 case OpCode.EXIT:
                 case OpCode.LOADNIL:
                 case OpCode.POP:
-                case OpCode.STASHTOP:
+                case OpCode.PUSHSTASH:
                 case OpCode.POPSTASH:
                 case OpCode.CALL:
                 case OpCode.CLOSURECLOSE:
@@ -77,7 +77,7 @@ namespace lightning
                 case OpCode.RETSREL:
                 case OpCode.TABLEGET:
                     return op.ToString() + " " + this.opA;
-                // 2 op                
+                // 2 op
                 case OpCode.ASSIGNG:
                 case OpCode.ASSIGNUPVAL:
                 case OpCode.LOADV:
@@ -118,10 +118,10 @@ namespace lightning
         TABLESET,
 
         POP,
-        STASHTOP,
+        PUSHSTASH,
         POPSTASH,
 
-        JMP,    // Jumps n instructions 
+        JMP,    // Jumps n instructions
         JNT,    // Jumps if not true
         JMPB,     // Jumps back n instructions
 
@@ -132,7 +132,7 @@ namespace lightning
 
         ADD, // Float
         APP, // String
-        SUB, // 
+        SUB, //
         MUL,
         DIV,
         NEG,
@@ -166,7 +166,7 @@ namespace lightning
     }
 
     public class Chunk
-    {        
+    {
         //class LineInfo
         //{
         //    public uint line;
@@ -210,7 +210,7 @@ namespace lightning
             int constant_counter = 0;
             foreach (Unit v in constants)
             {
-                if(v.HeapValueType() == typeof(StringUnit))
+                if(v.HeapUnitType() == typeof(StringUnit))
                     Console.WriteLine("Constant: " + constant_counter.ToString() + " \"" + v.ToString() + "\"");
                 else
                     Console.WriteLine("Constant: "+ constant_counter.ToString() + " " + v.ToString());
@@ -235,7 +235,7 @@ namespace lightning
         {
             Console.Write(instruction.ToString());
         }
- 
+
         public ushort AddConstant(Unit value)
         {
             constants.Add(value);
@@ -298,10 +298,10 @@ namespace lightning
         {
             foreach(Unit v in constants)
             {
-                if(v.HeapValueType() == typeof(FunctionUnit))
-                    if( ((FunctionUnit)(v.heapValue)).name == name)
+                if(v.HeapUnitType() == typeof(FunctionUnit))
+                    if( ((FunctionUnit)(v.heapUnitValue)).name == name)
                     {
-                        return (FunctionUnit)(v.heapValue);
+                        return (FunctionUnit)(v.heapUnitValue);
                     }
             }
             foreach (IntrinsicUnit v in Prelude.intrinsics)
@@ -337,6 +337,6 @@ namespace lightning
         public void SwapConstant(int address, Unit new_value)
         {
             constants[address] = new_value;
-        }        
+        }
     }
 }

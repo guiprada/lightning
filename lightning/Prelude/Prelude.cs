@@ -109,7 +109,7 @@ namespace lightning
 
                 Unit listPush(VM vm)
                 {
-                    TableUnit list = (TableUnit)vm.stack.Peek(0).heapValue;
+                    TableUnit list = (TableUnit)vm.stack.Peek(0).heapUnitValue;
                     Unit value = vm.stack.Peek(1);
                     list.elements.Add(value);
 
@@ -120,7 +120,7 @@ namespace lightning
                 //////////////////////////////////////////////////////
                 Unit listPop(VM vm)
                 {
-                    TableUnit list = (TableUnit)vm.stack.Peek(0).heapValue;
+                    TableUnit list = (TableUnit)vm.stack.Peek(0).heapUnitValue;
                     Number value = list.elements[^1].unitValue;
                     list.elements.RemoveRange(list.elements.Count - 1, 1);
 
@@ -131,7 +131,7 @@ namespace lightning
                 //////////////////////////////////////////////////////
                 Unit listToString(VM vm)
                 {
-                    TableUnit this_table = (TableUnit)vm.stack.Peek(0).heapValue;
+                    TableUnit this_table = (TableUnit)vm.stack.Peek(0).heapUnitValue;
                     bool first = true;
                     string value = "";
                     foreach (Unit v in this_table.elements)
@@ -153,7 +153,7 @@ namespace lightning
                 ////////////////////////////////////////////////////
                 Unit listCount(VM vm)
                 {
-                    TableUnit this_table = (TableUnit)vm.stack.Peek(0).heapValue;
+                    TableUnit this_table = (TableUnit)vm.stack.Peek(0).heapUnitValue;
                     int count = this_table.ECount;
                     return new Unit(count);
                 }
@@ -162,7 +162,7 @@ namespace lightning
                 //////////////////////////////////////////////////////
                 Unit listClear(VM vm)
                 {
-                    TableUnit list = (TableUnit)vm.stack.Peek(0).heapValue;
+                    TableUnit list = (TableUnit)vm.stack.Peek(0).heapUnitValue;
                     list.elements.Clear();
                     return new Unit("null");
                 }
@@ -171,7 +171,7 @@ namespace lightning
                 //////////////////////////////////////////////////////
                 Unit listRemoveRange(VM vm)
                 {
-                    TableUnit list = (TableUnit)vm.stack.Peek(0).heapValue;
+                    TableUnit list = (TableUnit)vm.stack.Peek(0).heapUnitValue;
                     int range_init = (int)vm.stack.Peek(1).unitValue;
                     int range_end = (int)vm.stack.Peek(2).unitValue;
                     list.elements.RemoveRange(range_init, range_end - range_init + 1);
@@ -183,7 +183,7 @@ namespace lightning
                 //////////////////////////////////////////////////////
                 Unit listCopy(VM vm)
                 {
-                    TableUnit list = (TableUnit)vm.stack.Peek(0).heapValue;
+                    TableUnit list = (TableUnit)vm.stack.Peek(0).heapUnitValue;
                     List<Unit> new_list_elements = new List<Unit>();
                     foreach (Unit v in list.elements)
                     {
@@ -198,7 +198,7 @@ namespace lightning
                 //////////////////////////////////////////////////////
                 Unit listSplit(VM vm)
                 {
-                    TableUnit list = (TableUnit)vm.stack.Peek(0).heapValue;
+                    TableUnit list = (TableUnit)vm.stack.Peek(0).heapUnitValue;
                     int range_init = (int)vm.stack.Peek(1).unitValue;
                     List<Unit> new_list_elements = list.elements.GetRange(range_init, list.elements.Count - range_init);
                     list.elements.RemoveRange(range_init, list.elements.Count - range_init);
@@ -211,7 +211,7 @@ namespace lightning
                 //////////////////////////////////////////////////////
                 Unit listSlice(VM vm)
                 {
-                    TableUnit list = (TableUnit)vm.stack.Peek(0).heapValue;
+                    TableUnit list = (TableUnit)vm.stack.Peek(0).heapUnitValue;
                     int range_init = (int)vm.stack.Peek(1).unitValue;
                     int range_end = (int)vm.stack.Peek(2).unitValue;
 
@@ -225,7 +225,7 @@ namespace lightning
                 //////////////////////////////////////////////////////
                 Unit listReverse(VM vm)
                 {
-                    TableUnit list = (TableUnit)vm.stack.Peek(0).heapValue;
+                    TableUnit list = (TableUnit)vm.stack.Peek(0).heapUnitValue;
                     list.elements.Reverse();
 
                     return new Unit("null");
@@ -236,7 +236,7 @@ namespace lightning
 
                 Unit makeIndexesIterator(VM vm)
                 {
-                    TableUnit this_table = (TableUnit)vm.stack.Peek(0).heapValue;
+                    TableUnit this_table = (TableUnit)vm.stack.Peek(0).heapUnitValue;
                     int i = -1;
                     StringUnit value_string = new StringUnit("value");
                     StringUnit key_string = new StringUnit("key");
@@ -262,7 +262,7 @@ namespace lightning
 
                 Unit makeIterator(VM vm)
                 {
-                    TableUnit this_table = (TableUnit)vm.stack.Peek(0).heapValue;
+                    TableUnit this_table = (TableUnit)vm.stack.Peek(0).heapUnitValue;
                     int i = -1;
                     Unit value = new Unit("null");
                     StringUnit value_string = new StringUnit("value");
@@ -297,7 +297,7 @@ namespace lightning
                 //////////////////////////////////////////////////////
                 Unit tableCount(VM vm)
                 {
-                    TableUnit this_table = (TableUnit)vm.stack.Peek(0).heapValue;
+                    TableUnit this_table = (TableUnit)vm.stack.Peek(0).heapUnitValue;
                     int count = this_table.TCount;
                     return new Unit(count);
                 }
@@ -306,7 +306,7 @@ namespace lightning
                 //////////////////////////////////////////////////////
                 Unit tableIndexes(VM vm)
                 {
-                    TableUnit this_table = (TableUnit)vm.stack.Peek(0).heapValue;
+                    TableUnit this_table = (TableUnit)vm.stack.Peek(0).heapUnitValue;
                     TableUnit indexes = new TableUnit(null, null);
 
                     foreach (StringUnit v in this_table.table.Keys)
@@ -321,7 +321,7 @@ namespace lightning
                 //////////////////////////////////////////////////////
                 Unit tableCopy(VM vm)
                 {
-                    TableUnit this_table = (TableUnit)vm.stack.Peek(0).heapValue;
+                    TableUnit this_table = (TableUnit)vm.stack.Peek(0).heapUnitValue;
                     Dictionary<StringUnit, Unit> table_copy = new Dictionary<StringUnit, Unit>();
                     foreach (KeyValuePair<StringUnit, Unit> entry in this_table.table)
                     {
@@ -337,14 +337,14 @@ namespace lightning
                 //////////////////////////////////////////////////////
                 Unit tableClear(VM vm)
                 {
-                    TableUnit this_table = (TableUnit)vm.stack.Peek(0).heapValue;
+                    TableUnit this_table = (TableUnit)vm.stack.Peek(0).heapUnitValue;
                     return new Unit("null");
                 }
                 table.TableSet(new StringUnit("clear"), new Unit(new IntrinsicUnit("clear", tableClear, 1)));
 
                 Unit makeIteratorTable(VM vm)
                 {
-                    TableUnit this_table = (TableUnit)vm.stack.Peek(0).heapValue;
+                    TableUnit this_table = (TableUnit)vm.stack.Peek(0).heapUnitValue;
                     System.Collections.IDictionaryEnumerator enumerator = this_table.table.GetEnumerator();
 
                     StringUnit value_string = new StringUnit("value");
@@ -372,7 +372,7 @@ namespace lightning
                 //////////////////////////////////////////////////////
                 Unit tableToString(VM vm)
                 {
-                    TableUnit this_table = (TableUnit)vm.stack.Peek(0).heapValue;
+                    TableUnit this_table = (TableUnit)vm.stack.Peek(0).heapUnitValue;
                     string value = "";
                     bool first = true;
                     foreach (KeyValuePair<StringUnit, Unit> entry in this_table.table)
@@ -588,8 +588,8 @@ namespace lightning
 
                 Unit timeSpan(VM vm)
                 {
-                    long timeStart = ((WrapperUnit<long>)vm.stack.Peek(0).heapValue).UnWrapp();
-                    long timeEnd = ((WrapperUnit<long>)vm.stack.Peek(1).heapValue).UnWrapp();
+                    long timeStart = ((WrapperUnit<long>)vm.stack.Peek(0).heapUnitValue).UnWrapp();
+                    long timeEnd = ((WrapperUnit<long>)vm.stack.Peek(1).heapUnitValue).UnWrapp();
                     return new Unit((Number)(new TimeSpan(timeEnd - timeStart).TotalMilliseconds));// Convert to milliseconds
                 }
                 time.TableSet(new StringUnit("span"), new Unit(new IntrinsicUnit("span", timeSpan, 2)));
@@ -604,7 +604,7 @@ namespace lightning
 
                 Unit stringSlice(VM vm)
                 {
-                    StringUnit val_input_string = (StringUnit)vm.stack.Peek(0).heapValue;
+                    StringUnit val_input_string = (StringUnit)vm.stack.Peek(0).heapUnitValue;
                     string input_string = val_input_string.ToString();
                     Number start = vm.stack.Peek(1).unitValue;
                     Number end = vm.stack.Peek(2).unitValue;
@@ -622,7 +622,7 @@ namespace lightning
 
                 Unit stringSplit(VM vm)
                 {
-                    StringUnit val_input_string = (StringUnit)vm.stack.Peek(0).heapValue;
+                    StringUnit val_input_string = (StringUnit)vm.stack.Peek(0).heapUnitValue;
                     string input_string = val_input_string.ToString();
                     Number start = vm.stack.Peek(1).unitValue;
                     if (start < input_string.Length)
@@ -640,7 +640,7 @@ namespace lightning
 
                 Unit stringLength(VM vm)
                 {
-                    StringUnit val_input_string = (StringUnit)vm.stack.Peek(0).heapValue;
+                    StringUnit val_input_string = (StringUnit)vm.stack.Peek(0).heapUnitValue;
                     return new Unit(val_input_string.ToString().Length);
                 }
                 string_table.TableSet(new StringUnit("length"), new Unit(new IntrinsicUnit("string_length", stringLength, 1)));
@@ -650,7 +650,7 @@ namespace lightning
                 Unit stringCopy(VM vm)
                 {
                     Unit val_input_string = vm.stack.Peek(0);
-                    if (val_input_string.HeapValueType() == typeof(StringUnit))
+                    if (val_input_string.HeapUnitType() == typeof(StringUnit))
                         return new Unit(new StringUnit(val_input_string.ToString()));
                     else
                         return new Unit("null");
@@ -668,7 +668,7 @@ namespace lightning
                 TableUnit char_table = new TableUnit(null, null);
                 Unit charAt(VM vm)
                 {
-                    StringUnit val_input_string = (StringUnit)vm.stack.Peek(0).heapValue;
+                    StringUnit val_input_string = (StringUnit)vm.stack.Peek(0).heapUnitValue;
                     Number index = vm.stack.Peek(1).unitValue;
                     string input_string = val_input_string.ToString();
                     if (index < input_string.Length)
@@ -684,7 +684,7 @@ namespace lightning
 
                 Unit isAlpha(VM vm)
                 {
-                    StringUnit val_input_string = (StringUnit)vm.stack.Peek(0).heapValue;
+                    StringUnit val_input_string = (StringUnit)vm.stack.Peek(0).heapUnitValue;
                     string input_string = val_input_string.ToString();
                     if (1 <= input_string.Length)
                     {
@@ -702,7 +702,7 @@ namespace lightning
 
                 Unit isDigit(VM vm)
                 {
-                    StringUnit val_input_string = (StringUnit)vm.stack.Peek(0).heapValue;
+                    StringUnit val_input_string = (StringUnit)vm.stack.Peek(0).heapUnitValue;
                     string input_string = val_input_string.ToString();
                     if (1 <= input_string.Length)
                     {
@@ -726,7 +726,7 @@ namespace lightning
                 TableUnit file = new TableUnit(null, null);
                 Unit loadFile(VM vm)
                 {
-                    string path = (vm.stack.Peek(0).heapValue).ToString();
+                    string path = (vm.stack.Peek(0).heapUnitValue).ToString();
                     string input;
                     using (var sr = new StreamReader(path))
                     {
@@ -742,8 +742,8 @@ namespace lightning
                 //////////////////////////////////////////////////////
                 Unit writeFile(VM vm)
                 {
-                    string path = (vm.stack.Peek(0).heapValue).ToString();
-                    string output = (vm.stack.Peek(1).heapValue).ToString();
+                    string path = (vm.stack.Peek(0).heapUnitValue).ToString();
+                    string output = (vm.stack.Peek(1).heapUnitValue).ToString();
                     using (System.IO.StreamWriter file = new System.IO.StreamWriter(path, false))
                     {
                         file.Write(output);
@@ -756,8 +756,8 @@ namespace lightning
                 //////////////////////////////////////////////////////
                 Unit appendFile(VM vm)
                 {
-                    string path = (vm.stack.Peek(0).heapValue).ToString();
-                    string output = (vm.stack.Peek(1).heapValue).ToString();
+                    string path = (vm.stack.Peek(0).heapUnitValue).ToString();
+                    string output = (vm.stack.Peek(1).heapUnitValue).ToString();
                     using (System.IO.StreamWriter file = new System.IO.StreamWriter(path, true))
                     {
                         file.Write(output);
@@ -777,7 +777,7 @@ namespace lightning
             //////////////////////////////////////////////////////
             Unit eval(VM vm)
             {
-                string eval_code = (vm.stack.Peek(0).heapValue).ToString();;
+                string eval_code = (vm.stack.Peek(0).heapUnitValue).ToString();;
                 Scanner scanner = new Scanner(eval_code);
 
                 Parser parser = new Parser(scanner.Tokens);
@@ -809,7 +809,7 @@ namespace lightning
                     VMResult result = imported_vm.Run();
                     if (result.status == VMResultType.OK)
                     {
-                        if (result.value.HeapValueType() == typeof(TableUnit) || result.value.HeapValueType() == typeof(FunctionUnit))
+                        if (result.value.HeapUnitType() == typeof(TableUnit) || result.value.HeapUnitType() == typeof(FunctionUnit))
                             MakeModule(result.value, eval_name, vm, imported_vm);
                         //vm.GetChunk().Print();
                         return result.value;
@@ -822,7 +822,7 @@ namespace lightning
             ////////////////////////////////////////////////////
             Unit require(VM vm)
             {
-                string path = (vm.stack.Peek(0).heapValue).ToString();
+                string path = (vm.stack.Peek(0).heapUnitValue).ToString();
                 foreach (ModuleUnit v in vm.modules)// skip already imported modules
                 {
                     if (v.name == path)
@@ -955,7 +955,7 @@ namespace lightning
             //////////////////////////////////////////////////////
             Unit count(VM vm)
             {
-                TableUnit this_table = (TableUnit)vm.stack.Peek(0).heapValue;
+                TableUnit this_table = (TableUnit)vm.stack.Peek(0).heapUnitValue;
                 int count = this_table.Count;
                 return new Unit(count);
             }
@@ -964,7 +964,7 @@ namespace lightning
             //////////////////////////////////////////////////////
             Unit type(VM vm)
             {
-                Type this_type = vm.stack.Peek(0).HeapValueType();
+                Type this_type = vm.stack.Peek(0).HeapUnitType();
                 return new Unit(new StringUnit(this_type.ToString()));
             }
             functions.Add(new IntrinsicUnit("type", type, 1));
@@ -974,7 +974,7 @@ namespace lightning
             {
                 Unit first = vm.stack.Peek(0);
                 Unit second = vm.stack.Peek(1);
-                if (first.HeapValueType() != null)
+                if (first.HeapUnitType() != null)
                     return first;
                 else
                     return second;
@@ -1101,9 +1101,9 @@ namespace lightning
                 module,
                 (Operand)module_index);
 
-            if (this_value.HeapValueType() == typeof(FunctionUnit)) RelocateFunction((FunctionUnit)this_value.heapValue, relocationInfo);
-            else if (this_value.HeapValueType() == typeof(ClosureUnit)) RelocateClosure((ClosureUnit)this_value.heapValue, relocationInfo);
-            else if (this_value.HeapValueType() == typeof(TableUnit)) FindFunction((TableUnit)this_value.heapValue, relocationInfo);
+            if (this_value.HeapUnitType() == typeof(FunctionUnit)) RelocateFunction((FunctionUnit)this_value.heapUnitValue, relocationInfo);
+            else if (this_value.HeapUnitType() == typeof(ClosureUnit)) RelocateClosure((ClosureUnit)this_value.heapUnitValue, relocationInfo);
+            else if (this_value.HeapUnitType() == typeof(TableUnit)) FindFunction((TableUnit)this_value.heapUnitValue, relocationInfo);
 
             return module;
         }
@@ -1115,9 +1115,9 @@ namespace lightning
                 relocationInfo.relocatedTables.Add(table.GetHashCode());
                 foreach (KeyValuePair<StringUnit, Unit> entry in table.table)
                 {
-                    if (entry.Value.HeapValueType() == typeof(FunctionUnit)) RelocateFunction((FunctionUnit)entry.Value.heapValue, relocationInfo);
-                    else if (entry.Value.HeapValueType() == typeof(ClosureUnit)) RelocateClosure((ClosureUnit)entry.Value.heapValue, relocationInfo);
-                    else if (entry.Value.HeapValueType() == typeof(TableUnit)) FindFunction((TableUnit)entry.Value.heapValue, relocationInfo);
+                    if (entry.Value.HeapUnitType() == typeof(FunctionUnit)) RelocateFunction((FunctionUnit)entry.Value.heapUnitValue, relocationInfo);
+                    else if (entry.Value.HeapUnitType() == typeof(ClosureUnit)) RelocateClosure((ClosureUnit)entry.Value.heapUnitValue, relocationInfo);
+                    else if (entry.Value.HeapUnitType() == typeof(TableUnit)) FindFunction((TableUnit)entry.Value.heapUnitValue, relocationInfo);
 
                     relocationInfo.module.TableSet(entry.Key, entry.Value);
                 }
@@ -1128,13 +1128,13 @@ namespace lightning
         {
             foreach (UpValueUnit v in closure.upValues)
             {
-                if (v.Val.HeapValueType() == typeof(ClosureUnit)/* && relocationInfo.module.name != closure.function.module*/)
+                if (v.Val.HeapUnitType() == typeof(ClosureUnit)/* && relocationInfo.module.name != closure.function.module*/)
                 {
-                    RelocateClosure((ClosureUnit)v.Val.heapValue, relocationInfo);
+                    RelocateClosure((ClosureUnit)v.Val.heapUnitValue, relocationInfo);
                 }
-                else if (v.Val.HeapValueType() == typeof(FunctionUnit)/* && relocationInfo.module.name != closure.function.module*/)
+                else if (v.Val.HeapUnitType() == typeof(FunctionUnit)/* && relocationInfo.module.name != closure.function.module*/)
                 {
-                    RelocateFunction((FunctionUnit)v.Val.heapValue, relocationInfo);
+                    RelocateFunction((FunctionUnit)v.Val.heapUnitValue, relocationInfo);
                 }
             }
 
@@ -1153,7 +1153,7 @@ namespace lightning
                 relocationInfo.module.globals.Add(new_value);
                 relocationInfo.relocatedGlobals.Add(relocationInfo.toBeRelocatedGlobals[i], (Operand)(relocationInfo.module.globals.Count - 1));
 
-                if (new_value.HeapValueType() == typeof(TableUnit)) relocation_stack.Add((TableUnit)new_value.heapValue);
+                if (new_value.HeapUnitType() == typeof(TableUnit)) relocation_stack.Add((TableUnit)new_value.heapUnitValue);
             }
             relocationInfo.toBeRelocatedGlobals.Clear();
 
@@ -1164,7 +1164,7 @@ namespace lightning
                 relocationInfo.module.constants.Add(new_value);
                 relocationInfo.relocatedConstants.Add(relocationInfo.toBeRelocatedConstants[i], (Operand)(relocationInfo.module.constants.Count - 1));
 
-                if (new_value.HeapValueType() == typeof(TableUnit)) relocation_stack.Add((TableUnit)new_value.heapValue);
+                if (new_value.HeapUnitType() == typeof(TableUnit)) relocation_stack.Add((TableUnit)new_value.heapUnitValue);
             }
             relocationInfo.toBeRelocatedConstants.Clear();
 
@@ -1240,7 +1240,7 @@ namespace lightning
                     {
                         relocationInfo.importingVM.GetChunk().GetConstants().Add(this_value);
                         next.opC = (Operand)(relocationInfo.importingVM.GetChunk().GetConstants().Count - 1);
-                        RelocateChunk(((ClosureUnit)this_value.heapValue).function, relocationInfo);
+                        RelocateChunk(((ClosureUnit)this_value.heapUnitValue).function, relocationInfo);
                     }
                 }
                 else if (next.opCode == OpCode.LOADGI)
@@ -1297,9 +1297,9 @@ namespace lightning
         {
             foreach (KeyValuePair<StringUnit, Unit> entry in module.table)
             {
-                if (entry.Value.HeapValueType() == typeof(FunctionUnit))
+                if (entry.Value.HeapUnitType() == typeof(FunctionUnit))
                 {
-                    FunctionUnit function = (FunctionUnit)entry.Value.heapValue;
+                    FunctionUnit function = (FunctionUnit)entry.Value.heapUnitValue;
                     for (Operand i = 0; i < function.body.Count; i++)
                     {
                         Instruction next = function.body[i];
