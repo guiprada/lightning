@@ -1,0 +1,1 @@
+ dotnet build --configuration Release lightning_interpreter\

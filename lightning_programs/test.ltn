@@ -693,6 +693,6 @@ else{
 }
 write_line("Elapsed time: " .. time.span(start_time, end_time) .. " ms")
 write_line("Loaded modules: " .. modules())
-write(stats())
+write(debug.memory_use())
 
 ////////////////////////////// scratch

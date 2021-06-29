@@ -310,7 +310,7 @@ namespace lightning
                             IP++;
                             Operand address = instruction.opA;
                             UpValueUnit up_val = upValues.GetAt(address);
-                            stack.Push(up_val.Val);
+                            stack.Push(up_val.UpValue);
                             break;
                         }
                     case OpCode.LOADNIL:
@@ -482,26 +482,26 @@ namespace lightning
                             if (op == 0)
                             {
                                 lock(this_upValue){
-                                    this_upValue.Val = new_value;
+                                    this_upValue.UpValue = new_value;
                                 }
                             }
                             else
                             {
                                 if (op == 1)
                                     lock(this_upValue){
-                                        this_upValue.Val = new Unit(this_upValue.Val.unitValue + new_value.unitValue);
+                                        this_upValue.UpValue = new Unit(this_upValue.UpValue.unitValue + new_value.unitValue);
                                     }
                                 else if (op == 2)
                                     lock(this_upValue){
-                                        this_upValue.Val = new Unit(this_upValue.Val.unitValue - new_value.unitValue);
+                                        this_upValue.UpValue = new Unit(this_upValue.UpValue.unitValue - new_value.unitValue);
                                     }
                                 else if (op == 3)
                                     lock(this_upValue){
-                                        this_upValue.Val = new Unit(this_upValue.Val.unitValue * new_value.unitValue);
+                                        this_upValue.UpValue = new Unit(this_upValue.UpValue.unitValue * new_value.unitValue);
                                     }
                                 else if (op == 4)
                                     lock(this_upValue){
-                                        this_upValue.Val = new Unit(this_upValue.Val.unitValue / new_value.unitValue);
+                                        this_upValue.UpValue = new Unit(this_upValue.UpValue.unitValue / new_value.unitValue);
                                     }
                             }
                             break;
@@ -1118,59 +1118,28 @@ namespace lightning
             }
         }
 
-        public string Stats()
-        {
-            string statsValue = "";
-            int counter = 0;
-            // for (int i = 0; i < stack.top; i++)
-            // {
-            //     if (i == 0)
-            //     {
-            //         statsValue += "Stack:\n";
-            //     }
-            //     statsValue += counter.ToString() + ": " + stack.values[i].ToString() + '\n';
-            //     counter++;
-            // }
-            // if (counter == 0)
-            // {
-            //     statsValue += "Stack empty :)\n";
-            // }
+        public int StackCount(){
+            return stack.top;
+        }
 
-            // counter = 0;
-            // for (int i = 0; i < variablesTop; i++)
-            // {
-            //     if (i == 0)
-            //     {
-            //         statsValue = statsValue + "Variables:\n";
-            //     }
-            //     statsValue += counter.ToString() + ": " + variables[i].ToString() + '\n';
-            //     counter++;
-            // }
-            // if (counter == 0)
-            // {
-            //     statsValue += "Variables empty :)\n";
-            // }
+        public int GlobalsCount(){
+            return globals.Count;
+        }
 
-            // counter = 0;
-            // for (int i = 0; i < upValuesBases[upValuesBasesTop - 1]; i++)
-            // {
-            //     if (i == 0)
-            //     {
-            //         statsValue += "Upvalues:\n";
-            //     }
-            //     foreach (HeapUnit v in upValues)
-            //     {
-            //         statsValue += counter.ToString() + ": " + upValues[i].ToString() + '\n';
-            //         counter++;
-            //     }
-            // }
-            if (counter == 0)
-            {
-                statsValue += "Upvalues empty :)\n";
-            }
+        public int VariablesCount(){
+            return variables.Count;
+        }
 
-            statsValue += "vmPool count: " + vmPool.Count + "\n";
-            return statsValue;
+        public int VariablesCapacity(){
+            return variables.Capacity;
+        }
+
+        public int UpValuesCount(){
+            return upValues.Count;
+        }
+
+        public int UpValueCapacity(){
+            return upValues.Capacity;
         }
     }
 }

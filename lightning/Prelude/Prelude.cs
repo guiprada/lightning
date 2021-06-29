@@ -52,15 +52,36 @@ namespace lightning
             Dictionary<string, TableUnit> tables = new Dictionary<string, TableUnit>();
 
             ////////////////////////////////////////////////////////////////////////////////////////////////////////////
+            ////////////////////////////////////////////////////////////////////////////////////////////////////// debug
+            {
+
+                TableUnit debug = new TableUnit(null, null);
+
+                Unit memoryUse(VM vm){
+                    TableUnit mem_use = new TableUnit(null, null);
+                    mem_use.TableSet(new StringUnit("stack_count"), new Unit(vm.StackCount()));
+                    mem_use.TableSet(new StringUnit("globals_count"), new Unit(vm.GlobalsCount()));
+                    mem_use.TableSet(new StringUnit("variables_count"), new Unit(vm.VariablesCount()));
+                    mem_use.TableSet(new StringUnit("variables_capacity"), new Unit(vm.VariablesCapacity()));
+                    mem_use.TableSet(new StringUnit("upvalues_count"), new Unit(vm.UpValuesCount()));
+                    mem_use.TableSet(new StringUnit("upvalue_capacity"), new Unit(vm.UpValueCapacity()));
+
+                    return new Unit(mem_use);
+                }
+                debug.TableSet(new StringUnit("memory_use"), new Unit(new IntrinsicUnit("memory_use", memoryUse, 0)));
+
+                tables.Add("debug", debug);
+            }
+            ////////////////////////////////////////////////////////////////////////////////////////////////////////////
             ////////////////////////////////////////////////////////////////////////////////////////////////// intrinsic
             {
                 TableUnit intrinsic = new TableUnit(null, null);
 #if ROSLYN
                 Unit createIntrinsic(VM vm)
                 {
-                    ValString name = (ValString)vm.stack.Peek(0).value;
+                    StringUnit name = (StringUnit)vm.stack.Peek(0).value;
                     Number arity = vm.stack.Peek(1).number;
-                    ValString val_body = (ValString)vm.stack.Peek(2).value;
+                    StringUnit val_body = (StringUnit)vm.stack.Peek(2).value;
                     string body = val_body.ToString();
 
                     var options = ScriptOptions.Default.AddReferences(
@@ -69,9 +90,9 @@ namespace lightning
                     Func<VM, Unit> new_intrinsic = CSharpScript.EvaluateAsync<Func<VM, Unit>>(body, options)
                         .GetAwaiter().GetResult();
 
-                    return new Unit(new ValIntrinsic(name.ToString(), new_intrinsic, (int)arity));
+                    return new Unit(new IntrinsicUnit(name.ToString(), new_intrinsic, (int)arity));
                 }
-                intrinsic.TableSet(new ValString("create"), new Unit(new ValIntrinsic("create", createIntrinsic, 3)));
+                intrinsic.TableSet(new StringUnit("create"), new Unit(new IntrinsicUnit("create", createIntrinsic, 3)));
 #else
                 intrinsic.TableSet(new StringUnit("create"), new Unit("null"));
 #endif
@@ -409,7 +430,7 @@ namespace lightning
 #if DOUBLE
                 math.TableSet(new StringUnit("double"), new Unit(true));
 #else
-                math.TableSet(new ValString("double"), new Unit(false));
+                math.TableSet(new StringUnit("double"), new Unit(false));
 #endif
 
                 //////////////////////////////////////////////////////
@@ -982,13 +1003,6 @@ namespace lightning
             functions.Add(new IntrinsicUnit("maybe", maybe, 2));
 
             //////////////////////////////////////////////////////
-            Unit stats(VM vm)
-            {
-                return new Unit(new StringUnit(vm.Stats()));
-            }
-            functions.Add(new IntrinsicUnit("stats", stats, 0));
-
-            //////////////////////////////////////////////////////
             Unit resourcesTrim(VM vm)
             {
                 vm.ResoursesTrim();
@@ -1128,13 +1142,13 @@ namespace lightning
         {
             foreach (UpValueUnit v in closure.upValues)
             {
-                if (v.Val.HeapUnitType() == typeof(ClosureUnit)/* && relocationInfo.module.name != closure.function.module*/)
+                if (v.UpValue.HeapUnitType() == typeof(ClosureUnit)/* && relocationInfo.module.name != closure.function.module*/)
                 {
-                    RelocateClosure((ClosureUnit)v.Val.heapUnitValue, relocationInfo);
+                    RelocateClosure((ClosureUnit)v.UpValue.heapUnitValue, relocationInfo);
                 }
-                else if (v.Val.HeapUnitType() == typeof(FunctionUnit)/* && relocationInfo.module.name != closure.function.module*/)
+                else if (v.UpValue.HeapUnitType() == typeof(FunctionUnit)/* && relocationInfo.module.name != closure.function.module*/)
                 {
-                    RelocateFunction((FunctionUnit)v.Val.heapUnitValue, relocationInfo);
+                    RelocateFunction((FunctionUnit)v.UpValue.heapUnitValue, relocationInfo);
                 }
             }
 

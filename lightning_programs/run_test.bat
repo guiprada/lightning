@@ -1,1 +1,0 @@
-.\lightning\lightning_interpreter.exe test.ltn

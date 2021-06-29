@@ -225,20 +225,20 @@ namespace lightning
         public Operand env;
         bool isCaptured;
         Memory<Unit> variables;
-        Unit val;
-        public Unit Val
+        Unit value;
+        public Unit UpValue
         {
             get
             {
                 if (isCaptured)
-                    return val;
+                    return value;
                 else
                     return variables.GetAt(address, env);
             }
             set
             {
                 if (isCaptured)
-                    val = value;
+                    this.value = value;
                 else
                     variables.SetAt(value, address, env);
             }
@@ -250,7 +250,7 @@ namespace lightning
             env = p_env;
             isCaptured = false;
             variables = null;
-            val = new Unit("null");
+            value = new Unit("null");
         }
 
         public void Attach(Memory<Unit> p_variables)
@@ -263,17 +263,17 @@ namespace lightning
             if (isCaptured == false)
             {
                 isCaptured = true;
-                val = variables.GetAt(address, env);
+                value = variables.GetAt(address, env);
             }
         }
         public override string ToString()
         {
-            return new string("upvalue " + address + " on env " + env + " HeapUnit: " + Val.ToString());
+            return new string("upvalue " + address + " on env " + env + " HeapUnit: " + UpValue.ToString());
         }
 
         public override bool ToBool()
         {
-            return Val.ToBool();
+            return UpValue.ToBool();
         }
 
         public override bool Equals(object other)
@@ -283,19 +283,19 @@ namespace lightning
             {
                 if(((Unit)other).HeapUnitType() == typeof(UpValueUnit))
                 {
-                    if (Val.Equals(((Unit)other).heapUnitValue)) return true;
+                    if (UpValue.Equals(((Unit)other).heapUnitValue)) return true;
                 }
             }
             if (other_type == typeof(UpValueUnit))
             {
-                if (Val.Equals(other)) return true;
+                if (UpValue.Equals(other)) return true;
             }
             return false;
         }
 
         public override int GetHashCode()
         {
-            return Val.GetHashCode();
+            return UpValue.GetHashCode();
         }
 
     }
