@@ -3,7 +3,9 @@ using Operand = System.UInt16;
 namespace lightning{
     public struct Env
     {
-        Memory<Unit> variables; // used for scoped variables
+        Memory<Unit> variables;
+		Memory<Unit> globals;
+
 		public int Current{
 			get{
 				return variables.Env;
@@ -16,8 +18,15 @@ namespace lightning{
 			}
 		}
 
-		public Env(Memory<Unit> p_variables){
+		public Memory<Unit> Globals{
+			get{
+				return globals;
+			}
+		}
+
+		public Env(Memory<Unit> p_variables, Memory<Unit> p_globals){
 			variables = p_variables;
+			globals = p_globals;
 		}
 
 		public void Push(){
@@ -50,6 +59,19 @@ namespace lightning{
 
 		public void AddVar(Unit new_var){
 			variables.Add(new_var);
+		}
+
+		public Unit GetGlobal(Operand address)
+        {
+            return globals.Get(address);
+        }
+
+		public void SetGlobal(Unit p_new_value, Operand p_address){
+			globals.Set(p_new_value, p_address);
+		}
+
+		public void AddGlobal(Unit p_new_global){
+			globals.Add(p_new_global);
 		}
 	}
 }

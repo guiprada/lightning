@@ -40,7 +40,6 @@ namespace lightning
         List<Instruction> instructionsCache;
 
         Env env;
-        Memory<Unit> globals; // used for global variables
 
         public Stack stack;
         Memory<UpValueUnit> upValues;
@@ -62,12 +61,10 @@ namespace lightning
 
             stack = new Stack(functionDeepness);
 
-            env = new Env(new Memory<Unit>());
-
-
             upValues = new Memory<UpValueUnit>();
             upValuesRegistry = new Memory<UpValueUnit>();
 
+            Memory<Unit> globals;
             if(p_globals == null){
                 globals = new Memory<Unit>();
                 Intrinsics = chunk.Prelude.intrinsics;
@@ -82,6 +79,8 @@ namespace lightning
             }
             else
                 globals = p_globals;
+
+            env = new Env(new Memory<Unit>(), globals);
 
             loadedModules = new Dictionary<string, int>();
             modules = new List<ModuleUnit>();
@@ -122,7 +121,7 @@ namespace lightning
             }
             else
             {
-                VM new_vm = new VM(chunk, 5, globals);
+                VM new_vm = new VM(chunk, 5, env.Globals);
                 return new_vm;
             }
         }
@@ -141,7 +140,7 @@ namespace lightning
 
         public Unit GetGlobal(Operand address)
         {
-            return globals.Get(address);
+            return env.GetGlobal(address);
         }
 
         void RegisterUpValue(UpValueUnit u)
@@ -271,7 +270,7 @@ namespace lightning
                             IP++;
                             Operand address = instruction.opA;
                             Unit global;
-                            global = globals.Get(address);
+                            global = env.GetGlobal(address);
                             stack.Push(global);
                             break;
                         }
@@ -338,7 +337,7 @@ namespace lightning
                         {
                             IP++;
                             Unit new_value = stack.Pop();
-                            globals.Add(new_value);
+                            env.AddGlobal(new_value);
 
                             break;
                         }
@@ -354,7 +353,7 @@ namespace lightning
                                 if (lambda == 0)
                                     if (fun_env == 0)// Global
                                     {
-                                        globals.Add(this_callable);
+                                        env.AddGlobal(this_callable);
                                     }
                                     else
                                     {
@@ -386,7 +385,7 @@ namespace lightning
                                 if (lambda == 0)
                                     if (fun_env == 0)// yes they exist!
                                     {
-                                        globals.Add(new_closure_unit);
+                                        env.AddGlobal(new_closure_unit);
                                     }
                                     else
                                     {
@@ -432,31 +431,31 @@ namespace lightning
                             Unit new_value = stack.Peek();
                             if (op == 0)
                             {
-                                lock(globals){
-                                    globals.Set(new_value, address);
+                                lock(env.Globals){
+                                    env.SetGlobal(new_value, address);
                                 }
                             }
                             else
                             {
                                 if (op == 1)
-                                    lock(globals){
-                                        Unit result = new Unit(globals.Get(address).unitValue + new_value.unitValue);
-                                        globals.Set(result, address);
+                                    lock(env.Globals){
+                                        Unit result = new Unit(env.GetGlobal(address).unitValue + new_value.unitValue);
+                                        env.SetGlobal(result, address);
                                     }
                                 else if (op == 2)
-                                    lock(globals){
-                                        Unit result = new Unit(globals.Get(address).unitValue - new_value.unitValue);
-                                        globals.Set(result, address);
+                                    lock(env.Globals){
+                                        Unit result = new Unit(env.GetGlobal(address).unitValue - new_value.unitValue);
+                                        env.SetGlobal(result, address);
                                     }
                                 else if (op == 3)
-                                    lock(globals){
-                                        Unit result = new Unit(globals.Get(address).unitValue * new_value.unitValue);
-                                        globals.Set(result, address);
+                                    lock(env.Globals){
+                                        Unit result = new Unit(env.GetGlobal(address).unitValue * new_value.unitValue);
+                                        env.SetGlobal(result, address);
                                     }
                                 else if (op == 4)
-                                    lock(globals){
-                                        Unit result = new Unit(globals.Get(address).unitValue / new_value.unitValue);
-                                        globals.Set(result, address);
+                                    lock(env.Globals){
+                                        Unit result = new Unit(env.GetGlobal(address).unitValue / new_value.unitValue);
+                                        env.SetGlobal(result, address);
                                     }
                             }
                             break;
