@@ -53,11 +53,7 @@ namespace lightning
         Stack<VM> vmPool;
         int functionDeepness;
 
-        int Env{
-            get{
-                return variables.Env;
-            }
-        }
+        int Env{ get{ return variables.Env; } }
 
         public VM(Chunk p_chunk, int p_function_deepness = 100, Memory<Unit> p_globals = null)
         {
