@@ -1012,7 +1012,7 @@ namespace lightning
             //////////////////////////////////////////////////////
             Unit releaseAllVMs(VM vm)
             {
-                vm.ReleaseVMs();
+                VM.ReleaseVMs();
                 return new Unit("null");
             }
             functions.Add(new IntrinsicUnit("release_all_vms", releaseAllVMs, 0));
@@ -1021,7 +1021,7 @@ namespace lightning
             Unit releaseVMs(VM vm)
             {
                 Unit count = vm.stack.Peek(0);
-                vm.ReleaseVMs((int)count.unitValue);
+                VM.ReleaseVMs((int)count.unitValue);
                 return new Unit("null");
             }
             functions.Add(new IntrinsicUnit("release_vms", releaseVMs, 1));
@@ -1029,7 +1029,7 @@ namespace lightning
             //////////////////////////////////////////////////////
             Unit countVMs(VM vm)
             {
-                return new Unit(vm.CountVMs());
+                return new Unit(VM.CountVMs());
             }
             functions.Add(new IntrinsicUnit("count_vms", countVMs, 0));
 
@@ -1055,11 +1055,52 @@ namespace lightning
                 });
                 for (int i = init; i < end; i++)
                 {
-                    vm.RecycleVM(vms[i]);
+                    VM.RecycleVM(vms[i]);
                 }
                 return new Unit("null");
             }
+
             functions.Add(new IntrinsicUnit("foreach", forEach, 2));
+            //////////////////////////////////////////////////////
+
+            Unit ForRange(VM vm)
+            {
+                Number tasks = vm.stack.Peek(0).unitValue;
+                TableUnit table = (TableUnit)(vm.stack.Peek(1).heapUnitValue);
+                Unit func = vm.stack.Peek(2);
+
+                int n_tasks = (int)tasks;
+
+                int init = 0;
+                int end = n_tasks;
+                VM[] vms = new VM[end];
+                for (int i = 0; i < end; i++)
+                {
+                    vms[i] = vm.GetVM();
+                }
+
+                int count = table.ECount;
+                int step = (count / n_tasks) + 1;
+
+                System.Threading.Tasks.Parallel.For(init, end, (index) =>
+                {
+                    List<Unit> args = new List<Unit>();
+                    int range_start = index * step;
+                    args.Add(new Unit(range_start));
+                    int range_end = range_start + step;
+                    if (range_end > count) range_end = count;
+                    args.Add(new Unit(range_end));
+                    args.Add(new Unit(table));
+                    vms[index].CallFunction(func, args);
+                });
+                for (int i = 0; i < end; i++)
+                {
+                    VM.RecycleVM(vms[i]);
+                }
+                return new Unit("null");
+            }
+
+            functions.Add(new IntrinsicUnit("range", ForRange, 3));
 
             //////////////////////////////////////////////////////
             Library prelude = new Library(functions, tables);

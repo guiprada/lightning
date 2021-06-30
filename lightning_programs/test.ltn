@@ -502,25 +502,25 @@ function clear_errors()
     range(6, table1, many_for)
     for (var i = 0; i< 100; i++)
     {
-        assert(table1[i], i, "Failed Range Test " .. i .. ".")
+        assert(table1[i], i, "Failed range Test " .. i .. ".")
     }
 
     range(1, table1, many_for)
     for (var i = 0; i< 100; i++)
     {
-        assert(table1[i], i, "Failed Range Test " .. i .. ".")
+        assert(table1[i], i, "Failed range Test " .. i .. ".")
     }
 
     range(3, table1, many_for)
     for (var i = 0; i< 100; i++)
     {
-        assert(table1[i], i, "Failed Range Test " .. i .. ".")
+        assert(table1[i], i, "Failed range Test " .. i .. ".")
     }
 
     range(200, table1, many_for)
     for (var i = 0; i< 100; i++)
     {
-        assert(table1[i], i, "Failed Range Test " .. i .. ".")
+        assert(table1[i], i, "Failed range Test " .. i .. ".")
     }
 }
 {

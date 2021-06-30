@@ -77,9 +77,6 @@ namespace lightning
                 case NodeType.FOR:
                     PrintFor(p_node as ForNode);
                     break;
-                case NodeType.RANGE:
-                    PrintRange(p_node as RangeNode);
-                    break;
                 case NodeType.TABLE:
                     PrintTable(p_node as TableNode);
                     break;
@@ -270,15 +267,6 @@ namespace lightning
                 IdentMinus();
             }
             Console.WriteLine(identString + "]");
-        }
-
-        public void PrintRange(RangeNode p_node)
-        {
-            Console.Write(identString + "[RANGE ");
-            Print(p_node.Tasks);
-            Print(p_node.List);
-            Print(p_node.Function);
-            Console.WriteLine("]");
         }
 
         public void PrintWhile(WhileNode p_node)

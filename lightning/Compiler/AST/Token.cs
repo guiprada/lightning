@@ -60,8 +60,6 @@ namespace lightning
         FALSE,
         FUN,
         FOR,
-        RANGE,
-        FOREACH,
         IF,
         NIL,
         OR,

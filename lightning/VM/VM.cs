@@ -50,7 +50,7 @@ namespace lightning
         List<IntrinsicUnit> Intrinsics { get; set; }
         public Dictionary<string, int> loadedModules { get; private set; }
         public List<ModuleUnit> modules;
-        Stack<VM> vmPool;
+        static Stack<VM> vmPool;
         int functionDeepness;
 
         int Env{ get{ return variables.Env; } }
@@ -107,21 +107,21 @@ namespace lightning
             variables.Trim();
             upValues.Trim();
         }
-        public void ReleaseVMs(int count){
+        public static void ReleaseVMs(int count){
             for (int i = 0; i < count; i++)
                 if (vmPool.Count > 0)
                     vmPool.Pop();
                 vmPool.TrimExcess();
         }
-        public void ReleaseVMs(){
+        public static void ReleaseVMs(){
             vmPool.Clear();
             vmPool.TrimExcess();
         }
 
-        public int CountVMs(){
+        public static int CountVMs(){
             return vmPool.Count;
         }
-        public void RecycleVM(VM vm)
+        public static void RecycleVM(VM vm)
         {
             vmPool.Push(vm);
         }
@@ -1043,69 +1043,6 @@ namespace lightning
                         {
                             IP++;
                             stack.PopStash();
-                            break;
-                        }
-                    // case OpCode.FOREACH:
-                    //     {
-                    //         IP++;
-                    //         Unit func = stack.Pop();
-                    //         TableUnit table = (TableUnit)(stack.Pop().heapUnitValue);
-
-                    //         int init = 0;
-                    //         int end = table.ECount;
-                    //         VM[] vms = new VM[end];
-                    //         for (int i = init; i < end; i++)
-                    //         {
-                    //             vms[i] = GetVM();
-                    //         }
-                    //         System.Threading.Tasks.Parallel.For(init, end, (index) =>
-                    //         {
-                    //             List<Unit> args = new List<Unit>();
-                    //             args.Add(new Unit(index));
-                    //             args.Add(new Unit(table));
-                    //             vms[index].CallFunction(func, args);
-                    //         });
-                    //         for (int i = init; i < end; i++)
-                    //         {
-                    //             RecycleVM(vms[i]);
-                    //         }
-                    //         break;
-                    //     }
-                    case OpCode.RANGE:
-                        {
-                            IP++;
-                            Unit func = stack.Pop();
-                            TableUnit table = (TableUnit)(stack.Pop().heapUnitValue);
-                            Number tasks = stack.Pop().unitValue;
-
-                            int n_tasks = (int)tasks;
-
-                            int init = 0;
-                            int end = n_tasks;
-                            VM[] vms = new VM[end];
-                            for (int i = 0; i < end; i++)
-                            {
-                                vms[i] = GetVM();
-                            }
-
-                            int count = table.ECount;
-                            int step = (count / n_tasks) + 1;
-
-                            System.Threading.Tasks.Parallel.For(init, end, (index) =>
-                            {
-                                List<Unit> args = new List<Unit>();
-                                int range_start = index * step;
-                                args.Add(new Unit(range_start));
-                                int range_end = range_start + step;
-                                if (range_end > count) range_end = count;
-                                args.Add(new Unit(range_end));
-                                args.Add(new Unit(table));
-                                vms[index].CallFunction(func, args);
-                            });
-                            for (int i = 0; i < end; i++)
-                            {
-                                RecycleVM(vms[i]);
-                            }
                             break;
                         }
                     case OpCode.EXIT:

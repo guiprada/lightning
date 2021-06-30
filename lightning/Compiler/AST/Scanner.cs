@@ -17,7 +17,6 @@ namespace lightning
             {"else", TokenType.ELSE},
             {"false", TokenType.FALSE},
             {"for", TokenType.FOR},
-            {"range", TokenType.RANGE},
             {"function", TokenType.FUN},
             {"if", TokenType.IF},
             {"null", TokenType.NIL},

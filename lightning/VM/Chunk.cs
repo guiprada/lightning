@@ -70,7 +70,6 @@ namespace lightning
                 case OpCode.FUNCLOSE:
                 case OpCode.LOADFALSE:
                 case OpCode.LOADTRUE:
-                case OpCode.RANGE:
                     return op.ToString();
 
                 // 1 op
@@ -166,7 +165,6 @@ namespace lightning
         CALL,
         CLOSURECLOSE,
         FUNCLOSE,
-        RANGE,
 
         EXIT// EXIT ;)
     }

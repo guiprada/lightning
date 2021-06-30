@@ -4,8 +4,8 @@
 	"scopeName": "source.lightning",
 	"patterns": [
 		{
-            "name": "comment.line.note.lightning", 
-            "match": "(//).*$\\n?", 
+            "name": "comment.line.note.lightning",
+            "match": "(//).*$\\n?",
             "captures": {
                 "1": {
                     "name": "punctuation.definition.comment.lightning"
@@ -175,7 +175,7 @@
 			"name": "support.function.lightning"
 		},
 		{
-			"match": "(?<![^.]\\.|:)\\b(listMap\\.(indexOf|indexes|values|sum|shuffle|remove|range|slice|push|pop|pull)|string\\.(char|hasIndex|indexOf|len|lower|remove|upper)|table\\.(concat|insert|maxn|remove|sort)|math\\.(abs|acos|asin|atan|cos|pi|r|rnd|sign|sin|sqrt|tan)|io\\.(close|flush|input|lines|open|output|popen|read|tmpfile|type|write)|os\\.(clock|date|difftime|execute|exit|getenv|remove|rename|setlocale|time|tmpname)|package\\.(cpath|loaded|loadlib|path|preload|seeall))\\b(?=\\s*(?:[({\"']|\\[\\[))",
+			"match": "(?<![^.]\\.|:)\\b(listMap\\.(indexOf|indexes|values|sum|shuffle|remove|range|foreach|slice|push|pop|pull)|string\\.(char|hasIndex|indexOf|len|lower|remove|upper)|table\\.(concat|insert|maxn|remove|sort)|math\\.(abs|acos|asin|atan|cos|pi|r|rnd|sign|sin|sqrt|tan)|io\\.(close|flush|input|lines|open|output|popen|read|tmpfile|type|write)|os\\.(clock|date|difftime|execute|exit|getenv|remove|rename|setlocale|time|tmpname)|package\\.(cpath|loaded|loadlib|path|preload|seeall))\\b(?=\\s*(?:[({\"']|\\[\\[))",
 			"name": "support.function.library.lightning"
 		},
 		{

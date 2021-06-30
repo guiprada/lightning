@@ -26,7 +26,6 @@ namespace lightning
         IF,
         WHILE,
         FOR,
-        RANGE,
 
         VAR_DECLARATION,
         ASSIGMENT,
@@ -202,20 +201,6 @@ namespace lightning
             Condition = p_Condition;
             Finalizer = p_Finalizer;
             Body = p_Body;
-        }
-    }
-
-    public class RangeNode : Node
-    {
-        public Node Tasks { get; private set; }
-        public Node List { get; private set; }
-        public Node Function { get; private set; }
-        public RangeNode(Node p_Tasks, Node p_List, Node p_Function, int p_Line)
-            : base(NodeType.RANGE, p_Line)
-        {
-            Tasks = p_Tasks;
-            List = p_List;
-            Function = p_Function;
         }
     }
 
