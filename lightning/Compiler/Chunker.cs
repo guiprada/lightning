@@ -957,7 +957,9 @@ namespace lightning
             else
                 Add(OpCode.FUNCLOSE, line);
 
-            new_function.body = code.Slice(function_start, instructionCounter);
+            ChunkSlice slice = code.Slice(function_start, instructionCounter);
+            new_function.body = slice.program;
+            new_function.lines = slice.lines;
             new_function.originalPosition = (Operand)function_start;
             instructionCounter = function_start;
 

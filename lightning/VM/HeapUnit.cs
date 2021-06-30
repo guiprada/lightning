@@ -70,6 +70,7 @@ namespace lightning
         public string name;
         public Operand arity;
         public List<Instruction> body;
+        public List<uint> lines;
         public string module;
         public Operand originalPosition;
 

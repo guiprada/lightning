@@ -696,8 +696,11 @@ write_line("Elapsed time: " .. time.span(start_time, end_time) .. " ms")
 write_line("Loaded modules: " .. modules())
 write(machine.memory_use())
 ////////////////////////////// scratch
-function teste()
+function teste(){
     write_line(null)
+    var a = 1
+    a()
+}
 teste()
 teste = 1
 teste()

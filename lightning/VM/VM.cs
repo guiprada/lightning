@@ -90,6 +90,10 @@ namespace lightning
             vmPool = new Stack<VM>();
         }
 
+        ModuleUnit GetModule(string p_module_name){
+            return modules[loadedModules[p_module_name]];
+        }
+
         Operand CalculateEnvShift(Operand n_shift){
             return (Operand)(variables.Env - n_shift);
         }
@@ -193,7 +197,7 @@ namespace lightning
                 Console.Write("Error: " + msg);
                 Console.Write(" on function: " + instructions.ExecutingFunction.name);
                 Console.Write(" from module: " + instructions.ExecutingFunction.module);
-                Console.WriteLine(" on line: " + chunk.GetLine(IP + instructions.ExecutingFunction.originalPosition));
+                Console.WriteLine(" on line: " + instructions.ExecutingFunction.lines[IP]);
             }
         }
 

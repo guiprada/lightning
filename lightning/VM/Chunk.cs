@@ -6,6 +6,14 @@ using Operand = System.UInt16;
 
 namespace lightning
 {
+    public struct ChunkSlice{
+        public List<Instruction> program;
+        public List<uint> lines;
+        public ChunkSlice(List<Instruction> p_program, List<uint> p_lines){
+            program = p_program;
+            lines = p_lines;
+        }
+    }
     public struct Instruction
     {
         public OpCode opCode;
@@ -180,7 +188,7 @@ namespace lightning
 
         List<Instruction> program;
         List<Unit> constants;
-        Dictionary<uint, uint> lines;
+        List<uint> lines;
         public Library Prelude { get; private set; }
 
         public Operand ProgramSize
@@ -199,7 +207,7 @@ namespace lightning
         public Chunk(Library p_prelude)
         {
             program = new List<Instruction>();
-            lines = new Dictionary<uint, uint>();
+            lines = new List<uint>();
             constants = new List<Unit>();
             Prelude = p_prelude;
         }
@@ -256,27 +264,11 @@ namespace lightning
 
         void AddLine(uint line)
         {
-            if (lines.ContainsKey(line))
-            {
-                lines[line]++;
-            }
-            else
-            {
-                lines.Add(line, 1);
-            }
+            lines.Add(line);
         }
         public uint GetLine(int instruction_address)
         {
-            uint sum = 0;
-            uint counter = 1;
-            while(sum < instruction_address)
-            {
-                if (lines.ContainsKey(counter)) {
-                    sum += lines[counter];
-                }
-                counter++;
-            }
-            return counter;
+            return lines[instruction_address];
         }
 
         public Instruction ReadInstruction(Operand address)
@@ -315,11 +307,16 @@ namespace lightning
             return null;
         }
 
-        public List<Instruction> Slice(int start, int end)
+        public ChunkSlice Slice(int start, int end)
         {
-            List<Instruction> slice = program.GetRange(start, end - start);
-            program.RemoveRange(start, end - start);
-            return slice;
+            int range = end - start;
+            List<Instruction> programSlice = program.GetRange(start, range);
+            program.RemoveRange(start, range);
+
+            List<uint> linesSlice = lines.GetRange(start, range);
+            lines.RemoveRange(start, range);
+
+            return new ChunkSlice(programSlice, linesSlice);
         }
 
         public void FixInstruction(int address, OpCode? opCode, Operand? opA, Operand? opB, Operand? opC)
