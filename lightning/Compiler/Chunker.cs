@@ -163,9 +163,6 @@ namespace lightning
                 case NodeType.FOR:
                     ChunkFor(p_node as ForNode);
                     break;
-                case NodeType.FOREACH:
-                    ChunkForEach(p_node as ForEachNode);
-                    break;
                 case NodeType.RANGE:
                     ChunkRange(p_node as RangeNode);
                     break;
@@ -392,13 +389,6 @@ namespace lightning
             code.FixInstruction(start_address, null, (Operand)(exit_adress - start_address), null, null);
             code.FixInstruction(go_back_address, null, (Operand)(go_back_address - condition_address), null, null);
 
-        }
-
-        void ChunkForEach(ForEachNode p_node)
-        {
-            ChunkIt(p_node.List);
-            ChunkIt(p_node.Function);
-            Add(OpCode.FOREACH, p_node.Line);
         }
 
         void ChunkRange(RangeNode p_node)

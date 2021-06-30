@@ -26,7 +26,6 @@ namespace lightning
         IF,
         WHILE,
         FOR,
-        FOREACH,
         RANGE,
 
         VAR_DECLARATION,
@@ -203,18 +202,6 @@ namespace lightning
             Condition = p_Condition;
             Finalizer = p_Finalizer;
             Body = p_Body;
-        }
-    }
-
-    public class ForEachNode : Node
-    {
-        public Node List  { get; private set; }
-        public Node Function { get; private set; }
-        public ForEachNode(Node p_List, Node p_Function, int p_Line)
-            : base(NodeType.FOREACH, p_Line)
-        {
-            List = p_List;
-            Function = p_Function;
         }
     }
 

@@ -223,8 +223,6 @@ namespace lightning
         {
             if (Match(TokenType.FOR))
                 return For();
-            else if (Match(TokenType.FOREACH))
-                return ForEach();
             else if (Match(TokenType.RANGE))
                 return Range();
             else if (Match(TokenType.RETURN))
@@ -290,18 +288,6 @@ namespace lightning
             Node body = Statement();
 
             return new ForNode(initializer, condition, finalizer, body, line);
-        }
-
-        Node ForEach()
-        {
-            int line = Previous().Line;
-            Consume(TokenType.LEFT_PAREN, "Expected '(' after 'for'.", true);
-
-            Node list = Primary();
-            Consume(TokenType.COMMA, "Expected ',' separating 'pfor'", false);
-            Node function = Primary();
-            Consume(TokenType.RIGHT_PAREN, "Expected ')' after 'for'.", true);
-            return new ForEachNode(list, function, line);
         }
 
         Node Range()

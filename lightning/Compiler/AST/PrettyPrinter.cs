@@ -80,9 +80,6 @@ namespace lightning
                 case NodeType.RANGE:
                     PrintRange(p_node as RangeNode);
                     break;
-                case NodeType.FOREACH:
-                    PrintForEach(p_node as ForEachNode);
-                    break;
                 case NodeType.TABLE:
                     PrintTable(p_node as TableNode);
                     break;
@@ -140,7 +137,7 @@ namespace lightning
             else if (p_node.Op == OperatorType.NOT) Console.Write(" ! ");
             else if (p_node.Op == OperatorType.PLUS_PLUS) Console.Write(" ++ ");
             else if (p_node.Op == OperatorType.MINUS_MINUS) Console.Write(" -- ");
-            else 
+            else
                 Error("Invalid unary operator.", p_node.Line);
             Print(p_node.Right);
             Console.Write("]");
@@ -178,7 +175,7 @@ namespace lightning
                         Console.Write(", ");
                         Print(n);
                     }
-                }                
+                }
                 foreach(KeyValuePair<Node,Node> entry in p_node.table)
                 {
                     if (first)
@@ -226,8 +223,8 @@ namespace lightning
                 Console.WriteLine(identString + "ELSE ");
                 IdentPlus();
                 Print(p_node.ElseBranch);
-                IdentMinus();                
-                IdentPlus();    
+                IdentMinus();
+                IdentPlus();
             }
             IdentMinus();
             Console.WriteLine(identString + "]");
@@ -235,7 +232,7 @@ namespace lightning
 
         public void PrintFor(ForNode p_node)
         {
-            Console.WriteLine(identString + "[FOR ");            
+            Console.WriteLine(identString + "[FOR ");
             if (p_node.Initializer != null)
             {
                 IdentPlus();
@@ -257,7 +254,7 @@ namespace lightning
             if (p_node.Finalizer != null)
             {
                 IdentPlus();
-                Console.Write(identString + "[FINALIZER ");                
+                Console.Write(identString + "[FINALIZER ");
                 Print(p_node.Finalizer);
                 Console.WriteLine("]");
                 IdentMinus();
@@ -275,13 +272,6 @@ namespace lightning
             Console.WriteLine(identString + "]");
         }
 
-        public void PrintForEach(ForEachNode p_node)
-        {
-            Console.Write(identString + "[FOREACH ");
-            Print(p_node.List);
-            Print(p_node.Function);
-            Console.WriteLine("]");
-        }
         public void PrintRange(RangeNode p_node)
         {
             Console.Write(identString + "[RANGE ");
@@ -297,7 +287,7 @@ namespace lightning
             if (p_node.Condition != null)
                 Print(p_node.Condition);
             Console.WriteLine();
-            
+
             if (p_node.Body != null)
             {
                 IdentPlus();

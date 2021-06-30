@@ -121,12 +121,12 @@ namespace lightning
         public int CountVMs(){
             return vmPool.Count;
         }
-        void RecycleVM(VM vm)
+        public void RecycleVM(VM vm)
         {
             vmPool.Push(vm);
         }
 
-        VM GetVM()
+        public VM GetVM()
         {
             if (vmPool.Count > 0)
             {
@@ -1045,32 +1045,32 @@ namespace lightning
                             stack.PopStash();
                             break;
                         }
-                    case OpCode.FOREACH:
-                        {
-                            IP++;
-                            Unit func = stack.Pop();
-                            TableUnit table = (TableUnit)(stack.Pop().heapUnitValue);
+                    // case OpCode.FOREACH:
+                    //     {
+                    //         IP++;
+                    //         Unit func = stack.Pop();
+                    //         TableUnit table = (TableUnit)(stack.Pop().heapUnitValue);
 
-                            int init = 0;
-                            int end = table.ECount;
-                            VM[] vms = new VM[end];
-                            for (int i = init; i < end; i++)
-                            {
-                                vms[i] = GetVM();
-                            }
-                            System.Threading.Tasks.Parallel.For(init, end, (index) =>
-                            {
-                                List<Unit> args = new List<Unit>();
-                                args.Add(new Unit(index));
-                                args.Add(new Unit(table));
-                                vms[index].CallFunction(func, args);
-                            });
-                            for (int i = init; i < end; i++)
-                            {
-                                RecycleVM(vms[i]);
-                            }
-                            break;
-                        }
+                    //         int init = 0;
+                    //         int end = table.ECount;
+                    //         VM[] vms = new VM[end];
+                    //         for (int i = init; i < end; i++)
+                    //         {
+                    //             vms[i] = GetVM();
+                    //         }
+                    //         System.Threading.Tasks.Parallel.For(init, end, (index) =>
+                    //         {
+                    //             List<Unit> args = new List<Unit>();
+                    //             args.Add(new Unit(index));
+                    //             args.Add(new Unit(table));
+                    //             vms[index].CallFunction(func, args);
+                    //         });
+                    //         for (int i = init; i < end; i++)
+                    //         {
+                    //             RecycleVM(vms[i]);
+                    //         }
+                    //         break;
+                    //     }
                     case OpCode.RANGE:
                         {
                             IP++;

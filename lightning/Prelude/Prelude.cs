@@ -1034,7 +1034,34 @@ namespace lightning
             functions.Add(new IntrinsicUnit("count_vms", countVMs, 0));
 
             //////////////////////////////////////////////////////
+            Unit forEach(VM vm)
+            {
+                TableUnit table = (TableUnit)(vm.stack.Peek(0).heapUnitValue);
+                Unit func = vm.stack.Peek(1);
 
+                int init = 0;
+                int end = table.ECount;
+                VM[] vms = new VM[end];
+                for (int i = init; i < end; i++)
+                {
+                    vms[i] = vm.GetVM();
+                }
+                System.Threading.Tasks.Parallel.For(init, end, (index) =>
+                {
+                    List<Unit> args = new List<Unit>();
+                    args.Add(new Unit(index));
+                    args.Add(new Unit(table));
+                    vms[index].CallFunction(func, args);
+                });
+                for (int i = init; i < end; i++)
+                {
+                    vm.RecycleVM(vms[i]);
+                }
+                return new Unit("null");
+            }
+            functions.Add(new IntrinsicUnit("foreach", forEach, 2));
+
+            //////////////////////////////////////////////////////
             Library prelude = new Library(functions, tables);
 
             return prelude;
