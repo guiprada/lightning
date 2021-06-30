@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.IO;
 
@@ -73,17 +73,24 @@ namespace interpreter
                     Console.WriteLine(error);
                 }
             }
-#if VERBOSE
+            bool skip_line = false;
+#if TOKENS
             Console.WriteLine("---------------------------------- Tokens:");
 
             foreach (Token token in scanner.Tokens)
             {
                Console.WriteLine(token.ToString());
             }
+            Console.WriteLine("-------------------------------end Tokens:");
+            skip_line = true;
+#endif
+#if AST
             Console.WriteLine("\n---------------------------------- AST:");
 
             PrettyPrinter astPrinter = new PrettyPrinter();
             astPrinter.Print(program);
+            Console.WriteLine("\n-------------------------------end AST:");
+            skip_line = true;
 #endif
 
             Chunker code_generator = new Chunker(program, "main", Prelude.GetPrelude());
@@ -99,16 +106,21 @@ namespace interpreter
             }
             if (code_generator.HasChunked == true)
             {
-#if VERBOSE
+#if CHUNK
                 Console.WriteLine("\n---------------------------------- Generated Chunk:");
                 Console.WriteLine();
                 chunk.Print();
-
+#endif
+#if CONSTANTS
                 foreach(Unit v in chunk.GetConstants())
                 {
                    Console.WriteLine(v);
                 }
+                Console.WriteLine("\n-------------------------------end Generated Chunk:");
+                skip_line = true;
 #endif
+                if(skip_line)
+                    Console.WriteLine();
 
                 VM vm = new VM(chunk);
                 VMResult result = vm.Run();

@@ -1,6 +1,6 @@
 var start_time = time.now()
 write_line(start_time)
-fun rec_fib(n){
+function rec_fib(n){
     if(n < 2){
         return n;
     }

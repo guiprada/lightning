@@ -52,10 +52,9 @@ namespace lightning
             Dictionary<string, TableUnit> tables = new Dictionary<string, TableUnit>();
 
             ////////////////////////////////////////////////////////////////////////////////////////////////////////////
-            ////////////////////////////////////////////////////////////////////////////////////////////////////// debug
+            //////////////////////////////////////////////////////////////////////////////////////////////////// machine
             {
-
-                TableUnit debug = new TableUnit(null, null);
+                TableUnit machine = new TableUnit(null, null);
 
                 Unit memoryUse(VM vm){
                     TableUnit mem_use = new TableUnit(null, null);
@@ -68,9 +67,9 @@ namespace lightning
 
                     return new Unit(mem_use);
                 }
-                debug.TableSet(new StringUnit("memory_use"), new Unit(new IntrinsicUnit("memory_use", memoryUse, 0)));
+                machine.TableSet(new StringUnit("memory_use"), new Unit(new IntrinsicUnit("memory_use", memoryUse, 0)));
 
-                tables.Add("debug", debug);
+                tables.Add("machine", machine);
             }
             ////////////////////////////////////////////////////////////////////////////////////////////////////////////
             ////////////////////////////////////////////////////////////////////////////////////////////////// intrinsic

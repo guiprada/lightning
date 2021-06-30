@@ -267,7 +267,7 @@ namespace lightning
             while (Peek() != terminator && !IsAtEnd())
             {
                 if (Peek() == '\n') line++;
-                if (Peek() == '\\' && PeekNext() == terminator) // scaping terminator
+                else if (Peek() == '\\' && PeekNext() == terminator) // scaping terminator
                 {
                     Advance();
                 }

@@ -718,7 +718,7 @@ namespace lightning
                     }
                 }
                 else
-                {// it is a compoundCall/metho/Getvars
+                {// it is a compoundCall/method/Getvars
 
                     // is it a method?
                     if ((p_node.Name.Indexes[p_node.Name.Indexes.Count - 1] as VariableNode).AccessType == VarAccessType.METHOD)

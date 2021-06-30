@@ -45,7 +45,7 @@ namespace lightning
         void Parse()
         {
             ast = Program();
-        }            
+        }
 
         //////////////////////////////////////////////////////////////////////
 
@@ -85,7 +85,7 @@ namespace lightning
             int line = last_token.Line;
 
             return FinishCompoundVar(name, line);
-            
+
         }
 
         Node FinishCompoundVar(string name, int line) {
@@ -98,10 +98,10 @@ namespace lightning
                     Consume(TokenType.RIGHT_BRACKET, "Expected ']' after 'compoundVar indentifier'", true);
                 }
                 else if (Match(TokenType.DOT))
-                {   
+                {
                     Match(TokenType.IDENTIFIER);
                     string this_name = (Previous() as TokenString).value;
-                    VariableNode index = new VariableNode(this_name, new List<Node>(), VarAccessType.DOTTED, Previous().Line); 
+                    VariableNode index = new VariableNode(this_name, new List<Node>(), VarAccessType.DOTTED, Previous().Line);
                     indexes.Add(index);
                 }
                 else if (Match(TokenType.COLON))
@@ -202,7 +202,7 @@ namespace lightning
             List<Node> statements;
             if(body.Type == NodeType.BLOCK)
             {
-                statements = (body as BlockNode).Statements;                
+                statements = (body as BlockNode).Statements;
             }
             else
             {
@@ -279,7 +279,7 @@ namespace lightning
 
             Node finalizer = null;
             if (Match(TokenType.SEMICOLON))
-            {   
+            {
                 if (!Check(TokenType.RIGHT_PAREN))
                 {
                     finalizer = Expression();
@@ -298,7 +298,7 @@ namespace lightning
             Consume(TokenType.LEFT_PAREN, "Expected '(' after 'for'.", true);
 
             Node list = Primary();
-            Consume(TokenType.COMMA, "Expected ',' separating 'pfor'", false);            
+            Consume(TokenType.COMMA, "Expected ',' separating 'pfor'", false);
             Node function = Primary();
             Consume(TokenType.RIGHT_PAREN, "Expected ')' after 'for'.", true);
             return new ForEachNode(list, function, line);
@@ -326,7 +326,7 @@ namespace lightning
             Node condition = Expression();
             if (condition == null) Error("'while' 'condition' can not be null.");
             Consume(TokenType.RIGHT_PAREN, "Expected ')' after 'while' condition.", true);
-            
+
             Node body = Statement();
 
             return new WhileNode(condition, body, line);
@@ -345,7 +345,7 @@ namespace lightning
             Node else_branch = null;
             if (Match(TokenType.ELSE))
             {
-                else_branch = Statement();                
+                else_branch = Statement();
             }
 
             return new IfNode(condition, then_branch, else_branch, line);
@@ -442,7 +442,7 @@ namespace lightning
                     return new AssignmentNode((VariableNode)expr, value, expr.Line);
                 else
                     Error("Invalid assignment.");
-                
+
             }
 
             return expr;
@@ -601,7 +601,7 @@ namespace lightning
                 Token op = Previous();
                 OperatorType this_op;
 
-                if (op.Type == TokenType.SLASH) this_op = OperatorType.DIVISION;                
+                if (op.Type == TokenType.SLASH) this_op = OperatorType.DIVISION;
                 else this_op = OperatorType.MULTIPLICATION;
 
                 Node right = Unary();
@@ -682,7 +682,7 @@ namespace lightning
         }
 
         Node Table()
-        {            
+        {
             int line = Previous().Line;
             List<Node> elements = new List<Node>();
             Dictionary<Node, Node> table = new Dictionary<Node, Node>();
@@ -732,7 +732,7 @@ namespace lightning
             {
                 return new TableNode(null, null, line);
             }
-                       
+
         }
 
         Node Primary()

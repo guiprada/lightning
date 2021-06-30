@@ -1,0 +1,24 @@
+write_line("*** Welcome to lightning Zzz :) ***")
+write_line("Starting tests ..")
+var start_time = time.now()
+
+// Let's use some modules
+var lib_assert_counter = require("assert_counter.ltn")
+var lib_assert_counter_not = require("assert_counter_not.ltn")
+var lib_assert = require("assert.ltn")
+
+write("assertion detects errors ..")
+lib_assert.assert(2,1," OK!")
+
+var assert = lib_assert_counter.assert
+var assert_not = lib_assert_counter_not.assert_not
+
+function count_errors()
+{
+    return lib_assert_counter_not.errors + lib_assert_counter.errors
+}
+function clear_errors()
+{
+    lib_assert_counter_not.errors = 0
+    lib_assert_counter.errors = 0
+}

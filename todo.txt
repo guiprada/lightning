@@ -1,4 +1,8 @@
 ﻿todo
+	fix line counting and reporting
+	sobrecarga de metodos?
+	tuples  and nuples
+	arrays
 	coroutines
 	compilador self_hosted
 	adicionar variaveis internas a tabela

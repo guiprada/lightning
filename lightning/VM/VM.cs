@@ -187,7 +187,7 @@ namespace lightning
         void Error(string msg)
         {
             if (instructions.ExecutingInstructionsIndex == 0)
-                Console.WriteLine("Error: " + msg + chunk.GetLine(IP));
+                Console.WriteLine("Error: " + msg + " on line: "+ chunk.GetLine(IP));
             else
             {
                 Console.Write("Error: " + msg);
@@ -1020,7 +1020,11 @@ namespace lightning
                             }
                             else
                             {
-                                Error("Trying to call a " + this_callable.HeapUnitType());
+                                UnitType this_unit_type = this_callable.type;
+                                if(this_unit_type == UnitType.HeapUnit)
+                                    Error("Trying to call a " + this_callable.HeapUnitType());
+                                else
+                                    Error("Trying to call a " + this_callable.type);
                                 return new VMResult(VMResultType.OK, new Unit("null"));
                             }
                             break;
