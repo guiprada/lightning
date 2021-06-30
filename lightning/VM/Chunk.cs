@@ -71,7 +71,6 @@ namespace lightning
                 case OpCode.LOADFALSE:
                 case OpCode.LOADTRUE:
                 case OpCode.RANGE:
-                case OpCode.FOREACH:
                     return op.ToString();
 
                 // 1 op
@@ -168,24 +167,12 @@ namespace lightning
         CLOSURECLOSE,
         FUNCLOSE,
         RANGE,
-        FOREACH,
 
         EXIT// EXIT ;)
     }
 
     public class Chunk
     {
-        //class LineInfo
-        //{
-        //    public uint line;
-        //    public uint nMembers;
-        //    public LineInfo(uint p_line, uint p_nMembers)
-        //    {
-        //        line = p_line;
-        //        nMembers = p_nMembers;
-        //    }
-        //}
-
         List<Instruction> program;
         List<Unit> constants;
         List<uint> lines;
@@ -321,8 +308,6 @@ namespace lightning
 
         public void FixInstruction(int address, OpCode? opCode, Operand? opA, Operand? opB, Operand? opC)
         {
-            //Console.WriteLine("Fixed instruction: " + address);
-            //PrintInstruction(program[address]);
             Instruction old_instruction = program[address];
             program[address] = new Instruction(
                 opCode ??= old_instruction.opCode,
