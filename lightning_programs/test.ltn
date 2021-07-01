@@ -694,6 +694,6 @@ else{
 write_line("-- Finished tests! --")
 write_line("Elapsed time: " .. time.span(start_time, end_time) .. " ms")
 write_line("Loaded modules: " .. modules())
-write(machine.memory_use())
+write_line(machine.memory_use())
 
 ////////////////////////////// scratch

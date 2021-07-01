@@ -52,14 +52,16 @@ namespace lightning
         public List<ModuleUnit> modules;
         static Stack<VM> vmPool;
         int functionDeepness;
+        bool parallelVM;
 
         int Env{ get{ return variables.Env; } }
 
-        public VM(Chunk p_chunk, int p_function_deepness = 100, Memory<Unit> p_globals = null)
+        public VM(Chunk p_chunk, int p_function_deepness = 100, Memory<Unit> p_globals = null, bool p_parallelVM = false)
         {
             chunk = p_chunk;
             IP = 0;
             functionDeepness = p_function_deepness;
+            parallelVM = p_parallelVM;
 
             instructions = new Instructions(functionDeepness, chunk, out instructionsCache);
 
@@ -134,7 +136,7 @@ namespace lightning
             }
             else
             {
-                VM new_vm = new VM(chunk, 5, globals);
+                VM new_vm = new VM(chunk, 5, globals, true);
                 return new_vm;
             }
         }
@@ -191,13 +193,13 @@ namespace lightning
         void Error(string msg)
         {
             if (instructions.ExecutingInstructionsIndex == 0)
-                Console.WriteLine("Error: " + msg + " on line: "+ chunk.GetLine(IP));
+                Console.WriteLine("Error: " + msg + " on line: "+ chunk.lineCounter.GetLine(IP));
             else
             {
                 Console.Write("Error: " + msg);
                 Console.Write(" on function: " + instructions.ExecutingFunction.name);
                 Console.Write(" from module: " + instructions.ExecutingFunction.module);
-                Console.WriteLine(" on line: " + instructions.ExecutingFunction.lines[IP]);
+                Console.WriteLine(" on line: " + instructions.ExecutingFunction.lineCounter.GetLine(IP));
             }
         }
 
@@ -443,12 +445,8 @@ namespace lightning
                             Unit new_value = stack.Peek();
                             if (op == 0)
                             {
-                                lock(globals){
-                                    globals.Set(new_value, address);
-                                }
-                            }
-                            else
-                            {
+                                globals.Set(new_value, address);
+                            }else if(parallelVM == true){
                                 if (op == 1)
                                     lock(globals){
                                         Unit result = new Unit(globals.Get(address).unitValue + new_value.unitValue);
@@ -469,6 +467,26 @@ namespace lightning
                                         Unit result = new Unit(globals.Get(address).unitValue / new_value.unitValue);
                                         globals.Set(result, address);
                                     }
+                            }else{
+                                if (op == 1){
+                                    Unit result = new Unit(globals.Get(address).unitValue + new_value.unitValue);
+                                    globals.Set(result, address);
+                                }
+                                else if (op == 2)
+                                {
+                                    Unit result = new Unit(globals.Get(address).unitValue - new_value.unitValue);
+                                    globals.Set(result, address);
+                                }
+                                else if (op == 3)
+                                {
+                                    Unit result = new Unit(globals.Get(address).unitValue * new_value.unitValue);
+                                    globals.Set(result, address);
+                                }
+                                else if (op == 4)
+                                {
+                                    Unit result = new Unit(globals.Get(address).unitValue / new_value.unitValue);
+                                    globals.Set(result, address);
+                                }
                             }
                             break;
                         }
@@ -481,12 +499,8 @@ namespace lightning
                             Unit new_value = stack.Peek();
                             if (op == 0)
                             {
-                                lock(this_upValue){
-                                    this_upValue.UpValue = new_value;
-                                }
-                            }
-                            else
-                            {
+                                this_upValue.UpValue = new_value;
+                            }else if(parallelVM == true){
                                 if (op == 1)
                                     lock(this_upValue){
                                         this_upValue.UpValue = new Unit(this_upValue.UpValue.unitValue + new_value.unitValue);
@@ -503,6 +517,23 @@ namespace lightning
                                     lock(this_upValue){
                                         this_upValue.UpValue = new Unit(this_upValue.UpValue.unitValue / new_value.unitValue);
                                     }
+                            }else{
+                                if (op == 1)
+                                {
+                                    this_upValue.UpValue = new Unit(this_upValue.UpValue.unitValue + new_value.unitValue);
+                                }
+                                else if (op == 2)
+                                {
+                                    this_upValue.UpValue = new Unit(this_upValue.UpValue.unitValue - new_value.unitValue);
+                                }
+                                else if (op == 3)
+                                {
+                                    this_upValue.UpValue = new Unit(this_upValue.UpValue.unitValue * new_value.unitValue);
+                                }
+                                else if (op == 4)
+                                {
+                                    this_upValue.UpValue = new Unit(this_upValue.UpValue.unitValue / new_value.unitValue);
+                                }
                             }
                             break;
                         }

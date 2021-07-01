@@ -6,12 +6,27 @@ using Operand = System.UInt16;
 
 namespace lightning
 {
-    public struct ChunkSlice{
-        public List<Instruction> program;
+    public struct LineCounter{
         public List<uint> lines;
-        public ChunkSlice(List<Instruction> p_program, List<uint> p_lines){
-            program = p_program;
+
+        public LineCounter(List<uint> p_lines){
             lines = p_lines;
+        }
+        public void AddLine(uint line)
+        {
+            lines.Add(line);
+        }
+        public uint GetLine(int instruction_address)
+        {
+            return lines[instruction_address];
+        }
+        public LineCounter Slice(int start, int end)
+        {
+            int range = end - start;
+            List<uint> linesSlice = lines.GetRange(start, range);
+            lines.RemoveRange(start, range);
+
+            return new LineCounter(linesSlice);
         }
     }
     public struct Instruction
@@ -173,7 +188,7 @@ namespace lightning
     {
         List<Instruction> program;
         List<Unit> constants;
-        List<uint> lines;
+        public LineCounter lineCounter;
         public Library Prelude { get; private set; }
 
         public Operand ProgramSize
@@ -192,7 +207,7 @@ namespace lightning
         public Chunk(Library p_prelude)
         {
             program = new List<Instruction>();
-            lines = new List<uint>();
+            lineCounter = new LineCounter(new List<uint>());
             constants = new List<Unit>();
             Prelude = p_prelude;
         }
@@ -214,7 +229,7 @@ namespace lightning
             {
                 Console.Write(i + ": ");
                 PrintInstruction(program[i]);
-                Console.Write(" on line: " + " " + GetLine(i) + '\n');
+                Console.Write(" on line: " + " " + lineCounter.GetLine(i) + '\n');
             }
             Console.WriteLine();
         }
@@ -239,21 +254,12 @@ namespace lightning
         {
             Instruction this_instruction = new Instruction(opCode, opA, opB, opC);
             program.Add(this_instruction);
-            AddLine(line);
+            lineCounter.AddLine(line);
         }
 
         public void WriteInstruction(Instruction instruction)
         {
             program.Add(instruction);
-        }
-
-        void AddLine(uint line)
-        {
-            lines.Add(line);
-        }
-        public uint GetLine(int instruction_address)
-        {
-            return lines[instruction_address];
         }
 
         public Instruction ReadInstruction(Operand address)
@@ -292,16 +298,13 @@ namespace lightning
             return null;
         }
 
-        public ChunkSlice Slice(int start, int end)
+        public List<Instruction> Slice(int start, int end)
         {
             int range = end - start;
             List<Instruction> programSlice = program.GetRange(start, range);
             program.RemoveRange(start, range);
 
-            List<uint> linesSlice = lines.GetRange(start, range);
-            lines.RemoveRange(start, range);
-
-            return new ChunkSlice(programSlice, linesSlice);
+            return programSlice;
         }
 
         public void FixInstruction(int address, OpCode? opCode, Operand? opA, Operand? opB, Operand? opC)
