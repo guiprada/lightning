@@ -1,0 +1,1 @@
+copy lightning_vscode C:\Users\guiprada\.vscode\extensions\
