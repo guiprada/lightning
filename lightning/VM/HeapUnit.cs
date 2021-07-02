@@ -328,7 +328,7 @@ namespace lightning
             elements.Add(value);
         }
 
-        public void TableSet(StringUnit index, Unit value)
+        public void TABLE_SET(StringUnit index, Unit value)
         {
             table[index] = value;
         }

@@ -262,7 +262,7 @@ namespace lightning
                             Unit value = stack.Pop();
                             break;
                         }
-                    case OpCode.LOADC:
+                    case OpCode.LOAD_CONSTANT:
                         {
                             IP++;
                             Operand address = instruction.opA;
@@ -270,7 +270,7 @@ namespace lightning
                             stack.Push(constant);
                             break;
                         }
-                    case OpCode.LOADV:
+                    case OpCode.LOAD_VARIABLE:
                         {
                             IP++;
                             Operand address = instruction.opA;
@@ -279,7 +279,7 @@ namespace lightning
                             stack.Push(variable);
                             break;
                         }
-                    case OpCode.LOADG:
+                    case OpCode.LOAD_GLOBAL:
                         {
                             IP++;
                             Operand address = instruction.opA;
@@ -288,7 +288,7 @@ namespace lightning
                             stack.Push(global);
                             break;
                         }
-                    case OpCode.LOADGI:
+                    case OpCode.LOAD_IMPORTED_GLOBAL:
                         {
                             IP++;
                             Operand address = instruction.opA;
@@ -297,7 +297,7 @@ namespace lightning
                             stack.Push(global);
                             break;
                         }
-                    case OpCode.LOADCI:
+                    case OpCode.LOAD_IMPORTED_CONSTANT:
                         {
                             IP++;
                             Operand address = instruction.opA;
@@ -307,7 +307,7 @@ namespace lightning
                             stack.Push(constant);
                             break;
                         }
-                    case OpCode.LOADUPVAL:
+                    case OpCode.LOAD_UPVALUE:
                         {
                             IP++;
                             Operand address = instruction.opA;
@@ -315,39 +315,39 @@ namespace lightning
                             stack.Push(up_val.UpValue);
                             break;
                         }
-                    case OpCode.LOADNIL:
+                    case OpCode.LOAD_NIL:
                         {
                             IP++;
                             stack.Push(new Unit("null"));
                             break;
                         }
-                    case OpCode.LOADTRUE:
+                    case OpCode.LOAD_TRUE:
                         {
                             IP++;
                             stack.Push(new Unit(true));
                             break;
                         }
-                    case OpCode.LOADFALSE:
+                    case OpCode.LOAD_FALSE:
                         {
                             IP++;
                             stack.Push(new Unit(false));
                             break;
                         }
-                    case OpCode.LOADINTR:
+                    case OpCode.LOAD_INTRINSIC:
                         {
                             IP++;
                             Operand value = instruction.opA;
                             stack.Push(new Unit(Intrinsics[value]));
                             break;
                         }
-                    case OpCode.VARDCL:
+                    case OpCode.DECLARE_VARIABLE:
                         {
                             IP++;
                             Unit new_value = stack.Pop();
                             variables.Add(new_value);
                             break;
                         }
-                    case OpCode.GLOBALDCL:
+                    case OpCode.DECLARE_GLOBAL:
                         {
                             IP++;
                             Unit new_value = stack.Pop();
@@ -355,7 +355,7 @@ namespace lightning
 
                             break;
                         }
-                    case OpCode.FUNDCL:
+                    case OpCode.DECLARE_FUNCTION:
                         {
                             IP++;
                             Operand env = instruction.opA;
@@ -410,7 +410,7 @@ namespace lightning
                             }
                             break;
                         }
-                    case OpCode.ASSIGN:
+                    case OpCode.ASSIGN_VARIABLE:
                         {
                             IP++;
                             Operand address = instruction.opA;
@@ -437,7 +437,7 @@ namespace lightning
                             }
                             break;
                         }
-                    case OpCode.ASSIGNG:
+                    case OpCode.ASSIGN_GLOBAL:
                         {
                             IP++;
                             Operand address = instruction.opA;
@@ -490,7 +490,7 @@ namespace lightning
                             }
                             break;
                         }
-                    case OpCode.ASSIGNUPVAL:
+                    case OpCode.ASSIGN_UPVALUE:
                         {
                             IP++;
                             Operand address = instruction.opA;
@@ -537,7 +537,7 @@ namespace lightning
                             }
                             break;
                         }
-                    case OpCode.TABLEGET:
+                    case OpCode.TABLE_GET:
                         {
                             IP++;
                             Operand indexes_counter = instruction.opA;
@@ -562,7 +562,7 @@ namespace lightning
                             break;
                         }
 
-                    case OpCode.TABLESET:
+                    case OpCode.TABLE_SET:
                         {
                             IP++;
                             Operand indexes_counter = instruction.opA;
@@ -603,7 +603,7 @@ namespace lightning
                                     {
                                         Unit old_value = ((TableUnit)(this_table.heapUnitValue)).table[(StringUnit)indexes[indexes_counter - 1].heapUnitValue];
                                     }
-                                    ((TableUnit)(this_table.heapUnitValue)).TableSet((StringUnit)indexes[indexes_counter - 1].heapUnitValue, new_value);
+                                    ((TableUnit)(this_table.heapUnitValue)).TABLE_SET((StringUnit)indexes[indexes_counter - 1].heapUnitValue, new_value);
                                 }
                             }
                             else
@@ -632,13 +632,13 @@ namespace lightning
                             }
                             break;
                         }
-                    case OpCode.JMP:
+                    case OpCode.JUMP:
                         {
                             Operand value = instruction.opA;
                             IP += value;
                             break;
                         }
-                    case OpCode.JNT:
+                    case OpCode.JUMP_IF_NOT_TRUE:
                         {
                             bool value = stack.Pop().ToBool();
                             if (value == false)
@@ -651,30 +651,30 @@ namespace lightning
                             }
                             break;
                         }
-                    case OpCode.JMPB:
+                    case OpCode.JUMP_BACK:
                         {
                             Operand value = instruction.opA;
                             IP -= value;
                             break;
                         }
-                    case OpCode.NENV:
+                    case OpCode.OPEN_ENV:
                         {
                             IP++;
                             EnvPush();
                             break;
                         }
-                    case OpCode.CENV:
+                    case OpCode.CLOSE_ENV:
                         {
                             IP++;
                             EnvPop();
                             break;
                         }
-                    case OpCode.RET:
+                    case OpCode.RETURN:
                         {
                             IP = instructions.PopRET();
                             break;
                         }
-                    case OpCode.SETRET:
+                    case OpCode.RETURN_SET:
                         {
                             Operand value = instruction.opA;
                             instructions.PushRET((Operand)(value + IP));
@@ -693,7 +693,7 @@ namespace lightning
 
                             break;
                         }
-                    case OpCode.APP:
+                    case OpCode.APPEND:
                         {
                             IP++;
                             Unit opB = stack.Pop();
@@ -705,7 +705,7 @@ namespace lightning
 
                             break;
                         }
-                    case OpCode.SUB:
+                    case OpCode.SUBTRACT:
                         {
                             IP++;
                             Number opB = stack.Pop().unitValue;
@@ -716,7 +716,7 @@ namespace lightning
 
                             break;
                         }
-                    case OpCode.MUL:
+                    case OpCode.MULTIPLY:
                         {
                             IP++;
                             Number opB = stack.Pop().unitValue;
@@ -727,7 +727,7 @@ namespace lightning
 
                             break;
                         }
-                    case OpCode.DIV:
+                    case OpCode.DIVIDE:
                         {
                             IP++;
                             Number opB = stack.Pop().unitValue;
@@ -738,7 +738,7 @@ namespace lightning
 
                             break;
                         }
-                    case OpCode.NEG:
+                    case OpCode.NEGATE:
                         {
                             IP++;
                             Number opA = stack.Pop().unitValue;
@@ -746,7 +746,7 @@ namespace lightning
                             stack.Push(new_value);
                             break;
                         }
-                    case OpCode.INC:
+                    case OpCode.INCREMENT:
                         {
                             IP++;
                             Number opA = stack.Pop().unitValue;
@@ -754,7 +754,7 @@ namespace lightning
                             stack.Push(new_value);
                             break;
                         }
-                    case OpCode.DEC:
+                    case OpCode.DECREMENT:
                         {
                             IP++;
                             Number opA = stack.Pop().unitValue;
@@ -762,7 +762,7 @@ namespace lightning
                             stack.Push(new_value);
                             break;
                         }
-                    case OpCode.EQ:
+                    case OpCode.EQUALS:
                         {
                             IP++;
                             Unit opB = stack.Pop();
@@ -778,7 +778,7 @@ namespace lightning
 
                             break;
                         }
-                    case OpCode.NEQ:
+                    case OpCode.NOT_EQUALS:
                         {
                             IP++;
                             Unit opB = stack.Pop();
@@ -795,7 +795,7 @@ namespace lightning
 
                             break;
                         }
-                    case OpCode.GTQ:
+                    case OpCode.GREATER_EQUALS:
                         {
                             IP++;
                             Number opB = stack.Pop().unitValue;
@@ -811,7 +811,7 @@ namespace lightning
                             }
                             break;
                         }
-                    case OpCode.LTQ:
+                    case OpCode.LESS_EQUALS:
                         {
                             IP++;
                             Number opB = stack.Pop().unitValue;
@@ -827,7 +827,7 @@ namespace lightning
                             }
                             break;
                         }
-                    case OpCode.GT:
+                    case OpCode.GREATER:
                         {
                             IP++;
                             Number opB = stack.Pop().unitValue;
@@ -843,7 +843,7 @@ namespace lightning
                             }
                             break;
                         }
-                    case OpCode.LT:
+                    case OpCode.LESS:
                         {
                             IP++;
                             Number opB = stack.Pop().unitValue;
@@ -972,7 +972,7 @@ namespace lightning
                             }
                             break;
                         }
-                    case OpCode.CLOSURECLOSE:
+                    case OpCode.CLOSE_CLOSURE:
                         {
                             upValues.PopEnv();
 
@@ -982,7 +982,7 @@ namespace lightning
 
                             break;
                         }
-                    case OpCode.FUNCLOSE:
+                    case OpCode.CLOSE_FUNCTION:
                         {
                             int target_env = instructions.TargetEnv;
                             EnvSet(target_env);
@@ -990,7 +990,7 @@ namespace lightning
 
                             break;
                         }
-                    case OpCode.NTABLE:
+                    case OpCode.NEW_TABLE:
                         {
                             IP++;
 
@@ -1064,13 +1064,13 @@ namespace lightning
                             }
                             break;
                         }
-                    case OpCode.PUSHSTASH:
+                    case OpCode.PUSH_STASH:
                         {
                             IP++;
                             stack.PushStash();
                             break;
                         }
-                    case OpCode.POPSTASH:
+                    case OpCode.POP_STASH:
                         {
                             IP++;
                             stack.PopStash();

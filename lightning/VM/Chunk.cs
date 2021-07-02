@@ -49,67 +49,67 @@ namespace lightning
             switch (op)
             {
                 // 0 op
-                case OpCode.VARDCL:
-                case OpCode.GLOBALDCL:
-                case OpCode.NENV:
-                case OpCode.CENV:
-                case OpCode.RET:
+                case OpCode.DECLARE_VARIABLE:
+                case OpCode.DECLARE_GLOBAL:
+                case OpCode.OPEN_ENV:
+                case OpCode.CLOSE_ENV:
+                case OpCode.RETURN:
                 case OpCode.ADD:
-                case OpCode.APP:
-                case OpCode.SUB:
-                case OpCode.MUL:
-                case OpCode.DIV:
-                case OpCode.NEG:
+                case OpCode.APPEND:
+                case OpCode.SUBTRACT:
+                case OpCode.MULTIPLY:
+                case OpCode.DIVIDE:
+                case OpCode.NEGATE:
                 case OpCode.NOT:
-                case OpCode.INC:
-                case OpCode.DEC:
+                case OpCode.INCREMENT:
+                case OpCode.DECREMENT:
                 case OpCode.AND:
                 case OpCode.OR:
                 case OpCode.XOR:
                 case OpCode.NAND:
                 case OpCode.NOR:
                 case OpCode.XNOR:
-                case OpCode.EQ:
-                case OpCode.NEQ:
-                case OpCode.GTQ:
-                case OpCode.LTQ:
-                case OpCode.GT:
-                case OpCode.LT:
+                case OpCode.EQUALS:
+                case OpCode.NOT_EQUALS:
+                case OpCode.GREATER_EQUALS:
+                case OpCode.LESS_EQUALS:
+                case OpCode.GREATER:
+                case OpCode.LESS:
                 case OpCode.EXIT:
-                case OpCode.LOADNIL:
+                case OpCode.LOAD_NIL:
                 case OpCode.POP:
-                case OpCode.PUSHSTASH:
-                case OpCode.POPSTASH:
+                case OpCode.PUSH_STASH:
+                case OpCode.POP_STASH:
                 case OpCode.CALL:
-                case OpCode.CLOSURECLOSE:
-                case OpCode.FUNCLOSE:
-                case OpCode.LOADFALSE:
-                case OpCode.LOADTRUE:
+                case OpCode.CLOSE_CLOSURE:
+                case OpCode.CLOSE_FUNCTION:
+                case OpCode.LOAD_FALSE:
+                case OpCode.LOAD_TRUE:
                     return op.ToString();
 
                 // 1 op
-                case OpCode.LOADC:
-                case OpCode.LOADG:
-                case OpCode.LOADUPVAL:
-                case OpCode.LOADINTR:
-                case OpCode.JMP:
-                case OpCode.JNT:
-                case OpCode.JMPB:
-                case OpCode.SETRET:
-                case OpCode.TABLEGET:
+                case OpCode.LOAD_CONSTANT:
+                case OpCode.LOAD_GLOBAL:
+                case OpCode.LOAD_UPVALUE:
+                case OpCode.LOAD_INTRINSIC:
+                case OpCode.JUMP:
+                case OpCode.JUMP_IF_NOT_TRUE:
+                case OpCode.JUMP_BACK:
+                case OpCode.RETURN_SET:
+                case OpCode.TABLE_GET:
                     return op.ToString() + " " + this.opA;
                 // 2 op
-                case OpCode.ASSIGNG:
-                case OpCode.ASSIGNUPVAL:
-                case OpCode.LOADV:
-                case OpCode.LOADGI:
-                case OpCode.LOADCI:
-                case OpCode.NTABLE:
-                case OpCode.TABLESET:
+                case OpCode.ASSIGN_GLOBAL:
+                case OpCode.ASSIGN_UPVALUE:
+                case OpCode.LOAD_VARIABLE:
+                case OpCode.LOAD_IMPORTED_GLOBAL:
+                case OpCode.LOAD_IMPORTED_CONSTANT:
+                case OpCode.NEW_TABLE:
+                case OpCode.TABLE_SET:
                     return op.ToString() + " " + this.opA + " " + this.opB;
                 // 3 op
-                case OpCode.ASSIGN:
-                case OpCode.FUNDCL:
+                case OpCode.ASSIGN_VARIABLE:
+                case OpCode.DECLARE_FUNCTION:
                     return op.ToString() + " " + this.opA + " " + this.opB + " " + this.opC;
                 default:
                     return "Unkown Opcode: " + op.ToString();
@@ -118,47 +118,47 @@ namespace lightning
     }
     public enum OpCode: Operand
     {
-        LOADC,// Loads a constant to stack
-        LOADV,// Loads o variable to stack
-        LOADG,
-        LOADGI,
-        LOADCI,
-        LOADUPVAL,
-        LOADINTR,
-        LOADNIL,
-        LOADTRUE,
-        LOADFALSE,
+        LOAD_CONSTANT,// Loads a constant to stack
+        LOAD_VARIABLE,// Loads o variable to stack
+        LOAD_GLOBAL,
+        LOAD_IMPORTED_GLOBAL,
+        LOAD_IMPORTED_CONSTANT,
+        LOAD_UPVALUE,
+        LOAD_INTRINSIC,
+        LOAD_NIL,
+        LOAD_TRUE,
+        LOAD_FALSE,
 
-        GLOBALDCL,
-        VARDCL,
-        FUNDCL,
-        ASSIGN,
-        ASSIGNG,
-        ASSIGNUPVAL,
-        TABLEGET,
-        TABLESET,
+        DECLARE_GLOBAL,
+        DECLARE_VARIABLE,
+        DECLARE_FUNCTION,
+        ASSIGN_VARIABLE,
+        ASSIGN_GLOBAL,
+        ASSIGN_UPVALUE,
+        TABLE_GET,
+        TABLE_SET,
 
         POP,
-        PUSHSTASH,
-        POPSTASH,
+        PUSH_STASH,
+        POP_STASH,
 
-        JMP,    // Jumps n instructions
-        JNT,    // Jumps if not true
-        JMPB,     // Jumps back n instructions
+        JUMP,    // Jumps n instructions
+        JUMP_IF_NOT_TRUE,    // Jumps if not true
+        JUMP_BACK,     // Jumps back n instructions
 
-        NENV,   // Open new env
-        CENV,   // Close env
-        RET,
-        SETRET,
+        OPEN_ENV,   // Open new env
+        CLOSE_ENV,   // Close env
+        RETURN,
+        RETURN_SET,
 
         ADD, // Float
-        APP, // String
-        SUB, //
-        MUL,
-        DIV,
-        NEG,
-        INC,
-        DEC,
+        APPEND, // String
+        SUBTRACT, //
+        MULTIPLY,
+        DIVIDE,
+        NEGATE,
+        INCREMENT,
+        DECREMENT,
 
         NOT,
         AND,
@@ -168,18 +168,18 @@ namespace lightning
         NOR,
         XNOR,
 
-        EQ,
-        NEQ,
-        GTQ,
-        LTQ,
-        GT,
-        LT,
+        EQUALS,
+        NOT_EQUALS,
+        GREATER_EQUALS,
+        LESS_EQUALS,
+        GREATER,
+        LESS,
 
-        NTABLE, // Creates a new table
+        NEW_TABLE, // Creates a new table
 
         CALL,
-        CLOSURECLOSE,
-        FUNCLOSE,
+        CLOSE_CLOSURE,
+        CLOSE_FUNCTION,
 
         EXIT// EXIT ;)
     }
