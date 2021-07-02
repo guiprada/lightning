@@ -27,36 +27,39 @@ namespace lightning
 
         public UnitType type;
 
-        public Unit(HeapUnit p_value) : this()
+        public Unit(HeapUnit p_value)
         {
+            unitValue = 0;
             heapUnitValue = p_value;
             type = UnitType.HeapUnit;
         }
-        public Unit(Number p_number) : this()
+        public Unit(Number p_number)
         {
             unitValue = p_number;
+            heapUnitValue = null;
             type = UnitType.Number;
         }
 
-        public Unit(bool p_value) : this(){
+        public Unit(bool p_value){
             if(p_value == true){
                 unitValue = 1;
             }else{
                 unitValue = 0;
             }
+            heapUnitValue = null;
             type = UnitType.Boolean;
         }
 
-        public Unit(String p_string) : this()
-        {
-            if(p_string == "null")
-            {
-                type = UnitType.Null;
-            }
-            else
-            {
-                throw new Exception("Trying to create a Unit with invalid string: " + p_string);
-            }
+        public Unit(String p_string){
+            unitValue = 0;
+            heapUnitValue = new StringUnit(p_string);
+            type = UnitType.HeapUnit;
+        }
+
+        public Unit(UnitType p_type){
+            unitValue = 0;
+            heapUnitValue = null;
+            type = p_type;
         }
 
         public Type HeapUnitType(){

@@ -1,3 +1,3 @@
 cd lightning_programs
-.\lightning\lightning_interpreter.exe test.ltn
+..\win_builds\lightning_interpreter.exe test.ltn
 cd ..

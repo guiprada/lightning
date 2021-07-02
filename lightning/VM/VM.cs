@@ -56,6 +56,7 @@ namespace lightning
 
         int Env{ get{ return variables.Env; } }
 
+//////////////////////////////////////////////////// Public
         public VM(Chunk p_chunk, int p_function_deepness = 100, Memory<Unit> p_globals = null, bool p_parallelVM = false)
         {
             chunk = p_chunk;
@@ -90,18 +91,6 @@ namespace lightning
             modules = new List<ModuleUnit>();
 
             vmPool = new Stack<VM>();
-        }
-
-        ModuleUnit GetModule(string p_module_name){
-            return modules[loadedModules[p_module_name]];
-        }
-
-        Operand CalculateEnvShift(Operand n_shift){
-            return (Operand)(variables.Env - n_shift);
-        }
-
-        Operand CalculateEnvShiftUpVal(Operand env){
-            return (Operand)(variables.Env + 1 - env);
         }
 
         public void ResoursesTrim(){
@@ -158,6 +147,81 @@ namespace lightning
             return globals.Get(address);
         }
 
+//////////////////////////// Accessors
+        public Unit GetUnit(int n){
+            return stack.Peek(n);
+        }
+        public string GetString(int n){
+            return ((StringUnit)(stack.Peek(n).heapUnitValue)).content;
+        }
+        public Number GetNumber(int n){
+            return stack.Peek(n).unitValue;
+        }
+        public TableUnit GetTable(int n){
+            return (TableUnit)(stack.Peek(n).heapUnitValue);
+        }
+
+        public T GetWrapperUnit<T>(int n){
+            return ((WrapperUnit<T>)(stack.Peek(n).heapUnitValue)).UnWrapp();
+        }
+
+//////////////////////////// End Accessors
+        public Unit CallFunction(Unit this_callable, List<Unit> args)
+        {
+            if (args != null)
+                for (int i = args.Count - 1; i >= 0; i--)
+                    stack.Push(args[i]);
+
+            Type this_type = this_callable.HeapUnitType();
+
+            instructions.PushRET((Operand)(chunk.ProgramSize - 1));
+            if (this_type == typeof(FunctionUnit))
+            {
+                FunctionUnit this_func = (FunctionUnit)(this_callable.heapUnitValue);
+                instructions.PushFunction(this_func, Env, out instructionsCache);
+
+                IP = 0;
+            }
+            else if (this_type == typeof(ClosureUnit))
+            {
+                ClosureUnit this_closure = (ClosureUnit)(this_callable.heapUnitValue);
+
+                upValues.PushEnv();
+
+                foreach (UpValueUnit u in this_closure.upValues)
+                {
+                    upValues.Add(u);
+                }
+                instructions.PushFunction(this_closure.function, Env, out instructionsCache);
+
+                IP = 0;
+            }
+            else if (this_type == typeof(IntrinsicUnit))
+            {
+                IntrinsicUnit this_intrinsic = (IntrinsicUnit)(this_callable.heapUnitValue);
+                Unit intrinsic_result = this_intrinsic.function(this);
+                stack.top -= this_intrinsic.arity;
+                stack.Push(intrinsic_result);
+            }
+            VMResult result = Run();
+            if (result.status == VMResultType.OK)
+                return result.value;
+            return new Unit(UnitType.Null);
+        }
+//////////////////////////////////////////////////// End Public
+
+        ModuleUnit GetModule(string p_module_name){
+            return modules[loadedModules[p_module_name]];
+        }
+
+        Operand CalculateEnvShift(Operand n_shift){
+            return (Operand)(variables.Env - n_shift);
+        }
+
+        Operand CalculateEnvShiftUpVal(Operand env){
+            return (Operand)(variables.Env + 1 - env);
+        }
+
         void RegisterUpValue(UpValueUnit u)
         {
             upValuesRegistry.Add(u);
@@ -201,49 +265,6 @@ namespace lightning
                 Console.Write(" from module: " + instructions.ExecutingFunction.module);
                 Console.WriteLine(" on line: " + instructions.ExecutingFunction.lineCounter.GetLine(IP));
             }
-        }
-
-        public Unit CallFunction(Unit this_callable, List<Unit> args)
-        {
-            if (args != null)
-                for (int i = args.Count - 1; i >= 0; i--)
-                    stack.Push(args[i]);
-
-            Type this_type = this_callable.HeapUnitType();
-
-            instructions.PushRET((Operand)(chunk.ProgramSize - 1));
-            if (this_type == typeof(FunctionUnit))
-            {
-                FunctionUnit this_func = (FunctionUnit)(this_callable.heapUnitValue);
-                instructions.PushFunction(this_func, Env, out instructionsCache);
-
-                IP = 0;
-            }
-            else if (this_type == typeof(ClosureUnit))
-            {
-                ClosureUnit this_closure = (ClosureUnit)(this_callable.heapUnitValue);
-
-                upValues.PushEnv();
-
-                foreach (UpValueUnit u in this_closure.upValues)
-                {
-                    upValues.Add(u);
-                }
-                instructions.PushFunction(this_closure.function, Env, out instructionsCache);
-
-                IP = 0;
-            }
-            else if (this_type == typeof(IntrinsicUnit))
-            {
-                IntrinsicUnit this_intrinsic = (IntrinsicUnit)(this_callable.heapUnitValue);
-                Unit intrinsic_result = this_intrinsic.function(this);
-                stack.top -= this_intrinsic.arity;
-                stack.Push(intrinsic_result);
-            }
-            VMResult result = Run();
-            if (result.status == VMResultType.OK)
-                return result.value;
-            return new Unit("null");
         }
 
         public VMResult Run()
@@ -318,7 +339,7 @@ namespace lightning
                     case OpCode.LOAD_NIL:
                         {
                             IP++;
-                            stack.Push(new Unit("null"));
+                            stack.Push(new Unit(UnitType.Null));
                             break;
                         }
                     case OpCode.LOAD_TRUE:
@@ -603,7 +624,7 @@ namespace lightning
                                     {
                                         Unit old_value = ((TableUnit)(this_table.heapUnitValue)).table[(StringUnit)indexes[indexes_counter - 1].heapUnitValue];
                                     }
-                                    ((TableUnit)(this_table.heapUnitValue)).TABLE_SET((StringUnit)indexes[indexes_counter - 1].heapUnitValue, new_value);
+                                    ((TableUnit)(this_table.heapUnitValue)).TableSet((StringUnit)indexes[indexes_counter - 1].heapUnitValue, new_value);
                                 }
                             }
                             else
@@ -700,7 +721,7 @@ namespace lightning
                             Unit opA = stack.Pop();
 
                             string result = opA.ToString() + opB.ToString();
-                            Unit new_value = new Unit(new StringUnit(result));
+                            Unit new_value = new Unit(result);
                             stack.Push(new_value);
 
                             break;
@@ -870,7 +891,7 @@ namespace lightning
                             else
                             {
                                 Error("NOT is insane!");
-                                return new VMResult(VMResultType.ERROR, new Unit("null"));
+                                return new VMResult(VMResultType.ERROR, new Unit(UnitType.Null));
                             }
 
                             break;
@@ -1060,7 +1081,7 @@ namespace lightning
                                     Error("Trying to call a " + this_callable.HeapUnitType());
                                 else
                                     Error("Trying to call a " + this_callable.type);
-                                return new VMResult(VMResultType.OK, new Unit("null"));
+                                return new VMResult(VMResultType.OK, new Unit(UnitType.Null));
                             }
                             break;
                         }
@@ -1078,14 +1099,14 @@ namespace lightning
                         }
                     case OpCode.EXIT:
                         {
-                            Unit result = new Unit("null");
+                            Unit result = new Unit(UnitType.Null);
                             if (stack.top > 0)
                                 result = stack.Pop();
                             return new VMResult(VMResultType.OK, result);
                         }
                     default:
                         Error("Unkown OpCode: " + instruction.opCode);
-                        return new VMResult(VMResultType.ERROR, new Unit("null"));
+                        return new VMResult(VMResultType.ERROR, new Unit(UnitType.Null));
                 }
             }
         }

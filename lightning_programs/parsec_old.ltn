@@ -18,15 +18,15 @@ lib.make_string = intrinsic("make_string_parser", 1,
                 if (slice_input_string == match_string)
                 {
                     ValTable match_result = new ValTable(null, null);
-                    match_result.TABLE_SET(match_val_string, val_match_string);
+                    match_result.TableSet(match_val_string, val_match_string);
                     string tail = input_string.Substring(length, input_string.Length - length);
-                    match_result.TABLE_SET(tail_val_string, new ValString(tail));
+                    match_result.TableSet(tail_val_string, new ValString(tail));
                     return match_result;
                 }
             }
             ValTable result = new ValTable(null, null);
-            result.TABLE_SET(match_val_string, Value.Nil);
-            result.TABLE_SET(tail_val_string, val_input_string);
+            result.TableSet(match_val_string, Value.Nil);
+            result.TableSet(tail_val_string, val_input_string);
             return result;
         };
         return new ValIntrinsic(match_string + "_parser", parser, 1);
@@ -46,15 +46,15 @@ lib.digit = intrinsic("digit_parser", 1,
             if (Char.IsDigit(head))
             {
                 ValTable match_result = new ValTable(null, null);
-                match_result.TABLE_SET(match_val_string, new ValString(head.ToString()));
+                match_result.TableSet(match_val_string, new ValString(head.ToString()));
                 string tail = input_string.Substring(1, input_string.Length - 1);
-                match_result.TABLE_SET(tail_val_string, new ValString(tail));
+                match_result.TableSet(tail_val_string, new ValString(tail));
                 return match_result;
             }
         }
         ValTable result = new ValTable(null, null);
-        result.TABLE_SET(match_val_string, Value.Nil);
-        result.TABLE_SET(tail_val_string, val_input_string);
+        result.TableSet(match_val_string, Value.Nil);
+        result.TableSet(tail_val_string, val_input_string);
         return result;
     }
 ')
@@ -72,15 +72,15 @@ lib.alpha = intrinsic("alpha_parser", 1,
             if (Char.IsLetter(head))
             {
                 ValTable match_result = new ValTable(null, null);
-                match_result.TABLE_SET(match_val_string, new ValString(head.ToString()));
+                match_result.TableSet(match_val_string, new ValString(head.ToString()));
                 string tail = input_string.Substring(1, input_string.Length - 1);
-                match_result.TABLE_SET(tail_val_string, new ValString(tail));
+                match_result.TableSet(tail_val_string, new ValString(tail));
                 return match_result;
             }
         }
         ValTable result = new ValTable(null, null);
-        result.TABLE_SET(match_val_string, Value.Nil);
-        result.TABLE_SET(tail_val_string, val_input_string);
+        result.TableSet(match_val_string, Value.Nil);
+        result.TableSet(tail_val_string, val_input_string);
         return result;
     }
 ')
@@ -127,8 +127,8 @@ lib.And = intrinsic("and_combinator", 2,
                 else
                 {
                     ValTable result3 = new ValTable(null, null);
-                    result3.TABLE_SET(match_val_string, Value.Nil);
-                    result3.TABLE_SET(tail_val_string, vm.StackPeek(0));
+                    result3.TableSet(match_val_string, Value.Nil);
+                    result3.TableSet(tail_val_string, vm.StackPeek(0));
                     return result3;
                 }
             }

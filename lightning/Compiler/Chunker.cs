@@ -1049,9 +1049,9 @@ namespace lightning
             {
                 constants.Add(p_string);
                 if (p_string == "Nil")
-                    code.AddConstant(new Unit("null"));
+                    code.AddConstant(new Unit(UnitType.Null));
                 else
-                    code.AddConstant(new Unit(new StringUnit(p_string)));
+                    code.AddConstant(new Unit(p_string));
 
                 return constants.Count - 1;
             }

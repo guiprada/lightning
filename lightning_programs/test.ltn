@@ -634,12 +634,14 @@ var global_lock_test_counter = 5
     // Testing inline Intrinsics
     var intr_sum =
     '
+        using Number = System.Double;
         using System;
-        (vm) =>{
-            ValNumber opA = vm.StackPeek(0) as ValNumber;
-            ValNumber opB = vm.StackPeek(1) as ValNumber;
 
-            return new ValNumber(opA.content + opB.content);
+        (vm) =>{
+            Number opA = vm.GetNumber(0);
+            Number opB = vm.GetNumber(1);
+
+            return new Unit(opA + opB);
         }
     '
     if (intrinsic.create != null){
