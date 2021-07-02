@@ -56,6 +56,7 @@ namespace lightning
 
         int Env{ get{ return variables.Env; } }
 
+//////////////////////////////////////////////////// Public
         public VM(Chunk p_chunk, int p_function_deepness = 100, Memory<Unit> p_globals = null, bool p_parallelVM = false)
         {
             chunk = p_chunk;
@@ -90,18 +91,6 @@ namespace lightning
             modules = new List<ModuleUnit>();
 
             vmPool = new Stack<VM>();
-        }
-
-        ModuleUnit GetModule(string p_module_name){
-            return modules[loadedModules[p_module_name]];
-        }
-
-        Operand CalculateEnvShift(Operand n_shift){
-            return (Operand)(variables.Env - n_shift);
-        }
-
-        Operand CalculateEnvShiftUpVal(Operand env){
-            return (Operand)(variables.Env + 1 - env);
         }
 
         public void ResoursesTrim(){
@@ -158,6 +147,81 @@ namespace lightning
             return globals.Get(address);
         }
 
+//////////////////////////// Accessors
+        public Unit GetUnit(int n){
+            return stack.Peek(n);
+        }
+        public string GetString(int n){
+            return ((StringUnit)(stack.Peek(n).heapUnitValue)).content;
+        }
+        public Number GetNumber(int n){
+            return stack.Peek(n).unitValue;
+        }
+        public TableUnit GetTable(int n){
+            return (TableUnit)(stack.Peek(n).heapUnitValue);
+        }
+
+        public T GetWrapperUnit<T>(int n){
+            return ((WrapperUnit<T>)(stack.Peek(n).heapUnitValue)).UnWrapp();
+        }
+
+//////////////////////////// End Accessors
+        public Unit CallFunction(Unit this_callable, List<Unit> args)
+        {
+            if (args != null)
+                for (int i = args.Count - 1; i >= 0; i--)
+                    stack.Push(args[i]);
+
+            Type this_type = this_callable.HeapUnitType();
+
+            instructions.PushRET((Operand)(chunk.ProgramSize - 1));
+            if (this_type == typeof(FunctionUnit))
+            {
+                FunctionUnit this_func = (FunctionUnit)(this_callable.heapUnitValue);
+                instructions.PushFunction(this_func, Env, out instructionsCache);
+
+                IP = 0;
+            }
+            else if (this_type == typeof(ClosureUnit))
+            {
+                ClosureUnit this_closure = (ClosureUnit)(this_callable.heapUnitValue);
+
+                upValues.PushEnv();
+
+                foreach (UpValueUnit u in this_closure.upValues)
+                {
+                    upValues.Add(u);
+                }
+                instructions.PushFunction(this_closure.function, Env, out instructionsCache);
+
+                IP = 0;
+            }
+            else if (this_type == typeof(IntrinsicUnit))
+            {
+                IntrinsicUnit this_intrinsic = (IntrinsicUnit)(this_callable.heapUnitValue);
+                Unit intrinsic_result = this_intrinsic.function(this);
+                stack.top -= this_intrinsic.arity;
+                stack.Push(intrinsic_result);
+            }
+            VMResult result = Run();
+            if (result.status == VMResultType.OK)
+                return result.value;
+            return new Unit(UnitType.Null);
+        }
+//////////////////////////////////////////////////// End Public
+
+        ModuleUnit GetModule(string p_module_name){
+            return modules[loadedModules[p_module_name]];
+        }
+
+        Operand CalculateEnvShift(Operand n_shift){
+            return (Operand)(variables.Env - n_shift);
+        }
+
+        Operand CalculateEnvShiftUpVal(Operand env){
+            return (Operand)(variables.Env + 1 - env);
+        }
+
         void RegisterUpValue(UpValueUnit u)
         {
             upValuesRegistry.Add(u);
@@ -203,49 +267,6 @@ namespace lightning
             }
         }
 
-        public Unit CallFunction(Unit this_callable, List<Unit> args)
-        {
-            if (args != null)
-                for (int i = args.Count - 1; i >= 0; i--)
-                    stack.Push(args[i]);
-
-            Type this_type = this_callable.HeapUnitType();
-
-            instructions.PushRET((Operand)(chunk.ProgramSize - 1));
-            if (this_type == typeof(FunctionUnit))
-            {
-                FunctionUnit this_func = (FunctionUnit)(this_callable.heapUnitValue);
-                instructions.PushFunction(this_func, Env, out instructionsCache);
-
-                IP = 0;
-            }
-            else if (this_type == typeof(ClosureUnit))
-            {
-                ClosureUnit this_closure = (ClosureUnit)(this_callable.heapUnitValue);
-
-                upValues.PushEnv();
-
-                foreach (UpValueUnit u in this_closure.upValues)
-                {
-                    upValues.Add(u);
-                }
-                instructions.PushFunction(this_closure.function, Env, out instructionsCache);
-
-                IP = 0;
-            }
-            else if (this_type == typeof(IntrinsicUnit))
-            {
-                IntrinsicUnit this_intrinsic = (IntrinsicUnit)(this_callable.heapUnitValue);
-                Unit intrinsic_result = this_intrinsic.function(this);
-                stack.top -= this_intrinsic.arity;
-                stack.Push(intrinsic_result);
-            }
-            VMResult result = Run();
-            if (result.status == VMResultType.OK)
-                return result.value;
-            return new Unit("null");
-        }
-
         public VMResult Run()
         {
             Instruction instruction;
@@ -262,7 +283,7 @@ namespace lightning
                             Unit value = stack.Pop();
                             break;
                         }
-                    case OpCode.LOADC:
+                    case OpCode.LOAD_CONSTANT:
                         {
                             IP++;
                             Operand address = instruction.opA;
@@ -270,7 +291,7 @@ namespace lightning
                             stack.Push(constant);
                             break;
                         }
-                    case OpCode.LOADV:
+                    case OpCode.LOAD_VARIABLE:
                         {
                             IP++;
                             Operand address = instruction.opA;
@@ -279,7 +300,7 @@ namespace lightning
                             stack.Push(variable);
                             break;
                         }
-                    case OpCode.LOADG:
+                    case OpCode.LOAD_GLOBAL:
                         {
                             IP++;
                             Operand address = instruction.opA;
@@ -288,7 +309,7 @@ namespace lightning
                             stack.Push(global);
                             break;
                         }
-                    case OpCode.LOADGI:
+                    case OpCode.LOAD_IMPORTED_GLOBAL:
                         {
                             IP++;
                             Operand address = instruction.opA;
@@ -297,7 +318,7 @@ namespace lightning
                             stack.Push(global);
                             break;
                         }
-                    case OpCode.LOADCI:
+                    case OpCode.LOAD_IMPORTED_CONSTANT:
                         {
                             IP++;
                             Operand address = instruction.opA;
@@ -307,7 +328,7 @@ namespace lightning
                             stack.Push(constant);
                             break;
                         }
-                    case OpCode.LOADUPVAL:
+                    case OpCode.LOAD_UPVALUE:
                         {
                             IP++;
                             Operand address = instruction.opA;
@@ -315,39 +336,39 @@ namespace lightning
                             stack.Push(up_val.UpValue);
                             break;
                         }
-                    case OpCode.LOADNIL:
+                    case OpCode.LOAD_NIL:
                         {
                             IP++;
-                            stack.Push(new Unit("null"));
+                            stack.Push(new Unit(UnitType.Null));
                             break;
                         }
-                    case OpCode.LOADTRUE:
+                    case OpCode.LOAD_TRUE:
                         {
                             IP++;
                             stack.Push(new Unit(true));
                             break;
                         }
-                    case OpCode.LOADFALSE:
+                    case OpCode.LOAD_FALSE:
                         {
                             IP++;
                             stack.Push(new Unit(false));
                             break;
                         }
-                    case OpCode.LOADINTR:
+                    case OpCode.LOAD_INTRINSIC:
                         {
                             IP++;
                             Operand value = instruction.opA;
                             stack.Push(new Unit(Intrinsics[value]));
                             break;
                         }
-                    case OpCode.VARDCL:
+                    case OpCode.DECLARE_VARIABLE:
                         {
                             IP++;
                             Unit new_value = stack.Pop();
                             variables.Add(new_value);
                             break;
                         }
-                    case OpCode.GLOBALDCL:
+                    case OpCode.DECLARE_GLOBAL:
                         {
                             IP++;
                             Unit new_value = stack.Pop();
@@ -355,7 +376,7 @@ namespace lightning
 
                             break;
                         }
-                    case OpCode.FUNDCL:
+                    case OpCode.DECLARE_FUNCTION:
                         {
                             IP++;
                             Operand env = instruction.opA;
@@ -410,7 +431,7 @@ namespace lightning
                             }
                             break;
                         }
-                    case OpCode.ASSIGN:
+                    case OpCode.ASSIGN_VARIABLE:
                         {
                             IP++;
                             Operand address = instruction.opA;
@@ -437,7 +458,7 @@ namespace lightning
                             }
                             break;
                         }
-                    case OpCode.ASSIGNG:
+                    case OpCode.ASSIGN_GLOBAL:
                         {
                             IP++;
                             Operand address = instruction.opA;
@@ -490,7 +511,7 @@ namespace lightning
                             }
                             break;
                         }
-                    case OpCode.ASSIGNUPVAL:
+                    case OpCode.ASSIGN_UPVALUE:
                         {
                             IP++;
                             Operand address = instruction.opA;
@@ -537,7 +558,7 @@ namespace lightning
                             }
                             break;
                         }
-                    case OpCode.TABLEGET:
+                    case OpCode.TABLE_GET:
                         {
                             IP++;
                             Operand indexes_counter = instruction.opA;
@@ -562,7 +583,7 @@ namespace lightning
                             break;
                         }
 
-                    case OpCode.TABLESET:
+                    case OpCode.TABLE_SET:
                         {
                             IP++;
                             Operand indexes_counter = instruction.opA;
@@ -632,13 +653,13 @@ namespace lightning
                             }
                             break;
                         }
-                    case OpCode.JMP:
+                    case OpCode.JUMP:
                         {
                             Operand value = instruction.opA;
                             IP += value;
                             break;
                         }
-                    case OpCode.JNT:
+                    case OpCode.JUMP_IF_NOT_TRUE:
                         {
                             bool value = stack.Pop().ToBool();
                             if (value == false)
@@ -651,30 +672,30 @@ namespace lightning
                             }
                             break;
                         }
-                    case OpCode.JMPB:
+                    case OpCode.JUMP_BACK:
                         {
                             Operand value = instruction.opA;
                             IP -= value;
                             break;
                         }
-                    case OpCode.NENV:
+                    case OpCode.OPEN_ENV:
                         {
                             IP++;
                             EnvPush();
                             break;
                         }
-                    case OpCode.CENV:
+                    case OpCode.CLOSE_ENV:
                         {
                             IP++;
                             EnvPop();
                             break;
                         }
-                    case OpCode.RET:
+                    case OpCode.RETURN:
                         {
                             IP = instructions.PopRET();
                             break;
                         }
-                    case OpCode.SETRET:
+                    case OpCode.RETURN_SET:
                         {
                             Operand value = instruction.opA;
                             instructions.PushRET((Operand)(value + IP));
@@ -693,19 +714,19 @@ namespace lightning
 
                             break;
                         }
-                    case OpCode.APP:
+                    case OpCode.APPEND:
                         {
                             IP++;
                             Unit opB = stack.Pop();
                             Unit opA = stack.Pop();
 
                             string result = opA.ToString() + opB.ToString();
-                            Unit new_value = new Unit(new StringUnit(result));
+                            Unit new_value = new Unit(result);
                             stack.Push(new_value);
 
                             break;
                         }
-                    case OpCode.SUB:
+                    case OpCode.SUBTRACT:
                         {
                             IP++;
                             Number opB = stack.Pop().unitValue;
@@ -716,7 +737,7 @@ namespace lightning
 
                             break;
                         }
-                    case OpCode.MUL:
+                    case OpCode.MULTIPLY:
                         {
                             IP++;
                             Number opB = stack.Pop().unitValue;
@@ -727,7 +748,7 @@ namespace lightning
 
                             break;
                         }
-                    case OpCode.DIV:
+                    case OpCode.DIVIDE:
                         {
                             IP++;
                             Number opB = stack.Pop().unitValue;
@@ -738,7 +759,7 @@ namespace lightning
 
                             break;
                         }
-                    case OpCode.NEG:
+                    case OpCode.NEGATE:
                         {
                             IP++;
                             Number opA = stack.Pop().unitValue;
@@ -746,7 +767,7 @@ namespace lightning
                             stack.Push(new_value);
                             break;
                         }
-                    case OpCode.INC:
+                    case OpCode.INCREMENT:
                         {
                             IP++;
                             Number opA = stack.Pop().unitValue;
@@ -754,7 +775,7 @@ namespace lightning
                             stack.Push(new_value);
                             break;
                         }
-                    case OpCode.DEC:
+                    case OpCode.DECREMENT:
                         {
                             IP++;
                             Number opA = stack.Pop().unitValue;
@@ -762,7 +783,7 @@ namespace lightning
                             stack.Push(new_value);
                             break;
                         }
-                    case OpCode.EQ:
+                    case OpCode.EQUALS:
                         {
                             IP++;
                             Unit opB = stack.Pop();
@@ -778,7 +799,7 @@ namespace lightning
 
                             break;
                         }
-                    case OpCode.NEQ:
+                    case OpCode.NOT_EQUALS:
                         {
                             IP++;
                             Unit opB = stack.Pop();
@@ -795,7 +816,7 @@ namespace lightning
 
                             break;
                         }
-                    case OpCode.GTQ:
+                    case OpCode.GREATER_EQUALS:
                         {
                             IP++;
                             Number opB = stack.Pop().unitValue;
@@ -811,7 +832,7 @@ namespace lightning
                             }
                             break;
                         }
-                    case OpCode.LTQ:
+                    case OpCode.LESS_EQUALS:
                         {
                             IP++;
                             Number opB = stack.Pop().unitValue;
@@ -827,7 +848,7 @@ namespace lightning
                             }
                             break;
                         }
-                    case OpCode.GT:
+                    case OpCode.GREATER:
                         {
                             IP++;
                             Number opB = stack.Pop().unitValue;
@@ -843,7 +864,7 @@ namespace lightning
                             }
                             break;
                         }
-                    case OpCode.LT:
+                    case OpCode.LESS:
                         {
                             IP++;
                             Number opB = stack.Pop().unitValue;
@@ -870,7 +891,7 @@ namespace lightning
                             else
                             {
                                 Error("NOT is insane!");
-                                return new VMResult(VMResultType.ERROR, new Unit("null"));
+                                return new VMResult(VMResultType.ERROR, new Unit(UnitType.Null));
                             }
 
                             break;
@@ -972,7 +993,7 @@ namespace lightning
                             }
                             break;
                         }
-                    case OpCode.CLOSURECLOSE:
+                    case OpCode.CLOSE_CLOSURE:
                         {
                             upValues.PopEnv();
 
@@ -982,7 +1003,7 @@ namespace lightning
 
                             break;
                         }
-                    case OpCode.FUNCLOSE:
+                    case OpCode.CLOSE_FUNCTION:
                         {
                             int target_env = instructions.TargetEnv;
                             EnvSet(target_env);
@@ -990,7 +1011,7 @@ namespace lightning
 
                             break;
                         }
-                    case OpCode.NTABLE:
+                    case OpCode.NEW_TABLE:
                         {
                             IP++;
 
@@ -1060,17 +1081,17 @@ namespace lightning
                                     Error("Trying to call a " + this_callable.HeapUnitType());
                                 else
                                     Error("Trying to call a " + this_callable.type);
-                                return new VMResult(VMResultType.OK, new Unit("null"));
+                                return new VMResult(VMResultType.OK, new Unit(UnitType.Null));
                             }
                             break;
                         }
-                    case OpCode.PUSHSTASH:
+                    case OpCode.PUSH_STASH:
                         {
                             IP++;
                             stack.PushStash();
                             break;
                         }
-                    case OpCode.POPSTASH:
+                    case OpCode.POP_STASH:
                         {
                             IP++;
                             stack.PopStash();
@@ -1078,14 +1099,14 @@ namespace lightning
                         }
                     case OpCode.EXIT:
                         {
-                            Unit result = new Unit("null");
+                            Unit result = new Unit(UnitType.Null);
                             if (stack.top > 0)
                                 result = stack.Pop();
                             return new VMResult(VMResultType.OK, result);
                         }
                     default:
                         Error("Unkown OpCode: " + instruction.opCode);
-                        return new VMResult(VMResultType.ERROR, new Unit("null"));
+                        return new VMResult(VMResultType.ERROR, new Unit(UnitType.Null));
                 }
             }
         }

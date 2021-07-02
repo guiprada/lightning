@@ -51,10 +51,10 @@ namespace lightning
                     PrintVarDeclaration(p_node as VarDeclarationNode);
                     break;
                 case NodeType.ASSIGMENT:
-                    PrintAssignment(p_node as AssignmentNode);
+                    PrintASSIGN_VARIABLEment(p_node as ASSIGN_VARIABLEmentNode);
                     break;
                 case NodeType.ASSIGMENTOP:
-                    PrintAssignmentOp(p_node as AssignmentOpNode);
+                    PrintASSIGN_VARIABLEmentOp(p_node as ASSIGN_VARIABLEmentOpNode);
                     break;
                 case NodeType.LOGICAL:
                     PrintLogical(p_node as LogicalNode);
@@ -328,16 +328,16 @@ namespace lightning
             Console.WriteLine("]");
         }
 
-        public void PrintAssignment(AssignmentNode p_node)
+        public void PrintASSIGN_VARIABLEment(ASSIGN_VARIABLEmentNode p_node)
         {
-            Console.Write("[ASSIGMENT " + p_node.Assigned.Name + " = ");
+            Console.Write("[ASSIGMENT " + p_node.ASSIGN_VARIABLEed.Name + " = ");
             Print(p_node.Value);
             Console.Write("]");
         }
 
-        public void PrintAssignmentOp(AssignmentOpNode p_node)
+        public void PrintASSIGN_VARIABLEmentOp(ASSIGN_VARIABLEmentOpNode p_node)
         {
-            Console.Write("[ASSIGMENTOP " + p_node.Assigned.Name);
+            Console.Write("[ASSIGMENTOP " + p_node.ASSIGN_VARIABLEed.Name);
             string op;
             switch (p_node.Op) {
                 case OperatorType.PLUS:

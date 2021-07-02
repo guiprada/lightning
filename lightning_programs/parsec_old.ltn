@@ -1,6 +1,6 @@
 var lib = []
 
-lib.make_string = intrinsic("make_string_parser", 1, 
+lib.make_string = intrinsic("make_string_parser", 1,
 '   (vm) =>
     {
         ValString val_match_string = vm.StackPeek(0) as ValString;
@@ -59,7 +59,7 @@ lib.digit = intrinsic("digit_parser", 1,
     }
 ')
 
-lib.alpha = intrinsic("alpha_parser", 1, 
+lib.alpha = intrinsic("alpha_parser", 1,
 '   (vm) =>
     {
         ValString val_input_string = vm.StackPeek(0) as ValString;
@@ -85,7 +85,7 @@ lib.alpha = intrinsic("alpha_parser", 1,
     }
 ')
 
-lib.Or = intrinsic("or_combinator", 2, 
+lib.Or = intrinsic("or_combinator", 2,
 '   (vm) =>
     {
         ValIntrinsic parser1 = vm.StackPeek(0) as ValIntrinsic;

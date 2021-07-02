@@ -477,16 +477,16 @@ function clear_errors()
     assert(math.mod(7,3), 1, "Failed Math test 1.")
 }
 {
-    // Testing assign ops
+    // Testing ASSIGN_VARIABLE ops
     var i = 0
     i+=1
-    assert(i, 1, "Failed Assign Ops Test 1.")
+    assert(i, 1, "Failed ASSIGN_VARIABLE Ops Test 1.")
     i*=10
-    assert(i, 10, "Failed Assign Ops Test 2.")
+    assert(i, 10, "Failed ASSIGN_VARIABLE Ops Test 2.")
     i/=2
-    assert(i, 5, "Failed Assign Ops Test 3.")
+    assert(i, 5, "Failed ASSIGN_VARIABLE Ops Test 3.")
     i-=10
-    assert(i, -5, "Failed Assign Ops Test 4.")
+    assert(i, -5, "Failed ASSIGN_VARIABLE Ops Test 4.")
 }
 {
     // Testing range
@@ -604,7 +604,7 @@ var global_lock_test_counter = 5
     var j1 = --j
     assert(j1, 0, "Failed Increment Test 1.")
     j = 2
-    j1 = j+=1 // chained assignment op works weird, this is equivalent to j1 = .. = 1
+    j1 = j+=1 // chained ASSIGN_VARIABLEment op works weird, this is equivalent to j1 = .. = 1
     assert(j1, 1, "Failed Increment Test 2.")
     var j2 = 0
     j2++
@@ -634,12 +634,14 @@ var global_lock_test_counter = 5
     // Testing inline Intrinsics
     var intr_sum =
     '
+        using Number = System.Double;
         using System;
-        (vm) =>{
-            ValNumber opA = vm.StackPeek(0) as ValNumber;
-            ValNumber opB = vm.StackPeek(1) as ValNumber;
 
-            return new ValNumber(opA.content + opB.content);
+        (vm) =>{
+            Number opA = vm.GetNumber(0);
+            Number opB = vm.GetNumber(1);
+
+            return new Unit(opA + opB);
         }
     '
     if (intrinsic.create != null){

@@ -251,7 +251,7 @@ namespace lightning
             env = p_env;
             isCaptured = false;
             variables = null;
-            value = new Unit("null");
+            value = new Unit(UnitType.Null);
         }
 
         public void Attach(Memory<Unit> p_variables)
@@ -333,11 +333,46 @@ namespace lightning
             table[index] = value;
         }
 
+        public void TableSet(string index, Unit value)
+        {
+            table[new StringUnit(index)] = value;
+        }
+
+        public void TableSet(StringUnit index, Number value)
+        {
+            table[index] = new Unit(value);
+        }
+
+        public void TableSet(string index, Number value)
+        {
+            table[new StringUnit(index)] = new Unit(value);
+        }
+
+        public void TableSet(StringUnit index, HeapUnit value)
+        {
+            table[index] = new Unit(value);
+        }
+
+        public void TableSet(string index, HeapUnit value)
+        {
+            table[new StringUnit(index)] = new Unit(value);
+        }
+
+        public void TableSet(StringUnit index, bool value)
+        {
+            table[index] = new Unit(value);
+        }
+
+        public void TableSet(string index, bool value)
+        {
+            table[new StringUnit(index)] = new Unit(value);
+        }
+
         void ElementsStretch(int n)
         {
             for (int i = 0; i < n; i++)
             {
-                elements.Add(new Unit("null"));
+                elements.Add(new Unit(UnitType.Null));
             }
         }
 

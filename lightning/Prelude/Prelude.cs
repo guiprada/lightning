@@ -13,7 +13,7 @@ using Microsoft.CodeAnalysis.CSharp.Scripting;
 #if DOUBLE
     using Number = System.Double;
 #else
-using Number = System.Single;
+    using Number = System.Single;
 #endif
 
 namespace lightning
@@ -58,16 +58,16 @@ namespace lightning
 
                 Unit memoryUse(VM vm){
                     TableUnit mem_use = new TableUnit(null, null);
-                    mem_use.TableSet(new StringUnit("stack_count"), new Unit(vm.StackCount()));
-                    mem_use.TableSet(new StringUnit("globals_count"), new Unit(vm.GlobalsCount()));
-                    mem_use.TableSet(new StringUnit("variables_count"), new Unit(vm.VariablesCount()));
-                    mem_use.TableSet(new StringUnit("variables_capacity"), new Unit(vm.VariablesCapacity()));
-                    mem_use.TableSet(new StringUnit("upvalues_count"), new Unit(vm.UpValuesCount()));
-                    mem_use.TableSet(new StringUnit("upvalue_capacity"), new Unit(vm.UpValueCapacity()));
+                    mem_use.TableSet("stack_count", vm.StackCount());
+                    mem_use.TableSet("globals_count", vm.GlobalsCount());
+                    mem_use.TableSet("variables_count", vm.VariablesCount());
+                    mem_use.TableSet("variables_capacity", vm.VariablesCapacity());
+                    mem_use.TableSet("upvalues_count", vm.UpValuesCount());
+                    mem_use.TableSet("upvalue_capacity", vm.UpValueCapacity());
 
                     return new Unit(mem_use);
                 }
-                machine.TableSet(new StringUnit("memory_use"), new Unit(new IntrinsicUnit("memory_use", memoryUse, 0)));
+                machine.TableSet("memory_use", new IntrinsicUnit("memory_use", memoryUse, 0));
 
                 tables.Add("machine", machine);
             }
@@ -78,10 +78,9 @@ namespace lightning
 #if ROSLYN
                 Unit createIntrinsic(VM vm)
                 {
-                    StringUnit name = (StringUnit)vm.stack.Peek(0).value;
-                    Number arity = vm.stack.Peek(1).number;
-                    StringUnit val_body = (StringUnit)vm.stack.Peek(2).value;
-                    string body = val_body.ToString();
+                    string name = vm.GetString(0);
+                    Number arity = vm.GetNumber(1);
+                    string body = vm.GetString(2);
 
                     var options = ScriptOptions.Default.AddReferences(
                         typeof(Unit).Assembly,
@@ -89,11 +88,11 @@ namespace lightning
                     Func<VM, Unit> new_intrinsic = CSharpScript.EvaluateAsync<Func<VM, Unit>>(body, options)
                         .GetAwaiter().GetResult();
 
-                    return new Unit(new IntrinsicUnit(name.ToString(), new_intrinsic, (int)arity));
+                    return new Unit(new IntrinsicUnit(name, new_intrinsic, (int)arity));
                 }
-                intrinsic.TableSet(new StringUnit("create"), new Unit(new IntrinsicUnit("create", createIntrinsic, 3)));
+                intrinsic.TableSet("create", new IntrinsicUnit("create", createIntrinsic, 3));
 #else
-                intrinsic.TableSet(new StringUnit("create"), new Unit("null"));
+                intrinsic.TableSet("create", new Unit(UnitType.Null));
 #endif
                 tables.Add("intrinsic", intrinsic);
             }
@@ -107,16 +106,16 @@ namespace lightning
 
                 Unit nextInt(VM vm)
                 {
-                    int max = (int)(vm.stack.Peek(0)).unitValue;
+                    int max = (int)(vm.GetNumber(0));
                     return new Unit(rng.Next(max + 1));
                 }
-                rand.TableSet(new StringUnit("int"), new Unit(new IntrinsicUnit("int", nextInt, 1)));
+                rand.TableSet("int", new IntrinsicUnit("int", nextInt, 1));
 
                 Unit nextFloat(VM vm)
                 {
                     return new Unit((Number)rng.NextDouble());
                 }
-                rand.TableSet(new StringUnit("float"), new Unit(new IntrinsicUnit("float", nextFloat, 0)));
+                rand.TableSet("float", new IntrinsicUnit("float", nextFloat, 0));
 
                 tables.Add("rand", rand);
             }
@@ -129,29 +128,29 @@ namespace lightning
 
                 Unit listPush(VM vm)
                 {
-                    TableUnit list = (TableUnit)vm.stack.Peek(0).heapUnitValue;
-                    Unit value = vm.stack.Peek(1);
+                    TableUnit list = vm.GetTable(0);
+                    Unit value = vm.GetUnit(1);
                     list.elements.Add(value);
 
-                    return new Unit("null");
+                    return new Unit(UnitType.Null);
                 }
-                list.TableSet(new StringUnit("push"), new Unit(new IntrinsicUnit("push", listPush, 2)));
+                list.TableSet("push", new IntrinsicUnit("push", listPush, 2));
 
                 //////////////////////////////////////////////////////
                 Unit listPop(VM vm)
                 {
-                    TableUnit list = (TableUnit)vm.stack.Peek(0).heapUnitValue;
+                    TableUnit list = vm.GetTable(0);
                     Number value = list.elements[^1].unitValue;
                     list.elements.RemoveRange(list.elements.Count - 1, 1);
 
                     return new Unit(value);
                 }
-                list.TableSet(new StringUnit("pop"), new Unit(new IntrinsicUnit("pop", listPop, 1)));
+                list.TableSet("pop", new IntrinsicUnit("pop", listPop, 1));
 
                 //////////////////////////////////////////////////////
                 Unit listToString(VM vm)
                 {
-                    TableUnit this_table = (TableUnit)vm.stack.Peek(0).heapUnitValue;
+                    TableUnit this_table = vm.GetTable(0);
                     bool first = true;
                     string value = "";
                     foreach (Unit v in this_table.elements)
@@ -166,44 +165,44 @@ namespace lightning
                             value += ", " + System.Text.RegularExpressions.Regex.Unescape(v.ToString());
                         }
                     }
-                    return new Unit(new StringUnit(value));
+                    return new Unit(value);
                 }
-                list.TableSet(new StringUnit("to_string"), new Unit(new IntrinsicUnit("to_string", listToString, 1)));
+                list.TableSet("to_string", new IntrinsicUnit("to_string", listToString, 1));
 
                 ////////////////////////////////////////////////////
                 Unit listCount(VM vm)
                 {
-                    TableUnit this_table = (TableUnit)vm.stack.Peek(0).heapUnitValue;
+                    TableUnit this_table = vm.GetTable(0);
                     int count = this_table.ECount;
                     return new Unit(count);
                 }
-                list.TableSet(new StringUnit("count"), new Unit(new IntrinsicUnit("count", listCount, 1)));
+                list.TableSet("count", new IntrinsicUnit("count", listCount, 1));
 
                 //////////////////////////////////////////////////////
                 Unit listClear(VM vm)
                 {
-                    TableUnit list = (TableUnit)vm.stack.Peek(0).heapUnitValue;
+                    TableUnit list = vm.GetTable(0);
                     list.elements.Clear();
-                    return new Unit("null");
+                    return new Unit(UnitType.Null);
                 }
-                list.TableSet(new StringUnit("clear"), new Unit(new IntrinsicUnit("clear", listClear, 1)));
+                list.TableSet("clear", new IntrinsicUnit("clear", listClear, 1));
 
                 //////////////////////////////////////////////////////
                 Unit listRemoveRange(VM vm)
                 {
-                    TableUnit list = (TableUnit)vm.stack.Peek(0).heapUnitValue;
-                    int range_init = (int)vm.stack.Peek(1).unitValue;
-                    int range_end = (int)vm.stack.Peek(2).unitValue;
+                    TableUnit list = vm.GetTable(0);
+                    int range_init = (int)vm.GetNumber(1);
+                    int range_end = (int)vm.GetNumber(2);
                     list.elements.RemoveRange(range_init, range_end - range_init + 1);
 
-                    return new Unit("null");
+                    return new Unit(UnitType.Null);
                 }
-                list.TableSet(new StringUnit("remove"), new Unit(new IntrinsicUnit("remove", listRemoveRange, 3)));
+                list.TableSet("remove", new IntrinsicUnit("remove", listRemoveRange, 3));
 
                 //////////////////////////////////////////////////////
                 Unit listCopy(VM vm)
                 {
-                    TableUnit list = (TableUnit)vm.stack.Peek(0).heapUnitValue;
+                    TableUnit list = vm.GetTable(0);
                     List<Unit> new_list_elements = new List<Unit>();
                     foreach (Unit v in list.elements)
                     {
@@ -213,27 +212,27 @@ namespace lightning
 
                     return new Unit(new_list);
                 }
-                list.TableSet(new StringUnit("copy"), new Unit(new IntrinsicUnit("copy", listCopy, 1)));
+                list.TableSet("copy", new IntrinsicUnit("copy", listCopy, 1));
 
                 //////////////////////////////////////////////////////
                 Unit listSplit(VM vm)
                 {
-                    TableUnit list = (TableUnit)vm.stack.Peek(0).heapUnitValue;
-                    int range_init = (int)vm.stack.Peek(1).unitValue;
+                    TableUnit list = vm.GetTable(0);
+                    int range_init = (int)vm.GetNumber(1);
                     List<Unit> new_list_elements = list.elements.GetRange(range_init, list.elements.Count - range_init);
                     list.elements.RemoveRange(range_init, list.elements.Count - range_init);
                     TableUnit new_list = new TableUnit(new_list_elements, null);
 
                     return new Unit(new_list);
                 }
-                list.TableSet(new StringUnit("split"), new Unit(new IntrinsicUnit("split", listSplit, 2)));
+                list.TableSet("split", new IntrinsicUnit("split", listSplit, 2));
 
                 //////////////////////////////////////////////////////
                 Unit listSlice(VM vm)
                 {
-                    TableUnit list = (TableUnit)vm.stack.Peek(0).heapUnitValue;
-                    int range_init = (int)vm.stack.Peek(1).unitValue;
-                    int range_end = (int)vm.stack.Peek(2).unitValue;
+                    TableUnit list = vm.GetTable(0);
+                    int range_init = (int)vm.GetNumber(1);
+                    int range_end = (int)vm.GetNumber(2);
 
                     List<Unit> new_list_elements = list.elements.GetRange(range_init, range_end - range_init + 1);
                     list.elements.RemoveRange(range_init, range_end - range_init + 1);
@@ -241,22 +240,22 @@ namespace lightning
 
                     return new Unit(new_list);
                 }
-                list.TableSet(new StringUnit("slice"), new Unit(new IntrinsicUnit("slice", listSlice, 3)));
+                list.TableSet("slice", new IntrinsicUnit("slice", listSlice, 3));
                 //////////////////////////////////////////////////////
                 Unit listReverse(VM vm)
                 {
-                    TableUnit list = (TableUnit)vm.stack.Peek(0).heapUnitValue;
+                    TableUnit list = vm.GetTable(0);
                     list.elements.Reverse();
 
-                    return new Unit("null");
+                    return new Unit(UnitType.Null);
                 }
-                list.TableSet(new StringUnit("reverse"), new Unit(new IntrinsicUnit("reverse", listReverse, 1)));
+                list.TableSet("reverse", new IntrinsicUnit("reverse", listReverse, 1));
 
                 //////////////////////////////////////////////////////
 
                 Unit makeIndexesIterator(VM vm)
                 {
-                    TableUnit this_table = (TableUnit)vm.stack.Peek(0).heapUnitValue;
+                    TableUnit this_table = vm.GetTable(0);
                     int i = -1;
                     StringUnit value_string = new StringUnit("value");
                     StringUnit key_string = new StringUnit("key");
@@ -273,18 +272,18 @@ namespace lightning
                         }
                         return new Unit(false);
                     };
-                    iterator.TableSet(new StringUnit("next"), new Unit(new IntrinsicUnit("iterator_next", next, 0)));
+                    iterator.TableSet("next", new IntrinsicUnit("iterator_next", next, 0));
                     return new Unit(iterator);
                 }
-                list.TableSet(new StringUnit("index_iterator"), new Unit(new IntrinsicUnit("list_index_iterator", makeIndexesIterator, 1)));
+                list.TableSet("index_iterator", new IntrinsicUnit("list_index_iterator", makeIndexesIterator, 1));
 
                 //////////////////////////////////////////////////////
 
                 Unit makeIterator(VM vm)
                 {
-                    TableUnit this_table = (TableUnit)vm.stack.Peek(0).heapUnitValue;
+                    TableUnit this_table = vm.GetTable(0);
                     int i = -1;
-                    Unit value = new Unit("null");
+                    Unit value = new Unit(UnitType.Null);
                     StringUnit value_string = new StringUnit("value");
 
                     TableUnit iterator = new TableUnit(null, null);
@@ -298,10 +297,10 @@ namespace lightning
                         }
                         return new Unit(false);
                     };
-                    iterator.TableSet(new StringUnit("next"), new Unit(new IntrinsicUnit("iterator_next", next, 0)));
+                    iterator.TableSet("next", new IntrinsicUnit("iterator_next", next, 0));
                     return new Unit(iterator);
                 }
-                list.TableSet(new StringUnit("iterator"), new Unit(new IntrinsicUnit("list_iterator", makeIterator, 1)));
+                list.TableSet("iterator", new IntrinsicUnit("list_iterator", makeIterator, 1));
 
                 //////////////////////////////////////////////////////
 
@@ -317,16 +316,16 @@ namespace lightning
                 //////////////////////////////////////////////////////
                 Unit tableCount(VM vm)
                 {
-                    TableUnit this_table = (TableUnit)vm.stack.Peek(0).heapUnitValue;
+                    TableUnit this_table = vm.GetTable(0);
                     int count = this_table.TCount;
                     return new Unit(count);
                 }
-                table.TableSet(new StringUnit("count"), new Unit(new IntrinsicUnit("table_count", tableCount, 1)));
+                table.TableSet("count", new IntrinsicUnit("table_count", tableCount, 1));
 
                 //////////////////////////////////////////////////////
                 Unit tableIndexes(VM vm)
                 {
-                    TableUnit this_table = (TableUnit)vm.stack.Peek(0).heapUnitValue;
+                    TableUnit this_table = vm.GetTable(0);
                     TableUnit indexes = new TableUnit(null, null);
 
                     foreach (StringUnit v in this_table.table.Keys)
@@ -336,12 +335,12 @@ namespace lightning
 
                     return new Unit(indexes);
                 }
-                table.TableSet(new StringUnit("indexes"), new Unit(new IntrinsicUnit("indexes", tableIndexes, 1)));
+                table.TableSet("indexes", new IntrinsicUnit("indexes", tableIndexes, 1));
 
                 //////////////////////////////////////////////////////
                 Unit tableCopy(VM vm)
                 {
-                    TableUnit this_table = (TableUnit)vm.stack.Peek(0).heapUnitValue;
+                    TableUnit this_table = vm.GetTable(0);
                     Dictionary<StringUnit, Unit> table_copy = new Dictionary<StringUnit, Unit>();
                     foreach (KeyValuePair<StringUnit, Unit> entry in this_table.table)
                     {
@@ -352,26 +351,26 @@ namespace lightning
 
                     return new Unit(copy);
                 }
-                table.TableSet(new StringUnit("copy"), new Unit(new IntrinsicUnit("copy", tableCopy, 1)));
+                table.TableSet("copy", new IntrinsicUnit("copy", tableCopy, 1));
 
                 //////////////////////////////////////////////////////
                 Unit tableClear(VM vm)
                 {
-                    TableUnit this_table = (TableUnit)vm.stack.Peek(0).heapUnitValue;
-                    return new Unit("null");
+                    TableUnit this_table = vm.GetTable(0);
+                    return new Unit(UnitType.Null);
                 }
-                table.TableSet(new StringUnit("clear"), new Unit(new IntrinsicUnit("clear", tableClear, 1)));
+                table.TableSet("clear", new IntrinsicUnit("clear", tableClear, 1));
 
                 Unit makeIteratorTable(VM vm)
                 {
-                    TableUnit this_table = (TableUnit)vm.stack.Peek(0).heapUnitValue;
+                    TableUnit this_table = vm.GetTable(0);
                     System.Collections.IDictionaryEnumerator enumerator = this_table.table.GetEnumerator();
 
                     StringUnit value_string = new StringUnit("value");
                     StringUnit key_string = new StringUnit("key");
                     TableUnit iterator = new TableUnit(null, null);
-                    iterator.table[key_string] = new Unit("null");
-                    iterator.table[value_string] = new Unit("null");
+                    iterator.table[key_string] = new Unit(UnitType.Null);
+                    iterator.table[value_string] = new Unit(UnitType.Null);
 
                     Unit next(VM vm)
                     {
@@ -384,15 +383,15 @@ namespace lightning
                         return new Unit(false);
                     };
 
-                    iterator.TableSet(new StringUnit("next"), new Unit(new IntrinsicUnit("table_iterator_next", next, 0)));
+                    iterator.TableSet("next", new IntrinsicUnit("table_iterator_next", next, 0));
                     return new Unit(iterator);
                 }
-                table.TableSet(new StringUnit("iterator"), new Unit(new IntrinsicUnit("iterator_table", makeIteratorTable, 1)));
+                table.TableSet("iterator", new IntrinsicUnit("iterator_table", makeIteratorTable, 1));
 
                 //////////////////////////////////////////////////////
                 Unit tableToString(VM vm)
                 {
-                    TableUnit this_table = (TableUnit)vm.stack.Peek(0).heapUnitValue;
+                    TableUnit this_table = vm.GetTable(0);
                     string value = "";
                     bool first = true;
                     foreach (KeyValuePair<StringUnit, Unit> entry in this_table.table)
@@ -412,9 +411,9 @@ namespace lightning
                                 + " : " + System.Text.RegularExpressions.Regex.Unescape(entry.Value.ToString());
                         }
                     }
-                    return new Unit(new StringUnit(value));
+                    return new Unit(value);
                 }
-                table.TableSet(new StringUnit("to_string"), new Unit(new IntrinsicUnit("table_to_string", tableToString, 1)));
+                table.TableSet("to_string", new IntrinsicUnit("table_to_string", tableToString, 1));
 
                 tables.Add("table", table);
             }
@@ -424,173 +423,173 @@ namespace lightning
 
             {
                 TableUnit math = new TableUnit(null, null);
-                math.TableSet(new StringUnit("pi"), new Unit((Number)Math.PI));
-                math.TableSet(new StringUnit("e"), new Unit((Number)Math.E));
+                math.TableSet("pi", (Number)Math.PI);
+                math.TableSet("e", (Number)Math.E);
 #if DOUBLE
-                math.TableSet(new StringUnit("double"), new Unit(true));
+                math.TableSet("double", true);
 #else
-                math.TableSet(new StringUnit("double"), new Unit(false));
+                math.TableSet("double", false);
 #endif
 
                 //////////////////////////////////////////////////////
                 Unit sin(VM vm)
                 {
-                    return new Unit((Number)Math.Sin(vm.stack.Peek(0).unitValue));
+                    return new Unit((Number)Math.Sin(vm.GetNumber(0)));
                 }
-                math.TableSet(new StringUnit("sin"), new Unit(new IntrinsicUnit("sin", sin, 1)));
+                math.TableSet("sin", new IntrinsicUnit("sin", sin, 1));
 
                 //////////////////////////////////////////////////////
                 Unit cos(VM vm)
                 {
-                    return new Unit((Number)Math.Cos(vm.stack.Peek(0).unitValue));
+                    return new Unit((Number)Math.Cos(vm.GetNumber(0)));
                 }
-                math.TableSet(new StringUnit("cos"), new Unit(new IntrinsicUnit("cos", cos, 1)));
+                math.TableSet("cos", new IntrinsicUnit("cos", cos, 1));
 
                 //////////////////////////////////////////////////////
                 Unit tan(VM vm)
                 {
-                    return new Unit((Number)Math.Tan(vm.stack.Peek(0).unitValue));
+                    return new Unit((Number)Math.Tan(vm.GetNumber(0)));
                 }
-                math.TableSet(new StringUnit("tan"), new Unit(new IntrinsicUnit("tan", tan, 1)));
+                math.TableSet("tan", new IntrinsicUnit("tan", tan, 1));
 
                 //////////////////////////////////////////////////////
                 Unit sec(VM vm)
                 {
-                    return new Unit((Number)(1 / Math.Cos(vm.stack.Peek(0).unitValue)));
+                    return new Unit((Number)(1 / Math.Cos(vm.GetNumber(0))));
                 }
-                math.TableSet(new StringUnit("sec"), new Unit(new IntrinsicUnit("sec", sec, 1)));
+                math.TableSet("sec", new IntrinsicUnit("sec", sec, 1));
 
                 //////////////////////////////////////////////////////
                 Unit cosec(VM vm)
                 {
-                    return new Unit((Number)(1 / Math.Sin(vm.stack.Peek(0).unitValue)));
+                    return new Unit((Number)(1 / Math.Sin(vm.GetNumber(0))));
                 }
-                math.TableSet(new StringUnit("cosec"), new Unit(new IntrinsicUnit("cosec", cosec, 1)));
+                math.TableSet("cosec", new IntrinsicUnit("cosec", cosec, 1));
 
                 //////////////////////////////////////////////////////
                 Unit cotan(VM vm)
                 {
-                    return new Unit((Number)(1 / Math.Tan(vm.stack.Peek(0).unitValue)));
+                    return new Unit((Number)(1 / Math.Tan(vm.GetNumber(0))));
                 }
-                math.TableSet(new StringUnit("cotan"), new Unit(new IntrinsicUnit("cotan", cotan, 1)));
+                math.TableSet("cotan", new IntrinsicUnit("cotan", cotan, 1));
 
                 //////////////////////////////////////////////////////
                 Unit asin(VM vm)
                 {
-                    return new Unit((Number)Math.Asin(vm.stack.Peek(0).unitValue));
+                    return new Unit((Number)Math.Asin(vm.GetNumber(0)));
                 }
-                math.TableSet(new StringUnit("asin"), new Unit(new IntrinsicUnit("asin", asin, 1)));
+                math.TableSet("asin", new IntrinsicUnit("asin", asin, 1));
 
                 //////////////////////////////////////////////////////
                 Unit acos(VM vm)
                 {
-                    return new Unit((Number)Math.Acos(vm.stack.Peek(0).unitValue));
+                    return new Unit((Number)Math.Acos(vm.GetNumber(0)));
                 }
-                math.TableSet(new StringUnit("acos"), new Unit(new IntrinsicUnit("acos", acos, 1)));
+                math.TableSet("acos", new IntrinsicUnit("acos", acos, 1));
 
                 //////////////////////////////////////////////////////
                 Unit atan(VM vm)
                 {
-                    return new Unit((Number)Math.Atan(vm.stack.Peek(0).unitValue));
+                    return new Unit((Number)Math.Atan(vm.GetNumber(0)));
                 }
-                math.TableSet(new StringUnit("atan"), new Unit(new IntrinsicUnit("atan", atan, 1)));
+                math.TableSet("atan", new IntrinsicUnit("atan", atan, 1));
 
                 //////////////////////////////////////////////////////
                 Unit sinh(VM vm)
                 {
-                    return new Unit((Number)Math.Sinh(vm.stack.Peek(0).unitValue));
+                    return new Unit((Number)Math.Sinh(vm.GetNumber(0)));
                 }
-                math.TableSet(new StringUnit("sinh"), new Unit(new IntrinsicUnit("sinh", sinh, 1)));
+                math.TableSet("sinh", new IntrinsicUnit("sinh", sinh, 1));
 
                 //////////////////////////////////////////////////////
                 Unit cosh(VM vm)
                 {
-                    return new Unit((Number)Math.Cosh(vm.stack.Peek(0).unitValue));
+                    return new Unit((Number)Math.Cosh(vm.GetNumber(0)));
                 }
-                math.TableSet(new StringUnit("cosh"), new Unit(new IntrinsicUnit("cosh", cosh, 1)));
+                math.TableSet("cosh", new IntrinsicUnit("cosh", cosh, 1));
 
                 //////////////////////////////////////////////////////
                 Unit tanh(VM vm)
                 {
-                    return new Unit((Number)Math.Tanh(vm.stack.Peek(0).unitValue));
+                    return new Unit((Number)Math.Tanh(vm.GetNumber(0)));
                 }
-                math.TableSet(new StringUnit("tanh"), new Unit(new IntrinsicUnit("tanh", tanh, 1)));
+                math.TableSet("tanh", new IntrinsicUnit("tanh", tanh, 1));
 
                 //////////////////////////////////////////////////////
                 Unit pow(VM vm)
                 {
-                    Number value = vm.stack.Peek(0).unitValue;
-                    Number exponent = vm.stack.Peek(1).unitValue;
+                    Number value = vm.GetNumber(0);
+                    Number exponent = vm.GetNumber(1);
                     return new Unit((Number)Math.Pow(value, exponent));
                 }
-                math.TableSet(new StringUnit("pow"), new Unit(new IntrinsicUnit("pow", pow, 2)));
+                math.TableSet("pow", new IntrinsicUnit("pow", pow, 2));
 
                 //////////////////////////////////////////////////////
                 Unit root(VM vm)
                 {
-                    Number value = vm.stack.Peek(0).unitValue;
-                    Number exponent = vm.stack.Peek(1).unitValue;
+                    Number value = vm.GetNumber(0);
+                    Number exponent = vm.GetNumber(1);
                     return new Unit((Number)Math.Pow(value, 1 / exponent));
                 }
-                math.TableSet(new StringUnit("root"), new Unit(new IntrinsicUnit("root", root, 2)));
+                math.TableSet("root", new IntrinsicUnit("root", root, 2));
 
                 //////////////////////////////////////////////////////
                 Unit sqroot(VM vm)
                 {
-                    Number value = vm.stack.Peek(0).unitValue;
+                    Number value = vm.GetNumber(0);
                     return new Unit((Number)Math.Sqrt(value));
                 }
-                math.TableSet(new StringUnit("sqroot"), new Unit(new IntrinsicUnit("sqroot", sqroot, 1)));
+                math.TableSet("sqroot", new IntrinsicUnit("sqroot", sqroot, 1));
                 //////////////////////////////////////////////////////
                 Unit exp(VM vm)
                 {
-                    Number exponent = vm.stack.Peek(0).unitValue;
+                    Number exponent = vm.GetNumber(0);
                     return new Unit((Number)Math.Exp(exponent));
                 }
-                math.TableSet(new StringUnit("exp"), new Unit(new IntrinsicUnit("exp", exp, 1)));
+                math.TableSet("exp", new IntrinsicUnit("exp", exp, 1));
 
                 //////////////////////////////////////////////////////
                 Unit log(VM vm)
                 {
-                    Number value = vm.stack.Peek(0).unitValue;
-                    Number this_base = vm.stack.Peek(1).unitValue;
+                    Number value = vm.GetNumber(0);
+                    Number this_base = vm.GetNumber(1);
                     return new Unit((Number)Math.Log(value, this_base));
                 }
-                math.TableSet(new StringUnit("log"), new Unit(new IntrinsicUnit("log", log, 2)));
+                math.TableSet("log", new IntrinsicUnit("log", log, 2));
 
                 //////////////////////////////////////////////////////
                 Unit ln(VM vm)
                 {
-                    Number value = vm.stack.Peek(0).unitValue;
+                    Number value = vm.GetNumber(0);
                     return new Unit((Number)Math.Log(value, Math.E));
                 }
-                math.TableSet(new StringUnit("ln"), new Unit(new IntrinsicUnit("ln", ln, 1)));
+                math.TableSet("ln", new IntrinsicUnit("ln", ln, 1));
 
                 //////////////////////////////////////////////////////
                 Unit log10(VM vm)
                 {
-                    Number value = vm.stack.Peek(0).unitValue;
+                    Number value = vm.GetNumber(0);
                     return new Unit((Number)Math.Log(value, (Number)10));
                 }
-                math.TableSet(new StringUnit("log10"), new Unit(new IntrinsicUnit("log10", log10, 1)));
+                math.TableSet("log10", new IntrinsicUnit("log10", log10, 1));
 
                 //////////////////////////////////////////////////////
                 Unit mod(VM vm)
                 {
-                    Number value1 = vm.stack.Peek(0).unitValue;
-                    Number value2 = vm.stack.Peek(1).unitValue;
+                    Number value1 = vm.GetNumber(0);
+                    Number value2 = vm.GetNumber(1);
                     return new Unit((Number)value1 % value2);
                 }
-                math.TableSet(new StringUnit("mod"), new Unit(new IntrinsicUnit("mod", mod, 2)));
+                math.TableSet("mod", new IntrinsicUnit("mod", mod, 2));
 
                 //////////////////////////////////////////////////////
                 Unit idiv(VM vm)
                 {
-                    Number value1 = vm.stack.Peek(0).unitValue;
-                    Number value2 = vm.stack.Peek(1).unitValue;
+                    Number value1 = vm.GetNumber(0);
+                    Number value2 = vm.GetNumber(1);
                     return new Unit((Number)(int)(value1 / value2));
                 }
-                math.TableSet(new StringUnit("idiv"), new Unit(new IntrinsicUnit("idiv", idiv, 2)));
+                math.TableSet("idiv", new IntrinsicUnit("idiv", idiv, 2));
 
                 tables.Add("math", math);
             }
@@ -604,15 +603,15 @@ namespace lightning
                 {
                     return new Unit(new WrapperUnit<long>(DateTime.Now.Ticks));
                 }
-                time.TableSet(new StringUnit("now"), new Unit(new IntrinsicUnit("now", now, 0)));
+                time.TableSet("now", new IntrinsicUnit("now", now, 0));
 
                 Unit timeSpan(VM vm)
                 {
-                    long timeStart = ((WrapperUnit<long>)vm.stack.Peek(0).heapUnitValue).UnWrapp();
-                    long timeEnd = ((WrapperUnit<long>)vm.stack.Peek(1).heapUnitValue).UnWrapp();
+                    long timeStart = vm.GetWrapperUnit<long>(0);
+                    long timeEnd = vm.GetWrapperUnit<long>(1);
                     return new Unit((Number)(new TimeSpan(timeEnd - timeStart).TotalMilliseconds));// Convert to milliseconds
                 }
-                time.TableSet(new StringUnit("span"), new Unit(new IntrinsicUnit("span", timeSpan, 2)));
+                time.TableSet("span", new IntrinsicUnit("span", timeSpan, 2));
 
                 tables.Add("time", time);
             }
@@ -626,15 +625,15 @@ namespace lightning
                 {
                     StringUnit val_input_string = (StringUnit)vm.stack.Peek(0).heapUnitValue;
                     string input_string = val_input_string.ToString();
-                    Number start = vm.stack.Peek(1).unitValue;
-                    Number end = vm.stack.Peek(2).unitValue;
+                    Number start = vm.GetNumber(1);
+                    Number end = vm.GetNumber(2);
 
                     if (end < input_string.Length)
                     {
                         string result = input_string.Substring((int)start, (int)(end - start));
-                        return new Unit(new StringUnit(result));
+                        return new Unit(result);
                     }
-                    return new Unit("null");
+                    return new Unit(UnitType.Null);
                 }
                 string_table.TableSet(new StringUnit("slice"), new Unit(new IntrinsicUnit("string_slice", stringSlice, 3)));
 
@@ -644,15 +643,15 @@ namespace lightning
                 {
                     StringUnit val_input_string = (StringUnit)vm.stack.Peek(0).heapUnitValue;
                     string input_string = val_input_string.ToString();
-                    Number start = vm.stack.Peek(1).unitValue;
+                    Number start = vm.GetNumber(1);
                     if (start < input_string.Length)
                     {
                         Number end = input_string.Length;
                         string result = input_string.Substring((int)start, (int)(end - start));
                         val_input_string.content = input_string.Substring(0, (int)start);
-                        return new Unit(new StringUnit(result));
+                        return new Unit(result);
                     }
-                    return new Unit("null");
+                    return new Unit(UnitType.Null);
                 }
                 string_table.TableSet(new StringUnit("split"), new Unit(new IntrinsicUnit("string_split", stringSplit, 2)));
 
@@ -671,9 +670,9 @@ namespace lightning
                 {
                     Unit val_input_string = vm.stack.Peek(0);
                     if (val_input_string.HeapUnitType() == typeof(StringUnit))
-                        return new Unit(new StringUnit(val_input_string.ToString()));
+                        return new Unit(val_input_string.ToString());
                     else
-                        return new Unit("null");
+                        return new Unit(UnitType.Null);
                 }
                 string_table.TableSet(new StringUnit("copy"), new Unit(new IntrinsicUnit("string_copy", stringCopy, 1)));
 
@@ -689,14 +688,14 @@ namespace lightning
                 Unit charAt(VM vm)
                 {
                     StringUnit val_input_string = (StringUnit)vm.stack.Peek(0).heapUnitValue;
-                    Number index = vm.stack.Peek(1).unitValue;
+                    Number index = vm.GetNumber(1);
                     string input_string = val_input_string.ToString();
                     if (index < input_string.Length)
                     {
                         char result = input_string[(int)index];
-                        return new Unit(new StringUnit(result.ToString()));
+                        return new Unit(result.ToString());
                     }
-                    return new Unit("null");
+                    return new Unit(UnitType.Null);
                 }
                 char_table.TableSet(new StringUnit("at"), new Unit(new IntrinsicUnit("char_at", charAt, 2)));
 
@@ -733,7 +732,7 @@ namespace lightning
                         }
                         return new Unit(false);
                     }
-                    return new Unit("null");
+                    return new Unit(UnitType.Null);
                 }
                 char_table.TableSet(new StringUnit("is_digit"), new Unit(new IntrinsicUnit("is_digit", isDigit, 1)));
 
@@ -753,9 +752,9 @@ namespace lightning
                         input = sr.ReadToEnd();
                     }
                     if (input != null)
-                        return new Unit(new StringUnit(input));
+                        return new Unit(input);
 
-                    return new Unit("null");
+                    return new Unit(UnitType.Null);
                 }
                 file.TableSet(new StringUnit("load"), new Unit(new IntrinsicUnit("load_file", loadFile, 1)));
 
@@ -769,7 +768,7 @@ namespace lightning
                         file.Write(output);
                     }
 
-                    return new Unit("null");
+                    return new Unit(UnitType.Null);
                 }
                 file.TableSet(new StringUnit("write"), new Unit(new IntrinsicUnit("write_file", writeFile, 2)));
 
@@ -783,7 +782,7 @@ namespace lightning
                         file.Write(output);
                     }
 
-                    return new Unit("null");
+                    return new Unit(UnitType.Null);
                 }
                 file.TableSet(new StringUnit("append"), new Unit(new IntrinsicUnit("append_file", appendFile, 2)));
 
@@ -808,7 +807,7 @@ namespace lightning
                     {
                         Console.WriteLine(error);
                     }
-                    return new Unit("null");
+                    return new Unit(UnitType.Null);
                 }
 
                 Node program = parser.ParsedTree;
@@ -821,7 +820,7 @@ namespace lightning
                     Console.WriteLine("Code generation had errors:");
                     foreach (string error in code_generator.Errors)
                         Console.WriteLine(error);
-                    return new Unit("null");
+                    return new Unit(UnitType.Null);
                 }
                 if (code_generator.HasChunked == true)
                 {
@@ -835,7 +834,7 @@ namespace lightning
                         return result.value;
                     }
                 }
-                return new Unit("null");
+                return new Unit(UnitType.Null);
             }
             functions.Add(new IntrinsicUnit("eval", eval, 1));
 
@@ -866,7 +865,7 @@ namespace lightning
                         {
                             Console.WriteLine(error);
                         }
-                        return new Unit("null");
+                        return new Unit(UnitType.Null);
                     }
 
                     Node program = parser.ParsedTree;
@@ -878,7 +877,7 @@ namespace lightning
                         Console.WriteLine("Code generation had errors:");
                         foreach (string error in code_generator.Errors)
                             Console.WriteLine(error);
-                        return new Unit("null");
+                        return new Unit(UnitType.Null);
                     }
 
                     if (code_generator.HasChunked == true)
@@ -893,7 +892,7 @@ namespace lightning
                         }
                     }
                 }
-                return new Unit("null");
+                return new Unit(UnitType.Null);
             }
             functions.Add(new IntrinsicUnit("require", require, 1));
 
@@ -915,7 +914,7 @@ namespace lightning
                     }
                 }
 
-                return new Unit(new StringUnit(modules));
+                return new Unit(modules);
             }
             functions.Add(new IntrinsicUnit("modules", modules, 0));
 
@@ -924,7 +923,7 @@ namespace lightning
             Unit writeLine(VM vm)
             {
                 Console.WriteLine(System.Text.RegularExpressions.Regex.Unescape(vm.stack.Peek(0).ToString()));
-                return new Unit("null");
+                return new Unit(UnitType.Null);
             }
             functions.Add(new IntrinsicUnit("write_line", writeLine, 1));
 
@@ -932,7 +931,7 @@ namespace lightning
             Unit write(VM vm)
             {
                 Console.Write(System.Text.RegularExpressions.Regex.Unescape(vm.stack.Peek(0).ToString()));
-                return new Unit("null");
+                return new Unit(UnitType.Null);
             }
             functions.Add(new IntrinsicUnit("write", write, 1));
 
@@ -940,7 +939,7 @@ namespace lightning
             Unit readln(VM vm)
             {
                 string read = Console.ReadLine();
-                return new Unit(new StringUnit(read));
+                return new Unit(read);
             }
             functions.Add(new IntrinsicUnit("read_line", readln, 0));
 
@@ -951,7 +950,7 @@ namespace lightning
                 if (Number.TryParse(read, out Number n))
                     return new Unit(n);
                 else
-                    return new Unit("null");
+                    return new Unit(UnitType.Null);
             }
             functions.Add(new IntrinsicUnit("read_number", readNumber, 0));
 
@@ -963,19 +962,19 @@ namespace lightning
                 {
                     char next = Convert.ToChar(read);
                     if (next == '\n')
-                        return new Unit("null");
+                        return new Unit(UnitType.Null);
                     else
-                        return new Unit(new StringUnit(Char.ToString(next)));
+                        return new Unit(Char.ToString(next));
                 }
                 else
-                    return new Unit("null");
+                    return new Unit(UnitType.Null);
             }
             functions.Add(new IntrinsicUnit("read", read, 0));
 
             //////////////////////////////////////////////////////
             Unit count(VM vm)
             {
-                TableUnit this_table = (TableUnit)vm.stack.Peek(0).heapUnitValue;
+                TableUnit this_table = vm.GetTable(0);
                 int count = this_table.Count;
                 return new Unit(count);
             }
@@ -985,7 +984,7 @@ namespace lightning
             Unit type(VM vm)
             {
                 Type this_type = vm.stack.Peek(0).HeapUnitType();
-                return new Unit(new StringUnit(this_type.ToString()));
+                return new Unit(this_type.ToString());
             }
             functions.Add(new IntrinsicUnit("type", type, 1));
 
@@ -994,7 +993,7 @@ namespace lightning
             {
                 Unit first = vm.stack.Peek(0);
                 Unit second = vm.stack.Peek(1);
-                if (first.HeapUnitType() != null)
+                if (first.type != UnitType.Null)
                     return first;
                 else
                     return second;
@@ -1005,7 +1004,7 @@ namespace lightning
             Unit resourcesTrim(VM vm)
             {
                 vm.ResoursesTrim();
-                return new Unit("null");
+                return new Unit(UnitType.Null);
             }
             functions.Add(new IntrinsicUnit("trim", resourcesTrim, 0));
 
@@ -1013,7 +1012,7 @@ namespace lightning
             Unit releaseAllVMs(VM vm)
             {
                 VM.ReleaseVMs();
-                return new Unit("null");
+                return new Unit(UnitType.Null);
             }
             functions.Add(new IntrinsicUnit("release_all_vms", releaseAllVMs, 0));
 
@@ -1022,7 +1021,7 @@ namespace lightning
             {
                 Unit count = vm.stack.Peek(0);
                 VM.ReleaseVMs((int)count.unitValue);
-                return new Unit("null");
+                return new Unit(UnitType.Null);
             }
             functions.Add(new IntrinsicUnit("release_vms", releaseVMs, 1));
 
@@ -1057,7 +1056,7 @@ namespace lightning
                 {
                     VM.RecycleVM(vms[i]);
                 }
-                return new Unit("null");
+                return new Unit(UnitType.Null);
             }
 
             functions.Add(new IntrinsicUnit("foreach", forEach, 2));
@@ -1065,7 +1064,7 @@ namespace lightning
 
             Unit ForRange(VM vm)
             {
-                Number tasks = vm.stack.Peek(0).unitValue;
+                Number tasks = vm.GetNumber(0);
                 TableUnit table = (TableUnit)(vm.stack.Peek(1).heapUnitValue);
                 Unit func = vm.stack.Peek(2);
 
@@ -1097,7 +1096,7 @@ namespace lightning
                 {
                     VM.RecycleVM(vms[i]);
                 }
-                return new Unit("null");
+                return new Unit(UnitType.Null);
             }
 
             functions.Add(new IntrinsicUnit("range", ForRange, 3));
@@ -1261,19 +1260,19 @@ namespace lightning
             {
                 Instruction next = function.body[i];
 
-                if (next.opCode == OpCode.LOADG)
+                if (next.opCode == OpCode.LOAD_GLOBAL)
                 {
-                    if ((next.opCode == OpCode.LOADG && next.opA >= relocationInfo.importedVM.GetChunk().Prelude.intrinsics.Count))
+                    if ((next.opCode == OpCode.LOAD_GLOBAL && next.opA >= relocationInfo.importedVM.GetChunk().Prelude.intrinsics.Count))
                     {
                         if (relocationInfo.relocatedGlobals.ContainsKey(next.opA))
                         {
-                            next.opCode = OpCode.LOADGI;
+                            next.opCode = OpCode.LOAD_IMPORTED_GLOBAL;
                             next.opA = relocationInfo.relocatedGlobals[next.opA];
                             next.opB = relocationInfo.moduleIndex;
                         }
                         else if (relocationInfo.toBeRelocatedGlobals.Contains(next.opA))
                         {
-                            next.opCode = OpCode.LOADGI;
+                            next.opCode = OpCode.LOAD_IMPORTED_GLOBAL;
                             next.opA = (Operand)(relocationInfo.toBeRelocatedGlobals.IndexOf(next.opA) + relocationInfo.relocatedGlobals.Count);
                             next.opB = relocationInfo.moduleIndex;
                         }
@@ -1281,23 +1280,23 @@ namespace lightning
                         {
                             Operand global_count = (Operand)(relocationInfo.relocatedGlobals.Count + relocationInfo.toBeRelocatedGlobals.Count);
                             relocationInfo.toBeRelocatedGlobals.Add(next.opA);
-                            next.opCode = OpCode.LOADGI;
+                            next.opCode = OpCode.LOAD_IMPORTED_GLOBAL;
                             next.opA = global_count;
                             next.opB = relocationInfo.moduleIndex;
                         }
                     }
                 }
-                else if (next.opCode == OpCode.LOADC)
+                else if (next.opCode == OpCode.LOAD_CONSTANT)
                 {
                     if (relocationInfo.relocatedConstants.ContainsKey(next.opA))
                     {
-                        next.opCode = OpCode.LOADCI;
+                        next.opCode = OpCode.LOAD_IMPORTED_CONSTANT;
                         next.opA = relocationInfo.relocatedConstants[next.opA];
                         next.opB = relocationInfo.moduleIndex;
                     }
                     else if (relocationInfo.toBeRelocatedConstants.Contains(next.opA))
                     {
-                        next.opCode = OpCode.LOADCI;
+                        next.opCode = OpCode.LOAD_IMPORTED_CONSTANT;
                         next.opA = (Operand)(relocationInfo.toBeRelocatedConstants.IndexOf(next.opA) + relocationInfo.relocatedConstants.Count);
                         next.opB = relocationInfo.moduleIndex;
                     }
@@ -1305,12 +1304,12 @@ namespace lightning
                     {
                         Operand global_count = (Operand)(relocationInfo.relocatedConstants.Count + relocationInfo.toBeRelocatedConstants.Count);
                         relocationInfo.toBeRelocatedConstants.Add(next.opA);
-                        next.opCode = OpCode.LOADCI;
+                        next.opCode = OpCode.LOAD_IMPORTED_CONSTANT;
                         next.opA = global_count;
                         next.opB = relocationInfo.moduleIndex;
                     }
                 }
-                else if (next.opCode == OpCode.FUNDCL)
+                else if (next.opCode == OpCode.DECLARE_FUNCTION)
                 {
                     Unit this_value = relocationInfo.importedVM.GetChunk().GetConstant(next.opC);
                     if (relocationInfo.importingVM.GetChunk().GetConstants().Contains(this_value))
@@ -1324,7 +1323,7 @@ namespace lightning
                         RelocateChunk(((ClosureUnit)this_value.heapUnitValue).function, relocationInfo);
                     }
                 }
-                else if (next.opCode == OpCode.LOADGI)
+                else if (next.opCode == OpCode.LOAD_IMPORTED_GLOBAL)
                 {
                     if (relocationInfo.relocatedModules.ContainsKey(next.opB))
                     {
@@ -1343,10 +1342,10 @@ namespace lightning
                             }
                         }
                         if (found == false)
-                            Console.WriteLine("Can not find LOADGI index" + function.module);
+                            Console.WriteLine("Can not find LOAD_IMPORTED_GLOBAL index" + function.module);
                     }
                 }
-                else if (next.opCode == OpCode.LOADCI)
+                else if (next.opCode == OpCode.LOAD_IMPORTED_CONSTANT)
                 {
                     if (relocationInfo.relocatedModules.ContainsKey(next.opB))
                     {
@@ -1365,7 +1364,7 @@ namespace lightning
                             }
                         }
                         if (found == false)
-                            Console.WriteLine("Can not find LOADCI index" + function.module);
+                            Console.WriteLine("Can not find LOAD_IMPORTED_CONSTANT index" + function.module);
                     }
                 }
 
@@ -1385,7 +1384,7 @@ namespace lightning
                     {
                         Instruction next = function.body[i];
 
-                        if (next.opCode == OpCode.LOADGI || next.opCode == OpCode.LOADCI)
+                        if (next.opCode == OpCode.LOAD_IMPORTED_GLOBAL || next.opCode == OpCode.LOAD_IMPORTED_CONSTANT)
                         {
                             next.opB = new_index;
                             function.body[i] = next;
