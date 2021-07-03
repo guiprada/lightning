@@ -313,7 +313,7 @@ namespace lightning
             }
             else if (p_node.ValueType == typeof(string))
             {
-                if ((string)p_node.Value == "Nil")
+                if ((string)p_node.Value == "Null")
                 {
                     Add(OpCode.LOAD_NIL, p_node.Line);
                 }
@@ -451,7 +451,7 @@ namespace lightning
         {
             if (p_node.Initializer == null)
             {
-                //int address = AddConstant("Nil");
+                //int address = AddConstant("Null");
                 //Add(OpCode.LOAD_CONSTANT, (Operand)address, p_node.Line);
                 Add(OpCode.LOAD_NIL, p_node.Line);
             }
@@ -921,7 +921,7 @@ namespace lightning
                     new_upvalues.Add(new UpValueUnit((Operand)v.address, (Operand)v.envIndex));
                 }
                 ClosureUnit new_closure = new ClosureUnit(new_function, new_upvalues);
-                code.SwapConstant(this_address, new Unit(new_closure));
+                code.SwapConstant(this_address, new_closure);
             }
             else
             {
@@ -1048,10 +1048,10 @@ namespace lightning
             else
             {
                 constants.Add(p_string);
-                if (p_string == "Nil")
-                    code.AddConstant(new Unit(UnitType.Null));
+                if (p_string == "Null")
+                    code.AddConstant(Unit.Null);
                 else
-                    code.AddConstant(new Unit(p_string));
+                    code.AddConstant(new StringUnit(p_string));
 
                 return constants.Count - 1;
             }
@@ -1066,29 +1066,15 @@ namespace lightning
             else
             {
                 constants.Add(p_number);
-                code.AddConstant(new Unit(p_number));
+                code.AddConstant(new NumberUnit(p_number));
                 return constants.Count - 1;
             }
         }
 
-        //int AddConstant(bool p_bool)
-        //{
-        //    if (constants.Contains(p_bool))
-        //    {
-        //        return constants.IndexOf(p_bool);
-        //    }
-        //    else
-        //    {
-        //        constants.Add(p_bool);
-        //        code.AddConstant(new ValBool(p_bool));
-        //        return constants.Count - 1;
-        //    }
-        //}
-
         int AddConstant(FunctionUnit new_function)
         {
             constants.Add(new_function);
-            code.AddConstant(new Unit(new_function));
+            code.AddConstant(new_function);
             return constants.Count - 1;
         }
 

@@ -713,7 +713,7 @@ namespace lightning
             else if (Match(TokenType.TRUE))
                 return new LiteralNode(true, Previous().Line);
             else if (Match(TokenType.NIL))
-                return new LiteralNode("Nil", Previous().Line);
+                return new LiteralNode("Null", Previous().Line);
             else if (Match(TokenType.NUMBER))
                 return new LiteralNode((Previous() as TokenNumber).value, Previous().Line);
             else if (Match(TokenType.STRING))

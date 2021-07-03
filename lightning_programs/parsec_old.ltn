@@ -25,7 +25,7 @@ lib.make_string = intrinsic("make_string_parser", 1,
                 }
             }
             ValTable result = new ValTable(null, null);
-            result.TableSet(match_val_string, Value.Nil);
+            result.TableSet(match_val_string, Value.Null);
             result.TableSet(tail_val_string, val_input_string);
             return result;
         };
@@ -53,7 +53,7 @@ lib.digit = intrinsic("digit_parser", 1,
             }
         }
         ValTable result = new ValTable(null, null);
-        result.TableSet(match_val_string, Value.Nil);
+        result.TableSet(match_val_string, Value.Null);
         result.TableSet(tail_val_string, val_input_string);
         return result;
     }
@@ -79,7 +79,7 @@ lib.alpha = intrinsic("alpha_parser", 1,
             }
         }
         ValTable result = new ValTable(null, null);
-        result.TableSet(match_val_string, Value.Nil);
+        result.TableSet(match_val_string, Value.Null);
         result.TableSet(tail_val_string, val_input_string);
         return result;
     }
@@ -95,7 +95,7 @@ lib.Or = intrinsic("or_combinator", 2,
         Func<VM, Value> parser = (vm) =>
         {
             ValTable result1 = parser1.function(vm) as ValTable;
-            if (result1.table[match_val_string] != Value.Nil)
+            if (result1.table[match_val_string] != Value.Null)
                 return result1;
             ValTable result2 = parser2.function(vm) as ValTable;
             return result2;
@@ -114,12 +114,12 @@ lib.And = intrinsic("and_combinator", 2,
         Func<VM, Value> parser = (vm) =>
         {
             ValTable result1 = parser1.function(vm) as ValTable;
-            if (result1.table[match_val_string] != Value.Nil)
+            if (result1.table[match_val_string] != Value.Null)
             {
                 vm.StackPush(result1.table[tail_val_string]);
                 ValTable result2 = parser2.function(vm) as ValTable;
                 vm.StackPop();
-                if (result2.table[match_val_string] != Value.Nil)
+                if (result2.table[match_val_string] != Value.Null)
                 {
                     result2.table[match_val_string] = new ValString(result1.table[match_val_string].ToString() + result2.table[match_val_string].ToString());
                     return result2;
@@ -127,7 +127,7 @@ lib.And = intrinsic("and_combinator", 2,
                 else
                 {
                     ValTable result3 = new ValTable(null, null);
-                    result3.TableSet(match_val_string, Value.Nil);
+                    result3.TableSet(match_val_string, Value.Null);
                     result3.TableSet(tail_val_string, vm.StackPeek(0));
                     return result3;
                 }
