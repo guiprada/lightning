@@ -164,6 +164,9 @@ namespace lightning
         public T GetWrapperUnit<T>(int n){
             return ((WrapperUnit<T>)(stack.Peek(n).heapUnitValue)).UnWrapp();
         }
+        public StringUnit GetStringUnit(int n){
+            return ((StringUnit)(stack.Peek(n).heapUnitValue));
+        }
 
 //////////////////////////// End Accessors
         public Unit CallFunction(Unit this_callable, List<Unit> args)
