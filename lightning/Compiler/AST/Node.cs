@@ -245,12 +245,12 @@ namespace lightning
         }
     }
 
-    public class ASSIGN_VARIABLEmentNode : Node
+    public class assignmentNode : Node
     {
         public VariableNode ASSIGN_VARIABLEed { get; private set; }
         public Node Value { get; private set; }
 
-        public ASSIGN_VARIABLEmentNode(VariableNode p_ASSIGN_VARIABLEed, Node p_Value, int p_Line)
+        public assignmentNode(VariableNode p_ASSIGN_VARIABLEed, Node p_Value, int p_Line)
         : base(NodeType.ASSIGMENT, p_Line)
         {
             ASSIGN_VARIABLEed = p_ASSIGN_VARIABLEed;
@@ -258,14 +258,14 @@ namespace lightning
         }
     }
 
-    public class ASSIGN_VARIABLEmentOpNode : Node
+    public class assignmentOpNode : Node
     {
         public VariableNode ASSIGN_VARIABLEed { get; private set; }
         public Node Value { get; private set; }
 
         public OperatorType Op { get; private set; }
 
-        public ASSIGN_VARIABLEmentOpNode(VariableNode p_ASSIGN_VARIABLEed, Node p_Value, OperatorType p_op, int p_Line)
+        public assignmentOpNode(VariableNode p_ASSIGN_VARIABLEed, Node p_Value, OperatorType p_op, int p_Line)
         : base(NodeType.ASSIGMENTOP, p_Line)
         {
             ASSIGN_VARIABLEed = p_ASSIGN_VARIABLEed;

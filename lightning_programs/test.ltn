@@ -683,6 +683,20 @@ var global_lock_test_counter = 5
         counter++
     }
 }
+{
+    // Testing tuples
+    function get_tuple(a, b){
+        return tuple(a, b)
+    }
+    var tuple1 = get_tuple(1, "hello")
+    assert(tuple_x(tuple1), 1, "Failed Tuples Test 1.")
+    assert(tuple_y(tuple1), "hello", "Failed Tuples Test 2.")
+
+    tuple_set_x(tuple1, "hello")
+    tuple_set_y(tuple1, "world")
+    assert(tuple_x(tuple1), "hello", "Failed Tuples Test 3.")
+    assert(tuple_y(tuple1), "world", "Failed Tuples Test 4.")
+}
 trim()
 
 var end_time = time.now()

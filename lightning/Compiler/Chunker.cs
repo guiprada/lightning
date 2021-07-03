@@ -137,10 +137,10 @@ namespace lightning
                     ChunkVarDeclaration(p_node as VarDeclarationNode);
                     break;
                 case NodeType.ASSIGMENT:
-                    ChunkASSIGN_VARIABLEment(p_node as ASSIGN_VARIABLEmentNode);
+                    Chunkassignment(p_node as assignmentNode);
                     break;
                 case NodeType.ASSIGMENTOP:
-                    ChunkASSIGN_VARIABLEmentOp(p_node as ASSIGN_VARIABLEmentOpNode);
+                    ChunkassignmentOp(p_node as assignmentOpNode);
                     break;
                 case NodeType.LOGICAL:
                     ChunkLogical(p_node as LogicalNode);
@@ -473,7 +473,7 @@ namespace lightning
             }
         }
 
-        void ChunkASSIGN_VARIABLEment(ASSIGN_VARIABLEmentNode p_node)
+        void Chunkassignment(assignmentNode p_node)
         {
             ChunkIt(p_node.Value);
             Nullable<Variable> maybe_var = GetVar(p_node.ASSIGN_VARIABLEed.Name);
@@ -530,11 +530,11 @@ namespace lightning
             }
             else
             {
-                Error("ASSIGN_VARIABLEment to non existing variable!", p_node.Line);
+                Error("assignment to non existing variable!", p_node.Line);
             }
         }
 
-        void ChunkASSIGN_VARIABLEmentOp(ASSIGN_VARIABLEmentOpNode p_node)
+        void ChunkassignmentOp(assignmentOpNode p_node)
         {
             ChunkIt(p_node.Value);
             Nullable<Variable> maybe_var = GetVar(p_node.ASSIGN_VARIABLEed.Name);
@@ -616,7 +616,7 @@ namespace lightning
             }
             else
             {
-                Error("ASSIGN_VARIABLEment to non existing variable!", p_node.Line);
+                Error("assignment to non existing variable!", p_node.Line);
             }
         }
 

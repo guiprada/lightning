@@ -55,7 +55,7 @@ done
 	- intrinsics
 	- remove print from language def
 	- list
-	- table ASSIGN_VARIABLEment by index works for elements
+	- table assignment by index works for elements
 	- add prelude with count functions
 	- lambda
 	- table constructors should take identifiers

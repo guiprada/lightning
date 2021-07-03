@@ -342,75 +342,75 @@ namespace lightning
 
         Node Expression()
         {
-            return ASSIGN_VARIABLEment();
+            return assignment();
         }
 
-        Node ASSIGN_VARIABLEment()
+        Node assignment()
         {
             Node expr = LogicalOr();
 
             if (Match(TokenType.PLUS_EQUAL))
             {
-                Node value = ASSIGN_VARIABLEment();
+                Node value = assignment();
 
                 if (expr.Type == NodeType.VARIABLE)
-                    return new ASSIGN_VARIABLEmentOpNode((VariableNode)expr, value, OperatorType.PLUS, expr.Line);
+                    return new assignmentOpNode((VariableNode)expr, value, OperatorType.PLUS, expr.Line);
                 else
-                    Error("Invalid ASSIGN_VARIABLEment.");
+                    Error("Invalid assignment.");
             }
             else if (Match(TokenType.PLUS_PLUS))
             {
                 Node value = new LiteralNode(1, expr.Line);
 
                 if (expr.Type == NodeType.VARIABLE)
-                    return new ASSIGN_VARIABLEmentOpNode((VariableNode)expr, value, OperatorType.PLUS, expr.Line);
+                    return new assignmentOpNode((VariableNode)expr, value, OperatorType.PLUS, expr.Line);
                 else
-                    Error("Invalid ASSIGN_VARIABLEment.");
+                    Error("Invalid assignment.");
             }
             else if (Match(TokenType.MINUS_EQUAL))
             {
-                Node value = ASSIGN_VARIABLEment();
+                Node value = assignment();
 
                 if (expr.Type == NodeType.VARIABLE)
-                    return new ASSIGN_VARIABLEmentOpNode((VariableNode)expr, value, OperatorType.MINUS, expr.Line);
+                    return new assignmentOpNode((VariableNode)expr, value, OperatorType.MINUS, expr.Line);
                 else
-                    Error("Invalid ASSIGN_VARIABLEment.");
+                    Error("Invalid assignment.");
             }
             else if (Match(TokenType.MINUS_MINUS))
             {
                 Node value = new LiteralNode(1, expr.Line);
 
                 if (expr.Type == NodeType.VARIABLE)
-                    return new ASSIGN_VARIABLEmentOpNode((VariableNode)expr, value, OperatorType.MINUS, expr.Line);
+                    return new assignmentOpNode((VariableNode)expr, value, OperatorType.MINUS, expr.Line);
                 else
-                    Error("Invalid ASSIGN_VARIABLEment.");
+                    Error("Invalid assignment.");
             }
             else if (Match(TokenType.STAR_EQUAL))
             {
-                Node value = ASSIGN_VARIABLEment();
+                Node value = assignment();
 
                 if (expr.Type == NodeType.VARIABLE)
-                    return new ASSIGN_VARIABLEmentOpNode((VariableNode)expr, value, OperatorType.MULTIPLICATION, expr.Line);
+                    return new assignmentOpNode((VariableNode)expr, value, OperatorType.MULTIPLICATION, expr.Line);
                 else
-                    Error("Invalid ASSIGN_VARIABLEment.");
+                    Error("Invalid assignment.");
             }
             if (Match(TokenType.SLASH_EQUAL))
             {
-                Node value = ASSIGN_VARIABLEment();
+                Node value = assignment();
 
                 if (expr.Type == NodeType.VARIABLE)
-                    return new ASSIGN_VARIABLEmentOpNode((VariableNode)expr, value, OperatorType.DIVISION, expr.Line);
+                    return new assignmentOpNode((VariableNode)expr, value, OperatorType.DIVISION, expr.Line);
                 else
-                    Error("Invalid ASSIGN_VARIABLEment.");
+                    Error("Invalid assignment.");
             }
             else if (Match(TokenType.EQUAL))
             {
-                Node value = ASSIGN_VARIABLEment();
+                Node value = assignment();
 
                 if (expr.Type == NodeType.VARIABLE)
-                    return new ASSIGN_VARIABLEmentNode((VariableNode)expr, value, expr.Line);
+                    return new assignmentNode((VariableNode)expr, value, expr.Line);
                 else
-                    Error("Invalid ASSIGN_VARIABLEment.");
+                    Error("Invalid assignment.");
 
             }
 

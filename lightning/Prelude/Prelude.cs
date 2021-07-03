@@ -1096,6 +1096,53 @@ namespace lightning
             functions.Add(new IntrinsicUnit("range", ForRange, 3));
 
             //////////////////////////////////////////////////////
+            Unit tuple(VM vm)
+            {
+                Unit[] tuple = new Unit[2];
+                tuple[0] = vm.GetUnit(0);
+                tuple[1] = vm.GetUnit(1);
+
+                return new Unit(new WrapperUnit<Unit[]>(tuple));
+            }
+            functions.Add(new IntrinsicUnit("tuple", tuple, 2));
+
+            //////////////////////////////////////////////////////
+            Unit getTupleX(VM vm)
+            {
+                Unit x = vm.GetWrapperUnit<Unit[]>(0)[0];
+
+                return x;
+            }
+            functions.Add(new IntrinsicUnit("tuple_x", getTupleX, 1));
+
+            //////////////////////////////////////////////////////
+            Unit getTupleY(VM vm)
+            {
+                Unit y = vm.GetWrapperUnit<Unit[]>(0)[1];
+
+                return y;
+            }
+            functions.Add(new IntrinsicUnit("tuple_y", getTupleY, 1));
+
+            //////////////////////////////////////////////////////
+            Unit setTupleX(VM vm)
+            {
+                vm.GetWrapperUnit<Unit[]>(0)[0] = vm.GetUnit(1);
+
+                return new Unit(UnitType.Null);
+            }
+            functions.Add(new IntrinsicUnit("tuple_set_x", setTupleX, 2));
+
+            //////////////////////////////////////////////////////
+            Unit setTupleY(VM vm)
+            {
+                vm.GetWrapperUnit<Unit[]>(0)[1] = vm.GetUnit(1);
+
+                return new Unit(UnitType.Null);
+            }
+            functions.Add(new IntrinsicUnit("tuple_set_y", setTupleY, 2));
+
+            //////////////////////////////////////////////////////
             Library prelude = new Library(functions, tables);
 
             return prelude;
