@@ -689,14 +689,29 @@ var global_lock_test_counter = 5
         return tuple(a, b)
     }
     var tuple1 = get_tuple(1, "hello")
-    assert(tuple_x(tuple1), 1, "Failed Tuples Test 1.")
-    assert(tuple_y(tuple1), "hello", "Failed Tuples Test 2.")
+    assert(tuple_get_x(tuple1), 1, "Failed Tuples Test 1.")
+    assert(tuple_get_y(tuple1), "hello", "Failed Tuples Test 2.")
 
     tuple_set_x(tuple1, "hello")
     tuple_set_y(tuple1, "world")
-    assert(tuple_x(tuple1), "hello", "Failed Tuples Test 3.")
-    assert(tuple_y(tuple1), "world", "Failed Tuples Test 4.")
+    assert(tuple_get_x(tuple1), "hello", "Failed Tuples Test 3.")
+    assert(tuple_get_y(tuple1), "world", "Failed Tuples Test 4.")
 }
+{
+    // Testing nuples
+    function get_nuple(list){
+        return nuple(list)
+    }
+    var nuple1 = get_nuple([1, "hello"])
+    assert(nuple_get(nuple1, 0), 1, "Failed Nuples Test 1.")
+    assert(nuple_get(nuple1, 1), "hello", "Failed Nuples Test 2.")
+
+    nuple_set(nuple1, 0, "hello")
+    nuple_set(nuple1, 1, "world")
+    assert(nuple_get(nuple1, 0), "hello", "Failed Nuples Test 3.")
+    assert(nuple_get(nuple1, 1), "world", "Failed Nuples Test 4.")
+}
+
 trim()
 
 var end_time = time.now()

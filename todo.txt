@@ -1,6 +1,4 @@
 ﻿todo
-	finish porting prelude and stack helpers
-	tuples  and nuples
 	improve line counting
 	sobrecarga de metodos?
 	arrays
@@ -94,3 +92,5 @@ done
 	- Global lock tests.
 	- Move Env out of VM.
 	- Fix line counting and reporting
+	- finish porting prelude and stack helpers
+	- tuples  and nuples

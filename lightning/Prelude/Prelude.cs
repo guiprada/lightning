@@ -1113,7 +1113,7 @@ namespace lightning
 
                 return x;
             }
-            functions.Add(new IntrinsicUnit("tuple_x", getTupleX, 1));
+            functions.Add(new IntrinsicUnit("tuple_get_x", getTupleX, 1));
 
             //////////////////////////////////////////////////////
             Unit getTupleY(VM vm)
@@ -1122,7 +1122,7 @@ namespace lightning
 
                 return y;
             }
-            functions.Add(new IntrinsicUnit("tuple_y", getTupleY, 1));
+            functions.Add(new IntrinsicUnit("tuple_get_y", getTupleY, 1));
 
             //////////////////////////////////////////////////////
             Unit setTupleX(VM vm)
@@ -1141,6 +1141,37 @@ namespace lightning
                 return new Unit(UnitType.Null);
             }
             functions.Add(new IntrinsicUnit("tuple_set_y", setTupleY, 2));
+
+            //////////////////////////////////////////////////////
+            Unit nuple(VM vm)
+            {
+                TableUnit table = vm.GetTable(0);
+                int size = table.ECount;
+                Unit[] nuple = new Unit[size];
+                for(int i = 0; i < size; i++)
+                    nuple[i] = table.elements[i];
+
+                return new Unit(new WrapperUnit<Unit[]>(nuple));
+            }
+            functions.Add(new IntrinsicUnit("nuple", nuple, 1));
+
+            //////////////////////////////////////////////////////
+            Unit getNuple(VM vm)
+            {
+                Unit x = vm.GetWrapperUnit<Unit[]>(0)[(int)vm.GetNumber(1)];
+
+                return x;
+            }
+            functions.Add(new IntrinsicUnit("nuple_get", getNuple, 2));
+
+            //////////////////////////////////////////////////////
+            Unit setNuple(VM vm)
+            {
+                vm.GetWrapperUnit<Unit[]>(0)[(int)vm.GetNumber(1)] = vm.GetUnit(2);
+
+                return new Unit(UnitType.Null);
+            }
+            functions.Add(new IntrinsicUnit("nuple_set", setNuple, 3));
 
             //////////////////////////////////////////////////////
             Library prelude = new Library(functions, tables);
