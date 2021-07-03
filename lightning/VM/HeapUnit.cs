@@ -37,8 +37,7 @@ namespace lightning
 
         public override bool ToBool()
         {
-            Console.WriteLine("ERROR: Can not convert string to Bool.");
-            throw new NotImplementedException();
+            throw new Exception("Can not convert String to Bool.");
         }
 
         public override bool Equals(object other)
@@ -93,8 +92,7 @@ namespace lightning
 
         public override bool ToBool()
         {
-            Console.WriteLine("ERROR: Can not convert function to Bool.");
-            throw new NotImplementedException();
+            throw new Exception("Can not convert Function to Bool.");
         }
 
         public override bool Equals(object other)
@@ -142,8 +140,7 @@ namespace lightning
 
         public override bool ToBool()
         {
-            Console.WriteLine("ERROR: Can not convert intrinsic to Bool.");
-            throw new NotImplementedException();
+            throw new Exception("Can not convert Intrinsic to Bool.");
         }
 
         public override bool Equals(object other)
@@ -193,8 +190,7 @@ namespace lightning
 
         public override bool ToBool()
         {
-            Console.WriteLine("ERROR: Can not convert clojure to Bool.");
-            throw new NotImplementedException();
+            throw new Exception("Can not convert Clojure to Bool.");
         }
 
         public override bool Equals(object other)
@@ -413,8 +409,7 @@ namespace lightning
 
         public override bool ToBool()
         {
-            Console.WriteLine("ERROR: Can not convert list to Bool.");
-            throw new NotImplementedException();
+            throw new Exception("Can not convert List to Bool.");
         }
 
         public override bool Equals(object other)
@@ -521,8 +516,7 @@ namespace lightning
 
         public override bool ToBool()
         {
-            Console.WriteLine("ERROR: Can not convert a referenc Wrapper to Bool.");
-            throw new NotImplementedException();
+            throw new Exception("Can not convert a Wrapper to Bool.");
         }
 
         public T UnWrapp()

@@ -22,10 +22,9 @@ namespace lightning
     }
 
     public struct Unit{
+        public UnitType type;
         public Number unitValue;
         public HeapUnit heapUnitValue;
-
-        public UnitType type;
 
         public Unit(HeapUnit p_value)
         {
@@ -79,7 +78,7 @@ namespace lightning
                     return "false";
                 if(unitValue == 1)
                     return "true";
-                throw new Exception("Trying to get String of Invalid Boolean");
+                throw new Exception("Trying to get String of Invalid Boolean.");
             }else{
                 return heapUnitValue.ToString();
             }
@@ -88,8 +87,7 @@ namespace lightning
         public bool ToBool()
         {
             if (type == UnitType.Number){
-                Console.WriteLine("ERROR: Can not convert number to Bool.");
-                throw new NotImplementedException();
+                throw new Exception("Can not convert Number to Bool.");
             }else if(type == UnitType.Null){
                 return false;
             }else if(type == UnitType.Boolean){
@@ -97,7 +95,7 @@ namespace lightning
                     return false;
                 if(unitValue == 1)
                     return true;
-                throw new Exception("Trying to get Value of Invalid Boolean");
+                throw new Exception("Trying to get Value of Invalid Boolean.");
             }else{
                 return heapUnitValue.ToBool();
             }
@@ -105,7 +103,7 @@ namespace lightning
 
         public override bool Equals(object other){
             if(other.GetType() != typeof(Unit))
-                throw new Exception("Trying to compare Unit to non Unit type");
+                throw new Exception("Trying to compare Unit to non Unit type.");
             if (type == UnitType.Number){
                 Type other_type = other.GetType();
                 if (((Unit)other).type == UnitType.Number){
