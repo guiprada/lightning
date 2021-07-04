@@ -259,7 +259,7 @@ namespace lightning
                 upValuesRegistry.Get(i).Capture();
             }
             upValuesRegistry.PopEnv();
-            // variables.ReleaseNumbers(numberPool);
+            variables.ReleaseNumbers(numberPool);
             variables.PopEnv();
         }
 
@@ -549,11 +549,14 @@ namespace lightning
                             if (op == 0)
                             {
                                 Unit old_value = this_value.UpValue;
-                                if (old_value.GetType() == typeof(NumberUnit))
+                                if (old_value.GetType() == typeof(NumberUnit)){
+                                    ((NumberUnit)old_value).referenced = false;
                                     numberPool.Release(old_value);
+                                }
                                 if (new_value.GetType() == typeof(NumberUnit))
                                 {
                                     new_value = numberPool.Get(new_value);
+                                    ((NumberUnit)new_value).referenced = true;
                                 }
                                 this_value.UpValue = new_value;
                             }
@@ -641,8 +644,10 @@ namespace lightning
                                     if (((TableUnit)this_table).elements.Count - 1 >= ((int)((NumberUnit)indexes[indexes_counter - 1]).content))
                                     {
                                         Unit old_value = ((TableUnit)this_table).elements[(int)((NumberUnit)indexes[indexes_counter - 1]).content];
-                                        if (old_value.GetType() == typeof(NumberUnit))
+                                        if (old_value.GetType() == typeof(NumberUnit)){
+                                            ((NumberUnit)old_value).referenced = false;
                                             numberPool.Release(old_value);
+                                        }
                                     }
                                     if (new_value.GetType() == typeof(NumberUnit))
                                     {
@@ -655,8 +660,10 @@ namespace lightning
                                     if (((TableUnit)this_table).table.ContainsKey((StringUnit)indexes[indexes_counter - 1]))
                                     {
                                         Unit old_value = ((TableUnit)this_table).table[(StringUnit)indexes[indexes_counter - 1]];
-                                        if (old_value.GetType() == typeof(NumberUnit))
+                                        if (old_value.GetType() == typeof(NumberUnit)){
+                                            ((NumberUnit)old_value).referenced = false;
                                             numberPool.Release(old_value);
+                                        }
                                     }
                                     if (new_value.GetType() == typeof(NumberUnit))
                                     {

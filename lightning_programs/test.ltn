@@ -641,7 +641,7 @@ var global_lock_test_counter = 5
             Number opA = vm.GetNumber(0);
             Number opB = vm.GetNumber(1);
 
-            return new NumberUnit(opA + opB);
+            return vm.numberPool.Get(opA + opB);
         }
     '
     if (intrinsic.create != null){

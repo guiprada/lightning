@@ -79,13 +79,13 @@ namespace lightning
             markers.RemoveAt(last_index);
         }
 
-        // public void ReleaseNumbers(NumberPool pool){
-        //     int last_index = markers.Count -1;
-        //     for(int i=markers[last_index]; i<values.Count; i++){
-        //         if(values[i].GetType() == typeof(NumberUnit)){
-        //             pool.Release(values[i] as NumberUnit);
-        //         }
-        //     }
-        // }
+        public void ReleaseNumbers(NumberPool pool){
+            int last_index = markers.Count -1;
+            for(int i=markers[last_index]; i<values.Count; i++){
+                if(values[i].GetType() == typeof(NumberUnit)){
+                    pool.Release(values[i] as NumberUnit);
+                }
+            }
+        }
     }
 }

@@ -19,12 +19,16 @@ namespace lightning{
         {
             values[top] = p_value;
             top++;
+            if(p_value.GetType() == typeof(NumberUnit))
+                ((NumberUnit)p_value).stacked = true;
         }
 
         public Unit Pop()
         {
             top--;
             Unit popped = values[top];
+            if(popped.GetType() == typeof(NumberUnit))
+                ((NumberUnit)popped).stacked = false;
             return popped;
         }
 

@@ -71,9 +71,11 @@ namespace lightning
 
         public void Release(NumberUnit v)
         {
-            inUse--;
-            if(objects.Count <= maxUsed)
-                objects.Push(v);
+            if(v.referenced == false && v.stacked == false){
+                inUse--;
+                if(objects.Count <= maxUsed)
+                    objects.Push(v);
+            }
         }
     }
 }

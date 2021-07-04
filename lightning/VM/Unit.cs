@@ -70,11 +70,13 @@ namespace lightning
     public class NumberUnit : Unit
     {
         public Number content;
-        // public uint refCounter;
+        public bool referenced;
+        public bool stacked;
         public NumberUnit(Number value)
         {
             content = value;
-            // refCounter = 0;
+            referenced = false;
+            stacked = false;
         }
 
         public override string ToString()
@@ -339,6 +341,8 @@ namespace lightning
             {
                 isCaptured = true;
                 value = variables.GetAt(address, env);
+                if(value.GetType() == typeof(NumberUnit))
+                    ((NumberUnit)value).referenced = true;
             }
         }
         public override string ToString()
@@ -387,31 +391,45 @@ namespace lightning
             if (index > (ECount - 1))
                 ElementsStretch(index - (ECount - 1));
             elements[index] = value;
+
+            if(value.GetType() == typeof(NumberUnit))
+                ((NumberUnit)value).referenced = true;
         }
 
         public void ElementAdd(Unit value)
         {
             elements.Add(value);
+            if(value.GetType() == typeof(NumberUnit))
+                ((NumberUnit)value).referenced = true;
         }
 
         public void TableSet(StringUnit index, Unit value)
         {
             table[index] = value;
+            if(value.GetType() == typeof(NumberUnit))
+                ((NumberUnit)value).referenced = true;
         }
 
         public void TableSet(string index, Unit value)
         {
             table[new StringUnit(index)] = value;
+            if(value.GetType() == typeof(NumberUnit))
+                ((NumberUnit)value).referenced = true;
         }
 
         public void TableSet(StringUnit index, Number value)
         {
             table[index] = new NumberUnit(value);
+            if(table[index].GetType() == typeof(NumberUnit))
+                ((NumberUnit)table[index]).referenced = true;
         }
 
         public void TableSet(string index, Number value)
         {
-            table[new StringUnit(index)] = new NumberUnit(value);
+            StringUnit string_unit_index = new StringUnit(index);
+            table[string_unit_index] = new NumberUnit(value);
+            if(table[string_unit_index].GetType() == typeof(NumberUnit))
+                ((NumberUnit)table[string_unit_index]).referenced = true;
         }
 
         void ElementsStretch(int n)
