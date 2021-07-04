@@ -64,6 +64,9 @@ namespace lightning
                     mem_use.TableSet("variables_capacity", vm.VariablesCapacity());
                     mem_use.TableSet("upvalues_count", vm.UpValuesCount());
                     mem_use.TableSet("upvalue_capacity", vm.UpValueCapacity());
+                    mem_use.TableSet("number_pool_count", vm.numberPool.Count);
+                    mem_use.TableSet("number_pool_max_used", vm.numberPool.MaxUsed);
+                    mem_use.TableSet("number_pool_in_use", vm.numberPool.InUse);
 
                     return mem_use;
                 }
@@ -107,13 +110,13 @@ namespace lightning
                 Unit nextInt(VM vm)
                 {
                     int max = (int)(vm.GetNumber(0));
-                    return new NumberUnit(rng.Next(max + 1));
+                    return vm.numberPool.Get(rng.Next(max + 1));
                 }
                 rand.TableSet("int", new IntrinsicUnit("int", nextInt, 1));
 
                 Unit nextFloat(VM vm)
                 {
-                    return new NumberUnit((Number)rng.NextDouble());
+                    return vm.numberPool.Get((Number)rng.NextDouble());
                 }
                 rand.TableSet("float", new IntrinsicUnit("float", nextFloat, 0));
 
@@ -143,7 +146,7 @@ namespace lightning
                     Number value = ((NumberUnit)list.elements[^1]).content;
                     list.elements.RemoveRange(list.elements.Count - 1, 1);
 
-                    return new NumberUnit(value);
+                    return vm.numberPool.Get(value);
                 }
                 list.TableSet("pop", new IntrinsicUnit("pop", listPop, 1));
 
@@ -174,7 +177,7 @@ namespace lightning
                 {
                     TableUnit this_table = vm.GetTable(0);
                     int count = this_table.ECount;
-                    return new NumberUnit(count);
+                    return vm.numberPool.Get(count);
                 }
                 list.TableSet("count", new IntrinsicUnit("count", listCount, 1));
 
@@ -266,7 +269,7 @@ namespace lightning
                         if (i < (this_table.ECount - 1))
                         {
                             i++;
-                            iterator.table[key_string] = new NumberUnit(i);
+                            iterator.table[key_string] = vm.numberPool.Get(i);
                             iterator.table[value_string] = this_table.elements[i];
                             return Unit.True;
                         }
@@ -318,7 +321,7 @@ namespace lightning
                 {
                     TableUnit this_table = vm.GetTable(0);
                     int count = this_table.TCount;
-                    return new NumberUnit(count);
+                    return vm.numberPool.Get(count);
                 }
                 table.TableSet("count", new IntrinsicUnit("table_count", tableCount, 1));
 
@@ -434,84 +437,84 @@ namespace lightning
                 //////////////////////////////////////////////////////
                 Unit sin(VM vm)
                 {
-                    return new NumberUnit((Number)Math.Sin(vm.GetNumber(0)));
+                    return vm.numberPool.Get((Number)Math.Sin(vm.GetNumber(0)));
                 }
                 math.TableSet("sin", new IntrinsicUnit("sin", sin, 1));
 
                 //////////////////////////////////////////////////////
                 Unit cos(VM vm)
                 {
-                    return new NumberUnit((Number)Math.Cos(vm.GetNumber(0)));
+                    return vm.numberPool.Get((Number)Math.Cos(vm.GetNumber(0)));
                 }
                 math.TableSet("cos", new IntrinsicUnit("cos", cos, 1));
 
                 //////////////////////////////////////////////////////
                 Unit tan(VM vm)
                 {
-                    return new NumberUnit((Number)Math.Tan(vm.GetNumber(0)));
+                    return vm.numberPool.Get((Number)Math.Tan(vm.GetNumber(0)));
                 }
                 math.TableSet("tan", new IntrinsicUnit("tan", tan, 1));
 
                 //////////////////////////////////////////////////////
                 Unit sec(VM vm)
                 {
-                    return new NumberUnit((Number)(1 / Math.Cos(vm.GetNumber(0))));
+                    return vm.numberPool.Get((Number)(1 / Math.Cos(vm.GetNumber(0))));
                 }
                 math.TableSet("sec", new IntrinsicUnit("sec", sec, 1));
 
                 //////////////////////////////////////////////////////
                 Unit cosec(VM vm)
                 {
-                    return new NumberUnit((Number)(1 / Math.Sin(vm.GetNumber(0))));
+                    return vm.numberPool.Get((Number)(1 / Math.Sin(vm.GetNumber(0))));
                 }
                 math.TableSet("cosec", new IntrinsicUnit("cosec", cosec, 1));
 
                 //////////////////////////////////////////////////////
                 Unit cotan(VM vm)
                 {
-                    return new NumberUnit((Number)(1 / Math.Tan(vm.GetNumber(0))));
+                    return vm.numberPool.Get((Number)(1 / Math.Tan(vm.GetNumber(0))));
                 }
                 math.TableSet("cotan", new IntrinsicUnit("cotan", cotan, 1));
 
                 //////////////////////////////////////////////////////
                 Unit asin(VM vm)
                 {
-                    return new NumberUnit((Number)Math.Asin(vm.GetNumber(0)));
+                    return vm.numberPool.Get((Number)Math.Asin(vm.GetNumber(0)));
                 }
                 math.TableSet("asin", new IntrinsicUnit("asin", asin, 1));
 
                 //////////////////////////////////////////////////////
                 Unit acos(VM vm)
                 {
-                    return new NumberUnit((Number)Math.Acos(vm.GetNumber(0)));
+                    return vm.numberPool.Get((Number)Math.Acos(vm.GetNumber(0)));
                 }
                 math.TableSet("acos", new IntrinsicUnit("acos", acos, 1));
 
                 //////////////////////////////////////////////////////
                 Unit atan(VM vm)
                 {
-                    return new NumberUnit((Number)Math.Atan(vm.GetNumber(0)));
+                    return vm.numberPool.Get((Number)Math.Atan(vm.GetNumber(0)));
                 }
                 math.TableSet("atan", new IntrinsicUnit("atan", atan, 1));
 
                 //////////////////////////////////////////////////////
                 Unit sinh(VM vm)
                 {
-                    return new NumberUnit((Number)Math.Sinh(vm.GetNumber(0)));
+                    return vm.numberPool.Get((Number)Math.Sinh(vm.GetNumber(0)));
                 }
                 math.TableSet("sinh", new IntrinsicUnit("sinh", sinh, 1));
 
                 //////////////////////////////////////////////////////
                 Unit cosh(VM vm)
                 {
-                    return new NumberUnit((Number)Math.Cosh(vm.GetNumber(0)));
+                    return vm.numberPool.Get((Number)Math.Cosh(vm.GetNumber(0)));
                 }
                 math.TableSet("cosh", new IntrinsicUnit("cosh", cosh, 1));
 
                 //////////////////////////////////////////////////////
                 Unit tanh(VM vm)
                 {
-                    return new NumberUnit((Number)Math.Tanh(vm.GetNumber(0)));
+                    return vm.numberPool.Get((Number)Math.Tanh(vm.GetNumber(0)));
                 }
                 math.TableSet("tanh", new IntrinsicUnit("tanh", tanh, 1));
 
@@ -520,7 +523,7 @@ namespace lightning
                 {
                     Number value = vm.GetNumber(0);
                     Number exponent = vm.GetNumber(1);
-                    return new NumberUnit((Number)Math.Pow(value, exponent));
+                    return vm.numberPool.Get((Number)Math.Pow(value, exponent));
                 }
                 math.TableSet("pow", new IntrinsicUnit("pow", pow, 2));
 
@@ -529,7 +532,7 @@ namespace lightning
                 {
                     Number value = vm.GetNumber(0);
                     Number exponent = vm.GetNumber(1);
-                    return new NumberUnit((Number)Math.Pow(value, 1 / exponent));
+                    return vm.numberPool.Get((Number)Math.Pow(value, 1 / exponent));
                 }
                 math.TableSet("root", new IntrinsicUnit("root", root, 2));
 
@@ -537,14 +540,14 @@ namespace lightning
                 Unit sqroot(VM vm)
                 {
                     Number value = vm.GetNumber(0);
-                    return new NumberUnit((Number)Math.Sqrt(value));
+                    return vm.numberPool.Get((Number)Math.Sqrt(value));
                 }
                 math.TableSet("sqroot", new IntrinsicUnit("sqroot", sqroot, 1));
                 //////////////////////////////////////////////////////
                 Unit exp(VM vm)
                 {
                     Number exponent = vm.GetNumber(0);
-                    return new NumberUnit((Number)Math.Exp(exponent));
+                    return vm.numberPool.Get((Number)Math.Exp(exponent));
                 }
                 math.TableSet("exp", new IntrinsicUnit("exp", exp, 1));
 
@@ -553,7 +556,7 @@ namespace lightning
                 {
                     Number value = vm.GetNumber(0);
                     Number this_base = vm.GetNumber(1);
-                    return new NumberUnit((Number)Math.Log(value, this_base));
+                    return vm.numberPool.Get((Number)Math.Log(value, this_base));
                 }
                 math.TableSet("log", new IntrinsicUnit("log", log, 2));
 
@@ -561,7 +564,7 @@ namespace lightning
                 Unit ln(VM vm)
                 {
                     Number value = vm.GetNumber(0);
-                    return new NumberUnit((Number)Math.Log(value, Math.E));
+                    return vm.numberPool.Get((Number)Math.Log(value, Math.E));
                 }
                 math.TableSet("ln", new IntrinsicUnit("ln", ln, 1));
 
@@ -569,7 +572,7 @@ namespace lightning
                 Unit log10(VM vm)
                 {
                     Number value = vm.GetNumber(0);
-                    return new NumberUnit((Number)Math.Log(value, (Number)10));
+                    return vm.numberPool.Get((Number)Math.Log(value, (Number)10));
                 }
                 math.TableSet("log10", new IntrinsicUnit("log10", log10, 1));
 
@@ -578,7 +581,7 @@ namespace lightning
                 {
                     Number value1 = vm.GetNumber(0);
                     Number value2 = vm.GetNumber(1);
-                    return new NumberUnit((Number)value1 % value2);
+                    return vm.numberPool.Get((Number)value1 % value2);
                 }
                 math.TableSet("mod", new IntrinsicUnit("mod", mod, 2));
 
@@ -587,7 +590,7 @@ namespace lightning
                 {
                     Number value1 = vm.GetNumber(0);
                     Number value2 = vm.GetNumber(1);
-                    return new NumberUnit((Number)(int)(value1 / value2));
+                    return vm.numberPool.Get((Number)(int)(value1 / value2));
                 }
                 math.TableSet("idiv", new IntrinsicUnit("idiv", idiv, 2));
 
@@ -609,7 +612,7 @@ namespace lightning
                 {
                     long timeStart = vm.GetWrapperUnit<long>(0);
                     long timeEnd = vm.GetWrapperUnit<long>(1);
-                    return new NumberUnit((Number)(new TimeSpan(timeEnd - timeStart).TotalMilliseconds));// Convert to milliseconds
+                    return vm.numberPool.Get((Number)(new TimeSpan(timeEnd - timeStart).TotalMilliseconds));// Convert to milliseconds
                 }
                 time.TableSet("span", new IntrinsicUnit("span", timeSpan, 2));
 
@@ -659,7 +662,7 @@ namespace lightning
                 Unit stringLength(VM vm)
                 {
                     StringUnit val_input_string = vm.GetStringUnit(0);
-                    return new NumberUnit(val_input_string.ToString().Length);
+                    return vm.numberPool.Get(val_input_string.ToString().Length);
                 }
                 string_table.TableSet("length", new IntrinsicUnit("string_length", stringLength, 1));
 
@@ -943,7 +946,7 @@ namespace lightning
             {
                 string read = Console.ReadLine();
                 if (Number.TryParse(read, out Number n))
-                    return new NumberUnit(n);
+                    return vm.numberPool.Get(n);
                 else
                     return Unit.Null;
             }
@@ -971,7 +974,7 @@ namespace lightning
             {
                 TableUnit this_table = vm.GetTable(0);
                 int count = this_table.Count;
-                return new NumberUnit(count);
+                return vm.numberPool.Get(count);
             }
             functions.Add(new IntrinsicUnit("count_all", count, 1));
 
@@ -1022,7 +1025,7 @@ namespace lightning
             //////////////////////////////////////////////////////
             Unit countVMs(VM vm)
             {
-                return new NumberUnit(VM.CountVMs());
+                return vm.numberPool.Get(VM.CountVMs());
             }
             functions.Add(new IntrinsicUnit("count_vms", countVMs, 0));
 
@@ -1042,7 +1045,7 @@ namespace lightning
                 System.Threading.Tasks.Parallel.For(init, end, (index) =>
                 {
                     List<Unit> args = new List<Unit>();
-                    args.Add(new NumberUnit(index));
+                    args.Add(vm.numberPool.Get(index));
                     args.Add(table);
                     vms[index].CallFunction(func, args);
                 });
@@ -1079,10 +1082,10 @@ namespace lightning
                 {
                     List<Unit> args = new List<Unit>();
                     int range_start = index * step;
-                    args.Add(new NumberUnit(range_start));
+                    args.Add(vm.numberPool.Get(range_start));
                     int range_end = range_start + step;
                     if (range_end > count) range_end = count;
-                    args.Add(new NumberUnit(range_end));
+                    args.Add(vm.numberPool.Get(range_end));
                     args.Add(table);
                     vms[index].CallFunction(func, args);
                 });

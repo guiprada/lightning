@@ -70,9 +70,11 @@ namespace lightning
     public class NumberUnit : Unit
     {
         public Number content;
+        // public uint refCounter;
         public NumberUnit(Number value)
         {
             content = value;
+            // refCounter = 0;
         }
 
         public override string ToString()

@@ -51,6 +51,8 @@ namespace lightning
         public Dictionary<string, int> loadedModules { get; private set; }
         public List<ModuleUnit> modules;
         static Stack<VM> vmPool;
+
+        public NumberPool numberPool;
         int functionDeepness;
         bool parallelVM;
 
@@ -91,6 +93,7 @@ namespace lightning
             modules = new List<ModuleUnit>();
 
             vmPool = new Stack<VM>();
+            numberPool = new NumberPool();
         }
 
         public void ResoursesTrim(){
@@ -99,22 +102,32 @@ namespace lightning
             upValues.Trim();
         }
         public static void ReleaseVMs(int count){
-            for (int i = 0; i < count; i++)
-                if (vmPool.Count > 0)
-                    vmPool.Pop();
-                vmPool.TrimExcess();
+            lock(vmPool){
+                for (int i = 0; i < count; i++)
+                    if (vmPool.Count > 0)
+                        vmPool.Pop();
+                    vmPool.TrimExcess();
+            }
         }
         public static void ReleaseVMs(){
-            vmPool.Clear();
-            vmPool.TrimExcess();
+            lock(vmPool){
+                vmPool.Clear();
+                vmPool.TrimExcess();
+            }
         }
 
         public static int CountVMs(){
-            return vmPool.Count;
+            int count;
+            lock(vmPool){
+                count = vmPool.Count;
+            }
+            return count;
         }
         public static void RecycleVM(VM vm)
         {
-            vmPool.Push(vm);
+            lock(vmPool){
+                vmPool.Push(vm);
+            }
         }
 
         public VM GetVM()
@@ -246,6 +259,7 @@ namespace lightning
                 upValuesRegistry.Get(i).Capture();
             }
             upValuesRegistry.PopEnv();
+            // variables.ReleaseNumbers(numberPool);
             variables.PopEnv();
         }
 
@@ -291,7 +305,11 @@ namespace lightning
                             IP++;
                             Operand address = instruction.opA;
                             Unit constant = chunk.GetConstant(address);
-                            stack.Push(constant);
+
+                            if (constant.GetType() == typeof(NumberUnit))
+                                stack.Push(numberPool.Get(constant));
+                            else
+                                stack.Push(constant);
                             break;
                         }
                     case OpCode.LOAD_VARIABLE:
@@ -328,7 +346,11 @@ namespace lightning
                             Operand module = instruction.opB;
                             Unit constant = modules[module].constants[address];
 
-                            stack.Push(constant);
+                            if (constant.GetType() == typeof(NumberUnit))
+                                stack.Push(numberPool.Get(constant));
+                            else
+                                stack.Push(constant);
+
                             break;
                         }
                     case OpCode.LOAD_UPVALUE:
@@ -367,15 +389,21 @@ namespace lightning
                     case OpCode.DECLARE_VARIABLE:
                         {
                             IP++;
-                            Unit new_value = stack.Pop();
-                            variables.Add(new_value);
+                            Unit variable = stack.Pop();
+                            if (variable.GetType() == typeof(NumberUnit))
+                                variable = numberPool.Get(variable);
+
+                            variables.Add(variable);
                             break;
                         }
                     case OpCode.DECLARE_GLOBAL:
                         {
                             IP++;
-                            Unit new_value = stack.Pop();
-                            globals.Add(new_value);
+                            Unit global = stack.Pop();
+                            if (global.GetType() == typeof(NumberUnit))
+                                global = numberPool.Get(global);
+
+                            globals.Add(global);
 
                             break;
                         }
@@ -440,23 +468,27 @@ namespace lightning
                             Operand n_shift = instruction.opB;
                             Operand op = instruction.opC;
                             Unit new_value = stack.Peek();
+                            Unit old_value = variables.GetAt(address, CalculateEnvShift(n_shift));
                             if (op == 0)
                             {
+                                if (old_value.GetType() == typeof(NumberUnit))
+                                    numberPool.Release(old_value);
+                                if (new_value.GetType() == typeof(NumberUnit))
+                                {
+                                    new_value = numberPool.Get(new_value);
+                                }
                                 variables.SetAt(new_value, address, CalculateEnvShift(n_shift));
                             }
                             else
                             {
-                                NumberUnit old_value = (NumberUnit)variables.GetAt(address, CalculateEnvShift(n_shift));
-                                Number result = 0;
                                 if (op == 1)
-                                    result = old_value.content + ((NumberUnit)new_value).content;
+                                    ((NumberUnit)old_value).content += ((NumberUnit)new_value).content;
                                 else if (op == 2)
-                                    result = old_value.content - ((NumberUnit)new_value).content;
+                                    ((NumberUnit)old_value).content -= ((NumberUnit)new_value).content;
                                 else if (op == 3)
-                                    result = old_value.content * ((NumberUnit)new_value).content;
+                                    ((NumberUnit)old_value).content *= ((NumberUnit)new_value).content;
                                 else if (op == 4)
-                                    result = old_value.content / ((NumberUnit)new_value).content;
-                                variables.SetAt(new NumberUnit(result), address, CalculateEnvShift(n_shift));
+                                    ((NumberUnit)old_value).content /= ((NumberUnit)new_value).content;
                             }
                             break;
                         }
@@ -468,56 +500,42 @@ namespace lightning
                             Unit new_value = stack.Peek();
                             if (op == 0)
                             {
+
+                                Unit old_value = globals.Get(address);
+                                if (old_value.GetType() == typeof(NumberUnit))
+                                    numberPool.Release(old_value);
+                                if (new_value.GetType() == typeof(NumberUnit))
+                                {
+                                    new_value = numberPool.Get(new_value);
+                                }
                                 globals.Set(new_value, address);
-                            }else if(parallelVM == true){
-                                if (op == 1)
+                            }
+                            else
+                            {
+                                if(parallelVM){
                                     lock(globals){
-                                        Number old_value = ((NumberUnit)globals.Get(address)).content;
-                                        Unit result = new NumberUnit(old_value + ((NumberUnit)new_value).content);
-                                        globals.Set(result, address);
+                                        Unit old_value = globals.Get(address);
+                                        if (op == 1)
+                                            ((NumberUnit)old_value).content += ((NumberUnit)new_value).content;
+                                        else if (op == 2)
+                                            ((NumberUnit)old_value).content -= ((NumberUnit)new_value).content;
+                                        else if (op == 3)
+                                            ((NumberUnit)old_value).content *= ((NumberUnit)new_value).content;
+                                        else if (op == 4)
+                                            ((NumberUnit)old_value).content /= ((NumberUnit)new_value).content;
                                     }
-                                else if (op == 2)
-                                    lock(globals){
-                                        Number old_value = ((NumberUnit)globals.Get(address)).content;
-                                        Unit result = new NumberUnit(old_value - ((NumberUnit)new_value).content);
-                                        globals.Set(result, address);
-                                    }
-                                else if (op == 3)
-                                    lock(globals){
-                                         Number old_value = ((NumberUnit)globals.Get(address)).content;
-                                        Unit result = new NumberUnit(old_value * ((NumberUnit)new_value).content);
-                                        globals.Set(result, address);
-                                    }
-                                else if (op == 4)
-                                    lock(globals){
-                                        Number old_value = ((NumberUnit)globals.Get(address)).content;
-                                        Unit result = new NumberUnit(old_value / ((NumberUnit)new_value).content);
-                                        globals.Set(result, address);
-                                    }
-                            }else{
-                                if (op == 1){
-                                    Number old_value = ((NumberUnit)globals.Get(address)).content;
-                                    Unit result = new NumberUnit(old_value + ((NumberUnit)new_value).content);
-                                    globals.Set(result, address);
+                                }else{
+                                     Unit old_value = globals.Get(address);
+                                    if (op == 1)
+                                        ((NumberUnit)old_value).content += ((NumberUnit)new_value).content;
+                                    else if (op == 2)
+                                        ((NumberUnit)old_value).content -= ((NumberUnit)new_value).content;
+                                    else if (op == 3)
+                                        ((NumberUnit)old_value).content *= ((NumberUnit)new_value).content;
+                                    else if (op == 4)
+                                        ((NumberUnit)old_value).content /= ((NumberUnit)new_value).content;
                                 }
-                                else if (op == 2)
-                                {
-                                    Number old_value = ((NumberUnit)globals.Get(address)).content;
-                                    Unit result = new NumberUnit(old_value - ((NumberUnit)new_value).content);
-                                    globals.Set(result, address);
-                                }
-                                else if (op == 3)
-                                {
-                                    Number old_value = ((NumberUnit)globals.Get(address)).content;
-                                    Unit result = new NumberUnit(old_value * ((NumberUnit)new_value).content);
-                                    globals.Set(result, address);
-                                }
-                                else if (op == 4)
-                                {
-                                    Number old_value = ((NumberUnit)globals.Get(address)).content;
-                                    Unit result = new NumberUnit(old_value / ((NumberUnit)new_value).content);
-                                    globals.Set(result, address);
-                                }
+
                             }
                             break;
                         }
@@ -526,52 +544,43 @@ namespace lightning
                             IP++;
                             Operand address = instruction.opA;
                             Operand op = instruction.opB;
-                            UpValueUnit this_upValue = upValues.GetAt(address);
+                            UpValueUnit this_value = upValues.GetAt(address);
                             Unit new_value = stack.Peek();
                             if (op == 0)
                             {
-                                this_upValue.UpValue = new_value;
-                            }else if(parallelVM == true){
-                                if (op == 1)
-                                    lock(this_upValue){
-                                        Number old_value = ((NumberUnit)this_upValue.UpValue).content;
-                                        this_upValue.UpValue = new NumberUnit(old_value + ((NumberUnit)new_value).content);
-                                    }
-                                else if (op == 2)
-                                    lock(this_upValue){
-                                        Number old_value = ((NumberUnit)this_upValue.UpValue).content;
-                                        this_upValue.UpValue = new NumberUnit(old_value - ((NumberUnit)new_value).content);
-                                    }
-                                else if (op == 3)
-                                    lock(this_upValue){
-                                        Number old_value = ((NumberUnit)this_upValue.UpValue).content;
-                                        this_upValue.UpValue = new NumberUnit(old_value * ((NumberUnit)new_value).content);
-                                    }
-                                else if (op == 4)
-                                    lock(this_upValue){
-                                        Number old_value = ((NumberUnit)this_upValue.UpValue).content;
-                                        this_upValue.UpValue = new NumberUnit(old_value / ((NumberUnit)new_value).content);
-                                    }
-                            }else{
-                                if (op == 1)
+                                Unit old_value = this_value.UpValue;
+                                if (old_value.GetType() == typeof(NumberUnit))
+                                    numberPool.Release(old_value);
+                                if (new_value.GetType() == typeof(NumberUnit))
                                 {
-                                    Number old_value = ((NumberUnit)this_upValue.UpValue).content;
-                                    this_upValue.UpValue = new NumberUnit(old_value + ((NumberUnit)new_value).content);
+                                    new_value = numberPool.Get(new_value);
                                 }
-                                else if (op == 2)
-                                {
-                                    Number old_value = ((NumberUnit)this_upValue.UpValue).content;
-                                    this_upValue.UpValue = new NumberUnit(old_value - ((NumberUnit)new_value).content);
-                                }
-                                else if (op == 3)
-                                {
-                                    Number old_value = ((NumberUnit)this_upValue.UpValue).content;
-                                    this_upValue.UpValue = new NumberUnit(old_value * ((NumberUnit)new_value).content);
-                                }
-                                else if (op == 4)
-                                {
-                                    Number old_value = ((NumberUnit)this_upValue.UpValue).content;
-                                    this_upValue.UpValue = new NumberUnit(old_value / ((NumberUnit)new_value).content);
+                                this_value.UpValue = new_value;
+                            }
+                            else
+                            {
+                                if(parallelVM){
+                                    lock(globals){
+                                        Unit old_value = this_value.UpValue;
+                                        if (op == 1)
+                                            ((NumberUnit)old_value).content += ((NumberUnit)new_value).content;
+                                        else if (op == 2)
+                                            ((NumberUnit)old_value).content -= ((NumberUnit)new_value).content;
+                                        else if (op == 3)
+                                            ((NumberUnit)old_value).content *= ((NumberUnit)new_value).content;
+                                        else if (op == 4)
+                                            ((NumberUnit)old_value).content /= ((NumberUnit)new_value).content;
+                                    }
+                                }else{
+                                    Unit old_value = this_value.UpValue;
+                                    if (op == 1)
+                                        ((NumberUnit)old_value).content += ((NumberUnit)new_value).content;
+                                    else if (op == 2)
+                                        ((NumberUnit)old_value).content -= ((NumberUnit)new_value).content;
+                                    else if (op == 3)
+                                        ((NumberUnit)old_value).content *= ((NumberUnit)new_value).content;
+                                    else if (op == 4)
+                                        ((NumberUnit)old_value).content /= ((NumberUnit)new_value).content;
                                 }
                             }
                             break;
@@ -590,17 +599,16 @@ namespace lightning
                             {
                                 if (v.GetType() == typeof(NumberUnit))
                                 {
-                                    value = ((TableUnit)(value)).elements[(int)((NumberUnit)v).content];
+                                    value = ((TableUnit)value).elements[(int)((NumberUnit)v).content];
                                 }
                                 else
                                 {
-                                    value = ((TableUnit)(value)).table[(StringUnit)v];
+                                    value = ((TableUnit)value).table[(StringUnit)v];
                                 }
                             }
                             stack.Push(value);
                             break;
                         }
-
                     case OpCode.TABLE_SET:
                         {
                             IP++;
@@ -618,11 +626,11 @@ namespace lightning
                                 Unit v = indexes[i];
                                 if (v.GetType() == typeof(NumberUnit))
                                 {
-                                    this_table = ((TableUnit)(this_table)).elements[(int)((NumberUnit)v).content];
+                                    this_table = ((TableUnit)this_table).elements[(int)((NumberUnit)v).content];
                                 }
                                 else
                                 {
-                                    this_table = ((TableUnit)(this_table)).table[(StringUnit)v];
+                                    this_table = ((TableUnit)this_table).table[(StringUnit)v];
                                 }
                             }
                             Unit new_value = stack.Peek();
@@ -630,9 +638,15 @@ namespace lightning
                             {
                                 if (indexes[indexes_counter - 1].GetType() == typeof(NumberUnit))
                                 {
-                                    if ((this_table as TableUnit).elements.Count - 1 >= ((int)((NumberUnit)indexes[indexes_counter - 1]).content))
+                                    if (((TableUnit)this_table).elements.Count - 1 >= ((int)((NumberUnit)indexes[indexes_counter - 1]).content))
                                     {
-                                        Unit old_value = (this_table as TableUnit).elements[(int)((NumberUnit)indexes[indexes_counter - 1]).content];
+                                        Unit old_value = ((TableUnit)this_table).elements[(int)((NumberUnit)indexes[indexes_counter - 1]).content];
+                                        if (old_value.GetType() == typeof(NumberUnit))
+                                            numberPool.Release(old_value);
+                                    }
+                                    if (new_value.GetType() == typeof(NumberUnit))
+                                    {
+                                        new_value = numberPool.Get(new_value);
                                     }
                                     ((TableUnit)this_table).ElementSet((int)((NumberUnit)indexes[indexes_counter - 1]).content, new_value);
                                 }
@@ -641,6 +655,12 @@ namespace lightning
                                     if (((TableUnit)this_table).table.ContainsKey((StringUnit)indexes[indexes_counter - 1]))
                                     {
                                         Unit old_value = ((TableUnit)this_table).table[(StringUnit)indexes[indexes_counter - 1]];
+                                        if (old_value.GetType() == typeof(NumberUnit))
+                                            numberPool.Release(old_value);
+                                    }
+                                    if (new_value.GetType() == typeof(NumberUnit))
+                                    {
+                                        new_value = numberPool.Get(new_value);
                                     }
                                     ((TableUnit)this_table).TableSet((StringUnit)indexes[indexes_counter - 1], new_value);
                                 }
@@ -649,7 +669,7 @@ namespace lightning
                             {
                                 Unit old_value;
                                 if (indexes[indexes_counter - 1].GetType() == typeof(NumberUnit))
-                                    old_value = (this_table as TableUnit).elements[(int)((NumberUnit)indexes[indexes_counter - 1]).content];
+                                    old_value = ((TableUnit)this_table).elements[(int)((NumberUnit)indexes[indexes_counter - 1]).content];
                                 else
                                     old_value = ((TableUnit)this_table).table[(StringUnit)indexes[indexes_counter - 1]];
 
@@ -661,7 +681,6 @@ namespace lightning
                                     ((NumberUnit)old_value).content *= ((NumberUnit)new_value).content;
                                 else if (op == 4)
                                     ((NumberUnit)old_value).content /= ((NumberUnit)new_value).content;
-
                             }
                             break;
                         }
@@ -722,7 +741,7 @@ namespace lightning
                             Number opA = ((NumberUnit)stack.Pop()).content;
 
                             Number result = opA + opB;
-                            stack.Push(new NumberUnit(result));
+                            stack.Push(numberPool.Get(result));
 
                             break;
                         }
@@ -745,7 +764,7 @@ namespace lightning
                             Number opA = ((NumberUnit)stack.Pop()).content;
 
                             Number result = opA - opB;
-                            stack.Push(new NumberUnit(result));
+                            stack.Push(numberPool.Get(result));
 
                             break;
                         }
@@ -756,7 +775,7 @@ namespace lightning
                             Number opA = ((NumberUnit)stack.Pop()).content;
 
                             Number result = opA * opB;
-                            stack.Push(new NumberUnit(result));
+                            stack.Push(numberPool.Get(result));
 
                             break;
                         }
@@ -767,7 +786,7 @@ namespace lightning
                             Number opA = ((NumberUnit)stack.Pop()).content;
 
                             Number result = opA / opB;
-                            stack.Push(new NumberUnit(result));
+                            stack.Push(numberPool.Get(result));
 
                             break;
                         }
@@ -775,7 +794,7 @@ namespace lightning
                         {
                             IP++;
                             Number opA = ((NumberUnit)stack.Pop()).content;
-                            Unit new_value = new NumberUnit(-opA);
+                            Unit new_value = numberPool.Get(-opA);
                             stack.Push(new_value);
                             break;
                         }
@@ -783,7 +802,7 @@ namespace lightning
                         {
                             IP++;
                             Number opA = ((NumberUnit)stack.Pop()).content;
-                            Unit new_value = new NumberUnit(opA + 1);
+                            Unit new_value = numberPool.Get(opA + 1);
                             stack.Push(new_value);
                             break;
                         }
@@ -791,7 +810,7 @@ namespace lightning
                         {
                             IP++;
                             Number opA = ((NumberUnit)stack.Pop()).content;
-                            Unit new_value = new NumberUnit(opA - 1);
+                            Unit new_value = numberPool.Get(opA - 1);
                             stack.Push(new_value);
                             break;
                         }
