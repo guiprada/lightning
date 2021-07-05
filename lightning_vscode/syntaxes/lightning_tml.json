@@ -163,7 +163,7 @@
 			"name": "keyword.control.lightning"
 		},
 		{
-			"match": "(?<![^.]\\.|:)\\b(false|nil|true|var|math\\.(pi|e))\\b|(?<![.])\\.{3}(?!\\.)",
+			"match": "(?<![^.]\\.|:)\\b(false|null|true|math\\.(pi|e|double))\\b|(?<![.])\\.{3}(?!\\.)",
 			"name": "constant.language.lightning"
 		},
 		{
@@ -171,11 +171,11 @@
 			"name": "variable.language.self.lightning"
 		},
 		{
-			"match": "(?<![^.]\\.|:)\\b(assert|collectgarbage|dofile|error|getfenv|getmetatable|ipairs|loadfile|loadstring|module|next|pairs|pcall|print|rawequal|rawget|rawset|require|select|setfenv|setmetatable|tonumber|tostring|type|unpack|xpcall)\\b(?=\\s*(?:[({\"']|\\[\\[))",
+			"match": "()",
 			"name": "support.function.lightning"
 		},
 		{
-			"match": "(?<![^.]\\.|:)\\b(listMap\\.(indexOf|indexes|values|sum|shuffle|remove|range|foreach|slice|push|pop|pull)|string\\.(char|hasIndex|indexOf|len|lower|remove|upper)|table\\.(concat|insert|maxn|remove|sort)|math\\.(abs|acos|asin|atan|cos|pi|r|rnd|sign|sin|sqrt|tan)|io\\.(close|flush|input|lines|open|output|popen|read|tmpfile|type|write)|os\\.(clock|date|difftime|execute|exit|getenv|remove|rename|setlocale|time|tmpname)|package\\.(cpath|loaded|loadlib|path|preload|seeall))\\b(?=\\s*(?:[({\"']|\\[\\[))",
+			"match": "()",
 			"name": "support.function.library.lightning"
 		},
 		{

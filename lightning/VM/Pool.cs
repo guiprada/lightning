@@ -15,6 +15,7 @@ namespace lightning
         Stack<NumberUnit> objects;
         uint maxUsed;
         uint inUse;
+        uint recycled;
 
         public int Count{
             get{
@@ -34,10 +35,16 @@ namespace lightning
             }
         }
 
+        public int Recycled{
+            get{
+                return (int)recycled;
+            }
+        }
         public NumberPool(){
             objects = new Stack<NumberUnit>();
             maxUsed = 0;
             inUse = 0;
+            recycled = 0;
         }
 
         public NumberUnit Get(Unit p_unit){
@@ -72,6 +79,7 @@ namespace lightning
         public void Release(NumberUnit v)
         {
             if(v.referenced == false && v.stacked == false){
+                recycled++;
                 inUse--;
                 if(objects.Count <= maxUsed)
                     objects.Push(v);

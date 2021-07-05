@@ -56,6 +56,7 @@ namespace lightning
             {
                 TableUnit machine = new TableUnit(null, null);
 
+                //////////////////////////////////////////////////////
                 Unit memoryUse(VM vm){
                     TableUnit mem_use = new TableUnit(null, null);
                     mem_use.TableSet("stack_count", vm.StackCount());
@@ -67,10 +68,64 @@ namespace lightning
                     mem_use.TableSet("number_pool_count", vm.numberPool.Count);
                     mem_use.TableSet("number_pool_max_used", vm.numberPool.MaxUsed);
                     mem_use.TableSet("number_pool_in_use", vm.numberPool.InUse);
+                    mem_use.TableSet("number_pool_recycled", vm.numberPool.Recycled);
 
                     return mem_use;
                 }
                 machine.TableSet("memory_use", new IntrinsicUnit("memory_use", memoryUse, 0));
+
+                //////////////////////////////////////////////////////
+                Unit modules(VM vm)
+                {
+                    string modules = "";
+                    bool first = true;
+                    foreach (KeyValuePair<string, int> entry in vm.loadedModules)
+                    {
+                        if (first == true)
+                        {
+                            modules += entry.Key;
+                            first = false;
+                        }
+                        else
+                        {
+                            modules += " " + entry.Key;
+                        }
+                    }
+
+                    return new StringUnit(modules);
+                }
+                machine.TableSet("modules",new IntrinsicUnit("modules", modules, 0));
+
+                //////////////////////////////////////////////////////
+                Unit resourcesTrim(VM vm)
+                {
+                    vm.ResoursesTrim();
+                    return Unit.Null;
+                }
+                machine.TableSet("trim", new IntrinsicUnit("trim", resourcesTrim, 0));
+
+                //////////////////////////////////////////////////////
+                Unit releaseAllVMs(VM vm)
+                {
+                    VM.ReleaseVMs();
+                    return Unit.Null;
+                }
+                machine.TableSet("release_all_vms", new IntrinsicUnit("release_all_vms", releaseAllVMs, 0));
+
+                //////////////////////////////////////////////////////
+                Unit releaseVMs(VM vm)
+                {
+                    VM.ReleaseVMs((int)vm.GetNumber(0));
+                    return Unit.Null;
+                }
+                machine.TableSet("release_vms",new IntrinsicUnit("release_vms", releaseVMs, 1));
+
+                //////////////////////////////////////////////////////
+                Unit countVMs(VM vm)
+                {
+                    return vm.numberPool.Get(VM.CountVMs());
+                }
+                machine.TableSet("count_vms",new IntrinsicUnit("count_vms", countVMs, 0));
 
                 tables.Add("machine", machine);
             }
@@ -795,7 +850,7 @@ namespace lightning
             //////////////////////////////////////////////////////
             Unit eval(VM vm)
             {
-                string eval_code = vm.GetString(0);;
+                string eval_code = vm.GetString(0);
                 Scanner scanner = new Scanner(eval_code);
 
                 Parser parser = new Parser(scanner.Tokens);
@@ -895,28 +950,6 @@ namespace lightning
             functions.Add(new IntrinsicUnit("require", require, 1));
 
             //////////////////////////////////////////////////////
-            Unit modules(VM vm)
-            {
-                string modules = "";
-                bool first = true;
-                foreach (KeyValuePair<string, int> entry in vm.loadedModules)
-                {
-                    if (first == true)
-                    {
-                        modules += entry.Key;
-                        first = false;
-                    }
-                    else
-                    {
-                        modules += " " + entry.Key;
-                    }
-                }
-
-                return new StringUnit(modules);
-            }
-            functions.Add(new IntrinsicUnit("modules", modules, 0));
-
-            //////////////////////////////////////////////////////
 
             Unit writeLine(VM vm)
             {
@@ -999,37 +1032,6 @@ namespace lightning
             functions.Add(new IntrinsicUnit("maybe", maybe, 2));
 
             //////////////////////////////////////////////////////
-            Unit resourcesTrim(VM vm)
-            {
-                vm.ResoursesTrim();
-                return Unit.Null;
-            }
-            functions.Add(new IntrinsicUnit("trim", resourcesTrim, 0));
-
-            //////////////////////////////////////////////////////
-            Unit releaseAllVMs(VM vm)
-            {
-                VM.ReleaseVMs();
-                return Unit.Null;
-            }
-            functions.Add(new IntrinsicUnit("release_all_vms", releaseAllVMs, 0));
-
-            //////////////////////////////////////////////////////
-            Unit releaseVMs(VM vm)
-            {
-                VM.ReleaseVMs((int)vm.GetNumber(0));
-                return Unit.Null;
-            }
-            functions.Add(new IntrinsicUnit("release_vms", releaseVMs, 1));
-
-            //////////////////////////////////////////////////////
-            Unit countVMs(VM vm)
-            {
-                return vm.numberPool.Get(VM.CountVMs());
-            }
-            functions.Add(new IntrinsicUnit("count_vms", countVMs, 0));
-
-            //////////////////////////////////////////////////////
             Unit forEach(VM vm)
             {
                 TableUnit table = vm.GetTable(0);
@@ -1059,7 +1061,7 @@ namespace lightning
             functions.Add(new IntrinsicUnit("foreach", forEach, 2));
             //////////////////////////////////////////////////////
 
-            Unit ForRange(VM vm)
+            Unit forRange(VM vm)
             {
                 Number tasks = vm.GetNumber(0);
                 TableUnit table = vm.GetTable(1);
@@ -1096,7 +1098,7 @@ namespace lightning
                 return Unit.Null;
             }
 
-            functions.Add(new IntrinsicUnit("range", ForRange, 3));
+            functions.Add(new IntrinsicUnit("range", forRange, 3));
 
             //////////////////////////////////////////////////////
             Unit tuple(VM vm)

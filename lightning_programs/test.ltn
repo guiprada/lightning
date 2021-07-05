@@ -17,6 +17,7 @@ function count_errors()
 {
     return lib_assert_counter_not.errors + lib_assert_counter.errors
 }
+
 function clear_errors()
 {
     lib_assert_counter_not.errors = 0
@@ -590,13 +591,13 @@ var global_lock_test_counter = 5
 }
 {
     // Testing VMs management
-    var totalVMs = count_vms()
+    var totalVMs = machine.count_vms()
     var halth = math.idiv(totalVMs, 2)
-    release_vms(halth)
-    assert(count_vms(), totalVMs - halth, "Failed VMs management Test 1.")
+    machine.release_vms(halth)
+    assert(machine.count_vms(), totalVMs - halth, "Failed VMs management Test 1.")
 
-    release_all_vms()
-    assert(count_vms(), 0, "Failed VMs management Test 0.")
+    machine.release_all_vms()
+    assert(machine.count_vms(), 0, "Failed VMs management Test 0.")
 }
 {
     // Testing increment and decrement
@@ -712,7 +713,7 @@ var global_lock_test_counter = 5
     assert(nuple_get(nuple1, 1), "world", "Failed Nuples Test 4.")
 }
 
-trim()
+machine.trim()
 
 var end_time = time.now()
 write_line("")
@@ -724,7 +725,7 @@ else{
 }
 write_line("-- Finished tests! --")
 write_line("Elapsed time: " .. time.span(start_time, end_time) .. " ms")
-write_line("Loaded modules: " .. modules())
+write_line("Loaded modules: " .. machine.modules())
 write_line(machine.memory_use())
 
 ////////////////////////////// scratch
