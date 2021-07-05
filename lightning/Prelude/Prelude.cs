@@ -950,7 +950,6 @@ namespace lightning
             functions.Add(new IntrinsicUnit("require", require, 1));
 
             //////////////////////////////////////////////////////
-
             Unit writeLine(VM vm)
             {
                 Console.WriteLine(System.Text.RegularExpressions.Regex.Unescape(vm.GetUnit(0).ToString()));

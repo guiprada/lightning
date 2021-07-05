@@ -15,12 +15,12 @@
             "id": "lightning",
             "aliases": ["lightning", "lightning"],
             "extensions": ["ltn"],
-            "configuration": "./language-configuration.json"
+            "configuration": "language-configuration.json"
         }],
         "grammars": [{
             "language": "lightning",
             "scopeName": "source.lightning",
-            "path": "./syntaxes/lightning_tml.json"
+            "path": "lightning_tml.json"
         }]
     }
 }
