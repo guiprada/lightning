@@ -69,6 +69,59 @@ namespace lightning
                 }
                 machine.TableSet("memory_use", new IntrinsicUnit("memory_use", memoryUse, 0));
 
+                //////////////////////////////////////////////////////
+                Unit modules(VM vm)
+                {
+                    string modules = "";
+                    bool first = true;
+                    foreach (KeyValuePair<string, int> entry in vm.loadedModules)
+                    {
+                        if (first == true)
+                        {
+                            modules += entry.Key;
+                            first = false;
+                        }
+                        else
+                        {
+                            modules += " " + entry.Key;
+                        }
+                    }
+
+                    return new Unit(modules);
+                }
+                machine.TableSet("modules", new IntrinsicUnit("modules", modules, 0));
+
+                //////////////////////////////////////////////////////
+                Unit resourcesTrim(VM vm)
+                {
+                    vm.ResoursesTrim();
+                    return new Unit(UnitType.Null);
+                }
+                machine.TableSet("trim", new IntrinsicUnit("trim", resourcesTrim, 0));
+
+                //////////////////////////////////////////////////////
+                Unit releaseAllVMs(VM vm)
+                {
+                    VM.ReleaseVMs();
+                    return new Unit(UnitType.Null);
+                }
+                machine.TableSet("release_all_vms", new IntrinsicUnit("release_all_vms", releaseAllVMs, 0));
+
+                //////////////////////////////////////////////////////
+                Unit releaseVMs(VM vm)
+                {
+                    VM.ReleaseVMs((int)vm.GetNumber(0));
+                    return new Unit(UnitType.Null);
+                }
+                machine.TableSet("release_vms", new IntrinsicUnit("release_vms", releaseVMs, 1));
+
+                //////////////////////////////////////////////////////
+                Unit countVMs(VM vm)
+                {
+                    return new Unit(VM.CountVMs());
+                }
+                machine.TableSet("count_vms", new IntrinsicUnit("count_vms", countVMs, 0));
+
                 tables.Add("machine", machine);
             }
             ////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -892,29 +945,6 @@ namespace lightning
             functions.Add(new IntrinsicUnit("require", require, 1));
 
             //////////////////////////////////////////////////////
-            Unit modules(VM vm)
-            {
-                string modules = "";
-                bool first = true;
-                foreach (KeyValuePair<string, int> entry in vm.loadedModules)
-                {
-                    if (first == true)
-                    {
-                        modules += entry.Key;
-                        first = false;
-                    }
-                    else
-                    {
-                        modules += " " + entry.Key;
-                    }
-                }
-
-                return new Unit(modules);
-            }
-            functions.Add(new IntrinsicUnit("modules", modules, 0));
-
-            //////////////////////////////////////////////////////
-
             Unit writeLine(VM vm)
             {
                 Console.WriteLine(System.Text.RegularExpressions.Regex.Unescape(vm.GetUnit(0).ToString()));
@@ -994,37 +1024,6 @@ namespace lightning
                     return second;
             }
             functions.Add(new IntrinsicUnit("maybe", maybe, 2));
-
-            //////////////////////////////////////////////////////
-            Unit resourcesTrim(VM vm)
-            {
-                vm.ResoursesTrim();
-                return new Unit(UnitType.Null);
-            }
-            functions.Add(new IntrinsicUnit("trim", resourcesTrim, 0));
-
-            //////////////////////////////////////////////////////
-            Unit releaseAllVMs(VM vm)
-            {
-                VM.ReleaseVMs();
-                return new Unit(UnitType.Null);
-            }
-            functions.Add(new IntrinsicUnit("release_all_vms", releaseAllVMs, 0));
-
-            //////////////////////////////////////////////////////
-            Unit releaseVMs(VM vm)
-            {
-                VM.ReleaseVMs((int)vm.GetNumber(0));
-                return new Unit(UnitType.Null);
-            }
-            functions.Add(new IntrinsicUnit("release_vms", releaseVMs, 1));
-
-            //////////////////////////////////////////////////////
-            Unit countVMs(VM vm)
-            {
-                return new Unit(VM.CountVMs());
-            }
-            functions.Add(new IntrinsicUnit("count_vms", countVMs, 0));
 
             //////////////////////////////////////////////////////
             Unit forEach(VM vm)
