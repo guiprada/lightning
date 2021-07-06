@@ -78,7 +78,7 @@ namespace lightning
 
         public void Release(NumberUnit v)
         {
-            if(v.referenced == false || v.stacked == false){
+            if(v.referenced == false && v.stacked == false){
                 recycled++;
                 inUse--;
                 if(objects.Count <= maxUsed)
