@@ -1,4 +1,7 @@
-﻿write_line("*** Welcome to lightning Zzz :) ***")
+﻿write = function(){}
+write_line = write
+
+write_line("*** Welcome to lightning Zzz :) ***")
 write_line("-- Starting tests --")
 var start_time = time.now()
 

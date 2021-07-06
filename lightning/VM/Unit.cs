@@ -320,6 +320,11 @@ namespace lightning
                     variables.SetAt(value, address, env);
             }
         }
+        public bool IsCaptured{
+            get{
+                return isCaptured;
+            }
+        }
 
         public UpValueUnit(Operand p_address, Operand p_env)
         {

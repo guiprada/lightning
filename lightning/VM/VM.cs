@@ -400,8 +400,10 @@ namespace lightning
                         {
                             IP++;
                             Unit global = stack.Pop();
-                            if (global.GetType() == typeof(NumberUnit))
+                            if (global.GetType() == typeof(NumberUnit)){
                                 global = numberPool.Get(global);
+                                ((NumberUnit)global).referenced = true;
+                            }
 
                             globals.Add(global);
 
@@ -507,6 +509,7 @@ namespace lightning
                                 if (new_value.GetType() == typeof(NumberUnit))
                                 {
                                     new_value = numberPool.Get(new_value);
+                                    ((NumberUnit)new_value).referenced = true;
                                 }
                                 globals.Set(new_value, address);
                             }
@@ -556,7 +559,8 @@ namespace lightning
                                 if (new_value.GetType() == typeof(NumberUnit))
                                 {
                                     new_value = numberPool.Get(new_value);
-                                    ((NumberUnit)new_value).referenced = true;
+                                    if(this_value.IsCaptured)
+                                        ((NumberUnit)new_value).referenced = true;
                                 }
                                 this_value.UpValue = new_value;
                             }

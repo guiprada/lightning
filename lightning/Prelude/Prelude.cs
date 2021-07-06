@@ -1046,7 +1046,7 @@ namespace lightning
                 System.Threading.Tasks.Parallel.For(init, end, (index) =>
                 {
                     List<Unit> args = new List<Unit>();
-                    args.Add(vm.numberPool.Get(index));
+                    args.Add(vms[index].numberPool.Get(index));
                     args.Add(table);
                     vms[index].CallFunction(func, args);
                 });
@@ -1083,10 +1083,10 @@ namespace lightning
                 {
                     List<Unit> args = new List<Unit>();
                     int range_start = index * step;
-                    args.Add(vm.numberPool.Get(range_start));
+                    args.Add(vms[index].numberPool.Get(range_start));
                     int range_end = range_start + step;
                     if (range_end > count) range_end = count;
-                    args.Add(vm.numberPool.Get(range_end));
+                    args.Add(vms[index].numberPool.Get(range_end));
                     args.Add(table);
                     vms[index].CallFunction(func, args);
                 });
