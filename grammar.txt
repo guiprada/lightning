@@ -32,5 +32,5 @@ methodCall      -> compoundVar : IDENTIFIER ( "(" arguments? ")" ( . compoundVar
 arguments       -> expression ( "," expression )*
 table           -> [ tableEntry (, tableEntry )* ]
 tableEntry      -> primary | IDENTIFIER : primary
-compoundVar     -> IDENTIFIER ( ([ primary ]) | (. IDENTIFIER) )*
+compoundVar     -> IDENTIFIER ( ([ expression ]) | (. IDENTIFIER) )*
 primary         ->  NUMBER | STRING | "false" | "true" | "null" | "(" expression ")" | compoundVar | list | funExpr | table
