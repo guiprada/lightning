@@ -1057,7 +1057,7 @@ namespace lightning
                 return Unit.Null;
             }
 
-            functions.Add(new IntrinsicUnit("foreach", forEach, 2));
+            functions.Add(new IntrinsicUnit("for_each", forEach, 2));
             //////////////////////////////////////////////////////
 
             Unit forRange(VM vm)
@@ -1097,7 +1097,7 @@ namespace lightning
                 return Unit.Null;
             }
 
-            functions.Add(new IntrinsicUnit("range", forRange, 3));
+            functions.Add(new IntrinsicUnit("for_range", forRange, 3));
 
             //////////////////////////////////////////////////////
             Unit tuple(VM vm)
