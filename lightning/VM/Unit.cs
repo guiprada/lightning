@@ -390,7 +390,9 @@ namespace lightning
         {
             if (index > (ECount - 1))
                 ElementsStretch(index - (ECount - 1));
-            elements[index] = value;
+            lock(elements){
+                elements[index] = value;
+            }
 
             if(value.GetType() == typeof(NumberUnit))
                 ((NumberUnit)value).referenced = true;
@@ -398,28 +400,36 @@ namespace lightning
 
         public void ElementAdd(Unit value)
         {
-            elements.Add(value);
+            lock(elements){
+                elements.Add(value);
+            }
             if(value.GetType() == typeof(NumberUnit))
                 ((NumberUnit)value).referenced = true;
         }
 
         public void TableSet(StringUnit index, Unit value)
         {
-            table[index] = value;
+            lock(table){
+                table[index] = value;
+            }
             if(value.GetType() == typeof(NumberUnit))
                 ((NumberUnit)value).referenced = true;
         }
 
         public void TableSet(string index, Unit value)
         {
-            table[new StringUnit(index)] = value;
+            lock(table){
+                table[new StringUnit(index)] = value;
+            }
             if(value.GetType() == typeof(NumberUnit))
                 ((NumberUnit)value).referenced = true;
         }
 
         public void TableSet(StringUnit index, Number value)
         {
-            table[index] = new NumberUnit(value);
+            lock(table){
+                table[index] = new NumberUnit(value);
+            }
             if(table[index].GetType() == typeof(NumberUnit))
                 ((NumberUnit)table[index]).referenced = true;
         }
@@ -427,7 +437,9 @@ namespace lightning
         public void TableSet(string index, Number value)
         {
             StringUnit string_unit_index = new StringUnit(index);
-            table[string_unit_index] = new NumberUnit(value);
+            lock(table){
+                table[string_unit_index] = new NumberUnit(value);
+            }
             if(table[string_unit_index].GetType() == typeof(NumberUnit))
                 ((NumberUnit)table[string_unit_index]).referenced = true;
         }
@@ -436,7 +448,9 @@ namespace lightning
         {
             for (int i = 0; i < n; i++)
             {
-                elements.Add(Unit.Null);
+                lock(table){
+                    elements.Add(Unit.Null);
+                }
             }
         }
 

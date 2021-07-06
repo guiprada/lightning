@@ -491,8 +491,11 @@ function clear_errors()
 }
 {
     // Testing range
+    write("Testing Range: ")
     var table1 = []
-    table1[99] = null
+    var n = 100
+    var size = n - 1
+    table1[size] = null
     function many_for (start, end, this_table)
     {
         for (var i = start; i<end; i++)
@@ -501,37 +504,37 @@ function clear_errors()
         }
     }
     range(6, table1, many_for)
-    for (var i = 0; i< 100; i++)
+    for (var i = 0; i< n; i++)
     {
         assert(table1[i], i, "Failed range Test " .. i .. ".")
     }
 
     range(1, table1, many_for)
-    for (var i = 0; i< 100; i++)
+    for (var i = 0; i< n; i++)
     {
         assert(table1[i], i, "Failed range Test " .. i .. ".")
     }
 
     range(3, table1, many_for)
-    for (var i = 0; i< 100; i++)
+    for (var i = 0; i< n; i++)
     {
         assert(table1[i], i, "Failed range Test " .. i .. ".")
     }
 
     range(200, table1, many_for)
-    for (var i = 0; i< 100; i++)
+    for (var i = 0; i< n; i++)
     {
         assert(table1[i], i, "Failed range Test " .. i .. ".")
     }
+    write_line("OK")
 }
 {
     // Testing foreach
+    write("Testing Foreach: ")
     var table1 = []
-    table1[99] = null
-    // for (var i = 0; i< 100; i++)
-    // {
-    //     table1[i] = []
-    // }
+    var n = 100
+    var size = n - 1
+    table1[size] = null
 
     function many(index, collection)
     {
@@ -539,48 +542,52 @@ function clear_errors()
         collection[index].x = 1
     }
     foreach(table1, many)
-    for (var i = 0; i< 100; i++)
+    for (var i = 0; i<n; i++)
     {
         assert(table1[i].x, 1, "Failed Foreach Test " .. i .. ".")
     }
 
     table1 = []
-    table1[99] = null
+    table1[size] = null
     function many_number(index, collection)
     {
         collection[index] = 1
     }
     foreach(table1, many_number)
-    for (var i = 0; i< 100; i++)
+    for (var i = 0; i<n; i++)
     {
         assert(table1[i], 1, "Failed Foreach Test " .. i .. ".")
     }
 
     table1 = []
-    table1[99] = null
+    table1[size] = null
     foreach(table1, function(index, collection)
     {
-        collection[index] = 100 - index
+        collection[index] = n - index
     })
-    for (var i = 0; i< 100; i++)
+    for (var i = 0; i<n; i++)
     {
-        assert(table1[i], 100 - i, "Failed Foreach Test " .. (99+i) .. ".")
+        assert(table1[i], n - i, "Failed Foreach Test " .. (size+i) .. ".")
     }
+    write_line("OK")
 }
 // Testing Global Lock
 var global_lock_test_counter = 5
 {
-    var n = 1000
+    write("Testing Global Lock: ")
+    var n = 10000
     function many(index, collection)
     {
         global_lock_test_counter++;
     }
     range(n, [], many)
     assert(global_lock_test_counter, n + 5, "Failed Global Lock Test 1.")
+    write_line("OK")
 }
 {
     // Testing UpValue Lock
-    var n = 1000
+    write("Testing UpValue Lock: ")
+    var n = 10000
     var upvalue_lock_test_counter = 5
     function many(index, collection)
     {
@@ -588,9 +595,11 @@ var global_lock_test_counter = 5
     }
     range(n, [], many)
     assert(upvalue_lock_test_counter, n + 5, "Failed UpValue Lock Test 1.")
+    write_line("OK")
 }
 {
     // Testing VMs management
+    write("Testing VM management: ")
     var totalVMs = machine.count_vms()
     var halth = math.idiv(totalVMs, 2)
     machine.release_vms(halth)
@@ -598,9 +607,11 @@ var global_lock_test_counter = 5
 
     machine.release_all_vms()
     assert(machine.count_vms(), 0, "Failed VMs management Test 0.")
+    write_line("OK")
 }
 {
     // Testing increment and decrement
+    write("Testing increment and decrement: ")
     var j = 1
     var j1 = --j
     assert(j1, 0, "Failed Increment Test 1.")
@@ -610,9 +621,11 @@ var global_lock_test_counter = 5
     var j2 = 0
     j2++
     assert(j2, 1, "Failed Increment Test 2.")
+    write_line("OK")
 }
 {
     // Testing List
+    write("Testing List: ")
     var new_list = []
     list.push(new_list, 3)
     list.push(new_list, 2)
@@ -630,6 +643,7 @@ var global_lock_test_counter = 5
     assert(list.count(list_copy), 3, "Failed List test 6.")
     list.clear(list_copy)
     assert(list.count(list_copy), 0, "Failed List test 7.")
+    write_line("OK")
 }
 {
     // Testing inline Intrinsics
@@ -646,14 +660,17 @@ var global_lock_test_counter = 5
         }
     '
     if (intrinsic.create != null){
+        write("Testing inline Intrinsic: ")
         var sum_intr = intrinsic.create("sum", 2, intr_sum)
         assert(sum_intr(5, 6), 11, "Failed inline Intrinsic test 1.")
+        write_line("OK")
     }else{
         write_line("No inline intrinsic support!")
     }
 }
 {
     // Testing iterators
+    write("Testing iterators: ")
     var table1 = [ brazil:"Brasilia", eua:"Washington", australia:"Canberra"]
     var indexes_table1 = table.indexes(table1)
     var counter = 0
@@ -683,9 +700,11 @@ var global_lock_test_counter = 5
         assert(it.value, list1[counter], "Failed iterator value Test 5, iteration: " .. counter)
         counter++
     }
+    write_line("OK")
 }
 {
     // Testing tuples
+    write("Testing tuples: ")
     function get_tuple(a, b){
         return tuple(a, b)
     }
@@ -697,9 +716,11 @@ var global_lock_test_counter = 5
     tuple_set_y(tuple1, "world")
     assert(tuple_get_x(tuple1), "hello", "Failed Tuples Test 3.")
     assert(tuple_get_y(tuple1), "world", "Failed Tuples Test 4.")
+    write_line("OK")
 }
 {
     // Testing nuples
+    write("Testing nuples: ")
     function get_nuple(list){
         return nuple(list)
     }
@@ -711,6 +732,7 @@ var global_lock_test_counter = 5
     nuple_set(nuple1, 1, "world")
     assert(nuple_get(nuple1, 0), "hello", "Failed Nuples Test 3.")
     assert(nuple_get(nuple1, 1), "world", "Failed Nuples Test 4.")
+    write_line("OK")
 }
 
 machine.trim()
