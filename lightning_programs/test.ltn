@@ -489,7 +489,7 @@ function clear_errors()
     assert(i, -5, "Failed ASSIGN_VARIABLE Ops Test 4.")
 }
 {
-    // Testing range
+    // Testing for_range
     var table1 = []
     var n = 100
     table1[n - 1] = null
@@ -500,32 +500,32 @@ function clear_errors()
             this_table[i] = i
         }
     }
-    range(6, table1, many_for)
+    for_range(6, table1, many_for)
     for (var i = 0; i<n; i++)
     {
-        assert(table1[i], i, "Failed range Test 1, iteration: " .. i .. ".")
+        assert(table1[i], i, "Failed for_range Test 1, iteration: " .. i .. ".")
     }
 
-    range(1, table1, many_for)
+    for_range(1, table1, many_for)
     for (var i = 0; i<n; i++)
     {
-        assert(table1[i], i, "Failed range Test 2, iteration: " .. i .. ".")
+        assert(table1[i], i, "Failed for_range Test 2, iteration: " .. i .. ".")
     }
 
-    range(3, table1, many_for)
+    for_range(3, table1, many_for)
     for (var i = 0; i<n; i++)
     {
-        assert(table1[i], i, "Failed range Test 3, iteration: " .. i .. ".")
+        assert(table1[i], i, "Failed for_range Test 3, iteration: " .. i .. ".")
     }
 
-    range(200, table1, many_for)
+    for_range(200, table1, many_for)
     for (var i = 0; i<n; i++)
     {
-        assert(table1[i], i, "Failed range Test 4, iteration: " .. i .. ".")
+        assert(table1[i], i, "Failed for_range Test 4, iteration: " .. i .. ".")
     }
 }
 {
-    // Testing foreach
+    // Testing for_each
     var table1 = []
     table1[99] = null
     // for (var i = 0; i< 100; i++)
@@ -538,10 +538,10 @@ function clear_errors()
         collection[index] = []
         collection[index].x = 1
     }
-    foreach(table1, many)
+    for_each(table1, many)
     for (var i = 0; i< 100; i++)
     {
-        assert(table1[i].x, 1, "Failed Foreach Test " .. i .. ".")
+        assert(table1[i].x, 1, "Failed for_each Test " .. i .. ".")
     }
 
     table1 = []
@@ -550,21 +550,21 @@ function clear_errors()
     {
         collection[index] = 1
     }
-    foreach(table1, many_number)
+    for_each(table1, many_number)
     for (var i = 0; i< 100; i++)
     {
-        assert(table1[i], 1, "Failed Foreach Test " .. i .. ".")
+        assert(table1[i], 1, "Failed for_each Test " .. i .. ".")
     }
 
     table1 = []
     table1[99] = null
-    foreach(table1, function(index, collection)
+    for_each(table1, function(index, collection)
     {
         collection[index] = 100 - index
     })
     for (var i = 0; i< 100; i++)
     {
-        assert(table1[i], 100 - i, "Failed Foreach Test " .. (99+i) .. ".")
+        assert(table1[i], 100 - i, "Failed for_each Test " .. (99+i) .. ".")
     }
 }
 // Testing Global Lock
@@ -575,7 +575,7 @@ var global_lock_test_counter = 5
     {
         global_lock_test_counter++;
     }
-    range(n, [], many)
+    for_range(n, [], many)
     assert(global_lock_test_counter, n + 5, "Failed Global Lock Test 1.")
 }
 {
@@ -586,7 +586,7 @@ var global_lock_test_counter = 5
     {
         upvalue_lock_test_counter++;
     }
-    range(n, [], many)
+    for_range(n, [], many)
     assert(upvalue_lock_test_counter, n + 5, "Failed UpValue Lock Test 1.")
 }
 {

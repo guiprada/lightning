@@ -1,0 +1,1 @@
+foreach($i in 1 .. 500){.\run_test.bat | Out-File -Append -FilePath log.log}
