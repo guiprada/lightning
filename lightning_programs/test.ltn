@@ -494,8 +494,7 @@ function clear_errors()
     write("Testing Range: ")
     var table1 = []
     var n = 100
-    var size = n - 1
-    table1[size] = null
+    table1[n - 1] = null
     function many_for (start, end, this_table)
     {
         for (var i = start; i<end; i++)
@@ -504,27 +503,27 @@ function clear_errors()
         }
     }
     range(6, table1, many_for)
-    for (var i = 0; i< n; i++)
+    for (var i = 0; i<n; i++)
     {
-        assert(table1[i], i, "Failed range Test " .. i .. ".")
+        assert(table1[i], i, "Failed range Test 1, iteration: " .. i .. ".")
     }
 
     range(1, table1, many_for)
-    for (var i = 0; i< n; i++)
+    for (var i = 0; i<n; i++)
     {
-        assert(table1[i], i, "Failed range Test " .. i .. ".")
+        assert(table1[i], i, "Failed range Test 2, iteration: " .. i .. ".")
     }
 
     range(3, table1, many_for)
-    for (var i = 0; i< n; i++)
+    for (var i = 0; i<n; i++)
     {
-        assert(table1[i], i, "Failed range Test " .. i .. ".")
+        assert(table1[i], i, "Failed range Test 3, iteration: " .. i .. ".")
     }
 
     range(200, table1, many_for)
-    for (var i = 0; i< n; i++)
+    for (var i = 0; i<n; i++)
     {
-        assert(table1[i], i, "Failed range Test " .. i .. ".")
+        assert(table1[i], i, "Failed range Test 4, iteration: " .. i .. ".")
     }
     write_line("OK")
 }
@@ -599,7 +598,6 @@ var global_lock_test_counter = 5
 }
 {
     // Testing VMs management
-    write("Testing VM management: ")
     var totalVMs = machine.count_vms()
     var halth = math.idiv(totalVMs, 2)
     machine.release_vms(halth)
@@ -607,7 +605,6 @@ var global_lock_test_counter = 5
 
     machine.release_all_vms()
     assert(machine.count_vms(), 0, "Failed VMs management Test 0.")
-    write_line("OK")
 }
 {
     // Testing increment and decrement
