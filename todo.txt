@@ -1,28 +1,33 @@
 ﻿todo
 
-	evaluate expressions in index
-	sobrecarga de metodos?
-	arrays
-	coroutines
-	compilador self_hosted
-	adicionar variaveis internas a tabela
-	adicionar properties
-	adicionar interfaces
-	retorno multiplo
-	sobrecarga de metodos
-	tabelas da valtable devem ser criados somentw quando utilizados
+Improvements
+	- foreach recebe so o item
+	- repensar forrange
+	- coroutines,wait, thread and message passing
+	- obrecarga de operacoes
+	- adicionar parametros de stack ao valfunction para poder completar com nil ao chamar a funcao.
 	- improve line counting
-	- add loading Value.Null for missing parameters on function call, emit a warning
+	- arrays, tuples and nuple Units
+
+
+Memory Management
+	- list has to free its numbers
+	- out parameter
+
+Parsec
 	- elide more stuff on parser
 	- parser generators and combinators
 	- many(*), at_least_one(+), optional(?)
-	- valtable containers should be null until used
-	- increment and decrement unarys
-	- table clone function
-	- need for semicolons?
+	- adicionar interfaces
+
+Optimizations
+	- tail call optimization
+	- remover auto global lock
+
+Parser
 	- error sync on statement
 	- better parser error messages
-	- tail call optimization
+	- add loading Value.Nil for missing parameters on function call, emit a warning
 
 done
 	- nil support
