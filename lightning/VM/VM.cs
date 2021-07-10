@@ -630,6 +630,32 @@ namespace lightning
                                     ((TableUnit)(this_table.heapUnitValue)).TableSet((StringUnit)indexes[indexes_counter - 1].heapUnitValue, new_value);
                                 }
                             }
+                            else if(parallelVM == true)
+                            {
+                                Unit old_value;
+                                Number result = 0;
+                                lock(this_table.heapUnitValue){
+                                    if (indexes[indexes_counter - 1].type == UnitType.Number)
+                                        old_value = ((TableUnit)(this_table.heapUnitValue)).elements[(int)(indexes[indexes_counter - 1].unitValue)];
+                                    else
+                                        old_value = ((TableUnit)(this_table.heapUnitValue)).table[(StringUnit)indexes[indexes_counter - 1].heapUnitValue];
+
+                                    if (op == 1)
+                                        result = old_value.unitValue + new_value.unitValue;
+                                    else if (op == 2)
+                                        result = old_value.unitValue - new_value.unitValue;
+                                    else if (op == 3)
+                                        result = old_value.unitValue * new_value.unitValue;
+                                    else if (op == 4)
+                                        result = old_value.unitValue / new_value.unitValue;
+                                }
+
+                                if (indexes[indexes_counter - 1].type == UnitType.Number)
+                                    ((TableUnit)(this_table.heapUnitValue)).elements[(int)(indexes[indexes_counter - 1].unitValue)] = new Unit(result);
+                                else
+                                    ((TableUnit)(this_table.heapUnitValue)).table[(StringUnit)indexes[indexes_counter - 1].heapUnitValue] = new Unit(result);
+
+                            }
                             else
                             {
                                 Unit old_value;
