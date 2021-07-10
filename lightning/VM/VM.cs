@@ -673,6 +673,25 @@ namespace lightning
                                     ((TableUnit)this_table).TableSet((StringUnit)indexes[indexes_counter - 1], new_value);
                                 }
                             }
+                            else if(parallelVM == true)
+                            {
+                                Unit old_value;
+                                lock(this_table){
+                                    if (indexes[indexes_counter - 1].GetType() == typeof(NumberUnit))
+                                        old_value = ((TableUnit)this_table).elements[(int)((NumberUnit)indexes[indexes_counter - 1]).content];
+                                    else
+                                        old_value = ((TableUnit)this_table).table[(StringUnit)indexes[indexes_counter - 1]];
+
+                                    if (op == 1)
+                                        ((NumberUnit)old_value).content += ((NumberUnit)new_value).content;
+                                    else if (op == 2)
+                                        ((NumberUnit)old_value).content -= ((NumberUnit)new_value).content;
+                                    else if (op == 3)
+                                        ((NumberUnit)old_value).content *= ((NumberUnit)new_value).content;
+                                    else if (op == 4)
+                                        ((NumberUnit)old_value).content /= ((NumberUnit)new_value).content;
+                                }
+                            }
                             else
                             {
                                 Unit old_value;
