@@ -468,6 +468,17 @@ namespace lightning
                 }
                 table.TableSet("to_string", new IntrinsicUnit("table_to_string", tableToString, 1));
 
+                //////////////////////////////////////////////////////
+                Unit setSuperTable(VM vm)
+                {
+                    TableUnit this_table = vm.GetTable(0);
+                    TableUnit super_table = vm.GetTable(1);
+                    this_table.superTable = super_table;
+
+                    return new Unit(UnitType.Null);
+                }
+                table.TableSet("set_super", new IntrinsicUnit("set_super", setSuperTable, 2));
+
                 tables.Add("table", table);
             }
 

@@ -1,0 +1,7 @@
+var scanner = []
+
+scanner.scan = function(source){
+
+}
+
+return scanner

@@ -1,0 +1,10 @@
+var scanner = require("scanner.ltn")
+var parser = require("parser.ltn")
+var chunker = require("chunker.ltn")
+
+function compile(source){
+	var tokens = scanner.scan(source)
+	var nodes = parser.parse(tokens)
+	var chunk = chunker.chunk(nodes)
+	return chunk
+}

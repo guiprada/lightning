@@ -573,14 +573,15 @@ namespace lightning
                             Unit value = stack.Pop();
                             foreach (Unit v in indexes)
                             {
-                                if (v.type == UnitType.Number)
-                                {
-                                    value = ((TableUnit)(value.heapUnitValue)).elements[(int)v.unitValue];
-                                }
-                                else
-                                {
-                                    value = ((TableUnit)(value.heapUnitValue)).table[(StringUnit)v.heapUnitValue];
-                                }
+                                value = ((TableUnit)(value.heapUnitValue)).Get(v);
+                                // if (v.type == UnitType.Number)
+                                // {
+                                //     value = ((TableUnit)(value.heapUnitValue)).elements[(int)v.unitValue];
+                                // }
+                                // else
+                                // {
+                                //     value = ((TableUnit)(value.heapUnitValue)).table[(StringUnit)v.heapUnitValue];
+                                // }
                             }
                             stack.Push(value);
                             break;

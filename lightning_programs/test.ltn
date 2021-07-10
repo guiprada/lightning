@@ -712,6 +712,13 @@ var global_lock_test_counter = 5
     assert(nuple_get(nuple1, 0), "hello", "Failed Nuples Test 3.")
     assert(nuple_get(nuple1, 1), "world", "Failed Nuples Test 4.")
 }
+{
+    // Testing super table
+    var super_table = [ brazil:"Brasilia", eua:"Washington", australia:"Canberra"]
+    var common_table = []
+    table.set_super(common_table, super_table)
+    assert(common_table.brazil, "Brasilia", "Failed Super Table Test 1.")
+}
 
 machine.trim()
 

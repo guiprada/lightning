@@ -302,6 +302,7 @@ namespace lightning
         public List<Unit> elements;
         public Dictionary<StringUnit, Unit> table;
 
+        public TableUnit superTable;
 
         public int ECount { get { return elements.Count; } }
         public int TCount { get { return table.Count; } }
@@ -312,6 +313,25 @@ namespace lightning
             table = p_table ??= new Dictionary<StringUnit, Unit>();
         }
 
+        public Unit Get(Unit p_key){
+            if (p_key.type == UnitType.Number){
+                return elements[(int)p_key.unitValue];
+            }else if (p_key.HeapUnitType == typeof(StringUnit)){
+                return GetTable((StringUnit)(p_key.heapUnitValue));
+            }else if (p_key.type == UnitType.HeapUnit)
+                throw new Exception("Table can not be indexed by: " + p_key.HeapUnitType);
+            else
+                throw new Exception("Table can not be indexed by: " + p_key.type);
+        }
+        public Unit GetTable(StringUnit p_string){
+            if(table.ContainsKey(p_string)){
+                return table[p_string];
+            }else if(superTable != null){
+                return superTable.GetTable(p_string);
+            }else{
+                return new Unit(UnitType.Null);
+            }
+        }
         public void ElementSet(int index, Unit value)
         {
             if (index > (ECount - 1))
