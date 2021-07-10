@@ -175,7 +175,7 @@ namespace lightning
                 for (int i = args.Count - 1; i >= 0; i--)
                     stack.Push(args[i]);
 
-            Type this_type = this_callable.HeapUnitType();
+            Type this_type = this_callable.HeapUnitType;
 
             instructions.PushRET((Operand)(chunk.ProgramSize - 1));
             if (this_type == typeof(FunctionUnit))
@@ -386,7 +386,7 @@ namespace lightning
                             Operand lambda = instruction.opB;
                             Operand new_fun_address = instruction.opC;
                             Unit this_callable = chunk.GetConstant(new_fun_address);
-                            if (this_callable.HeapUnitType() == typeof(FunctionUnit))
+                            if (this_callable.HeapUnitType == typeof(FunctionUnit))
                             {
                                 if (lambda == 0)
                                     if (env == 0)// Global
@@ -1069,7 +1069,7 @@ namespace lightning
                             IP++;
 
                             Unit this_callable = stack.Pop();
-                            Type this_type = this_callable.HeapUnitType();
+                            Type this_type = this_callable.HeapUnitType;
 
                             if (this_type == typeof(FunctionUnit))
                             {
@@ -1107,7 +1107,7 @@ namespace lightning
                             {
                                 UnitType this_unit_type = this_callable.type;
                                 if(this_unit_type == UnitType.HeapUnit)
-                                    Error("Trying to call a " + this_callable.HeapUnitType());
+                                    Error("Trying to call a " + this_callable.HeapUnitType);
                                 else
                                     Error("Trying to call a " + this_callable.type);
                                 return new VMResult(VMResultType.OK, new Unit(UnitType.Null));

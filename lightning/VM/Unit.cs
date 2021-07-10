@@ -17,7 +17,6 @@ namespace lightning
         Number,
         Null,
         Boolean,
-
         HeapUnit
     }
 
@@ -25,6 +24,14 @@ namespace lightning
         public UnitType type;
         public Number unitValue;
         public HeapUnit heapUnitValue;
+
+        public Type HeapUnitType{
+            get{
+                if(type == UnitType.HeapUnit)
+                    return heapUnitValue.GetType();
+                return null;
+            }
+        }
 
         public Unit(HeapUnit p_value)
         {
@@ -59,12 +66,6 @@ namespace lightning
             unitValue = 0;
             heapUnitValue = null;
             type = p_type;
-        }
-
-        public Type HeapUnitType(){
-            if(type == UnitType.HeapUnit)
-                return heapUnitValue.GetType();
-            return null;
         }
 
         public override string ToString()

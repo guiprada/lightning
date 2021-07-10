@@ -159,7 +159,7 @@
 			"name": "constant.other.placeholder.lightning"
 		},
 		{
-			"match": "\\b(else | for| if | return | while)\\b",
+			"match": "\\b(else|for|if|return|while)\\b",
 			"name": "keyword.control.lightning"
 		},
 		{
