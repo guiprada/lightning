@@ -683,7 +683,7 @@ namespace lightning
                         if(((LiteralNode)item).ValueType == typeof(Number)){
                             LiteralNode number_value = (LiteralNode)item;
                             for(int i = elements.Count; i<((Number)(number_value.Value)); i++)
-                                elements.Add(new LiteralNode("Nil", item.Line));
+                                elements.Add(new LiteralNode(item.Line));
                             elements.Add(Primary());
                         }else if(((LiteralNode)item).ValueType == typeof(string)){
                             LiteralNode string_value = (LiteralNode)item;
@@ -714,7 +714,7 @@ namespace lightning
                             if(((LiteralNode)item).ValueType == typeof(Number)){
                                 LiteralNode number_value = (LiteralNode)item;
                                 for(int i = elements.Count; i<((Number)(number_value.Value)); i++)
-                                    elements.Add(new LiteralNode("Nil", item.Line));
+                                    elements.Add(new LiteralNode(item.Line));
                                 elements.Add(Primary());
                             }else if(((LiteralNode)item).ValueType == typeof(string)){
                                 LiteralNode string_value = (LiteralNode)item;
@@ -747,7 +747,7 @@ namespace lightning
             else if (Match(TokenType.TRUE))
                 return new LiteralNode(true, Previous().Line);
             else if (Match(TokenType.NIL))
-                return new LiteralNode("Nil", Previous().Line);
+                return new LiteralNode(Previous().Line);
             else if (Match(TokenType.NUMBER))
                 return new LiteralNode((Previous() as TokenNumber).value, Previous().Line);
             else if (Match(TokenType.STRING))

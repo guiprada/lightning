@@ -42,9 +42,12 @@ function clear_errors()
 
     assert(null, null, "Failed null sanity check 1.")
     assert_not(1, null, "Failed null sanity check 2.")
-    assert(true, true, "Failed true sanity check 3.")
-    assert(false, false, "Failed false sanity check 4.")
-    assert_not(true, false, "Failed boolean sanity check 5.")
+    assert_not("Nil", null, "Failed null sanity check 3.")
+    assert_not("Null", null, "Failed null sanity check 4.")
+    assert_not("null", null, "Failed null sanity check 5.")
+    assert(true, true, "Failed true sanity check 1.")
+    assert(false, false, "Failed false sanity check 1.")
+    assert_not(true, false, "Failed boolean sanity check 1.")
 }
 {
     // Numbers Comparisson

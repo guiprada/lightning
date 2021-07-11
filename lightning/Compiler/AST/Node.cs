@@ -148,6 +148,13 @@ namespace lightning
             Value = p_Value;
             ValueType = p_Value.GetType();
         }
+
+        public LiteralNode(int p_line)
+            : base(NodeType.LITERAL, p_line)
+        {
+            Value = null;
+            ValueType = null;
+        }
     }
 
     public class GroupingNode : Node

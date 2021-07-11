@@ -313,15 +313,12 @@ namespace lightning
             }
             else if (p_node.ValueType == typeof(string))
             {
-                if ((string)p_node.Value == "Nil")
-                {
-                    Add(OpCode.LOAD_NIL, p_node.Line);
-                }
-                else
-                {
-                    int address = AddConstant((string)p_node.Value);
-                    Add(OpCode.LOAD_CONSTANT, (Operand)address, p_node.Line);
-                }
+                int address = AddConstant((string)p_node.Value);
+                Add(OpCode.LOAD_CONSTANT, (Operand)address, p_node.Line);
+            }
+            else if ((string)p_node.Value == null)
+            {
+                Add(OpCode.LOAD_NIL, p_node.Line);
             }
         }
 
@@ -1048,11 +1045,7 @@ namespace lightning
             else
             {
                 constants.Add(p_string);
-                if (p_string == "Nil")
-                    code.AddConstant(new Unit(UnitType.Null));
-                else
-                    code.AddConstant(new Unit(p_string));
-
+                code.AddConstant(new Unit(p_string));
                 return constants.Count - 1;
             }
         }
@@ -1070,20 +1063,6 @@ namespace lightning
                 return constants.Count - 1;
             }
         }
-
-        //int AddConstant(bool p_bool)
-        //{
-        //    if (constants.Contains(p_bool))
-        //    {
-        //        return constants.IndexOf(p_bool);
-        //    }
-        //    else
-        //    {
-        //        constants.Add(p_bool);
-        //        code.AddConstant(new ValBool(p_bool));
-        //        return constants.Count - 1;
-        //    }
-        //}
 
         int AddConstant(FunctionUnit new_function)
         {
