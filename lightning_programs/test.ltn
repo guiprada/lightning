@@ -97,6 +97,18 @@ function clear_errors()
     assert(table.count(this_list), 2, "Failed Array test 6.")
 }
 {
+    // Table literal test
+    var this_table = [5:"hello"]
+    for(var i = 0; i<5; i++){
+        assert(this_table[i], null, "Failed Table Literal test " .. (i+1) .. ".")
+    }
+    assert(this_table[5], "hello", "Failed Table Literal test 6.")
+
+    var another_table = [ "brazil":"Brasilia", eua:"Washington", australia:"Canberra",]
+    assert(another_table.brazil, "Brasilia", "Failed Table Literal test 7.")
+    assert(another_table.australia, "Canberra", "Failed Super Table Test 3.")
+}
+{
     // Testing lexical scoping
     var a = "a"
     {
@@ -655,7 +667,7 @@ var global_lock_test_counter = 5
 }
 {
     // Testing iterators
-    var table1 = [ brazil:"Brasilia", eua:"Washington", australia:"Canberra"]
+    var table1 = [brazil:"Brasilia", eua:"Washington", australia:"Canberra"]
     var indexes_table1 = table.indexes(table1)
     var counter = 0
     for (var it = table.iterator(table1); it.next())
@@ -715,7 +727,7 @@ var global_lock_test_counter = 5
 }
 {
     // Testing super table
-    var super_table = [ brazil:"Brasilia", eua:"Washington", australia:"Canberra"]
+    var super_table = [ brazil:"Brasilia", eua:"Washington", australia:"Canberra",]
     var common_table = []
     table.set_super(common_table, super_table)
     assert(common_table.brazil, "Brasilia", "Failed Super Table Test 1.")

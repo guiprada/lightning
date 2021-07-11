@@ -2,6 +2,12 @@
 using System.Collections.Generic;
 using System.Text;
 
+#if DOUBLE
+    using Number = System.Double;
+#else
+    using Number = System.Single;
+#endif
+
 namespace lightning
 {
     public class Parser
@@ -672,7 +678,22 @@ namespace lightning
                 else
                 {
                     Node item = Primary();
-                    elements.Add(item);
+                    if(Check(TokenType.COLON)){
+                        Consume(TokenType.COLON, "Expected ':' separating key:values in table constructor", true);
+                        if(((LiteralNode)item).ValueType == typeof(Number)){
+                            LiteralNode number_value = (LiteralNode)item;
+                            for(int i = elements.Count; i<((Number)(number_value.Value)); i++)
+                                elements.Add(new LiteralNode("Nil", item.Line));
+                            elements.Add(Primary());
+                        }else if(((LiteralNode)item).ValueType == typeof(string)){
+                            LiteralNode string_value = (LiteralNode)item;
+                            table.Add(string_value, Primary());
+                        }
+                    }
+                    else
+                    {
+                        elements.Add(item);
+                    }
                 }
 
                 while (Match(TokenType.COMMA))
@@ -686,11 +707,24 @@ namespace lightning
                         Node value = Primary();
 
                         table.Add(item, value);
-                    }
-                    else
-                    {
+                    }else if(!Check(TokenType.RIGHT_BRACKET)){// trailing comma suport
                         Node item = Primary();
-                        elements.Add(item);
+                        if(Check(TokenType.COLON)){
+                            Consume(TokenType.COLON, "Expected ':' separating key:values in table constructor", true);
+                            if(((LiteralNode)item).ValueType == typeof(Number)){
+                                LiteralNode number_value = (LiteralNode)item;
+                                for(int i = elements.Count; i<((Number)(number_value.Value)); i++)
+                                    elements.Add(new LiteralNode("Nil", item.Line));
+                                elements.Add(Primary());
+                            }else if(((LiteralNode)item).ValueType == typeof(string)){
+                                LiteralNode string_value = (LiteralNode)item;
+                                table.Add(string_value, Primary());
+                            }
+                        }
+                        else
+                        {
+                            elements.Add(item);
+                        }
                     }
                 }
                 Consume(TokenType.RIGHT_BRACKET, "Expected ']' to close 'table'", true);

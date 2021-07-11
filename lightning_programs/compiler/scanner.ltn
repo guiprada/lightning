@@ -1,5 +1,85 @@
 var scanner = []
 
+var TokenType = [
+	// one character tokens.
+	LEFT_PAREN: 1,
+	RIGHT_PAREN: 2,
+	LEFT_BRACE: 3,
+	RIGHT_BRACE: 4,
+	LEFT_BRACKET: 5,
+	RIGHT_BRACKET: 6,
+	COMMA: 7,
+	MINUS: 8,
+	MINUS_EQUAL: 9,
+	MINUS_MINUS: 10,
+	PLUS: 11,
+	PLUS_EQUAL: 12,
+	PLUS_PLUS: 13,
+	SEMICOLON: 14,
+	COLON: 15,
+	SLASH: 16,
+	SLASH_EQUAL: 17,
+	STAR: 18,
+	STAR_EQUAL: 19,
+
+	// one or two character tokens.
+	DOT: 20,
+	APPEND: 21,
+	BANG: 22,
+	BANG_EQUAL: 23,
+	EQUAL: 24,
+	EQUAL_EQUAL: 25,
+	GREATER: 26,
+	GREATER_EQUAL: 27,
+	LESS: 28,
+	LESS_EQUAL: 29,
+
+	// literals.
+	IDENTIFIER: 30,
+	STRING: 31,
+	NUMBER: 32,
+
+	// reserved words.
+	XNOR: 33,
+	NOR: 34,
+	NAND: 35,
+	XOR: 36,
+	AND: 37,
+	CLASS: 38,
+	ELSE: 39,
+	FALSE: 40,
+	FUN: 41,
+	FOR: 42,
+	IF: 43,
+	NIL: 44,
+	OR: 45,
+	RETURN: 46,
+	SUPER: 47,
+	THIS: 48,
+	TRUE: 49,
+	VAR: 50,
+	WHILE: 51,
+	EOF: 52,
+]
+var Keywords = [
+	{"else", TokenType.ELSE},
+	{"false", TokenType.FALSE},
+	{"for", TokenType.FOR},
+	{"function", TokenType.FUN},
+	{"if", TokenType.IF},
+	{"null", TokenType.NIL},
+	{"return", TokenType.RETURN},
+	{"true", TokenType.TRUE},
+	{"var", TokenType.VAR},
+	{"while", TokenType.WHILE},
+	{"and", TokenType.AND},
+	{"or", TokenType.OR},
+	{"xor", TokenType.XOR},
+	{"nand", TokenType.NAND},
+	{"nor", TokenType.NOR},
+	{"xnor", TokenType.XNOR},
+]
+
 scanner.scan = function(source){
 
 }
