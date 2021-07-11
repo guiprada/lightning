@@ -272,13 +272,6 @@ namespace lightning
 
         private char ReadChar()
         {
-            // string this_unescaped_string = Regex.Unescape(ReadString('\''));
-            // if(this_unescaped_string.Length > 1)
-            //     Error("Trying to declare a Char constant with more than one char! " + this_unescaped_string);
-
-            // return this_unescaped_string.ToCharArray()[0];
-
-            Console.WriteLine("here");
             char next_char = Advance();
             string this_string = "";
             while(next_char != '\''){

@@ -750,7 +750,16 @@ var global_lock_test_counter = 5
     var hello_string = "hello"
     assert('h', string.char_at(0, hello_string), "Failed Char Test 2.")
     assert('o', string.char_at(4, hello_string), "Failed Char Test 3.")
-    // var line_end  = #"\""
+    var char_list = string.to_list(hello_string)
+    assert('h', char_list[0], "Failed Char Test 4.")
+    assert('o', char_list[4], "Failed Char Test 5.")
+    var line_skip_string =
+"a
+a"
+    assert('\n', string.char_at(2,line_skip_string), "Failed Char Test 6.")
+    assert('a', string.char_at(3,line_skip_string), "Failed Char Test 7.")
+    assert('a', string.char_at(0,line_skip_string), "Failed Char Test 8.")
+    assert('\r', string.char_at(1,line_skip_string), "Failed Char Test 9.")
 }
 machine.trim()
 

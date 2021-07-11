@@ -751,6 +751,19 @@ namespace lightning
 
                 //////////////////////////////////////////////////////
 
+                Unit toList(VM vm)
+                {
+                    string val_input_string = vm.GetString(0);
+                    List<Unit> string_list = new List<Unit>();
+                    foreach(char c in val_input_string.ToCharArray()){
+                        string_list.Add(new Unit(c));
+                    }
+                    return new Unit(new TableUnit(string_list, null));
+                }
+                string_table.TableSet("to_list", new IntrinsicUnit("to_list", toList, 1));
+
+                //////////////////////////////////////////////////////
+
                 tables.Add("string", string_table);
             }
 
@@ -980,6 +993,22 @@ namespace lightning
                 return new Unit(UnitType.Null);
             }
             functions.Add(new IntrinsicUnit("write", write, 1));
+
+            //////////////////////////////////////////////////////
+            Unit writeLineRaw(VM vm)
+            {
+                Console.WriteLine(vm.GetUnit(0).ToString());
+                return new Unit(UnitType.Null);
+            }
+            functions.Add(new IntrinsicUnit("write_line_raw", writeLineRaw, 1));
+
+            //////////////////////////////////////////////////////
+            Unit writeRaw(VM vm)
+            {
+                Console.Write(vm.GetUnit(0).ToString());
+                return new Unit(UnitType.Null);
+            }
+            functions.Add(new IntrinsicUnit("write_raw", writeRaw, 1));
 
             //////////////////////////////////////////////////////
             Unit readln(VM vm)
