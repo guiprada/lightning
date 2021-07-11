@@ -719,6 +719,15 @@ var global_lock_test_counter = 5
     var common_table = []
     table.set_super(common_table, super_table)
     assert(common_table.brazil, "Brasilia", "Failed Super Table Test 1.")
+    common_table.brazil = "hello"
+    assert(common_table.brazil, "hello", "Failed Super Table Test 2.")
+    assert(super_table.brazil, "Brasilia", "Failed Super Table Test 3.")
+
+    super_table.a_function = function(self){
+        return self.brazil
+    }
+    assert(common_table:a_function(), "hello", "Failed Super Table Test 4.")
+    assert(super_table:a_function(), "Brasilia", "Failed Super Table Test 5.")
 }
 
 machine.trim()

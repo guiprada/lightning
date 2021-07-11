@@ -427,7 +427,7 @@ namespace lightning
             }else if(superTable != null){
                 return superTable.GetTable(p_string);
             }else{
-                return new Unit(UnitType.Null);
+                throw new Exception("Table or Super Table does not contain index: " + p_string.ToString());
             }
         }
         public void ElementSet(int index, Unit value)
