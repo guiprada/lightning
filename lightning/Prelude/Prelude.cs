@@ -1223,6 +1223,13 @@ namespace lightning
             functions.Add(new IntrinsicUnit("nuple_set", setNuple, 3));
 
             //////////////////////////////////////////////////////
+            Unit getOs(VM vm)
+            {
+                return new Unit(Environment.OSVersion.VersionString);
+            }
+            functions.Add(new IntrinsicUnit("get_os", getOs, 0));
+
+            //////////////////////////////////////////////////////
             Library prelude = new Library(functions, tables);
 
             return prelude;

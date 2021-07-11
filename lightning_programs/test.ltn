@@ -756,10 +756,13 @@ var global_lock_test_counter = 5
     var line_skip_string =
 "a
 a"
-    assert('\n', string.char_at(2,line_skip_string), "Failed Char Test 6.")
-    assert('a', string.char_at(3,line_skip_string), "Failed Char Test 7.")
-    assert('a', string.char_at(0,line_skip_string), "Failed Char Test 8.")
-    assert('\r', string.char_at(1,line_skip_string), "Failed Char Test 9.")
+    if(get_os() == "Microsoft Windows NT 10.0.19043.0"){
+        assert('\n', string.char_at(2,line_skip_string), "Failed Char Test 6.")
+        assert('a', string.char_at(3,line_skip_string), "Failed Char Test 7.")
+        assert('a', string.char_at(0,line_skip_string), "Failed Char Test 8.")
+        assert('\r', string.char_at(1,line_skip_string), "Failed Char Test 9.")
+    }
+    write_line(get_os())
 }
 machine.trim()
 
