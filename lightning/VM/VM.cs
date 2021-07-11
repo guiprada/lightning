@@ -151,12 +151,15 @@ namespace lightning
         public Unit GetUnit(int n){
             return stack.Peek(n);
         }
+
         public string GetString(int n){
             return ((StringUnit)(stack.Peek(n).heapUnitValue)).content;
         }
+
         public Number GetNumber(int n){
             return stack.Peek(n).unitValue;
         }
+
         public TableUnit GetTable(int n){
             return (TableUnit)(stack.Peek(n).heapUnitValue);
         }
@@ -164,8 +167,17 @@ namespace lightning
         public T GetWrapperUnit<T>(int n){
             return ((WrapperUnit<T>)(stack.Peek(n).heapUnitValue)).UnWrapp();
         }
+
         public StringUnit GetStringUnit(int n){
             return ((StringUnit)(stack.Peek(n).heapUnitValue));
+        }
+
+        public char GetChar(int n){
+            return (char)(stack.Peek(n).unitValue);
+        }
+
+        public bool GetBool(int n){
+            return stack.Peek(n).ToBool();
         }
 
 //////////////////////////// End Accessors
@@ -574,14 +586,6 @@ namespace lightning
                             foreach (Unit v in indexes)
                             {
                                 value = ((TableUnit)(value.heapUnitValue)).Get(v);
-                                // if (v.type == UnitType.Number)
-                                // {
-                                //     value = ((TableUnit)(value.heapUnitValue)).elements[(int)v.unitValue];
-                                // }
-                                // else
-                                // {
-                                //     value = ((TableUnit)(value.heapUnitValue)).table[(StringUnit)v.heapUnitValue];
-                                // }
                             }
                             stack.Push(value);
                             break;
@@ -602,14 +606,15 @@ namespace lightning
                             for (int i = 0; i < indexes_counter - 1; i++)
                             {
                                 Unit v = indexes[i];
-                                if (v.Type == UnitType.Number)
-                                {
-                                    this_table = ((TableUnit)(this_table.heapUnitValue)).elements[(int)v.unitValue];
-                                }
-                                else
-                                {
-                                    this_table = ((TableUnit)(this_table.heapUnitValue)).table[(StringUnit)v.heapUnitValue];
-                                }
+                                this_table = ((TableUnit)(this_table.heapUnitValue)).Get(v);
+                                // if (v.Type == UnitType.Number)
+                                // {
+                                //     this_table = ((TableUnit)(this_table.heapUnitValue)).elements[(int)v.unitValue];
+                                // }
+                                // else
+                                // {
+                                //     this_table = ((TableUnit)(this_table.heapUnitValue)).table[(StringUnit)v.heapUnitValue];
+                                // }
                             }
                             Unit new_value = stack.Peek();
                             if (op == 0)

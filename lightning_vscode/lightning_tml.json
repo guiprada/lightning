@@ -55,19 +55,19 @@
 			"name": "constant.numeric.float.lightning"
 		},
 		{
-			"begin": "#'",
+			"begin": "#",
 			"beginCaptures": {
 				"0": {
-					"name": "punctuation.definition.char.begin.lightning"
+					"name": "punctuation.definition.string.begin.lightning"
 				}
 			},
-			"end": "'",
+			"end": "#",
 			"endCaptures": {
 				"0": {
-					"name": "punctuation.definition.char.end.lightning"
+					"name": "punctuation.definition.string.end.lightning"
 				}
 			},
-			"name": "constant.char.lightning",
+			"name": "string.quoted.single.lightning",
 			"patterns": [
 				{
 					"include": "#escaped_char"
@@ -98,16 +98,16 @@
 			"begin": "'",
 			"beginCaptures": {
 				"0": {
-					"name": "punctuation.definition.string.begin.lightning"
+					"name": "punctuation.definition.char.begin.lightning"
 				}
 			},
 			"end": "'",
 			"endCaptures": {
 				"0": {
-					"name": "punctuation.definition.string.end.lightning"
+					"name": "punctuation.definition.char.end.lightning"
 				}
 			},
-			"name": "string.quoted.single.lightning",
+			"name": "char.lightning",
 			"patterns": [
 				{
 					"include": "#escaped_char"

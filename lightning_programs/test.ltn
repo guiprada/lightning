@@ -2,7 +2,7 @@
 write_line("-- Starting tests --")
 var start_time = time.now()
 
-// Let's use some modules
+// Let"s use some modules
 var lib_assert_counter = require("assert_counter.ltn")
 var lib_assert_counter_not = require("assert_counter_not.ltn")
 var lib_assert = require("assert.ltn")
@@ -447,7 +447,7 @@ function clear_errors()
 }
 {
     // Testing Eval
-    var my_prog1 = '
+    var my_prog1 = #
         var table1 = []
         var str_global = "global"
         {
@@ -458,19 +458,19 @@ function clear_errors()
                 }
         }
         return table1
-    '
+    #
     var a = eval(my_prog1)
     //var a = require("prog1.ltn")
 
     assert(a.append("a","b","c"),"globalabcup", "Failed Eval test 1.")
 
-    var my_prog2 = '
+    var my_prog2 = #
         var str_global = "global"
         var str_upvalue = "up"
         return function (value1, value2, value3){
                 return str_global .. value1  .. value2 .. value3 .. str_upvalue
             }
-    '
+    #
     file.write("file_write_test.ltn", my_prog2)
     file.append("file_write_test.ltn", my_prog1)
     a = eval(my_prog2)
@@ -649,7 +649,7 @@ var global_lock_test_counter = 5
 {
     // Testing inline Intrinsics
     var intr_sum =
-    '
+    #
         using Number = System.Double;
         using System;
 
@@ -659,7 +659,7 @@ var global_lock_test_counter = 5
 
             return new Unit(opA + opB);
         }
-    '
+    #
     if (intrinsic.create != null){
         var sum_intr = intrinsic.create("sum", 2, intr_sum)
         assert(sum_intr(5, 6), 11, "Failed inline Intrinsic test 1.")
@@ -745,9 +745,12 @@ var global_lock_test_counter = 5
 }
 {
     // Testing Char
-    var another_a = #'a'
-    assert(another_a, #a, "Failed Char Test 1.")
-    var line_end  = #'\''
+    var another_a = 'a'
+    assert(another_a, 'a', "Failed Char Test 1.")
+    var hello_string = "hello"
+    assert('h', string.char_at(0, hello_string), "Failed Char Test 2.")
+    assert('o', string.char_at(4, hello_string), "Failed Char Test 3.")
+    // var line_end  = #"\""
 }
 machine.trim()
 

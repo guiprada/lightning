@@ -741,6 +741,16 @@ namespace lightning
 
                 //////////////////////////////////////////////////////
 
+                Unit charAt(VM vm)
+                {
+                    Number index = vm.GetNumber(0);
+                    string val_input_string = vm.GetString(1);
+                    return new Unit(val_input_string.ToCharArray()[(int)index]);
+                }
+                string_table.TableSet("char_at", new IntrinsicUnit("char_at", charAt, 2));
+
+                //////////////////////////////////////////////////////
+
                 tables.Add("string", string_table);
             }
 

@@ -168,10 +168,11 @@ namespace lightning
                     }
                     break;
                 case '"': tokens.Add(new TokenString(TokenType.STRING, line, ReadString('"'))); break;
-                case '\'': tokens.Add(new TokenString(TokenType.STRING, line, ReadString('\''))); break;
-                case '#':
+                case '\'':
                     tokens.Add(new TokenChar(line, ReadChar()));
                     break;
+                case '#':
+                    tokens.Add(new TokenString(TokenType.STRING, line, ReadString('#'))); break;
                 default:
                     if (IsDigit(c))
                     {
@@ -277,26 +278,24 @@ namespace lightning
 
             // return this_unescaped_string.ToCharArray()[0];
 
-            char this_char = Advance();
-            if(this_char == '\''){//it is a escape sequence
-                char next_char = Advance();
-                string this_string = "";
-                while(next_char != '\''){
-                    if(next_char == '\\' && Peek() == '\''){
-                        this_string += next_char;
-                        this_string += Advance();
-                    }else{
-                        this_string += next_char;
-                    }
-                    next_char = Advance();
+            Console.WriteLine("here");
+            char next_char = Advance();
+            string this_string = "";
+            while(next_char != '\''){
+                if(next_char == '\\' && Peek() == '\''){
+                    this_string += next_char;
+                    this_string += Advance();
+                }else{
+                    this_string += next_char;
                 }
-                string this_unescaped_string = Regex.Unescape(this_string);
-                if(this_unescaped_string.Length > 1){
-                    Error("Trying to declare a Char constant with more than one char! " + this_unescaped_string);
-                }
-                this_char = this_unescaped_string.ToCharArray()[0];
+                next_char = Advance();
             }
-            return this_char;
+            string this_unescaped_string = Regex.Unescape(this_string);
+            if(this_unescaped_string.Length > 1){
+                Error("Trying to declare a Char constant with more than one char! " + this_unescaped_string);
+            }
+
+            return this_unescaped_string.ToCharArray()[0];
         }
 
 
