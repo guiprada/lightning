@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Text.RegularExpressions;
 
 #if DOUBLE
     using Number = System.Double;
@@ -37,7 +38,12 @@ namespace lightning
         int start;
         int current;
 
-        public List<string> Errors { get; private set;}
+        public List<string> Errors {
+            get{
+                return errors;
+            }
+        }
+        private List<string> errors;
 
         List<Token> tokens;
         bool hasScanned;
@@ -56,7 +62,7 @@ namespace lightning
         {
             source = input.ToCharArray();
             hasScanned = false;
-            Errors = new List<string>();
+            errors = new List<string>();
             line = 1;
             start = 0;
             current = 0;
@@ -163,6 +169,9 @@ namespace lightning
                     break;
                 case '"': tokens.Add(new TokenString(TokenType.STRING, line, ReadString('"'))); break;
                 case '\'': tokens.Add(new TokenString(TokenType.STRING, line, ReadString('\''))); break;
+                case '#':
+                    tokens.Add(new TokenChar(line, ReadChar()));
+                    break;
                 default:
                     if (IsDigit(c))
                     {
@@ -260,6 +269,37 @@ namespace lightning
             return new string(source, start, current - start);
         }
 
+        private char ReadChar()
+        {
+            // string this_unescaped_string = Regex.Unescape(ReadString('\''));
+            // if(this_unescaped_string.Length > 1)
+            //     Error("Trying to declare a Char constant with more than one char! " + this_unescaped_string);
+
+            // return this_unescaped_string.ToCharArray()[0];
+
+            char this_char = Advance();
+            if(this_char == '\''){//it is a escape sequence
+                char next_char = Advance();
+                string this_string = "";
+                while(next_char != '\''){
+                    if(next_char == '\\' && Peek() == '\''){
+                        this_string += next_char;
+                        this_string += Advance();
+                    }else{
+                        this_string += next_char;
+                    }
+                    next_char = Advance();
+                }
+                string this_unescaped_string = Regex.Unescape(this_string);
+                if(this_unescaped_string.Length > 1){
+                    Error("Trying to declare a Char constant with more than one char! " + this_unescaped_string);
+                }
+                this_char = this_unescaped_string.ToCharArray()[0];
+            }
+            return this_char;
+        }
+
+
         private string ReadString(char terminator)
         {
             while (Peek() != terminator && !IsAtEnd())
@@ -291,8 +331,7 @@ namespace lightning
 
         private void Error(string msg)
         {
-
-            Errors.Add(msg + " on line: " + line);
+            errors.Add(msg + " on line: " + line);
         }
 
     }

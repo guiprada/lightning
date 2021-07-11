@@ -749,9 +749,11 @@ namespace lightning
             else if (Match(TokenType.NIL))
                 return new LiteralNode(Previous().Line);
             else if (Match(TokenType.NUMBER))
-                return new LiteralNode((Previous() as TokenNumber).value, Previous().Line);
+                return new LiteralNode(((TokenNumber)Previous()).value, Previous().Line);
             else if (Match(TokenType.STRING))
-                return new LiteralNode((Previous() as TokenString).value, Previous().Line);
+                return new LiteralNode(((TokenString)Previous()).value, Previous().Line);
+            else if (Match(TokenType.CHAR))
+                return new LiteralNode(((TokenChar)Previous()).value , Previous().Line);
             else if (Match(TokenType.LEFT_PAREN))
             {
                 Node expr = Expression();

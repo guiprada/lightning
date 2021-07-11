@@ -61,7 +61,7 @@ namespace lightning
 
         public bool HasChunked { get; private set; }
         int instructionCounter;
-        List<dynamic> constants;
+        List<object> constants;
         List<List<string>> env;
         List<string> globals;
         Stack<List<Variable>> upvalueStack;
@@ -314,6 +314,11 @@ namespace lightning
             else if (p_node.ValueType == typeof(string))
             {
                 int address = AddConstant((string)p_node.Value);
+                Add(OpCode.LOAD_CONSTANT, (Operand)address, p_node.Line);
+            }
+            else if (p_node.ValueType == typeof(char))
+            {
+                int address = AddConstant((char)p_node.Value);
                 Add(OpCode.LOAD_CONSTANT, (Operand)address, p_node.Line);
             }
             else if ((string)p_node.Value == null)
@@ -1046,6 +1051,20 @@ namespace lightning
             {
                 constants.Add(p_string);
                 code.AddConstant(new Unit(p_string));
+                return constants.Count - 1;
+            }
+        }
+
+        int AddConstant(char p_char)
+        {
+            if (constants.Contains(p_char))
+            {
+                return constants.IndexOf(p_char);
+            }
+            else
+            {
+                constants.Add(p_char);
+                code.AddConstant(new Unit(p_char));
                 return constants.Count - 1;
             }
         }

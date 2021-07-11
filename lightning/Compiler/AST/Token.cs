@@ -47,6 +47,7 @@ namespace lightning
         // literals.
         IDENTIFIER,
         STRING,
+        CHAR,
         NUMBER,
 
         // reserved words.
@@ -99,6 +100,20 @@ namespace lightning
         public override string ToString()
         {
             return Type.ToString() + " string: " + value + " line: " + Line.ToString();
+        }
+    }
+
+    public class TokenChar: Token
+    {
+        public char value;
+        public TokenChar(int p_Line, char p_value): base(TokenType.CHAR, p_Line)
+        {
+            value = p_value;
+        }
+
+        public override string ToString()
+        {
+            return Type.ToString() + " char: " + value.ToString() + " line: " + Line.ToString();
         }
     }
 

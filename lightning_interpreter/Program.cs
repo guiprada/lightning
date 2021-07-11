@@ -44,6 +44,7 @@ namespace interpreter
         static int Run(string input)
         {
             Scanner scanner = new Scanner(input);
+            Parser parser = new Parser(scanner.Tokens);
             if (scanner.Errors.Count > 0)
             {
                 Console.WriteLine("Scanning had errors:");
@@ -54,7 +55,6 @@ namespace interpreter
                 return 0;
             }
 
-            Parser parser = new Parser(scanner.Tokens);
             Node program = parser.ParsedTree;
             if (parser.Errors.Count > 0)
             {

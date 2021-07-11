@@ -18,6 +18,7 @@ namespace lightning
         Null,
         Boolean,
         String,
+        Char,
         Function,
         Intrinsic,
         Closure,
@@ -26,6 +27,7 @@ namespace lightning
         Module,
         Wrapper
     }
+
     public abstract class HeapUnit
     {
         public abstract UnitType Type{get;}
@@ -34,6 +36,50 @@ namespace lightning
 
         public abstract override bool Equals(object other);
         public abstract override int GetHashCode();
+    }
+
+    public class TypeUnit : HeapUnit{
+        public static TypeUnit Number = new TypeUnit(UnitType.Number);
+        public static TypeUnit Null = new TypeUnit(UnitType.Null);
+        public static TypeUnit Boolean = new TypeUnit(UnitType.Boolean);
+        public static TypeUnit Char = new TypeUnit(UnitType.Char);
+
+        UnitType type;
+
+        public override UnitType Type{
+            get{
+                return type;
+            }
+        }
+
+        private TypeUnit(UnitType p_type){
+            type = p_type;
+        }
+
+        public override string ToString(){
+            if(this.type == UnitType.Number)
+                return "UnitType.Number";
+            else if(this.type == UnitType.Null)
+                return "UnitType.Null";
+            else if(this.type == UnitType.Boolean)
+                return "UnitType.Boolean";
+            else if(this.type == UnitType.Char)
+                return "UnitType.Char";
+            else
+                return "Unknown UnitType";
+        }
+        public override bool ToBool(){
+            throw new Exception("Trying to get a boolean value of TypeUnit");
+        }
+
+        public override bool Equals(object other){
+            if(other.GetType() == typeof(TypeUnit))
+                return this.type == ((TypeUnit)other).type;
+            return false;
+        }
+        public override int GetHashCode(){
+            return this.type.GetHashCode();
+        }
     }
 
     public class StringUnit : HeapUnit
@@ -81,47 +127,6 @@ namespace lightning
         public override int GetHashCode()
         {
             return content.GetHashCode();
-        }
-    }
-
-    public class TypeUnit : HeapUnit{
-        public static TypeUnit Number = new TypeUnit(UnitType.Number);
-        public static TypeUnit Null = new TypeUnit(UnitType.Null);
-        public static TypeUnit Boolean = new TypeUnit(UnitType.Boolean);
-
-        UnitType type;
-
-        public override UnitType Type{
-            get{
-                return type;
-            }
-        }
-
-        private TypeUnit(UnitType p_type){
-            type = p_type;
-        }
-
-        public override string ToString(){
-            if(this.type == UnitType.Number)
-                return "UnitType.Number";
-            else if(this.type == UnitType.Null)
-                return "UnitType.Null";
-            else if(this.type == UnitType.Boolean)
-                return "UnitType.Boolean";
-            else
-                return "Unknown UnitType";
-        }
-        public override bool ToBool(){
-            throw new Exception("Trying to get a boolean value of TypeUnit");
-        }
-
-        public override bool Equals(object other){
-            if(other.GetType() == typeof(TypeUnit))
-                return this.type == ((TypeUnit)other).type;
-            return false;
-        }
-        public override int GetHashCode(){
-            return this.type.GetHashCode();
         }
     }
 

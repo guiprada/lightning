@@ -8,7 +8,6 @@ var lib_assert_counter_not = require("assert_counter_not.ltn")
 var lib_assert = require("assert.ltn")
 
 write("assertion detects errors ..")
-write(lib_assert .. " " .. lib_assert.assert)
 lib_assert.assert(2,1," OK!")
 
 var assert = lib_assert_counter.assert
@@ -744,7 +743,12 @@ var global_lock_test_counter = 5
     assert(common_table:a_function(), "hello", "Failed Super Table Test 4.")
     assert(super_table:a_function(), "Brasilia", "Failed Super Table Test 5.")
 }
-
+{
+    // Testing Char
+    var another_a = #'a'
+    assert(another_a, #a, "Failed Char Test 1.")
+    var line_end  = #'\''
+}
 machine.trim()
 
 var end_time = time.now()

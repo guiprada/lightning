@@ -142,6 +142,13 @@ namespace lightning
             ValueType = p_Value.GetType();
         }
 
+        public LiteralNode(char p_Value, int p_Line)
+            : base(NodeType.LITERAL, p_Line)
+        {
+            Value = p_Value;
+            ValueType = p_Value.GetType();
+        }
+
         public LiteralNode(bool p_Value, int p_Line)
             : base(NodeType.LITERAL, p_Line)
         {
