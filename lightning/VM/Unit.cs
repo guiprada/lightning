@@ -13,23 +13,13 @@ using Operand = System.UInt16;
 
 namespace lightning
 {
-    public enum UnitType{
-        Number,
-        Null,
-        Boolean,
-        HeapUnit
-    }
-
     public struct Unit{
-        public UnitType type;
         public Number unitValue;
         public HeapUnit heapUnitValue;
 
-        public Type HeapUnitType{
+        public UnitType Type{
             get{
-                if(type == UnitType.HeapUnit)
-                    return heapUnitValue.GetType();
-                return null;
+                return heapUnitValue.Type;
             }
         }
 
@@ -37,13 +27,11 @@ namespace lightning
         {
             unitValue = 0;
             heapUnitValue = p_value;
-            type = UnitType.HeapUnit;
         }
         public Unit(Number p_number)
         {
             unitValue = p_number;
-            heapUnitValue = null;
-            type = UnitType.Number;
+            heapUnitValue = TypeUnit.Number;
         }
 
         public Unit(bool p_value){
@@ -52,24 +40,29 @@ namespace lightning
             }else{
                 unitValue = 0;
             }
-            heapUnitValue = null;
-            type = UnitType.Boolean;
+            heapUnitValue = TypeUnit.Boolean;
         }
 
         public Unit(String p_string){
             unitValue = 0;
             heapUnitValue = new StringUnit(p_string);
-            type = UnitType.HeapUnit;
         }
 
         public Unit(UnitType p_type){
             unitValue = 0;
-            heapUnitValue = null;
-            type = p_type;
+            if(p_type == UnitType.Null)
+                heapUnitValue = TypeUnit.Null;
+            else if(p_type == UnitType.Boolean)
+                heapUnitValue = TypeUnit.Boolean;
+            else if(p_type == UnitType.Number)
+                heapUnitValue = TypeUnit.Number;
+            else
+                throw new Exception("Trying to create a Unit of unknown type.");
         }
 
         public override string ToString()
         {
+            UnitType type = this.Type;
             if (type == UnitType.Number){
                 return unitValue.ToString();
             }else if(type == UnitType.Null){
@@ -80,18 +73,19 @@ namespace lightning
                 if(unitValue == 1)
                     return "true";
                 throw new Exception("Trying to get String of Invalid Boolean.");
-            }else{
-                return heapUnitValue.ToString();
             }
+
+            return heapUnitValue.ToString();
         }
 
         public bool ToBool()
         {
-            if (type == UnitType.Number){
+            UnitType this_type = this.Type;
+            if (this_type == UnitType.Number){
                 throw new Exception("Can not convert Number to Bool.");
-            }else if(type == UnitType.Null){
+            }else if(this_type == UnitType.Null){
                 return false;
-            }else if(type == UnitType.Boolean){
+            }else if(this_type == UnitType.Boolean){
                 if(unitValue == 0)
                     return false;
                 if(unitValue == 1)
@@ -103,21 +97,22 @@ namespace lightning
         }
 
         public override bool Equals(object other){
+            UnitType this_type = this.Type;
             if(other.GetType() != typeof(Unit))
                 throw new Exception("Trying to compare Unit to non Unit type.");
-            if (type == UnitType.Number){
-                Type other_type = other.GetType();
-                if (((Unit)other).type == UnitType.Number){
+
+            UnitType other_type = ((Unit)other).Type;
+            if (this_type == UnitType.Number){
+                if (other_type == UnitType.Number){
                     return ((Unit)other).unitValue == unitValue;
                 }
                 return false;
-            }else if(type == UnitType.Null){
-                Type other_type = other.GetType();
-                if (((Unit)other).type == UnitType.Null){
+            }else if(this_type == UnitType.Null){
+                if (other_type == UnitType.Null){
                     return true;
                 }
                 return false;
-            }else if(type == UnitType.Boolean){
+            }else if(this_type == UnitType.Boolean){
                 return ToBool() == ((Unit)other).ToBool();
             }else{
                 return heapUnitValue.Equals(other);
@@ -125,11 +120,12 @@ namespace lightning
         }
 
         public override int GetHashCode(){
-            if (type == UnitType.Number){
+            UnitType this_type = this.Type;
+            if (this_type == UnitType.Number){
                 return unitValue.GetHashCode();
-            }else if(type == UnitType.Null){
+            }else if(this_type == UnitType.Null){
                 return UnitType.Null.GetHashCode();
-            }else if(type == UnitType.Boolean){
+            }else if(this_type == UnitType.Boolean){
                 return ToBool().GetHashCode();
             }else{
                 return heapUnitValue.GetHashCode();

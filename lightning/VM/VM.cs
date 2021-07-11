@@ -175,17 +175,17 @@ namespace lightning
                 for (int i = args.Count - 1; i >= 0; i--)
                     stack.Push(args[i]);
 
-            Type this_type = this_callable.HeapUnitType;
+            UnitType this_type = this_callable.Type;
 
             instructions.PushRET((Operand)(chunk.ProgramSize - 1));
-            if (this_type == typeof(FunctionUnit))
+            if (this_type == UnitType.Function)
             {
                 FunctionUnit this_func = (FunctionUnit)(this_callable.heapUnitValue);
                 instructions.PushFunction(this_func, Env, out instructionsCache);
 
                 IP = 0;
             }
-            else if (this_type == typeof(ClosureUnit))
+            else if (this_type == UnitType.Closure)
             {
                 ClosureUnit this_closure = (ClosureUnit)(this_callable.heapUnitValue);
 
@@ -199,7 +199,7 @@ namespace lightning
 
                 IP = 0;
             }
-            else if (this_type == typeof(IntrinsicUnit))
+            else if (this_type == UnitType.Intrinsic)
             {
                 IntrinsicUnit this_intrinsic = (IntrinsicUnit)(this_callable.heapUnitValue);
                 Unit intrinsic_result = this_intrinsic.function(this);
@@ -386,7 +386,7 @@ namespace lightning
                             Operand lambda = instruction.opB;
                             Operand new_fun_address = instruction.opC;
                             Unit this_callable = chunk.GetConstant(new_fun_address);
-                            if (this_callable.HeapUnitType == typeof(FunctionUnit))
+                            if (this_callable.Type == UnitType.Function)
                             {
                                 if (lambda == 0)
                                     if (env == 0)// Global
@@ -602,7 +602,7 @@ namespace lightning
                             for (int i = 0; i < indexes_counter - 1; i++)
                             {
                                 Unit v = indexes[i];
-                                if (v.type == UnitType.Number)
+                                if (v.Type == UnitType.Number)
                                 {
                                     this_table = ((TableUnit)(this_table.heapUnitValue)).elements[(int)v.unitValue];
                                 }
@@ -614,7 +614,7 @@ namespace lightning
                             Unit new_value = stack.Peek();
                             if (op == 0)
                             {
-                                if (indexes[indexes_counter - 1].type == UnitType.Number)
+                                if (indexes[indexes_counter - 1].Type == UnitType.Number)
                                 {
                                     if (((TableUnit)(this_table.heapUnitValue)).elements.Count - 1 >= ((int)(indexes[indexes_counter - 1].unitValue)))
                                     {
@@ -636,7 +636,7 @@ namespace lightning
                                 Unit old_value;
                                 Number result = 0;
                                 lock(this_table.heapUnitValue){
-                                    if (indexes[indexes_counter - 1].type == UnitType.Number)
+                                    if (indexes[indexes_counter - 1].Type == UnitType.Number)
                                         old_value = ((TableUnit)(this_table.heapUnitValue)).elements[(int)(indexes[indexes_counter - 1].unitValue)];
                                     else
                                         old_value = ((TableUnit)(this_table.heapUnitValue)).table[(StringUnit)indexes[indexes_counter - 1].heapUnitValue];
@@ -651,7 +651,7 @@ namespace lightning
                                         result = old_value.unitValue / new_value.unitValue;
                                 }
 
-                                if (indexes[indexes_counter - 1].type == UnitType.Number)
+                                if (indexes[indexes_counter - 1].Type == UnitType.Number)
                                     ((TableUnit)(this_table.heapUnitValue)).elements[(int)(indexes[indexes_counter - 1].unitValue)] = new Unit(result);
                                 else
                                     ((TableUnit)(this_table.heapUnitValue)).table[(StringUnit)indexes[indexes_counter - 1].heapUnitValue] = new Unit(result);
@@ -660,7 +660,7 @@ namespace lightning
                             else
                             {
                                 Unit old_value;
-                                if (indexes[indexes_counter - 1].type == UnitType.Number)
+                                if (indexes[indexes_counter - 1].Type == UnitType.Number)
                                     old_value = ((TableUnit)(this_table.heapUnitValue)).elements[(int)(indexes[indexes_counter - 1].unitValue)];
                                 else
                                     old_value = ((TableUnit)(this_table.heapUnitValue)).table[(StringUnit)indexes[indexes_counter - 1].heapUnitValue];
@@ -675,7 +675,7 @@ namespace lightning
                                 else if (op == 4)
                                     result = old_value.unitValue / new_value.unitValue;
 
-                                if (indexes[indexes_counter - 1].type == UnitType.Number)
+                                if (indexes[indexes_counter - 1].Type == UnitType.Number)
                                     ((TableUnit)(this_table.heapUnitValue)).elements[(int)(indexes[indexes_counter - 1].unitValue)] = new Unit(result);
                                 else
                                     ((TableUnit)(this_table.heapUnitValue)).table[(StringUnit)indexes[indexes_counter - 1].heapUnitValue] = new Unit(result);
@@ -1070,9 +1070,9 @@ namespace lightning
                             IP++;
 
                             Unit this_callable = stack.Pop();
-                            Type this_type = this_callable.HeapUnitType;
+                            UnitType this_type = this_callable.Type;
 
-                            if (this_type == typeof(FunctionUnit))
+                            if (this_type == UnitType.Function)
                             {
                                 FunctionUnit this_func = (FunctionUnit)this_callable.heapUnitValue;
 
@@ -1081,7 +1081,7 @@ namespace lightning
 
                                 IP = 0;
                             }
-                            else if (this_type == typeof(ClosureUnit))
+                            else if (this_type == UnitType.Closure)
                             {
                                 ClosureUnit this_closure = (ClosureUnit)this_callable.heapUnitValue;
 
@@ -1097,7 +1097,7 @@ namespace lightning
 
                                 IP = 0;
                             }
-                            else if (this_type == typeof(IntrinsicUnit))
+                            else if (this_type == UnitType.Intrinsic)
                             {
                                 IntrinsicUnit this_intrinsic = (IntrinsicUnit)this_callable.heapUnitValue;
                                 Unit result = this_intrinsic.function(this);
@@ -1106,11 +1106,7 @@ namespace lightning
                             }
                             else
                             {
-                                UnitType this_unit_type = this_callable.type;
-                                if(this_unit_type == UnitType.HeapUnit)
-                                    Error("Trying to call a " + this_callable.HeapUnitType);
-                                else
-                                    Error("Trying to call a " + this_callable.type);
+                                Error("Trying to call a " + this_callable.Type);
                                 return new VMResult(VMResultType.OK, new Unit(UnitType.Null));
                             }
                             break;

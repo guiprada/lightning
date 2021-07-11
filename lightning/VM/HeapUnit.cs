@@ -13,8 +13,22 @@ using Operand = System.UInt16;
 
 namespace lightning
 {
+    public enum UnitType{
+        Number,
+        Null,
+        Boolean,
+        String,
+        Function,
+        Intrinsic,
+        Closure,
+        UpValue,
+        Table,
+        Module,
+        Wrapper
+    }
     public abstract class HeapUnit
     {
+        public abstract UnitType Type{get;}
         public abstract override string ToString();
         public abstract bool ToBool();
 
@@ -25,6 +39,12 @@ namespace lightning
     public class StringUnit : HeapUnit
     {
         public string content;
+
+        public override UnitType Type{
+            get{
+                return UnitType.String;
+            }
+        }
 
         public StringUnit(string value)
         {
@@ -45,7 +65,7 @@ namespace lightning
             Type other_type = other.GetType();
             if (other_type == typeof(Unit))
             {
-                if(((Unit)other).HeapUnitType == typeof(StringUnit))
+                if(((Unit)other).Type == UnitType.String)
                     if(content == ((StringUnit)((Unit)(other)).heapUnitValue).content)
                         return true;
             }
@@ -64,6 +84,47 @@ namespace lightning
         }
     }
 
+    public class TypeUnit : HeapUnit{
+        public static TypeUnit Number = new TypeUnit(UnitType.Number);
+        public static TypeUnit Null = new TypeUnit(UnitType.Null);
+        public static TypeUnit Boolean = new TypeUnit(UnitType.Boolean);
+
+        UnitType type;
+
+        public override UnitType Type{
+            get{
+                return type;
+            }
+        }
+
+        private TypeUnit(UnitType p_type){
+            type = p_type;
+        }
+
+        public override string ToString(){
+            if(this.type == UnitType.Number)
+                return "UnitType.Number";
+            else if(this.type == UnitType.Null)
+                return "UnitType.Null";
+            else if(this.type == UnitType.Boolean)
+                return "UnitType.Boolean";
+            else
+                return "Unknown UnitType";
+        }
+        public override bool ToBool(){
+            throw new Exception("Trying to get a boolean value of TypeUnit");
+        }
+
+        public override bool Equals(object other){
+            if(other.GetType() == typeof(TypeUnit))
+                return this.type == ((TypeUnit)other).type;
+            return false;
+        }
+        public override int GetHashCode(){
+            return this.type.GetHashCode();
+        }
+    }
+
     public class FunctionUnit : HeapUnit
     {
         public string name;
@@ -72,6 +133,12 @@ namespace lightning
         public LineCounter lineCounter;
         public string module;
         public Operand originalPosition;
+
+        public override UnitType Type{
+            get{
+                return UnitType.Function;
+            }
+        }
 
         public FunctionUnit(string p_name, string p_module)
         {
@@ -100,7 +167,7 @@ namespace lightning
             Type other_type = other.GetType();
             if (other_type == typeof(Unit))
             {
-                if(((Unit)other).HeapUnitType == typeof(FunctionUnit))
+                if(((Unit)other).Type == UnitType.Function)
                 {
                     FunctionUnit other_val_func = (FunctionUnit)((Unit)(other)).heapUnitValue;
                     if (other_val_func.name == this.name && other_val_func.module == this.module) return true;
@@ -126,6 +193,12 @@ namespace lightning
         public Func<VM, Unit> function;
         public int arity;
 
+        public override UnitType Type{
+            get{
+                return UnitType.Intrinsic;
+            }
+        }
+
         public IntrinsicUnit(string p_name, Func<VM, Unit> p_function, int p_arity)
         {
             name = p_name;
@@ -148,7 +221,7 @@ namespace lightning
             Type other_type = other.GetType();
             if (other_type == typeof(Unit))
             {
-                if(((Unit)other).HeapUnitType == typeof(IntrinsicUnit))
+                if(((Unit)other).Type == UnitType.Intrinsic)
                 {
                     if (function == (((Unit)other).heapUnitValue as IntrinsicUnit).function) return true;
                 }
@@ -170,6 +243,11 @@ namespace lightning
     {
         public FunctionUnit function;
         public List<UpValueUnit> upValues;
+        public override UnitType Type{
+            get{
+                return UnitType.Closure;
+            }
+        }
 
         public ClosureUnit(FunctionUnit p_function, List<UpValueUnit> p_upValues)
         {
@@ -198,7 +276,7 @@ namespace lightning
             Type other_type = other.GetType();
             if (other_type == typeof(Unit))
             {
-                if(((Unit)other).HeapUnitType == typeof(ClosureUnit))
+                if(((Unit)other).Type == UnitType.Closure)
                 {
                     if (this == ((Unit)other).heapUnitValue as ClosureUnit) return true;
                 }
@@ -223,6 +301,11 @@ namespace lightning
         bool isCaptured;
         Memory<Unit> variables;
         Unit value;
+        public override UnitType Type{
+            get{
+                return UnitType.UpValue;
+            }
+        }
         public Unit UpValue
         {
             get
@@ -278,7 +361,7 @@ namespace lightning
             Type other_type = other.GetType();
             if (other_type == typeof(Unit))
             {
-                if(((Unit)other).HeapUnitType == typeof(UpValueUnit))
+                if(((Unit)other).Type == UnitType.UpValue)
                 {
                     if (UpValue.Equals(((Unit)other).heapUnitValue)) return true;
                 }
@@ -304,9 +387,26 @@ namespace lightning
 
         public TableUnit superTable;
 
-        public int ECount { get { return elements.Count; } }
-        public int TCount { get { return table.Count; } }
-        public int Count { get { return ECount + TCount; } }
+        public override UnitType Type{
+            get{
+                return UnitType.Table;
+            }
+        }
+        public int ECount {
+            get{
+                return elements.Count;
+            }
+        }
+        public int TCount {
+            get{
+                return table.Count;
+            }
+        }
+        public int Count {
+            get{
+                return ECount + TCount;
+            }
+        }
         public TableUnit(List<Unit> p_elements, Dictionary<StringUnit, Unit> p_table)
         {
             elements = p_elements ??= new List<Unit>();
@@ -314,14 +414,12 @@ namespace lightning
         }
 
         public Unit Get(Unit p_key){
-            if (p_key.type == UnitType.Number){
-                return elements[(int)p_key.unitValue];
-            }else if (p_key.HeapUnitType == typeof(StringUnit)){
+            if (p_key.Type == UnitType.String)
                 return GetTable((StringUnit)(p_key.heapUnitValue));
-            }else if (p_key.type == UnitType.HeapUnit)
-                throw new Exception("Table can not be indexed by: " + p_key.HeapUnitType);
+            if (p_key.Type == UnitType.Number)
+                return elements[(int)p_key.unitValue];
             else
-                throw new Exception("Table can not be indexed by: " + p_key.type);
+                throw new Exception("Table can not be indexed by: " + p_key.Type);
         }
         public Unit GetTable(StringUnit p_string){
             if(table.ContainsKey(p_string)){
@@ -437,7 +535,7 @@ namespace lightning
             Type other_type = other.GetType();
             if (other_type == typeof(Unit))
             {
-                if(((Unit)other).HeapUnitType == typeof(TableUnit))
+                if(((Unit)other).Type == UnitType.Table)
                 {
                     if (this == ((Unit)other).heapUnitValue as TableUnit) return true;
                 }
@@ -461,6 +559,11 @@ namespace lightning
         public List<Unit> globals;
         public List<Unit> constants;
         public Operand importIndex;
+        public override UnitType Type{
+            get{
+                return UnitType.Module;
+            }
+        }
         public ModuleUnit(string p_name, List<Unit> p_elements, Dictionary<StringUnit, Unit> p_table, List<Unit> p_globals, List<Unit> p_constants)
             : base(p_elements, p_table)
         {
@@ -498,7 +601,11 @@ namespace lightning
     public class WrapperUnit<T> : HeapUnit
     {
         public object content;
-
+        public override UnitType Type{
+            get{
+                return UnitType.Wrapper;
+            }
+        }
         public WrapperUnit(object content)
         {
             this.content = content;
@@ -514,7 +621,7 @@ namespace lightning
             Type other_type = other.GetType();
             if (other_type == typeof(Unit))
             {
-                if(((Unit)other).HeapUnitType == typeof(WrapperUnit<T>))
+                if(((Unit)other).Type == UnitType.Wrapper)
                 {
                     if (this.content == (((Unit)other).heapUnitValue as WrapperUnit<T>).content) return true;
                 }

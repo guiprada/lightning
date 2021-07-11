@@ -732,7 +732,7 @@ namespace lightning
                 Unit stringCopy(VM vm)
                 {
                     Unit val_input_string = vm.GetUnit(0);
-                    if (val_input_string.HeapUnitType == typeof(StringUnit))
+                    if (val_input_string.Type == UnitType.String)
                         return new Unit(val_input_string.ToString());
                     else
                         return new Unit(UnitType.Null);
@@ -888,7 +888,7 @@ namespace lightning
                     VMResult result = imported_vm.Run();
                     if (result.status == VMResultType.OK)
                     {
-                        if (result.value.HeapUnitType == typeof(TableUnit) || result.value.HeapUnitType == typeof(FunctionUnit))
+                        if (result.value.Type == UnitType.Table || result.value.Type == UnitType.Function)
                             MakeModule(result.value, eval_name, vm, imported_vm);
                         return result.value;
                     }
@@ -1019,7 +1019,7 @@ namespace lightning
             //////////////////////////////////////////////////////
             Unit type(VM vm)
             {
-                Type this_type = vm.GetUnit(0).HeapUnitType;
+                UnitType this_type = vm.GetUnit(0).Type;
                 return new Unit(this_type.ToString());
             }
             functions.Add(new IntrinsicUnit("type", type, 1));
@@ -1029,7 +1029,7 @@ namespace lightning
             {
                 Unit first = vm.stack.Peek(0);
                 Unit second = vm.stack.Peek(1);
-                if (first.type != UnitType.Null)
+                if (first.Type != UnitType.Null)
                     return first;
                 else
                     return second;
@@ -1263,9 +1263,9 @@ namespace lightning
                 module,
                 (Operand)module_index);
 
-            if (this_value.HeapUnitType == typeof(FunctionUnit)) RelocateFunction((FunctionUnit)this_value.heapUnitValue, relocationInfo);
-            else if (this_value.HeapUnitType == typeof(ClosureUnit)) RelocateClosure((ClosureUnit)this_value.heapUnitValue, relocationInfo);
-            else if (this_value.HeapUnitType == typeof(TableUnit)) FindFunction((TableUnit)this_value.heapUnitValue, relocationInfo);
+            if (this_value.Type == UnitType.Function) RelocateFunction((FunctionUnit)this_value.heapUnitValue, relocationInfo);
+            else if (this_value.Type == UnitType.Closure) RelocateClosure((ClosureUnit)this_value.heapUnitValue, relocationInfo);
+            else if (this_value.Type == UnitType.Table) FindFunction((TableUnit)this_value.heapUnitValue, relocationInfo);
 
             return module;
         }
@@ -1277,9 +1277,9 @@ namespace lightning
                 relocationInfo.relocatedTables.Add(table.GetHashCode());
                 foreach (KeyValuePair<StringUnit, Unit> entry in table.table)
                 {
-                    if (entry.Value.HeapUnitType == typeof(FunctionUnit)) RelocateFunction((FunctionUnit)entry.Value.heapUnitValue, relocationInfo);
-                    else if (entry.Value.HeapUnitType == typeof(ClosureUnit)) RelocateClosure((ClosureUnit)entry.Value.heapUnitValue, relocationInfo);
-                    else if (entry.Value.HeapUnitType == typeof(TableUnit)) FindFunction((TableUnit)entry.Value.heapUnitValue, relocationInfo);
+                    if (entry.Value.Type == UnitType.Function) RelocateFunction((FunctionUnit)entry.Value.heapUnitValue, relocationInfo);
+                    else if (entry.Value.Type == UnitType.Closure) RelocateClosure((ClosureUnit)entry.Value.heapUnitValue, relocationInfo);
+                    else if (entry.Value.Type == UnitType.Table) FindFunction((TableUnit)entry.Value.heapUnitValue, relocationInfo);
 
                     relocationInfo.module.TableSet(entry.Key, entry.Value);
                 }
@@ -1290,11 +1290,11 @@ namespace lightning
         {
             foreach (UpValueUnit v in closure.upValues)
             {
-                if (v.UpValue.HeapUnitType == typeof(ClosureUnit)/* && relocationInfo.module.name != closure.function.module*/)
+                if (v.UpValue.Type == UnitType.Closure/* && relocationInfo.module.name != closure.function.module*/)
                 {
                     RelocateClosure((ClosureUnit)v.UpValue.heapUnitValue, relocationInfo);
                 }
-                else if (v.UpValue.HeapUnitType == typeof(FunctionUnit)/* && relocationInfo.module.name != closure.function.module*/)
+                else if (v.UpValue.Type == UnitType.Function/* && relocationInfo.module.name != closure.function.module*/)
                 {
                     RelocateFunction((FunctionUnit)v.UpValue.heapUnitValue, relocationInfo);
                 }
@@ -1315,7 +1315,7 @@ namespace lightning
                 relocationInfo.module.globals.Add(new_value);
                 relocationInfo.relocatedGlobals.Add(relocationInfo.toBeRelocatedGlobals[i], (Operand)(relocationInfo.module.globals.Count - 1));
 
-                if (new_value.HeapUnitType == typeof(TableUnit)) relocation_stack.Add((TableUnit)new_value.heapUnitValue);
+                if (new_value.Type == UnitType.Table) relocation_stack.Add((TableUnit)new_value.heapUnitValue);
             }
             relocationInfo.toBeRelocatedGlobals.Clear();
 
@@ -1326,7 +1326,7 @@ namespace lightning
                 relocationInfo.module.constants.Add(new_value);
                 relocationInfo.relocatedConstants.Add(relocationInfo.toBeRelocatedConstants[i], (Operand)(relocationInfo.module.constants.Count - 1));
 
-                if (new_value.HeapUnitType == typeof(TableUnit)) relocation_stack.Add((TableUnit)new_value.heapUnitValue);
+                if (new_value.Type == UnitType.Table) relocation_stack.Add((TableUnit)new_value.heapUnitValue);
             }
             relocationInfo.toBeRelocatedConstants.Clear();
 
@@ -1459,7 +1459,7 @@ namespace lightning
         {
             foreach (KeyValuePair<StringUnit, Unit> entry in module.table)
             {
-                if (entry.Value.HeapUnitType == typeof(FunctionUnit))
+                if (entry.Value.Type == UnitType.Function)
                 {
                     FunctionUnit function = (FunctionUnit)entry.Value.heapUnitValue;
                     for (Operand i = 0; i < function.body.Count; i++)

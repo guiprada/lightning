@@ -8,6 +8,7 @@ var lib_assert_counter_not = require("assert_counter_not.ltn")
 var lib_assert = require("assert.ltn")
 
 write("assertion detects errors ..")
+write(lib_assert .. " " .. lib_assert.assert)
 lib_assert.assert(2,1," OK!")
 
 var assert = lib_assert_counter.assert
