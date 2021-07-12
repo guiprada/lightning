@@ -790,6 +790,12 @@ a"
     assert(string.contains_char(hello_world_string, 'l'), true, "Failed String Contains Test 7.")
     assert(string.contains_char(hello_world_string, 'g'), false, "Failed String Contains Test 8.")
 }
+{
+    // Testing Integer
+    assert(1.0, 1, "Failed Integer test 1.")
+    assert_not(1.000000000000001, 1, "Failed Integer test 2.")
+    assert((0.5 + 0.5), 1, "Failed Integer test 3.")
+}
 machine.trim()
 
 var end_time = time.now()
