@@ -765,12 +765,14 @@ var global_lock_test_counter = 5
     var line_skip_string =
 "a
 a"
-    if(os == "Windows"){
+    var new_line = string.new_line()
+    var new_line_size = string.length(new_line)
+    if(new_line_size == 2){
         assert('\n', string.char_at(2,line_skip_string), "Failed Char Test 6.")
         assert('a', string.char_at(3,line_skip_string), "Failed Char Test 7.")
         assert('a', string.char_at(0,line_skip_string), "Failed Char Test 8.")
         assert('\r', string.char_at(1,line_skip_string), "Failed Char Test 9.")
-    }else if(os == "Unix"){
+    }else if(new_line_size == 1){
         assert('\n', string.char_at(1,line_skip_string), "Failed Char Test 6.")
         assert('a', string.char_at(2,line_skip_string), "Failed Char Test 7.")
         assert('a', string.char_at(0,line_skip_string), "Failed Char Test 8.")

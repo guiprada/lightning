@@ -735,7 +735,7 @@ namespace lightning
                 Unit stringLength(VM vm)
                 {
                     StringUnit val_input_string = vm.GetStringUnit(0);
-                    return new Unit(val_input_string.ToString().Length);
+                    return new Unit(val_input_string.content.Length);
                 }
                 string_table.TableSet("length", new IntrinsicUnit("string_length", stringLength, 1));
 
@@ -796,6 +796,13 @@ namespace lightning
                     return new Unit(input_string.Contains(contained_char));
                 }
                 string_table.TableSet("contains_char", new IntrinsicUnit("contains_char", ContainsChar, 2));
+
+                //////////////////////////////////////////////////////
+                Unit NewLine(VM vm)
+                {
+                    return new Unit(Environment.NewLine);
+                }
+                string_table.TableSet("new_line", new IntrinsicUnit("new_line", NewLine, 0));
 
                 tables.Add("string", string_table);
             }
