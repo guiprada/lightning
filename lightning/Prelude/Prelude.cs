@@ -752,17 +752,6 @@ namespace lightning
                 string_table.TableSet("copy", new IntrinsicUnit("string_copy", stringCopy, 1));
 
                 //////////////////////////////////////////////////////
-
-                Unit charAt(VM vm)
-                {
-                    Number index = vm.GetNumber(0);
-                    string val_input_string = vm.GetString(1);
-                    return new Unit(val_input_string.ToCharArray()[(int)index]);
-                }
-                string_table.TableSet("char_at", new IntrinsicUnit("char_at", charAt, 2));
-
-                //////////////////////////////////////////////////////
-
                 Unit toList(VM vm)
                 {
                     string val_input_string = vm.GetString(0);
@@ -775,6 +764,38 @@ namespace lightning
                 string_table.TableSet("to_list", new IntrinsicUnit("to_list", toList, 1));
 
                 //////////////////////////////////////////////////////
+                Unit charAt(VM vm)
+                {
+                    Integer index = vm.GetInteger(0);
+                    string input_string = vm.GetString(1);
+                    if (index < input_string.Length)
+                    {
+                        char result = input_string[(int)index];
+                        return new Unit(result);
+                    }
+                    return new Unit(UnitType.Null);
+                }
+                string_table.TableSet("char_at", new IntrinsicUnit("char_at", charAt, 2));
+
+                //////////////////////////////////////////////////////
+                Unit Contains(VM vm)
+                {
+                    string input_string = vm.GetString(0);
+                    string contained_string = vm.GetString(1);
+
+                    return new Unit(input_string.Contains(contained_string));
+                }
+                string_table.TableSet("contains", new IntrinsicUnit("contains", Contains, 2));
+
+                //////////////////////////////////////////////////////
+                Unit ContainsChar(VM vm)
+                {
+                    string input_string = vm.GetString(0);
+                    char contained_char = vm.GetChar(1);
+
+                    return new Unit(input_string.Contains(contained_char));
+                }
+                string_table.TableSet("contains_char", new IntrinsicUnit("contains_char", ContainsChar, 2));
 
                 tables.Add("string", string_table);
             }
@@ -783,18 +804,6 @@ namespace lightning
             /////////////////////////////////////////////////////////////////////////////////////////////////////// char
             {
                 TableUnit char_table = new TableUnit(null, null);
-                Unit charAt(VM vm)
-                {
-                    string input_string = vm.GetString(0);
-                    Number index = vm.GetNumber(1);
-                    if (index < input_string.Length)
-                    {
-                        char result = input_string[(int)index];
-                        return new Unit(result.ToString());
-                    }
-                    return new Unit(UnitType.Null);
-                }
-                char_table.TableSet("at", new IntrinsicUnit("char_at", charAt, 2));
 
                 //////////////////////////////////////////////////////
 

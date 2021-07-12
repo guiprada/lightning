@@ -1,4 +1,12 @@
 ﻿write_line("*** Welcome to lightning Zzz :) ***")
+
+var os_string = get_os()
+var os = "Unknown"
+if(string.contains(os_string, "Windows"))
+    os = "Windows"
+else if(string.contains(os_string, "Unix"))
+    os = "Unix"
+
 write_line(get_os())
 write_line("-- Starting tests --")
 var start_time = time.now()
@@ -757,16 +765,28 @@ var global_lock_test_counter = 5
     var line_skip_string =
 "a
 a"
-    if(get_os() == "Microsoft Windows NT 10.0.19043.0"){
+    if(os == "Windows"){
         assert('\n', string.char_at(2,line_skip_string), "Failed Char Test 6.")
         assert('a', string.char_at(3,line_skip_string), "Failed Char Test 7.")
         assert('a', string.char_at(0,line_skip_string), "Failed Char Test 8.")
         assert('\r', string.char_at(1,line_skip_string), "Failed Char Test 9.")
-    }else if(get_os() == "Unix 5.8.0.59"){
+    }else if(os == "Unix"){
         assert('\n', string.char_at(1,line_skip_string), "Failed Char Test 6.")
         assert('a', string.char_at(2,line_skip_string), "Failed Char Test 7.")
         assert('a', string.char_at(0,line_skip_string), "Failed Char Test 8.")
     }
+}
+{
+    // Testing String Contains
+    var hello_world_string = "hello world"
+    assert(string.contains(hello_world_string, "hello"), true, "Failed String Contains Test 1.")
+    assert(string.contains(hello_world_string, "world"), true, "Failed String Contains Test 2.")
+    assert(string.contains(hello_world_string, "llo wo"), true, "Failed String Contains Test 3.")
+    assert(string.contains(hello_world_string, "hey"), false, "Failed String Contains Test 4.")
+    assert(string.contains(hello_world_string, "_wor"), false, "Failed String Contains Test 5.")
+    assert(string.contains_char(hello_world_string, 'e'), true, "Failed String Contains Test 6.")
+    assert(string.contains_char(hello_world_string, 'l'), true, "Failed String Contains Test 7.")
+    assert(string.contains_char(hello_world_string, 'g'), false, "Failed String Contains Test 8.")
 }
 machine.trim()
 

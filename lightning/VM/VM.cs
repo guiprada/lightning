@@ -189,7 +189,7 @@ namespace lightning
         }
 
         public char GetChar(int n){
-            return (char)(stack.Peek(n).numberValue);
+            return (stack.Peek(n).charValue);
         }
 
         public bool GetBool(int n){
