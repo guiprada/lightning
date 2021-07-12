@@ -653,7 +653,7 @@ namespace lightning
                 {
                     Number value1 = vm.GetNumber(0);
                     Number value2 = vm.GetNumber(1);
-                    return new Unit((Number)(int)(value1 / value2));
+                    return new Unit((Integer)(value1 / value2));
                 }
                 math.TableSet("idiv", new IntrinsicUnit("idiv", idiv, 2));
 
