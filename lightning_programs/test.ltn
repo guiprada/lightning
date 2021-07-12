@@ -34,7 +34,7 @@ function clear_errors()
         write_line("Reseted error count.")
         clear_errors()
     }else{
-        write_line("Assertion functionctions are insane!")
+        write_line("Assertion functions are insane!")
     }
 
     lib_assert.header = "ERROR: "

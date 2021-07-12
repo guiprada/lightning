@@ -7,14 +7,31 @@ using Operand = System.UInt16;
 
 #if DOUBLE
     using Number = System.Double;
+    using Integer = System.Int64;
 #else
     using Number = System.Single;
+    using Integer = System.Int32;
 #endif
 
 namespace lightning
 {
+    [StructLayout(LayoutKind.Explicit)]
     public struct Unit{
-        public Number unitValue;
+
+        [FieldOffset(0)]
+        public Number numberValue;
+        [FieldOffset(0)]
+        public char charValue;
+        [FieldOffset(0)]
+        public Integer integerValue;
+        [FieldOffset(0)]
+        public bool boolValue;
+
+#if DOUBLE
+        [FieldOffset(8)]
+#else
+        [FieldOffset(4)]
+#endif
         public HeapUnit heapUnitValue;
 
         public UnitType Type{
@@ -23,38 +40,52 @@ namespace lightning
             }
         }
 
-        public Unit(HeapUnit p_value)
+        public Unit(HeapUnit p_value):this()
         {
-            unitValue = 0;
+            numberValue = 0;
             heapUnitValue = p_value;
         }
-        public Unit(Number p_number)
+        public Unit(Number p_number):this()
         {
-            unitValue = p_number;
-            heapUnitValue = TypeUnit.Number;
+            // if(p_number%1 == 0){
+            //     integerValue = (Integer)p_number;
+            //     heapUnitValue = TypeUnit.Integer;
+            // }else{
+                numberValue = p_number;
+                heapUnitValue = TypeUnit.Number;
+            // }
         }
 
-        public Unit(bool p_value){
+        // public Unit(Integer p_number):this()
+        // {
+        //     integerValue = p_number;
+        //     heapUnitValue = TypeUnit.Integer;
+        // }
+
+        public Unit(bool p_value):this()
+        {
             if(p_value == true){
-                unitValue = 1;
+                boolValue = true;
             }else{
-                unitValue = 0;
+                boolValue = false;
             }
             heapUnitValue = TypeUnit.Boolean;
         }
 
-        public Unit(String p_string){
-            unitValue = 0;
+        public Unit(String p_string):this()
+        {
+            numberValue = 0;
             heapUnitValue = new StringUnit(p_string);
         }
 
-        public Unit(char p_char){
-            unitValue = p_char;
+        public Unit(char p_char):this()
+        {
+            charValue = p_char;
             heapUnitValue = TypeUnit.Char;
         }
 
-        public Unit(UnitType p_type){
-            unitValue = 0;
+        public Unit(UnitType p_type):this()
+        {
             switch(p_type){
                 case UnitType.Null:
                     heapUnitValue = TypeUnit.Null;
@@ -64,6 +95,9 @@ namespace lightning
                     break;
                 case UnitType.Number:
                     heapUnitValue = TypeUnit.Number;
+                    break;
+                case UnitType.Integer:
+                    heapUnitValue = TypeUnit.Integer;
                     break;
                 case UnitType.Char:
                     heapUnitValue = TypeUnit.Char;
@@ -78,17 +112,15 @@ namespace lightning
             UnitType this_type = this.Type;
             switch(this_type){
                 case UnitType.Number:
-                    return unitValue.ToString();
+                    return numberValue.ToString();
+                case UnitType.Integer:
+                    return integerValue.ToString();
                 case UnitType.Char:
-                    return ((char)unitValue).ToString();
+                    return charValue.ToString();
                 case UnitType.Null:
                     return "null";
                 case UnitType.Boolean:
-                    if(unitValue == 0)
-                        return "false";
-                    if(unitValue == 1)
-                        return "true";
-                    throw new Exception("Trying to get String of Invalid Boolean.");
+                    return boolValue.ToString();
                 default:
                     return heapUnitValue.ToString();
             }
@@ -100,16 +132,14 @@ namespace lightning
             switch(this_type){
                 case UnitType.Number:
                     throw new Exception("Can not convert Number to Bool.");
+                case UnitType.Integer:
+                    throw new Exception("Can not convert Integer to Bool.");
                 case UnitType.Char:
                     throw new Exception("Can not convert Char to Bool.");
                 case UnitType.Null:
                     return false;
                 case UnitType.Boolean:
-                    if(unitValue == 0)
-                        return false;
-                    if(unitValue == 1)
-                        return true;
-                    throw new Exception("Trying to get Value of Invalid Boolean.");
+                    return boolValue;
                 default:
                     return heapUnitValue.ToBool();
             }
@@ -124,12 +154,21 @@ namespace lightning
             switch(this_type){
                 case UnitType.Number:
                     if (other_type == UnitType.Number){
-                        return ((Unit)other).unitValue == unitValue;
+                        return ((Unit)other).numberValue == numberValue;
+                    }else if(other_type == UnitType.Integer) {
+                        return ((Unit)other).integerValue == numberValue;
+                    }
+                    return false;
+                case UnitType.Integer:
+                    if (other_type == UnitType.Number){
+                        return ((Unit)other).numberValue == integerValue;
+                    }else if(other_type == UnitType.Integer) {
+                        return ((Unit)other).integerValue == integerValue;
                     }
                     return false;
                 case UnitType.Char:
                     if (other_type == UnitType.Char){
-                        return this.unitValue == ((Unit)other).unitValue;
+                        return this.charValue == ((Unit)other).charValue;
                     }
                     return false;
                 case UnitType.Null:
@@ -148,13 +187,15 @@ namespace lightning
             UnitType this_type = this.Type;
             switch(this_type){
                 case UnitType.Number:
-                    return unitValue.GetHashCode();
+                    return numberValue.GetHashCode();
+                case UnitType.Integer:
+                    return integerValue.GetHashCode();
                 case UnitType.Char:
-                    return ((char)unitValue).GetHashCode();
+                    return charValue.GetHashCode();
                 case UnitType.Null:
                     return UnitType.Null.GetHashCode();
                 case UnitType.Boolean:
-                    return ToBool().GetHashCode();
+                    return boolValue.GetHashCode();
                 default:
                     return heapUnitValue.GetHashCode();
             }

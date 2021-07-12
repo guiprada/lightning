@@ -7,14 +7,17 @@ using Operand = System.UInt16;
 
 #if DOUBLE
     using Number = System.Double;
+    using Integer = System.Int64;
 #else
     using Number = System.Single;
+    using Integer = System.Int32;
 #endif
 
 namespace lightning
 {
     public enum UnitType{
         Number,
+        Integer,
         Null,
         Boolean,
         String,
@@ -40,6 +43,7 @@ namespace lightning
 
     public class TypeUnit : HeapUnit{
         public static TypeUnit Number = new TypeUnit(UnitType.Number);
+        public static TypeUnit Integer = new TypeUnit(UnitType.Integer);
         public static TypeUnit Null = new TypeUnit(UnitType.Null);
         public static TypeUnit Boolean = new TypeUnit(UnitType.Boolean);
         public static TypeUnit Char = new TypeUnit(UnitType.Char);
@@ -59,6 +63,8 @@ namespace lightning
         public override string ToString(){
             if(this.type == UnitType.Number)
                 return "UnitType.Number";
+            else if(this.type == UnitType.Integer)
+                return "UnitType.Integer";
             else if(this.type == UnitType.Null)
                 return "UnitType.Null";
             else if(this.type == UnitType.Boolean)
@@ -422,7 +428,7 @@ namespace lightning
             if (p_key.Type == UnitType.String)
                 return GetTable((StringUnit)(p_key.heapUnitValue));
             if (p_key.Type == UnitType.Number)
-                return elements[(int)p_key.unitValue];
+                return elements[(int)p_key.numberValue];
             else
                 throw new Exception("Table can not be indexed by: " + p_key.Type);
         }

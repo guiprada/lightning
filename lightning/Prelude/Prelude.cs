@@ -193,7 +193,7 @@ namespace lightning
                 Unit listPop(VM vm)
                 {
                     TableUnit list = vm.GetTable(0);
-                    Number value = list.elements[^1].unitValue;
+                    Number value = list.elements[^1].numberValue;
                     list.elements.RemoveRange(list.elements.Count - 1, 1);
 
                     return new Unit(value);
