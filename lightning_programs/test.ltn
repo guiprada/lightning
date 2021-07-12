@@ -1,4 +1,5 @@
 ﻿write_line("*** Welcome to lightning Zzz :) ***")
+write_line(get_os())
 write_line("-- Starting tests --")
 var start_time = time.now()
 
@@ -761,8 +762,11 @@ a"
         assert('a', string.char_at(3,line_skip_string), "Failed Char Test 7.")
         assert('a', string.char_at(0,line_skip_string), "Failed Char Test 8.")
         assert('\r', string.char_at(1,line_skip_string), "Failed Char Test 9.")
+    }else if(get_os() == "Unix 5.8.0.59"){
+        assert('\n', string.char_at(1,line_skip_string), "Failed Char Test 6.")
+        assert('a', string.char_at(2,line_skip_string), "Failed Char Test 7.")
+        assert('a', string.char_at(0,line_skip_string), "Failed Char Test 8.")
     }
-    write_line(get_os())
 }
 machine.trim()
 
