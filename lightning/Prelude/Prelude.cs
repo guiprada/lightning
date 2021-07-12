@@ -6,14 +6,16 @@ using System.Text;
 using Operand = System.UInt16;
 
 #if ROSLYN
-using Microsoft.CodeAnalysis.Scripting;
-using Microsoft.CodeAnalysis.CSharp.Scripting;
+    using Microsoft.CodeAnalysis.Scripting;
+    using Microsoft.CodeAnalysis.CSharp.Scripting;
 #endif
 
 #if DOUBLE
     using Number = System.Double;
+    using Integer = System.Int64;
 #else
     using Number = System.Single;
+    using Integer = System.Int32;
 #endif
 
 namespace lightning
@@ -642,7 +644,7 @@ namespace lightning
                 {
                     Number value1 = vm.GetNumber(0);
                     Number value2 = vm.GetNumber(1);
-                    return new Unit((Number)value1 % value2);
+                    return new Unit(value1 % value2);
                 }
                 math.TableSet("mod", new IntrinsicUnit("mod", mod, 2));
 
@@ -665,15 +667,25 @@ namespace lightning
 
                 Unit now(VM vm)
                 {
+#if DOUBLE
+                    return new Unit((Integer)(DateTime.Now.Ticks));
+#else
                     return new Unit(new WrapperUnit<long>(DateTime.Now.Ticks));
+#endif
                 }
                 time.TableSet("now", new IntrinsicUnit("now", now, 0));
 
                 Unit timeSpan(VM vm)
                 {
+#if DOUBLE
+                    Integer timeStart = vm.GetInteger(0);
+                    Integer timeEnd = vm.GetInteger(1);
+                    return new Unit((Integer)(new TimeSpan(timeEnd - timeStart).TotalMilliseconds));// Convert to milliseconds
+#else
                     long timeStart = vm.GetWrapperUnit<long>(0);
                     long timeEnd = vm.GetWrapperUnit<long>(1);
                     return new Unit((Number)(new TimeSpan(timeEnd - timeStart).TotalMilliseconds));// Convert to milliseconds
+#endif
                 }
                 time.TableSet("span", new IntrinsicUnit("span", timeSpan, 2));
 
@@ -1107,14 +1119,13 @@ namespace lightning
 
             Unit ForRange(VM vm)
             {
-                Number tasks = vm.GetNumber(0);
+                Integer n_tasks = vm.GetInteger(0);
                 TableUnit table = vm.GetTable(1);
                 Unit func = vm.GetUnit(2);
 
-                int n_tasks = (int)tasks;
 
                 int init = 0;
-                int end = n_tasks;
+                int end = (int)n_tasks;
                 VM[] vms = new VM[end];
                 for (int i = 0; i < end; i++)
                 {
@@ -1122,7 +1133,7 @@ namespace lightning
                 }
 
                 int count = table.ECount;
-                int step = (count / n_tasks) + 1;
+                int step = (count / (int)n_tasks) + 1;
 
                 System.Threading.Tasks.Parallel.For(init, end, (index) =>
                 {

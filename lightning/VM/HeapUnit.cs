@@ -429,6 +429,8 @@ namespace lightning
                 return GetTable((StringUnit)(p_key.heapUnitValue));
             if (p_key.Type == UnitType.Number)
                 return elements[(int)p_key.numberValue];
+            if (p_key.Type == UnitType.Integer)
+                return elements[(int)p_key.integerValue];
             else
                 throw new Exception("Table can not be indexed by: " + p_key.Type);
         }

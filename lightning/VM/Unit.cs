@@ -47,20 +47,20 @@ namespace lightning
         }
         public Unit(Number p_number):this()
         {
-            // if(p_number%1 == 0){
-            //     integerValue = (Integer)p_number;
-            //     heapUnitValue = TypeUnit.Integer;
-            // }else{
+            if(p_number%1 == 0){
+                integerValue = (Integer)p_number;
+                heapUnitValue = TypeUnit.Integer;
+            }else{
                 numberValue = p_number;
                 heapUnitValue = TypeUnit.Number;
-            // }
+            }
         }
 
-        // public Unit(Integer p_number):this()
-        // {
-        //     integerValue = p_number;
-        //     heapUnitValue = TypeUnit.Integer;
-        // }
+        public Unit(Integer p_number):this()
+        {
+            integerValue = p_number;
+            heapUnitValue = TypeUnit.Integer;
+        }
 
         public Unit(bool p_value):this()
         {
@@ -161,7 +161,7 @@ namespace lightning
                     return false;
                 case UnitType.Integer:
                     if (other_type == UnitType.Number){
-                        return ((Unit)other).numberValue == integerValue;
+                        return (((Unit)other).numberValue) == integerValue;
                     }else if(other_type == UnitType.Integer) {
                         return ((Unit)other).integerValue == integerValue;
                     }
@@ -199,6 +199,141 @@ namespace lightning
                 default:
                     return heapUnitValue.GetHashCode();
             }
+        }
+
+        public static Unit operator +(Unit op) => op;
+        public static Unit operator -(Unit op){
+            UnitType op_type = op.Type;
+            if(op_type == UnitType.Number){
+                return new Unit(- op.numberValue);
+            }
+            if(op_type == UnitType.Integer){
+                return new Unit(- op.integerValue);
+            }
+            throw new Exception("Trying to negate non numeric UnitType");
+        }
+        public static Unit operator +(Unit opA, Unit opB){
+            UnitType opA_type = opA.Type;
+            UnitType opB_type = opB.Type;
+
+            if(opA_type == UnitType.Number){
+                if(opB_type == UnitType.Number)
+                    return new Unit(opA.numberValue + opB.numberValue);
+                if(opB_type == UnitType.Integer)
+                    return new Unit(opA.numberValue + opB.integerValue);
+            }
+            if(opA_type == UnitType.Integer){
+                if(opB_type == UnitType.Number)
+                    return new Unit(opA.integerValue + opB.numberValue);
+                if(opB_type == UnitType.Integer)
+                    return new Unit(opA.integerValue + opB.integerValue);
+            }
+            throw new Exception("Trying to add non numeric UnitType");
+        }
+
+        public static Unit operator +(Unit opA, Number opB){
+            UnitType opA_type = opA.Type;
+
+            if(opA_type == UnitType.Number){
+                return new Unit(opA.numberValue + opB);
+            }
+            if(opA_type == UnitType.Integer){
+                return new Unit(opA.integerValue + opB);
+            }
+            throw new Exception("Trying to increment non numeric UnitType");
+        }
+
+        public static Unit operator +(Unit opA, Integer opB){
+            UnitType opA_type = opA.Type;
+
+            if(opA_type == UnitType.Number){
+                return new Unit(opA.numberValue + opB);
+            }
+            if(opA_type == UnitType.Integer){
+                return new Unit(opA.integerValue + opB);
+            }
+            throw new Exception("Trying to increment non numeric UnitType");
+        }
+
+        public static Unit operator -(Unit opA, Unit opB){
+            UnitType opA_type = opA.Type;
+            UnitType opB_type = opB.Type;
+
+            if(opA_type == UnitType.Number){
+                if(opB_type == UnitType.Number)
+                    return new Unit(opA.numberValue - opB.numberValue);
+                if(opB_type == UnitType.Integer)
+                    return new Unit(opA.numberValue - opB.integerValue);
+            }
+            if(opA_type == UnitType.Integer){
+                if(opB_type == UnitType.Number)
+                    return new Unit(opA.integerValue - opB.numberValue);
+                if(opB_type == UnitType.Integer)
+                    return new Unit(opA.integerValue - opB.integerValue);
+            }
+            throw new Exception("Trying to subtract non numeric UnitType");
+        }
+
+        public static Unit operator -(Unit opA, Number opB){
+            UnitType opA_type = opA.Type;
+
+            if(opA_type == UnitType.Number){
+                return new Unit(opA.numberValue - opB);
+            }
+            if(opA_type == UnitType.Integer){
+                return new Unit(opA.integerValue - opB);
+            }
+            throw new Exception("Trying to decrement non numeric UnitType");
+        }
+
+        public static Unit operator -(Unit opA, Integer opB){
+            UnitType opA_type = opA.Type;
+
+            if(opA_type == UnitType.Number){
+                return new Unit(opA.numberValue - opB);
+            }
+            if(opA_type == UnitType.Integer){
+                return new Unit(opA.integerValue - opB);
+            }
+            throw new Exception("Trying to decrement non numeric UnitType");
+        }
+
+        public static Unit operator *(Unit opA, Unit opB){
+            UnitType opA_type = opA.Type;
+            UnitType opB_type = opB.Type;
+
+            if(opA_type == UnitType.Number){
+                if(opB_type == UnitType.Number)
+                    return new Unit(opA.numberValue * opB.numberValue);
+                if(opB_type == UnitType.Integer)
+                    return new Unit(opA.numberValue * opB.integerValue);
+            }
+            if(opA_type == UnitType.Integer){
+                if(opB_type == UnitType.Number)
+                    return new Unit(opA.integerValue * opB.numberValue);
+                if(opB_type == UnitType.Integer)
+                    return new Unit(opA.integerValue * opB.integerValue);
+            }
+            throw new Exception("Trying to multiply non numeric UnitType");
+        }
+
+        public static Unit operator /(Unit opA, Unit opB){
+            UnitType opA_type = opA.Type;
+            UnitType opB_type = opB.Type;
+
+            if(opA_type == UnitType.Number){
+                if(opB_type == UnitType.Number)
+                    return new Unit(opA.numberValue / opB.numberValue);
+                if(opB_type == UnitType.Integer)
+                    return new Unit(opA.numberValue / opB.integerValue);
+            }
+            if(opA_type == UnitType.Integer){
+                if(opB_type == UnitType.Number)
+                    return new Unit(opA.integerValue / opB.numberValue);
+                if(opB_type == UnitType.Integer)
+                    return new Unit(opA.integerValue / opB.integerValue);
+            }
+            throw new Exception("Trying to divide non numeric UnitType");
         }
     }
 }
