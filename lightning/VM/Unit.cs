@@ -201,7 +201,7 @@ namespace lightning
             }
         }
 
-        public static Unit operator +(Unit op) => op;
+        // public static Unit operator +(Unit op) => op;
         public static Unit operator -(Unit op){
             UnitType op_type = op.Type;
             if(op_type == UnitType.Float){
@@ -221,14 +221,20 @@ namespace lightning
                     return new Unit(opA.floatValue + opB.floatValue);
                 if(opB_type == UnitType.Integer)
                     return new Unit(opA.floatValue + opB.integerValue);
+                if(opB_type == UnitType.String || opB_type == UnitType.Char)
+                    return new Unit(opA.ToString() + opB.ToString());
             }
             if(opA_type == UnitType.Integer){
                 if(opB_type == UnitType.Float)
                     return new Unit(opA.integerValue + opB.floatValue);
                 if(opB_type == UnitType.Integer)
                     return new Unit(opA.integerValue + opB.integerValue);
+                if(opB_type == UnitType.String || opB_type == UnitType.Char)
+                    return new Unit(opA.ToString() + opB.ToString());
             }
-            throw new Exception("Trying to add non numeric UnitType" + VM.ErrorString(null));
+            if(opA_type == UnitType.String || opA_type == UnitType.Char)
+                return new Unit(opA.ToString() + opB.ToString());
+            throw new Exception("Trying to add non alphanumeric UnitType" + VM.ErrorString(null));
         }
 
         public static Unit operator +(Unit opA, Float opB){

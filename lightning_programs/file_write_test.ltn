@@ -2,7 +2,7 @@
         var str_global = "global"
         var str_upvalue = "up"
         return function (value1, value2, value3){
-                return str_global .. value1  .. value2 .. value3 .. str_upvalue
+                return str_global + value1  + value2 + value3 + str_upvalue
             }
     
         var table1 = []
@@ -11,7 +11,7 @@
             var str_upvalue = "up"
             table1.append =
                 function (value1, value2, value3){
-                    return str_global .. value1  .. value2 .. value3 .. str_upvalue
+                    return str_global + value1  + value2 + value3 + str_upvalue
                 }
         }
         return table1

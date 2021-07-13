@@ -1,7 +1,5 @@
 ﻿todo
-	rename Number to Float
 	add makeNumericIterator
-	think if we should error on overriding a map value with table value
 	remove append, replace with +
 	try , protected call
 	tuple and nuple class
@@ -109,3 +107,5 @@ done
 	- finish porting prelude and stack helpers
 	- tuples  and nuples
 	- methods on wrappers
+	- rename Number to Float
+	- Compiler diferentiates Integer and Float literals

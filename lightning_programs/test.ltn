@@ -79,7 +79,7 @@ function clear_errors()
     //String concatenation
     var hello = "hello"
     var world = "world"
-    var result = "hello" .. " " .. "world!"
+    var result = "hello" + " " + "world!"
     assert(result, "hello world!", "Failed string concatenation test 1.")
     assert_not(result, "world!", "Failed string concatenation test 2.")
 }
@@ -116,7 +116,7 @@ function clear_errors()
     // Table literal test
     var this_table = [null, null, null, null, null, 5:"hello"]
     for(var i = 0; i<5; i++){
-        assert(this_table[i], null, "Failed Table Literal test " .. (i+1) .. ".")
+        assert(this_table[i], null, "Failed Table Literal test " + (i+1) + ".")
     }
     assert(this_table[5], "hello", "Failed Table Literal test 6.")
 
@@ -166,7 +166,7 @@ function clear_errors()
         var local = "";
         function closure()
         {
-            local = local .. " extra";
+            local = local + " extra";
             return local
         }
         return closure;
@@ -311,7 +311,7 @@ function clear_errors()
     i = make_iterator(0);
     for (var j = 0; j < 10; j = i(1))
     {
-        assert(array[j], j, "Failed iterator test " .. j .. ".")
+        assert(array[j], j, "Failed iterator test " + j + ".")
     }
 }
 {
@@ -473,7 +473,7 @@ function clear_errors()
             var str_upvalue = "up"
             table1.append =
                 function (value1, value2, value3){
-                    return str_global .. value1  .. value2 .. value3 .. str_upvalue
+                    return str_global + value1  + value2 + value3 + str_upvalue
                 }
         }
         return table1
@@ -487,7 +487,7 @@ function clear_errors()
         var str_global = "global"
         var str_upvalue = "up"
         return function (value1, value2, value3){
-                return str_global .. value1  .. value2 .. value3 .. str_upvalue
+                return str_global + value1  + value2 + value3 + str_upvalue
             }
     #
     file.write("file_write_test.ltn", my_prog2)
@@ -537,25 +537,25 @@ function clear_errors()
     for_range(6, table1, many_for)
     for (var i = 0; i<n; i++)
     {
-        assert(table1[i], i, "Failed for_range Test 1, iteration: " .. i .. ".")
+        assert(table1[i], i, "Failed for_range Test 1, iteration: " + i + ".")
     }
 
     for_range(1, table1, many_for)
     for (var i = 0; i<n; i++)
     {
-        assert(table1[i], i, "Failed for_range Test 2, iteration: " .. i .. ".")
+        assert(table1[i], i, "Failed for_range Test 2, iteration: " + i + ".")
     }
 
     for_range(3, table1, many_for)
     for (var i = 0; i<n; i++)
     {
-        assert(table1[i], i, "Failed for_range Test 3, iteration: " .. i .. ".")
+        assert(table1[i], i, "Failed for_range Test 3, iteration: " + i + ".")
     }
 
     for_range(200, table1, many_for)
     for (var i = 0; i<n; i++)
     {
-        assert(table1[i], i, "Failed for_range Test 4, iteration: " .. i .. ".")
+        assert(table1[i], i, "Failed for_range Test 4, iteration: " + i + ".")
     }
 }
 {
@@ -571,7 +571,7 @@ function clear_errors()
     for_each(table1, many)
     for (var i = 0; i<n; i++)
     {
-        assert(table1[i].x, 1, "Failed for_each Test 1, iteration:" .. i .. ".")
+        assert(table1[i].x, 1, "Failed for_each Test 1, iteration:" + i + ".")
     }
 
     table1 = table.list_new(n)
@@ -582,7 +582,7 @@ function clear_errors()
     for_each(table1, many_number)
     for (var i = 0; i<n; i++)
     {
-        assert(table1[i], 1, "Failed for_each Test 2, iteration: " .. i .. ".")
+        assert(table1[i], 1, "Failed for_each Test 2, iteration: " + i + ".")
     }
 
     table1 = table.list_new(n)
@@ -592,7 +592,7 @@ function clear_errors()
     })
     for (var i = 0; i<n; i++)
     {
-        assert(table1[i], n - i, "Failed for_each Test 3, iteration: " .. i .. ".")
+        assert(table1[i], n - i, "Failed for_each Test 3, iteration: " + i + ".")
     }
 }
 // Testing Global Lock
@@ -633,7 +633,7 @@ var global_lock_test_counter = 5
     var j1 = --j
     assert(j1, 0, "Failed Increment Test 1.")
     j = 2
-    j1 = j+=1 // chained ASSIGN_VARIABLEment op works weird, this is equivalent to j1 = .. = 1
+    j1 = j+=1 // chained ASSIGN_VARIABLEment op works weird, this is equivalent to j1 = + = 1
     assert(j1, 1, "Failed Increment Test 2.")
     var j2 = 0
     j2++
@@ -699,8 +699,8 @@ var global_lock_test_counter = 5
     var counter = 0
     for (var it = table.map_iterator(table1); it.next())
     {
-        assert(it.key, indexes_table1[counter], "Failed iterator key Test 1, iteration: " .. counter)
-        assert(it.value, table1[it.key], "Failed iterator value Test 1, iteration: " .. counter)
+        assert(it.key, indexes_table1[counter], "Failed iterator key Test 1, iteration: " + counter)
+        assert(it.value, table1[it.key], "Failed iterator value Test 1, iteration: " + counter)
         counter++
     }
     assert(table.list_to_string(table.map_indexes(table1)), "australia, eua, brazil", "Failed iterator Test 2")
@@ -711,7 +711,7 @@ var global_lock_test_counter = 5
     counter = 0
     for (var it = table.list_iterator(list1); it.next())
     {
-        assert(it.value, list1[counter], "Failed iterator value Test 4, iteration: " .. counter)
+        assert(it.value, list1[counter], "Failed iterator value Test 4, iteration: " + counter)
         counter++
     }
 
@@ -719,24 +719,21 @@ var global_lock_test_counter = 5
     counter = 0
     for (var it = table.list_index_iterator(list1); it.next())
     {
-        assert(it.key, counter, "Failed iterator key Test 5, iteration: " .. counter)
-        assert(it.value, list1[counter], "Failed iterator value Test 5, iteration: " .. counter)
+        assert(it.key, counter, "Failed iterator key Test 5, iteration: " + counter)
+        assert(it.value, list1[counter], "Failed iterator value Test 5, iteration: " + counter)
         counter++
     }
 }
 {
     // Testing tuples
-    function get_tuple(a, b){
-        return tuple(a, b)
-    }
-    var tuple1 = get_tuple(1, "hello")
-    assert(tuple_get_x(tuple1), 1, "Failed Tuples Test 1.")
-    assert(tuple_get_y(tuple1), "hello", "Failed Tuples Test 2.")
+    var tuple1 = tuple.new(1, "hello")
+    assert(tuple1:get_x(), 1, "Failed Tuples Test 1.")
+    assert(tuple1:get_y(), "hello", "Failed Tuples Test 2.")
 
-    tuple_set_x(tuple1, "hello")
-    tuple_set_y(tuple1, "world")
-    assert(tuple_get_x(tuple1), "hello", "Failed Tuples Test 3.")
-    assert(tuple_get_y(tuple1), "world", "Failed Tuples Test 4.")
+    tuple1:set_x("hello")
+    tuple1:set_y("world")
+    assert(tuple1:get_x(), "hello", "Failed Tuples Test 3.")
+    assert(tuple1:get_y(), "world", "Failed Tuples Test 4.")
 }
 {
     // Testing nuples
@@ -833,11 +830,13 @@ a"
     assert(testTableClone:count(), 1, "Failed Table Class Test 4.")
     assert(testTableClone:map_count(), 1, "Failed Table Class Test 5.")
     assert(testTableClone:list_count(), 0, "Failed Table Class Test 6.")
-
-    testTable[1] = 1
-    testTable[-2] = -2
-    write_line(testTable)
-    write_line(testTable:map_numeric_indexes())
+}
+{
+    // Testing Append and Alphanumeric Addition
+    var char_o = 'o'
+    var char_a = 'a'
+    assert((1 .. 2  + char_o + 3 + 5 + " " .. char_a), "12o35 a", "Failed Append and Alphanumeric Addition Test 1.")
+    assert((1 + 2  + char_o + 3 + " " .. char_a), "3o3 a", "Failed Append and Alphanumeric Addition Test 1.")
 }
 machine.trim()
 
@@ -846,11 +845,11 @@ if (count_errors() == 0){
     write_line("No errors found! :)")
 }
 else{
-    write_line(":( " .. count_errors() .. " errors found!")
+    write_line(":( " + count_errors() + " errors found!")
 }
 write_line("-- Finished tests! --")
-write_line("Elapsed time: " .. start_time:elapsed_time() .. " ms")
-write_line("Loaded modules: " .. machine.modules())
+write_line("Elapsed time: " + start_time:elapsed_time() + " ms")
+write_line("Loaded modules: " + machine.modules())
 write_line(machine.memory_use())
 
-// ////////////////////////////// scratch
+//////////////////////////////// scratch
