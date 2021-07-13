@@ -4,8 +4,10 @@ using System.Text;
 
 #if DOUBLE
     using Float = System.Double;
+    using Integer = System.Int64;
 #else
     using Float = System.Single;
+    using Integer = System.Int32;
 #endif
 
 namespace lightning
@@ -119,15 +121,34 @@ namespace lightning
 
     public class TokenNumber: Token
     {
-        public Float value;
-        public TokenNumber(TokenType p_Type, int p_Line, Float p_value): base(p_Type, p_Line)
+        public Float floatValue;
+        public Integer integerValue;
+        public Type type;
+        public TokenNumber(TokenType p_Type, int p_Line, String p_value): base(p_Type, p_Line)
         {
-            value = p_value;
+            try {
+                integerValue = Integer.Parse(p_value);
+                type = integerValue.GetType();
+            } catch (FormatException) {
+                try {
+                    floatValue = Float.Parse(p_value);
+                    type = floatValue.GetType();
+                } catch (FormatException) {
+                    Console.WriteLine("{0}: Bad Format", p_value);
+                } catch (OverflowException) {
+                    Console.WriteLine("{0}: Overflow", p_value);
+                }
+            } catch (OverflowException) {
+                Console.WriteLine("{0}: Overflow", p_value);
+            }
         }
 
         public override string ToString()
         {
-            return Type.ToString() + " number: " + value.ToString() + " line: " + Line.ToString();
+            if (type == typeof(Float))
+                return Type.ToString() + " Float: " + floatValue.ToString() + " line: " + Line.ToString();
+            else
+                return Type.ToString() + " Integer: " + integerValue.ToString() + " line: " + Line.ToString();
         }
     }
 }

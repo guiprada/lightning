@@ -4,8 +4,10 @@ using System.Text;
 
 #if DOUBLE
     using Float = System.Double;
+    using Integer = System.Int64;
 #else
     using Float = System.Single;
+    using Integer = System.Int32;
 #endif
 
 namespace lightning
@@ -686,6 +688,12 @@ namespace lightning
                                 elements.Add(Primary());
                             else
                                 table.Add(number_value, Primary());
+                        }else if(((LiteralNode)item).ValueType == typeof(Integer)){
+                            LiteralNode number_value = (LiteralNode)item;
+                            if((Integer)(number_value.Value) == elements.Count)
+                                elements.Add(Primary());
+                            else
+                                table.Add(number_value, Primary());
                         }else if(((LiteralNode)item).ValueType == typeof(string)){
                             LiteralNode string_value = (LiteralNode)item;
                             table.Add(string_value, Primary());
@@ -715,6 +723,12 @@ namespace lightning
                             if(((LiteralNode)item).ValueType == typeof(Float)){
                                 LiteralNode number_value = (LiteralNode)item;
                                 if((Float)(number_value.Value) == elements.Count)
+                                    elements.Add(Primary());
+                                else
+                                    table.Add(number_value, Primary());
+                            }else if(((LiteralNode)item).ValueType == typeof(Integer)){
+                                LiteralNode number_value = (LiteralNode)item;
+                                if((Integer)(number_value.Value) == elements.Count)
                                     elements.Add(Primary());
                                 else
                                     table.Add(number_value, Primary());
@@ -750,40 +764,42 @@ namespace lightning
                 return new LiteralNode(true, Previous().Line);
             else if (Match(TokenType.NIL))
                 return new LiteralNode(Previous().Line);
-            else if (Match(TokenType.NUMBER))
-                return new LiteralNode(((TokenNumber)Previous()).value, Previous().Line);
-            else if (Match(TokenType.STRING))
+            else if (Match(TokenType.NUMBER)){
+                Type this_type = ((TokenNumber)Previous()).type;
+                if (this_type == typeof(Integer))
+                    return new LiteralNode(((TokenNumber)Previous()).integerValue, Previous().Line);
+                else
+                    return new LiteralNode(((TokenNumber)Previous()).floatValue, Previous().Line);
+            }else if (Match(TokenType.STRING))
                 return new LiteralNode(((TokenString)Previous()).value, Previous().Line);
             else if (Match(TokenType.CHAR))
                 return new LiteralNode(((TokenChar)Previous()).value , Previous().Line);
-            else if (Match(TokenType.LEFT_PAREN))
-            {
+            else if (Match(TokenType.LEFT_PAREN)){
                 Node expr = Expression();
                 Consume(TokenType.RIGHT_PAREN, "Expected ')' after grouping'", true);
                 return new GroupingNode(expr, expr.Line);
-            }
-            else if (Check(TokenType.FUN))
+            }else if (Check(TokenType.FUN))
                 return FunExpr();
             else if (Check(TokenType.IDENTIFIER))
                 return CompoundVar();
             else if (Match(TokenType.MINUS)){
-                if (Match(TokenType.NUMBER))
-                    return new LiteralNode(-((TokenNumber)Previous()).value, Previous().Line);
-                else{
+                if (Match(TokenType.NUMBER)){
+                    Type this_type = ((TokenNumber)Previous()).type;
+                    if (this_type == typeof(Integer))
+                        return new LiteralNode(-((TokenNumber)Previous()).integerValue, Previous().Line);
+                    else
+                        return new LiteralNode(-((TokenNumber)Previous()).floatValue, Previous().Line);
+                }else{
                     Error("Number expected after (-)! " + Previous().Line);
                     return new LiteralNode(Previous().Line);
                 }
-            }
-            else
-            {
+            }else{
                 Error("No match found! " + Peek().Line + " " + Peek());
                 return null;
             }
-
         }
 
         //////////////////////////////////////////////////////////////////////
-
         Token Advance()
         {
             if (!IsAtEnd()) current++;

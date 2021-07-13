@@ -6,8 +6,10 @@ using Operand = System.UInt16;
 
 #if DOUBLE
     using Float = System.Double;
+    using Integer = System.Int64;
 #else
     using Float = System.Single;
+    using Integer = System.Int32;
 #endif
 
 namespace lightning
@@ -311,6 +313,11 @@ namespace lightning
                 int address = AddConstant((Float)p_node.Value);
                 Add(OpCode.LOAD_CONSTANT, (Operand)address, p_node.Line);
             }
+            else if (p_node.ValueType == typeof(Integer))
+            {
+                int address = AddConstant((Integer)p_node.Value);
+                Add(OpCode.LOAD_CONSTANT, (Operand)address, p_node.Line);
+            }
             else if (p_node.ValueType == typeof(string))
             {
                 int address = AddConstant((string)p_node.Value);
@@ -453,8 +460,6 @@ namespace lightning
         {
             if (p_node.Initializer == null)
             {
-                //int address = AddConstant("Nil");
-                //Add(OpCode.LOAD_CONSTANT, (Operand)address, p_node.Line);
                 Add(OpCode.LOAD_NIL, p_node.Line);
             }
             else
@@ -1070,6 +1075,20 @@ namespace lightning
         }
 
         int AddConstant(Float p_number)
+        {
+            if (constants.Contains(p_number))
+            {
+                return constants.IndexOf(p_number);
+            }
+            else
+            {
+                constants.Add(p_number);
+                code.AddConstant(new Unit(p_number));
+                return constants.Count - 1;
+            }
+        }
+
+        int AddConstant(Integer p_number)
         {
             if (constants.Contains(p_number))
             {

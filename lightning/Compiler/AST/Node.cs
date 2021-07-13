@@ -4,8 +4,10 @@ using System.Text;
 
 #if DOUBLE
     using Float = System.Double;
+    using Integer = System.Int64;
 #else
     using Float = System.Single;
+    using Integer = System.Int32;
 #endif
 
 namespace lightning
@@ -129,6 +131,12 @@ namespace lightning
         public object Value { get; private set; }
         public Type ValueType { get; private set; }
         public LiteralNode(Float p_Value, int p_Line)
+            : base(NodeType.LITERAL, p_Line)
+        {
+            Value = p_Value;
+            ValueType = p_Value.GetType();
+        }
+        public LiteralNode(Integer p_Value, int p_Line)
             : base(NodeType.LITERAL, p_Line)
         {
             Value = p_Value;

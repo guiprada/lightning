@@ -54,6 +54,17 @@ namespace interpreter
                 }
                 return 0;
             }
+            bool skip_line = false;
+#if TOKENS
+            Console.WriteLine("---------------------------------- Tokens:");
+
+            foreach (Token token in scanner.Tokens)
+            {
+               Console.WriteLine(token.ToString());
+            }
+            Console.WriteLine("-------------------------------end Tokens:");
+            skip_line = true;
+#endif
 
             Node program = parser.ParsedTree;
             if (parser.Errors.Count > 0)
@@ -73,17 +84,7 @@ namespace interpreter
                     Console.WriteLine(error);
                 }
             }
-            bool skip_line = false;
-#if TOKENS
-            Console.WriteLine("---------------------------------- Tokens:");
 
-            foreach (Token token in scanner.Tokens)
-            {
-               Console.WriteLine(token.ToString());
-            }
-            Console.WriteLine("-------------------------------end Tokens:");
-            skip_line = true;
-#endif
 #if AST
             Console.WriteLine("\n---------------------------------- AST:");
 
