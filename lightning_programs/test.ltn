@@ -1,6 +1,7 @@
 ﻿var table_teste = [5:0, -11, -1:2]
-table_teste[-5] = 0
+table_teste[-5] = 0 - 1 + 5 - 3
 write_line(table_teste)
+
 
 write_line("*** Welcome to lightning Zzz :) ***")
 
@@ -15,7 +16,7 @@ write_line(get_os())
 write_line("-- Starting tests --")
 var start_time = time.now()
 
-// Let"s use some modules
+// Let's use some modules
 var lib_assert_counter = require("assert_counter.ltn")
 var lib_assert_counter_not = require("assert_counter_not.ltn")
 var lib_assert = require("assert.ltn")

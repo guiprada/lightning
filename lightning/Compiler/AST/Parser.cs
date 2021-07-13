@@ -750,14 +750,6 @@ namespace lightning
                 return new LiteralNode(true, Previous().Line);
             else if (Match(TokenType.NIL))
                 return new LiteralNode(Previous().Line);
-            else if (Match(TokenType.MINUS)){
-                if (Match(TokenType.NUMBER))
-                    return new LiteralNode(-((TokenNumber)Previous()).value, Previous().Line);
-                else{
-                    Error("Number expected after (-)! " + Previous().Line);
-                    return new LiteralNode(Previous().Line);
-                }
-            }
             else if (Match(TokenType.NUMBER))
                 return new LiteralNode(((TokenNumber)Previous()).value, Previous().Line);
             else if (Match(TokenType.STRING))
@@ -774,6 +766,14 @@ namespace lightning
                 return FunExpr();
             else if (Check(TokenType.IDENTIFIER))
                 return CompoundVar();
+            else if (Match(TokenType.MINUS)){
+                if (Match(TokenType.NUMBER))
+                    return new LiteralNode(-((TokenNumber)Previous()).value, Previous().Line);
+                else{
+                    Error("Number expected after (-)! " + Previous().Line);
+                    return new LiteralNode(Previous().Line);
+                }
+            }
             else
             {
                 Error("No match found! " + Peek().Line + " " + Peek());
