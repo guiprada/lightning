@@ -603,7 +603,7 @@ namespace lightning
                             Unit value = stack.Pop();
                             foreach (Unit v in indexes)
                             {
-                                value = ((TableUnit)(value.heapUnitValue)).Get(v);
+                                value = (value.heapUnitValue).Get(v);
                             }
                             stack.Push(value);
                             break;

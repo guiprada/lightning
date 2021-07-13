@@ -1,4 +1,8 @@
 ﻿todo
+	try , protected call
+	tuple and nuple class
+	List Class
+	table class, returned values should have super table set?
 
 Improvements
 	- foreach recebe so o item
@@ -100,3 +104,4 @@ done
 	- Fix line counting and reporting
 	- finish porting prelude and stack helpers
 	- tuples  and nuples
+	- methods on wrappers

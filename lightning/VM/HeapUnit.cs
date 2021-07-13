@@ -36,9 +36,9 @@ namespace lightning
         public abstract UnitType Type{get;}
         public abstract override string ToString();
         public abstract bool ToBool();
-
         public abstract override bool Equals(object other);
         public abstract override int GetHashCode();
+        public abstract Unit Get(Unit p_key);
     }
 
     public class TypeUnit : HeapUnit{
@@ -85,6 +85,10 @@ namespace lightning
         }
         public override int GetHashCode(){
             return this.type.GetHashCode();
+        }
+
+        public override Unit Get(Unit p_key){
+            throw new Exception("Trying to get Table value of TypeUnit");
         }
     }
 
@@ -133,6 +137,10 @@ namespace lightning
         public override int GetHashCode()
         {
             return content.GetHashCode();
+        }
+
+        public override Unit Get(Unit p_key){
+            throw new Exception("Trying to get Table value of StringUnit");
         }
     }
 
@@ -196,6 +204,10 @@ namespace lightning
         {
             return name.GetHashCode() + module.GetHashCode();
         }
+
+        public override Unit Get(Unit p_key){
+            throw new Exception("Trying to get Table value of FunctionUnit");
+        }
     }
 
     public class IntrinsicUnit : HeapUnit
@@ -247,6 +259,10 @@ namespace lightning
         public override int GetHashCode()
         {
             return name.GetHashCode();
+        }
+
+        public override Unit Get(Unit p_key){
+            throw new Exception("Trying to get Table value of IntrinsicUnit");
         }
     }
 
@@ -302,6 +318,10 @@ namespace lightning
         public override int GetHashCode()
         {
             return upValues.GetHashCode() + function.GetHashCode();
+        }
+
+        public override Unit Get(Unit p_key){
+            throw new Exception("Trying to get Table value of ClosureUnit");
         }
     }
 
@@ -389,6 +409,9 @@ namespace lightning
             return UpValue.GetHashCode();
         }
 
+        public override Unit Get(Unit p_key){
+            throw new Exception("Trying to get Table value of UpValueUnit");
+        }
     }
 
     public class TableUnit : HeapUnit
@@ -475,7 +498,7 @@ namespace lightning
             }
         }
 
-        public Unit Get(Unit p_key){
+        public override Unit Get(Unit p_key){
             UnitType key_type = p_key.Type;
             switch(key_type){
                 case UnitType.Integer:
@@ -650,14 +673,28 @@ namespace lightning
     public class WrapperUnit<T> : HeapUnit
     {
         public object content;
+
+        public TableUnit superTable;
         public override UnitType Type{
             get{
                 return UnitType.Wrapper;
             }
         }
-        public WrapperUnit(object content)
+        public WrapperUnit(object p_content, TableUnit p_superTable = null)
         {
-            this.content = content;
+            content = p_content;
+            superTable = p_superTable;
+        }
+
+        public override Unit Get(Unit p_key){
+            if(superTable.table.ContainsKey(p_key))
+                return superTable.table[p_key];
+            else
+                throw new Exception("Wrapper Super Table does not contain index: " + p_key.ToString());
+        }
+
+        public void Set(Unit p_key, Unit p_value){
+            superTable.table.Add(p_key, p_value);
         }
 
         public override string ToString()

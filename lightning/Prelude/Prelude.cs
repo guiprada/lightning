@@ -779,27 +779,17 @@ namespace lightning
 
                 Unit now(VM vm)
                 {
-#if DOUBLE
-                    return new Unit((Integer)(DateTime.Now.Ticks));
-#else
-                    return new Unit(new WrapperUnit<long>(DateTime.Now.Ticks));
-#endif
+                    return new Unit(new WrapperUnit<long>(DateTime.Now.Ticks, time));
                 }
                 time.Set("now", new IntrinsicUnit("now", now, 0));
 
-                Unit timeSpan(VM vm)
+                Unit ElapsedTime(VM vm)
                 {
-#if DOUBLE
-                    Integer timeStart = vm.GetInteger(0);
-                    Integer timeEnd = vm.GetInteger(1);
-                    return new Unit((Integer)(new TimeSpan(timeEnd - timeStart).TotalMilliseconds));// Convert to milliseconds
-#else
                     long timeStart = vm.GetWrapperUnit<long>(0);
-                    long timeEnd = vm.GetWrapperUnit<long>(1);
+                    long timeEnd = DateTime.Now.Ticks;
                     return new Unit((Number)(new TimeSpan(timeEnd - timeStart).TotalMilliseconds));// Convert to milliseconds
-#endif
                 }
-                time.Set("span", new IntrinsicUnit("span", timeSpan, 2));
+                time.Set("elapsed_time", new IntrinsicUnit("time_elapsed_time", ElapsedTime, 1));
 
                 tables.Add("time", time);
             }

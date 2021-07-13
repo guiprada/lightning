@@ -841,7 +841,6 @@ a"
 }
 machine.trim()
 
-var end_time = time.now()
 write_line("")
 if (count_errors() == 0){
     write_line("No errors found! :)")
@@ -850,7 +849,7 @@ else{
     write_line(":( " .. count_errors() .. " errors found!")
 }
 write_line("-- Finished tests! --")
-write_line("Elapsed time: " .. time.span(start_time, end_time) .. " ms")
+write_line("Elapsed time: " .. start_time:elapsed_time() .. " ms")
 write_line("Loaded modules: " .. machine.modules())
 write_line(machine.memory_use())
 
