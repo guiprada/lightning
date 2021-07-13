@@ -1,4 +1,5 @@
 ﻿todo
+	remove append, replace with +
 	try , protected call
 	tuple and nuple class
 	List Class
