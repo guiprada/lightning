@@ -93,9 +93,9 @@ function clear_errors()
     assert_not([a:"a",b:"b"], this_list, "Failed Table test 2.")
     assert_not([a:"b",b:"b"], this_list, "Failed Table test 3.")
     assert_not([], this_list, "Failed Table test 4.")
-    assert(count_all(this_list), 2, "Failed Table test 5")
-    assert(table.count(this_list), 2, "Failed Table test 6")
-    assert(list.count(this_list), 0, "Failed Table test 7")
+    assert(table.count(this_list), 2, "Failed Table test 5")
+    assert(table.map_count(this_list), 2, "Failed Table test 6")
+    assert(table.list_count(this_list), 0, "Failed Table test 7")
 
     var this_array = this_list
     this_array[0] = 100
@@ -104,9 +104,9 @@ function clear_errors()
     assert(this_array[0], 100, "Failed Array test 1.")
     assert(this_array[1], null, "Failed Array test 2.")
     assert(this_array[99], 0, "Failed Array test 3.")
-    assert(count_all(this_list), 5, "Failed Array test 4")
-    assert(list.count(this_array), 2, "Failed Array test 5.")
-    assert(table.count(this_list), 3, "Failed Array test 6.")
+    assert(table.count(this_list), 5, "Failed Array test 4")
+    assert(table.list_count(this_array), 2, "Failed Array test 5.")
+    assert(table.map_count(this_list), 3, "Failed Array test 6.")
 
     var table_negative = []
     table_negative[-1] = 5
@@ -526,7 +526,7 @@ function clear_errors()
     // Testing for_range
     var n = 100
     var table1 = []
-    list.init(table1, n)
+    table.list_init(table1, n)
     function many_for (start, end, this_table)
     {
         for (var i = start; i<end; i++)
@@ -561,7 +561,7 @@ function clear_errors()
 {
     // Testing for_each
     var n = 100
-    var table1 = list.new(n)
+    var table1 = table.list_new(n)
 
     function many(index, collection)
     {
@@ -574,7 +574,7 @@ function clear_errors()
         assert(table1[i].x, 1, "Failed for_each Test 1, iteration:" .. i .. ".")
     }
 
-    table1 = list.new(n)
+    table1 = table.list_new(n)
     function many_number(index, collection)
     {
         collection[index] = 1
@@ -585,7 +585,7 @@ function clear_errors()
         assert(table1[i], 1, "Failed for_each Test 2, iteration: " .. i .. ".")
     }
 
-    table1 = list.new(n)
+    table1 = table.list_new(n)
     for_each(table1, function(index, collection)
     {
         collection[index] = 100 - index
@@ -642,22 +642,34 @@ var global_lock_test_counter = 5
 {
     // Testing List
     var new_list = []
-    list.push(new_list, 3)
-    list.push(new_list, 2)
-    list.push(new_list, 1)
+    table.push(new_list, 3)
+    table.push(new_list, 2)
+    table.push(new_list, 1)
     assert(new_list[0], 3, "Failed List test 1.")
     assert(new_list[1], 2, "Failed List test 2.")
     assert(new_list[2], 1, "Failed List test 3.")
 
-    var list_copy = list.copy(new_list)
+    var list_copy = table.list_copy(new_list)
     assert_not(list_copy, new_list, "Failed List test 4.")
-    list.pop(new_list)
-    list.pop(new_list)
-    list.pop(new_list)
-    assert(list.count(new_list), 0, "Failed List test 5.")
-    assert(list.count(list_copy), 3, "Failed List test 6.")
-    list.clear(list_copy)
-    assert(list.count(list_copy), 0, "Failed List test 7.")
+    table.pop(new_list)
+    table.pop(new_list)
+    table.pop(new_list)
+    assert(table.list_count(new_list), 0, "Failed List test 5.")
+    assert(table.list_count(list_copy), 3, "Failed List test 6.")
+
+    list_copy.hey = "hey"
+    table.list_clear(list_copy)
+    assert(table.list_count(list_copy), 0, "Failed List test 7.")
+    assert(table.map_count(list_copy), 1, "Failed List test 8.")
+    table.push(list_copy, 1)
+    table.map_clear(list_copy)
+    assert(table.list_count(list_copy), 1, "Failed List test 9.")
+    assert(table.map_count(list_copy), 0, "Failed List test 10.")
+    list_copy.hey = "hey"
+    table.clear(list_copy)
+    assert(table.list_count(list_copy), 0, "Failed List test 9.")
+    assert(table.map_count(list_copy), 0, "Failed List test 10.")
+    assert(table.count(list_copy), 0, "Failed List test 11.")
 }
 {
     // Testing inline Intrinsics
@@ -683,21 +695,21 @@ var global_lock_test_counter = 5
 {
     // Testing iterators
     var table1 = [brazil:"Brasilia", eua:"Washington", australia:"Canberra"]
-    var indexes_table1 = table.indexes(table1)
+    var indexes_table1 = table.map_indexes(table1)
     var counter = 0
-    for (var it = table.iterator(table1); it.next())
+    for (var it = table.map_iterator(table1); it.next())
     {
         assert(it.key, indexes_table1[counter], "Failed iterator key Test 1, iteration: " .. counter)
         assert(it.value, table1[it.key], "Failed iterator value Test 1, iteration: " .. counter)
         counter++
     }
-    assert(list.to_string(table.indexes(table1)), "australia, eua, brazil", "Failed iterator Test 2")
-    assert(table.to_string(table1), "australia : Canberra, eua : Washington, brazil : Brasilia", "Failed iterator Test 3")
+    assert(table.list_to_string(table.map_indexes(table1)), "australia, eua, brazil", "Failed iterator Test 2")
+    assert(table.map_to_string(table1), "australia : Canberra, eua : Washington, brazil : Brasilia", "Failed iterator Test 3")
 
     ///////////////////////////////
     var list1 = [0, 1, 2, 3, 4, 5]
     counter = 0
-    for (var it = list.iterator(list1); it.next())
+    for (var it = table.list_iterator(list1); it.next())
     {
         assert(it.value, list1[counter], "Failed iterator value Test 4, iteration: " .. counter)
         counter++
@@ -705,7 +717,7 @@ var global_lock_test_counter = 5
 
     ///////////////////////////////
     counter = 0
-    for (var it = list.index_iterator(list1); it.next())
+    for (var it = table.list_index_iterator(list1); it.next())
     {
         assert(it.key, counter, "Failed iterator key Test 5, iteration: " .. counter)
         assert(it.value, list1[counter], "Failed iterator value Test 5, iteration: " .. counter)
@@ -756,9 +768,9 @@ var global_lock_test_counter = 5
     assert(common_table:a_function(), "hello", "Failed Super Table Test 4.")
     assert(super_table:a_function(), "Brasilia", "Failed Super Table Test 5.")
 
-    var Table = list.new(5)
+    var Table = table.list_new(5)
     table.set_super(Table, table)
-    write_line(Table:count())
+    assert(Table:count(), 5, "Failed Super Table Test 6.")
 }
 {
     // Testing Char
@@ -807,6 +819,25 @@ a"
     this_list[5.1] = 10
     this_list[5] = 20
     assert_not(this_list[5.1], this_list[5], "Failed Integer Test 4.")
+}
+{
+    // Testing Table Class
+    var testTable = table.new();
+    testTable[-1] = -1
+
+    assert(testTable:count(), 1, "Failed Table Class Test 1.")
+    assert(testTable:map_count(), 1, "Failed Table Class Test 2.")
+    assert(testTable:list_count(), 0, "Failed Table Class Test 3.")
+
+    var testTableClone = testTable:clone()
+    assert(testTableClone:count(), 1, "Failed Table Class Test 4.")
+    assert(testTableClone:map_count(), 1, "Failed Table Class Test 5.")
+    assert(testTableClone:list_count(), 0, "Failed Table Class Test 6.")
+
+    testTable[1] = 1
+    testTable[-2] = -2
+    write_line(testTable)
+    write_line(testTable:map_numeric_indexes())
 }
 machine.trim()
 

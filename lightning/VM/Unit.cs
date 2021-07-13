@@ -335,5 +335,10 @@ namespace lightning
             }
             throw new Exception("Trying to divide non numeric UnitType");
         }
+
+        public static bool isNumeric(Unit p_value){
+            UnitType type = p_value.Type;
+            return (type == UnitType.Number || type  == UnitType.Integer);
+        }
     }
 }
