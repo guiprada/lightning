@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Text;
 
 #if DOUBLE
-    using Number = System.Double;
+    using Float = System.Double;
 #else
-    using Number = System.Single;
+    using Float = System.Single;
 #endif
 
 namespace lightning
@@ -680,9 +680,9 @@ namespace lightning
                     Node item = Primary();
                     if(Check(TokenType.COLON)){
                         Consume(TokenType.COLON, "Expected ':' separating key:values in table constructor", true);
-                        if(((LiteralNode)item).ValueType == typeof(Number)){
+                        if(((LiteralNode)item).ValueType == typeof(Float)){
                             LiteralNode number_value = (LiteralNode)item;
-                            if((Number)(number_value.Value) == elements.Count)
+                            if((Float)(number_value.Value) == elements.Count)
                                 elements.Add(Primary());
                             else
                                 table.Add(number_value, Primary());
@@ -712,9 +712,9 @@ namespace lightning
                         Node item = Primary();
                         if(Check(TokenType.COLON)){
                             Consume(TokenType.COLON, "Expected ':' separating key:values in table constructor", true);
-                            if(((LiteralNode)item).ValueType == typeof(Number)){
+                            if(((LiteralNode)item).ValueType == typeof(Float)){
                                 LiteralNode number_value = (LiteralNode)item;
-                                if((Number)(number_value.Value) == elements.Count)
+                                if((Float)(number_value.Value) == elements.Count)
                                     elements.Add(Primary());
                                 else
                                     table.Add(number_value, Primary());

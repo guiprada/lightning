@@ -11,10 +11,10 @@ using Operand = System.UInt16;
 #endif
 
 #if DOUBLE
-    using Number = System.Double;
+    using Float = System.Double;
     using Integer = System.Int64;
 #else
-    using Number = System.Single;
+    using Float = System.Single;
     using Integer = System.Int32;
 #endif
 
@@ -134,7 +134,7 @@ namespace lightning
                 Unit createIntrinsic(VM vm)
                 {
                     string name = vm.GetString(0);
-                    Number arity = vm.GetNumber(1);
+                    Float arity = vm.GetNumber(1);
                     string body = vm.GetString(2);
 
                     var options = ScriptOptions.Default.AddReferences(
@@ -168,7 +168,7 @@ namespace lightning
 
                 Unit nextFloat(VM vm)
                 {
-                    return new Unit((Number)rng.NextDouble());
+                    return new Unit((Float)rng.NextDouble());
                 }
                 rand.Set("float", new IntrinsicUnit("float", nextFloat, 0));
 
@@ -255,7 +255,7 @@ namespace lightning
                 Unit listPop(VM vm)
                 {
                     TableUnit list = vm.GetTable(0);
-                    Number value = list.elements[^1].numberValue;
+                    Float value = list.elements[^1].floatValue;
                     list.elements.RemoveRange(list.elements.Count - 1, 1);
 
                     return new Unit(value);
@@ -601,8 +601,8 @@ namespace lightning
 
             {
                 TableUnit math = new TableUnit(null, null);
-                math.Set("pi", (Number)Math.PI);
-                math.Set("e", (Number)Math.E);
+                math.Set("pi", (Float)Math.PI);
+                math.Set("e", (Float)Math.E);
 #if DOUBLE
                 math.Set("double", true);
 #else
@@ -612,150 +612,150 @@ namespace lightning
                 //////////////////////////////////////////////////////
                 Unit sin(VM vm)
                 {
-                    return new Unit((Number)Math.Sin(vm.GetNumber(0)));
+                    return new Unit((Float)Math.Sin(vm.GetNumber(0)));
                 }
                 math.Set("sin", new IntrinsicUnit("sin", sin, 1));
 
                 //////////////////////////////////////////////////////
                 Unit cos(VM vm)
                 {
-                    return new Unit((Number)Math.Cos(vm.GetNumber(0)));
+                    return new Unit((Float)Math.Cos(vm.GetNumber(0)));
                 }
                 math.Set("cos", new IntrinsicUnit("cos", cos, 1));
 
                 //////////////////////////////////////////////////////
                 Unit tan(VM vm)
                 {
-                    return new Unit((Number)Math.Tan(vm.GetNumber(0)));
+                    return new Unit((Float)Math.Tan(vm.GetNumber(0)));
                 }
                 math.Set("tan", new IntrinsicUnit("tan", tan, 1));
 
                 //////////////////////////////////////////////////////
                 Unit sec(VM vm)
                 {
-                    return new Unit((Number)(1 / Math.Cos(vm.GetNumber(0))));
+                    return new Unit((Float)(1 / Math.Cos(vm.GetNumber(0))));
                 }
                 math.Set("sec", new IntrinsicUnit("sec", sec, 1));
 
                 //////////////////////////////////////////////////////
                 Unit cosec(VM vm)
                 {
-                    return new Unit((Number)(1 / Math.Sin(vm.GetNumber(0))));
+                    return new Unit((Float)(1 / Math.Sin(vm.GetNumber(0))));
                 }
                 math.Set("cosec", new IntrinsicUnit("cosec", cosec, 1));
 
                 //////////////////////////////////////////////////////
                 Unit cotan(VM vm)
                 {
-                    return new Unit((Number)(1 / Math.Tan(vm.GetNumber(0))));
+                    return new Unit((Float)(1 / Math.Tan(vm.GetNumber(0))));
                 }
                 math.Set("cotan", new IntrinsicUnit("cotan", cotan, 1));
 
                 //////////////////////////////////////////////////////
                 Unit asin(VM vm)
                 {
-                    return new Unit((Number)Math.Asin(vm.GetNumber(0)));
+                    return new Unit((Float)Math.Asin(vm.GetNumber(0)));
                 }
                 math.Set("asin", new IntrinsicUnit("asin", asin, 1));
 
                 //////////////////////////////////////////////////////
                 Unit acos(VM vm)
                 {
-                    return new Unit((Number)Math.Acos(vm.GetNumber(0)));
+                    return new Unit((Float)Math.Acos(vm.GetNumber(0)));
                 }
                 math.Set("acos", new IntrinsicUnit("acos", acos, 1));
 
                 //////////////////////////////////////////////////////
                 Unit atan(VM vm)
                 {
-                    return new Unit((Number)Math.Atan(vm.GetNumber(0)));
+                    return new Unit((Float)Math.Atan(vm.GetNumber(0)));
                 }
                 math.Set("atan", new IntrinsicUnit("atan", atan, 1));
 
                 //////////////////////////////////////////////////////
                 Unit sinh(VM vm)
                 {
-                    return new Unit((Number)Math.Sinh(vm.GetNumber(0)));
+                    return new Unit((Float)Math.Sinh(vm.GetNumber(0)));
                 }
                 math.Set("sinh", new IntrinsicUnit("sinh", sinh, 1));
 
                 //////////////////////////////////////////////////////
                 Unit cosh(VM vm)
                 {
-                    return new Unit((Number)Math.Cosh(vm.GetNumber(0)));
+                    return new Unit((Float)Math.Cosh(vm.GetNumber(0)));
                 }
                 math.Set("cosh", new IntrinsicUnit("cosh", cosh, 1));
 
                 //////////////////////////////////////////////////////
                 Unit tanh(VM vm)
                 {
-                    return new Unit((Number)Math.Tanh(vm.GetNumber(0)));
+                    return new Unit((Float)Math.Tanh(vm.GetNumber(0)));
                 }
                 math.Set("tanh", new IntrinsicUnit("tanh", tanh, 1));
 
                 //////////////////////////////////////////////////////
                 Unit pow(VM vm)
                 {
-                    Number value = vm.GetNumber(0);
-                    Number exponent = vm.GetNumber(1);
-                    return new Unit((Number)Math.Pow(value, exponent));
+                    Float value = vm.GetNumber(0);
+                    Float exponent = vm.GetNumber(1);
+                    return new Unit((Float)Math.Pow(value, exponent));
                 }
                 math.Set("pow", new IntrinsicUnit("pow", pow, 2));
 
                 //////////////////////////////////////////////////////
                 Unit root(VM vm)
                 {
-                    Number value = vm.GetNumber(0);
-                    Number exponent = vm.GetNumber(1);
-                    return new Unit((Number)Math.Pow(value, 1 / exponent));
+                    Float value = vm.GetNumber(0);
+                    Float exponent = vm.GetNumber(1);
+                    return new Unit((Float)Math.Pow(value, 1 / exponent));
                 }
                 math.Set("root", new IntrinsicUnit("root", root, 2));
 
                 //////////////////////////////////////////////////////
                 Unit sqroot(VM vm)
                 {
-                    Number value = vm.GetNumber(0);
-                    return new Unit((Number)Math.Sqrt(value));
+                    Float value = vm.GetNumber(0);
+                    return new Unit((Float)Math.Sqrt(value));
                 }
                 math.Set("sqroot", new IntrinsicUnit("sqroot", sqroot, 1));
                 //////////////////////////////////////////////////////
                 Unit exp(VM vm)
                 {
-                    Number exponent = vm.GetNumber(0);
-                    return new Unit((Number)Math.Exp(exponent));
+                    Float exponent = vm.GetNumber(0);
+                    return new Unit((Float)Math.Exp(exponent));
                 }
                 math.Set("exp", new IntrinsicUnit("exp", exp, 1));
 
                 //////////////////////////////////////////////////////
                 Unit log(VM vm)
                 {
-                    Number value = vm.GetNumber(0);
-                    Number this_base = vm.GetNumber(1);
-                    return new Unit((Number)Math.Log(value, this_base));
+                    Float value = vm.GetNumber(0);
+                    Float this_base = vm.GetNumber(1);
+                    return new Unit((Float)Math.Log(value, this_base));
                 }
                 math.Set("log", new IntrinsicUnit("log", log, 2));
 
                 //////////////////////////////////////////////////////
                 Unit ln(VM vm)
                 {
-                    Number value = vm.GetNumber(0);
-                    return new Unit((Number)Math.Log(value, Math.E));
+                    Float value = vm.GetNumber(0);
+                    return new Unit((Float)Math.Log(value, Math.E));
                 }
                 math.Set("ln", new IntrinsicUnit("ln", ln, 1));
 
                 //////////////////////////////////////////////////////
                 Unit log10(VM vm)
                 {
-                    Number value = vm.GetNumber(0);
-                    return new Unit((Number)Math.Log(value, (Number)10));
+                    Float value = vm.GetNumber(0);
+                    return new Unit((Float)Math.Log(value, (Float)10));
                 }
                 math.Set("log10", new IntrinsicUnit("log10", log10, 1));
 
                 //////////////////////////////////////////////////////
                 Unit mod(VM vm)
                 {
-                    Number value1 = vm.GetNumber(0);
-                    Number value2 = vm.GetNumber(1);
+                    Float value1 = vm.GetNumber(0);
+                    Float value2 = vm.GetNumber(1);
                     return new Unit(value1 % value2);
                 }
                 math.Set("mod", new IntrinsicUnit("mod", mod, 2));
@@ -763,8 +763,8 @@ namespace lightning
                 //////////////////////////////////////////////////////
                 Unit idiv(VM vm)
                 {
-                    Number value1 = vm.GetNumber(0);
-                    Number value2 = vm.GetNumber(1);
+                    Float value1 = vm.GetNumber(0);
+                    Float value2 = vm.GetNumber(1);
                     return new Unit((Integer)(value1 / value2));
                 }
                 math.Set("idiv", new IntrinsicUnit("idiv", idiv, 2));
@@ -787,7 +787,7 @@ namespace lightning
                 {
                     long timeStart = vm.GetWrapperUnit<long>(0);
                     long timeEnd = DateTime.Now.Ticks;
-                    return new Unit((Number)(new TimeSpan(timeEnd - timeStart).TotalMilliseconds));// Convert to milliseconds
+                    return new Unit((Float)(new TimeSpan(timeEnd - timeStart).TotalMilliseconds));// Convert to milliseconds
                 }
                 time.Set("elapsed_time", new IntrinsicUnit("time_elapsed_time", ElapsedTime, 1));
 
@@ -802,8 +802,8 @@ namespace lightning
                 Unit stringSlice(VM vm)
                 {
                     string input_string = vm.GetString(0);
-                    Number start = vm.GetNumber(1);
-                    Number end = vm.GetNumber(2);
+                    Float start = vm.GetNumber(1);
+                    Float end = vm.GetNumber(2);
 
                     if (end < input_string.Length)
                     {
@@ -820,10 +820,10 @@ namespace lightning
                 {
                     StringUnit val_input_string = vm.GetStringUnit(0);
                     string input_string = val_input_string.ToString();
-                    Number start = vm.GetNumber(1);
+                    Float start = vm.GetNumber(1);
                     if (start < input_string.Length)
                     {
-                        Number end = input_string.Length;
+                        Float end = input_string.Length;
                         string result = input_string.Substring((int)start, (int)(end - start));
                         val_input_string.content = input_string.Substring(0, (int)start);
                         return new Unit(result);
@@ -1152,7 +1152,7 @@ namespace lightning
             Unit readNumber(VM vm)
             {
                 string read = Console.ReadLine();
-                if (Number.TryParse(read, out Number n))
+                if (Float.TryParse(read, out Float n))
                     return new Unit(n);
                 else
                     return new Unit(UnitType.Null);

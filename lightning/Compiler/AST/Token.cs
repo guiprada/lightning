@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Text;
 
 #if DOUBLE
-    using Number = System.Double;
+    using Float = System.Double;
 #else
-    using Number = System.Single;
+    using Float = System.Single;
 #endif
 
 namespace lightning
@@ -119,8 +119,8 @@ namespace lightning
 
     public class TokenNumber: Token
     {
-        public Number value;
-        public TokenNumber(TokenType p_Type, int p_Line, Number p_value): base(p_Type, p_Line)
+        public Float value;
+        public TokenNumber(TokenType p_Type, int p_Line, Float p_value): base(p_Type, p_Line)
         {
             value = p_value;
         }

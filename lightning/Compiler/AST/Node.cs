@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Text;
 
 #if DOUBLE
-    using Number = System.Double;
+    using Float = System.Double;
 #else
-    using Number = System.Single;
+    using Float = System.Single;
 #endif
 
 namespace lightning
@@ -128,7 +128,7 @@ namespace lightning
     {
         public object Value { get; private set; }
         public Type ValueType { get; private set; }
-        public LiteralNode(Number p_Value, int p_Line)
+        public LiteralNode(Float p_Value, int p_Line)
             : base(NodeType.LITERAL, p_Line)
         {
             Value = p_Value;

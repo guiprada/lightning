@@ -6,10 +6,10 @@ using System.Text;
 using Operand = System.UInt16;
 
 #if DOUBLE
-    using Number = System.Double;
+    using Float = System.Double;
     using Integer = System.Int64;
 #else
-    using Number = System.Single;
+    using Float = System.Single;
     using Integer = System.Int32;
 #endif
 
@@ -53,6 +53,7 @@ namespace lightning
         public Dictionary<string, int> loadedModules { get; private set; }
         public List<ModuleUnit> modules;
         static Stack<VM> vmPool;
+        static VM vm0;
         int functionDeepness;
         bool parallelVM;
 
@@ -61,6 +62,9 @@ namespace lightning
 //////////////////////////////////////////////////// Public
         public VM(Chunk p_chunk, int p_function_deepness = 100, Memory<Unit> p_globals = null, bool p_parallelVM = false)
         {
+            if(vm0 == null)
+                vm0 = this;
+
             chunk = p_chunk;
             IP = 0;
             functionDeepness = p_function_deepness;
@@ -158,22 +162,22 @@ namespace lightning
             return ((StringUnit)(stack.Peek(n).heapUnitValue)).content;
         }
 
-        public Number GetNumber(int n){
+        public Float GetNumber(int n){
             Unit this_value = stack.Peek(n);
             if(this_value.Type == UnitType.Integer)
                 return this_value.integerValue;
-            if(this_value.Type == UnitType.Number)
-                return (this_value.numberValue);
-            throw new Exception("Trying to get a integer value of non numeric type.");
+            if(this_value.Type == UnitType.Float)
+                return (this_value.floatValue);
+            throw new Exception("Trying to get a integer value of non numeric type." + VM.ErrorString(this));
         }
 
         public Integer GetInteger(int n){
             Unit this_value = stack.Peek(n);
             if(this_value.Type == UnitType.Integer)
                 return this_value.integerValue;
-            if(this_value.Type == UnitType.Number)
-                return (Integer)(this_value.numberValue);
-            throw new Exception("Trying to get a integer value of non numeric type.");
+            if(this_value.Type == UnitType.Float)
+                return (Integer)(this_value.floatValue);
+            throw new Exception("Trying to get a integer value of non numeric type." + VM.ErrorString(this));
         }
 
         public TableUnit GetTable(int n){
@@ -295,6 +299,21 @@ namespace lightning
                 Console.Write(" on function: " + instructions.ExecutingFunction.name);
                 Console.Write(" from module: " + instructions.ExecutingFunction.module);
                 Console.WriteLine(" on line: " + instructions.ExecutingFunction.lineCounter.GetLine(IP));
+            }
+        }
+
+        public static string ErrorString(VM vm)
+        {
+            vm = vm ?? vm0;
+            if (vm == null)
+                return null;
+            if (vm.instructions.ExecutingInstructionsIndex == 0)
+                return "Line: " + vm.chunk.lineCounter.GetLine(vm.IP);
+            else
+            {
+                return "Function: " + vm.instructions.ExecutingFunction.name +
+                " from module: " + vm.instructions.ExecutingFunction.module +
+                " on line: " + vm.instructions.ExecutingFunction.lineCounter.GetLine(vm.IP);
             }
         }
 
@@ -486,7 +505,7 @@ namespace lightning
                                 else if (op == 4)
                                     result = old_value / new_value;
                                 else
-                                    throw new Exception("Unknown operator");
+                                    throw new Exception("Unknown operator" + VM.ErrorString(this));
                                 variables.SetAt(result, address, CalculateEnvShift(n_shift));
                             }
                             break;
@@ -574,7 +593,7 @@ namespace lightning
                             }else{
                                 if (op == 1)
                                 {
-                                    this_upValue.UpValue = new Unit(this_upValue.UpValue.numberValue + new_value.numberValue);
+                                    this_upValue.UpValue = new Unit(this_upValue.UpValue.floatValue + new_value.floatValue);
                                 }
                                 else if (op == 2)
                                 {
@@ -649,7 +668,7 @@ namespace lightning
                                     else if (op == 4)
                                         result = old_value / new_value;
                                     else
-                                        throw new Exception("Unknown operator");
+                                        throw new Exception("Unknown operator" + VM.ErrorString(this));
 
                                     ((TableUnit)(this_table.heapUnitValue)).Set(index, result);
                                 }
@@ -667,7 +686,7 @@ namespace lightning
                                 else if (op == 4)
                                     result = old_value / new_value;
                                 else
-                                    throw new Exception("Unknown operator");
+                                    throw new Exception("Unknown operator" + VM.ErrorString(this));
 
                                 ((TableUnit)(this_table.heapUnitValue)).Set(index, result);
 
@@ -835,8 +854,8 @@ namespace lightning
                     case OpCode.GREATER_EQUALS:
                         {
                             IP++;
-                            Number opB = stack.Pop().numberValue;
-                            Number opA = stack.Pop().numberValue;
+                            Float opB = stack.Pop().floatValue;
+                            Float opA = stack.Pop().floatValue;
                             bool truthness = opA >= opB;
                             if (truthness == true)
                             {
@@ -851,8 +870,8 @@ namespace lightning
                     case OpCode.LESS_EQUALS:
                         {
                             IP++;
-                            Number opB = stack.Pop().numberValue;
-                            Number opA = stack.Pop().numberValue;
+                            Float opB = stack.Pop().floatValue;
+                            Float opA = stack.Pop().floatValue;
                             bool truthness = opA <= opB;
                             if (truthness == true)
                             {
@@ -867,8 +886,8 @@ namespace lightning
                     case OpCode.GREATER:
                         {
                             IP++;
-                            Number opB = stack.Pop().numberValue;
-                            Number opA = stack.Pop().numberValue;
+                            Float opB = stack.Pop().floatValue;
+                            Float opA = stack.Pop().floatValue;
                             bool truthness = opA > opB;
                             if (truthness == true)
                             {
@@ -883,8 +902,8 @@ namespace lightning
                     case OpCode.LESS:
                         {
                             IP++;
-                            Number opB = stack.Pop().numberValue;
-                            Number opA = stack.Pop().numberValue;
+                            Float opB = stack.Pop().floatValue;
+                            Float opA = stack.Pop().floatValue;
                             bool truthness = opA < opB;
                             if (truthness == true)
                             {

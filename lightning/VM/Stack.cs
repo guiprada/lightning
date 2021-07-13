@@ -36,7 +36,7 @@ namespace lightning{
         public Unit Peek(int n)
         {
             if (n < 0 || n > (top - 1)){
-                throw new Exception("Atempt to read empty stack");
+                throw new Exception("Atempt to read empty stack" + VM.ErrorString(null));
             }
             return values[top - n - 1];
         }

@@ -6,10 +6,10 @@ using System.Text;
 using Operand = System.UInt16;
 
 #if DOUBLE
-    using Number = System.Double;
+    using Float = System.Double;
     using Integer = System.Int64;
 #else
-    using Number = System.Single;
+    using Float = System.Single;
     using Integer = System.Int32;
 #endif
 
@@ -19,7 +19,7 @@ namespace lightning
     public struct Unit{
 
         [FieldOffset(0)]
-        public Number numberValue;
+        public Float floatValue;
         [FieldOffset(0)]
         public char charValue;
         [FieldOffset(0)]
@@ -42,17 +42,17 @@ namespace lightning
 
         public Unit(HeapUnit p_value):this()
         {
-            numberValue = 0;
+            floatValue = 0;
             heapUnitValue = p_value;
         }
-        public Unit(Number p_number):this()
+        public Unit(Float p_number):this()
         {
             if(p_number%1 == 0){
                 integerValue = (Integer)p_number;
                 heapUnitValue = TypeUnit.Integer;
             }else{
-                numberValue = p_number;
-                heapUnitValue = TypeUnit.Number;
+                floatValue = p_number;
+                heapUnitValue = TypeUnit.Float;
             }
         }
 
@@ -74,7 +74,7 @@ namespace lightning
 
         public Unit(String p_string):this()
         {
-            numberValue = 0;
+            floatValue = 0;
             heapUnitValue = new StringUnit(p_string);
         }
 
@@ -93,8 +93,8 @@ namespace lightning
                 case UnitType.Boolean:
                     heapUnitValue = TypeUnit.Boolean;
                     break;
-                case UnitType.Number:
-                    heapUnitValue = TypeUnit.Number;
+                case UnitType.Float:
+                    heapUnitValue = TypeUnit.Float;
                     break;
                 case UnitType.Integer:
                     heapUnitValue = TypeUnit.Integer;
@@ -103,7 +103,7 @@ namespace lightning
                     heapUnitValue = TypeUnit.Char;
                     break;
                 default:
-                    throw new Exception("Trying to create a Unit of unknown type.");
+                    throw new Exception("Trying to create a Unit of unknown type." + VM.ErrorString(null));
             }
         }
 
@@ -111,8 +111,8 @@ namespace lightning
         {
             UnitType this_type = this.Type;
             switch(this_type){
-                case UnitType.Number:
-                    return numberValue.ToString();
+                case UnitType.Float:
+                    return floatValue.ToString();
                 case UnitType.Integer:
                     return integerValue.ToString();
                 case UnitType.Char:
@@ -130,12 +130,12 @@ namespace lightning
         {
             UnitType this_type = this.Type;
             switch(this_type){
-                case UnitType.Number:
-                    throw new Exception("Can not convert Number to Bool.");
+                case UnitType.Float:
+                    throw new Exception("Can not convert Float to Bool." + VM.ErrorString(null));
                 case UnitType.Integer:
-                    throw new Exception("Can not convert Integer to Bool.");
+                    throw new Exception("Can not convert Integer to Bool." + VM.ErrorString(null));
                 case UnitType.Char:
-                    throw new Exception("Can not convert Char to Bool.");
+                    throw new Exception("Can not convert Char to Bool." + VM.ErrorString(null));
                 case UnitType.Null:
                     return false;
                 case UnitType.Boolean:
@@ -147,21 +147,21 @@ namespace lightning
 
         public override bool Equals(object other){
             if(other.GetType() != typeof(Unit))
-                throw new Exception("Trying to compare Unit to non Unit type.");
+                throw new Exception("Trying to compare Unit to non Unit type." + VM.ErrorString(null));
 
             UnitType this_type = this.Type;
             UnitType other_type = ((Unit)other).Type;
             switch(this_type){
-                case UnitType.Number:
-                    if (other_type == UnitType.Number){
-                        return ((Unit)other).numberValue == numberValue;
+                case UnitType.Float:
+                    if (other_type == UnitType.Float){
+                        return ((Unit)other).floatValue == floatValue;
                     }else if(other_type == UnitType.Integer) {
-                        return ((Unit)other).integerValue == numberValue;
+                        return ((Unit)other).integerValue == floatValue;
                     }
                     return false;
                 case UnitType.Integer:
-                    if (other_type == UnitType.Number){
-                        return (((Unit)other).numberValue) == integerValue;
+                    if (other_type == UnitType.Float){
+                        return (((Unit)other).floatValue) == integerValue;
                     }else if(other_type == UnitType.Integer) {
                         return ((Unit)other).integerValue == integerValue;
                     }
@@ -186,8 +186,8 @@ namespace lightning
         public override int GetHashCode(){
             UnitType this_type = this.Type;
             switch(this_type){
-                case UnitType.Number:
-                    return numberValue.GetHashCode();
+                case UnitType.Float:
+                    return floatValue.GetHashCode();
                 case UnitType.Integer:
                     return integerValue.GetHashCode();
                 case UnitType.Char:
@@ -204,141 +204,141 @@ namespace lightning
         public static Unit operator +(Unit op) => op;
         public static Unit operator -(Unit op){
             UnitType op_type = op.Type;
-            if(op_type == UnitType.Number){
-                return new Unit(- op.numberValue);
+            if(op_type == UnitType.Float){
+                return new Unit(- op.floatValue);
             }
             if(op_type == UnitType.Integer){
                 return new Unit(- op.integerValue);
             }
-            throw new Exception("Trying to negate non numeric UnitType");
+            throw new Exception("Trying to negate non numeric UnitType" + VM.ErrorString(null));
         }
         public static Unit operator +(Unit opA, Unit opB){
             UnitType opA_type = opA.Type;
             UnitType opB_type = opB.Type;
 
-            if(opA_type == UnitType.Number){
-                if(opB_type == UnitType.Number)
-                    return new Unit(opA.numberValue + opB.numberValue);
+            if(opA_type == UnitType.Float){
+                if(opB_type == UnitType.Float)
+                    return new Unit(opA.floatValue + opB.floatValue);
                 if(opB_type == UnitType.Integer)
-                    return new Unit(opA.numberValue + opB.integerValue);
+                    return new Unit(opA.floatValue + opB.integerValue);
             }
             if(opA_type == UnitType.Integer){
-                if(opB_type == UnitType.Number)
-                    return new Unit(opA.integerValue + opB.numberValue);
+                if(opB_type == UnitType.Float)
+                    return new Unit(opA.integerValue + opB.floatValue);
                 if(opB_type == UnitType.Integer)
                     return new Unit(opA.integerValue + opB.integerValue);
             }
-            throw new Exception("Trying to add non numeric UnitType");
+            throw new Exception("Trying to add non numeric UnitType" + VM.ErrorString(null));
         }
 
-        public static Unit operator +(Unit opA, Number opB){
+        public static Unit operator +(Unit opA, Float opB){
             UnitType opA_type = opA.Type;
 
-            if(opA_type == UnitType.Number){
-                return new Unit(opA.numberValue + opB);
+            if(opA_type == UnitType.Float){
+                return new Unit(opA.floatValue + opB);
             }
             if(opA_type == UnitType.Integer){
                 return new Unit(opA.integerValue + opB);
             }
-            throw new Exception("Trying to increment non numeric UnitType");
+            throw new Exception("Trying to increment non numeric UnitType" + VM.ErrorString(null));
         }
 
         public static Unit operator +(Unit opA, Integer opB){
             UnitType opA_type = opA.Type;
 
-            if(opA_type == UnitType.Number){
-                return new Unit(opA.numberValue + opB);
+            if(opA_type == UnitType.Float){
+                return new Unit(opA.floatValue + opB);
             }
             if(opA_type == UnitType.Integer){
                 return new Unit(opA.integerValue + opB);
             }
-            throw new Exception("Trying to increment non numeric UnitType");
+            throw new Exception("Trying to increment non numeric UnitType" + VM.ErrorString(null));
         }
 
         public static Unit operator -(Unit opA, Unit opB){
             UnitType opA_type = opA.Type;
             UnitType opB_type = opB.Type;
 
-            if(opA_type == UnitType.Number){
-                if(opB_type == UnitType.Number)
-                    return new Unit(opA.numberValue - opB.numberValue);
+            if(opA_type == UnitType.Float){
+                if(opB_type == UnitType.Float)
+                    return new Unit(opA.floatValue - opB.floatValue);
                 if(opB_type == UnitType.Integer)
-                    return new Unit(opA.numberValue - opB.integerValue);
+                    return new Unit(opA.floatValue - opB.integerValue);
             }
             if(opA_type == UnitType.Integer){
-                if(opB_type == UnitType.Number)
-                    return new Unit(opA.integerValue - opB.numberValue);
+                if(opB_type == UnitType.Float)
+                    return new Unit(opA.integerValue - opB.floatValue);
                 if(opB_type == UnitType.Integer)
                     return new Unit(opA.integerValue - opB.integerValue);
             }
-            throw new Exception("Trying to subtract non numeric UnitType");
+            throw new Exception("Trying to subtract non numeric UnitType" + VM.ErrorString(null));
         }
 
-        public static Unit operator -(Unit opA, Number opB){
+        public static Unit operator -(Unit opA, Float opB){
             UnitType opA_type = opA.Type;
 
-            if(opA_type == UnitType.Number){
-                return new Unit(opA.numberValue - opB);
+            if(opA_type == UnitType.Float){
+                return new Unit(opA.floatValue - opB);
             }
             if(opA_type == UnitType.Integer){
                 return new Unit(opA.integerValue - opB);
             }
-            throw new Exception("Trying to decrement non numeric UnitType");
+            throw new Exception("Trying to decrement non numeric UnitType" + VM.ErrorString(null));
         }
 
         public static Unit operator -(Unit opA, Integer opB){
             UnitType opA_type = opA.Type;
 
-            if(opA_type == UnitType.Number){
-                return new Unit(opA.numberValue - opB);
+            if(opA_type == UnitType.Float){
+                return new Unit(opA.floatValue - opB);
             }
             if(opA_type == UnitType.Integer){
                 return new Unit(opA.integerValue - opB);
             }
-            throw new Exception("Trying to decrement non numeric UnitType");
+            throw new Exception("Trying to decrement non numeric UnitType" + VM.ErrorString(null));
         }
 
         public static Unit operator *(Unit opA, Unit opB){
             UnitType opA_type = opA.Type;
             UnitType opB_type = opB.Type;
 
-            if(opA_type == UnitType.Number){
-                if(opB_type == UnitType.Number)
-                    return new Unit(opA.numberValue * opB.numberValue);
+            if(opA_type == UnitType.Float){
+                if(opB_type == UnitType.Float)
+                    return new Unit(opA.floatValue * opB.floatValue);
                 if(opB_type == UnitType.Integer)
-                    return new Unit(opA.numberValue * opB.integerValue);
+                    return new Unit(opA.floatValue * opB.integerValue);
             }
             if(opA_type == UnitType.Integer){
-                if(opB_type == UnitType.Number)
-                    return new Unit(opA.integerValue * opB.numberValue);
+                if(opB_type == UnitType.Float)
+                    return new Unit(opA.integerValue * opB.floatValue);
                 if(opB_type == UnitType.Integer)
                     return new Unit(opA.integerValue * opB.integerValue);
             }
-            throw new Exception("Trying to multiply non numeric UnitType");
+            throw new Exception("Trying to multiply non numeric UnitType" + VM.ErrorString(null));
         }
 
         public static Unit operator /(Unit opA, Unit opB){
             UnitType opA_type = opA.Type;
             UnitType opB_type = opB.Type;
 
-            if(opA_type == UnitType.Number){
-                if(opB_type == UnitType.Number)
-                    return new Unit(opA.numberValue / opB.numberValue);
+            if(opA_type == UnitType.Float){
+                if(opB_type == UnitType.Float)
+                    return new Unit(opA.floatValue / opB.floatValue);
                 if(opB_type == UnitType.Integer)
-                    return new Unit(opA.numberValue / opB.integerValue);
+                    return new Unit(opA.floatValue / opB.integerValue);
             }
             if(opA_type == UnitType.Integer){
-                if(opB_type == UnitType.Number)
-                    return new Unit(opA.integerValue / opB.numberValue);
+                if(opB_type == UnitType.Float)
+                    return new Unit(opA.integerValue / opB.floatValue);
                 if(opB_type == UnitType.Integer)
                     return new Unit(opA.integerValue / opB.integerValue);
             }
-            throw new Exception("Trying to divide non numeric UnitType");
+            throw new Exception("Trying to divide non numeric UnitType" + VM.ErrorString(null));
         }
 
         public static bool isNumeric(Unit p_value){
             UnitType type = p_value.Type;
-            return (type == UnitType.Number || type  == UnitType.Integer);
+            return (type == UnitType.Float || type  == UnitType.Integer);
         }
     }
 }

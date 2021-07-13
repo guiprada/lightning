@@ -4,9 +4,9 @@ using System.Text;
 using System.Text.RegularExpressions;
 
 #if DOUBLE
-    using Number = System.Double;
+    using Float = System.Double;
 #else
-    using Number = System.Single;
+    using Float = System.Single;
 #endif
 
 namespace lightning
@@ -248,7 +248,7 @@ namespace lightning
             return IsAlpha(c) || IsDigit(c);
         }
 
-        private Number ReadNumber()
+        private Float ReadNumber()
         {
             while (IsDigit(Peek())) Advance();
 
@@ -260,7 +260,7 @@ namespace lightning
 
                 while (IsDigit(Peek())) Advance();
             }
-            return Number.Parse(new string(source, start, current - start));
+            return Float.Parse(new string(source, start, current - start));
         }
 
         private string ReadIdentifier()

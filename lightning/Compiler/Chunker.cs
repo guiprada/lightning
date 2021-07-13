@@ -5,9 +5,9 @@ using System.Text;
 using Operand = System.UInt16;
 
 #if DOUBLE
-    using Number = System.Double;
+    using Float = System.Double;
 #else
-    using Number = System.Single;
+    using Float = System.Single;
 #endif
 
 namespace lightning
@@ -306,9 +306,9 @@ namespace lightning
                     Add(OpCode.LOAD_FALSE, p_node.Line);
                 }
             }
-            else if (p_node.ValueType == typeof(Number))
+            else if (p_node.ValueType == typeof(Float))
             {
-                int address = AddConstant((Number)p_node.Value);
+                int address = AddConstant((Float)p_node.Value);
                 Add(OpCode.LOAD_CONSTANT, (Operand)address, p_node.Line);
             }
             else if (p_node.ValueType == typeof(string))
@@ -1069,7 +1069,7 @@ namespace lightning
             }
         }
 
-        int AddConstant(Number p_number)
+        int AddConstant(Float p_number)
         {
             if (constants.Contains(p_number))
             {

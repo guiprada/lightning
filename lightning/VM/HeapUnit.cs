@@ -6,17 +6,17 @@ using System.Text;
 using Operand = System.UInt16;
 
 #if DOUBLE
-    using Number = System.Double;
+    using Float = System.Double;
     using Integer = System.Int64;
 #else
-    using Number = System.Single;
+    using Float = System.Single;
     using Integer = System.Int32;
 #endif
 
 namespace lightning
 {
     public enum UnitType{
-        Number,
+        Float,
         Integer,
         Null,
         Boolean,
@@ -42,7 +42,7 @@ namespace lightning
     }
 
     public class TypeUnit : HeapUnit{
-        public static TypeUnit Number = new TypeUnit(UnitType.Number);
+        public static TypeUnit Float = new TypeUnit(UnitType.Float);
         public static TypeUnit Integer = new TypeUnit(UnitType.Integer);
         public static TypeUnit Null = new TypeUnit(UnitType.Null);
         public static TypeUnit Boolean = new TypeUnit(UnitType.Boolean);
@@ -61,8 +61,8 @@ namespace lightning
         }
 
         public override string ToString(){
-            if(this.type == UnitType.Number)
-                return "UnitType.Number";
+            if(this.type == UnitType.Float)
+                return "UnitType.Float";
             else if(this.type == UnitType.Integer)
                 return "UnitType.Integer";
             else if(this.type == UnitType.Null)
@@ -75,7 +75,7 @@ namespace lightning
                 return "Unknown UnitType";
         }
         public override bool ToBool(){
-            throw new Exception("Trying to get a boolean value of TypeUnit");
+            throw new Exception("Trying to get a boolean value of TypeUnit" + VM.ErrorString(null));
         }
 
         public override bool Equals(object other){
@@ -88,7 +88,7 @@ namespace lightning
         }
 
         public override Unit Get(Unit p_key){
-            throw new Exception("Trying to get Table value of TypeUnit");
+            throw new Exception("Trying to get Table value of TypeUnit" + VM.ErrorString(null));
         }
     }
 
@@ -113,7 +113,7 @@ namespace lightning
 
         public override bool ToBool()
         {
-            throw new Exception("Can not convert String to Bool.");
+            throw new Exception("Can not convert String to Bool." + VM.ErrorString(null));
         }
 
         public override bool Equals(object other)
@@ -140,7 +140,7 @@ namespace lightning
         }
 
         public override Unit Get(Unit p_key){
-            throw new Exception("Trying to get Table value of StringUnit");
+            throw new Exception("Trying to get Table value of StringUnit" + VM.ErrorString(null));
         }
     }
 
@@ -178,7 +178,7 @@ namespace lightning
 
         public override bool ToBool()
         {
-            throw new Exception("Can not convert Function to Bool.");
+            throw new Exception("Can not convert Function to Bool." + VM.ErrorString(null));
         }
 
         public override bool Equals(object other)
@@ -206,7 +206,7 @@ namespace lightning
         }
 
         public override Unit Get(Unit p_key){
-            throw new Exception("Trying to get Table value of FunctionUnit");
+            throw new Exception("Trying to get Table value of FunctionUnit" + VM.ErrorString(null));
         }
     }
 
@@ -236,7 +236,7 @@ namespace lightning
 
         public override bool ToBool()
         {
-            throw new Exception("Can not convert Intrinsic to Bool.");
+            throw new Exception("Can not convert Intrinsic to Bool." + VM.ErrorString(null));
         }
 
         public override bool Equals(object other)
@@ -262,7 +262,7 @@ namespace lightning
         }
 
         public override Unit Get(Unit p_key){
-            throw new Exception("Trying to get Table value of IntrinsicUnit");
+            throw new Exception("Trying to get Table value of IntrinsicUnit" + VM.ErrorString(null));
         }
     }
 
@@ -295,7 +295,7 @@ namespace lightning
 
         public override bool ToBool()
         {
-            throw new Exception("Can not convert Clojure to Bool.");
+            throw new Exception("Can not convert Clojure to Bool." + VM.ErrorString(null));
         }
 
         public override bool Equals(object other)
@@ -321,7 +321,7 @@ namespace lightning
         }
 
         public override Unit Get(Unit p_key){
-            throw new Exception("Trying to get Table value of ClosureUnit");
+            throw new Exception("Trying to get Table value of ClosureUnit" + VM.ErrorString(null));
         }
     }
 
@@ -410,7 +410,7 @@ namespace lightning
         }
 
         public override Unit Get(Unit p_key){
-            throw new Exception("Trying to get Table value of UpValueUnit");
+            throw new Exception("Trying to get Table value of UpValueUnit" + VM.ErrorString(null));
         }
     }
 
@@ -453,7 +453,7 @@ namespace lightning
         public void Set(string p_key, Unit p_value){
             Set(new Unit(p_key), p_value);
         }
-        public void Set(string p_key, Number p_value){
+        public void Set(string p_key, Float p_value){
             Set(new Unit(p_key), new Unit(p_value));
         }
         public void Set(string p_key, Integer p_value){
@@ -468,7 +468,7 @@ namespace lightning
         public void Set(string p_key, HeapUnit p_value){
             Set(new Unit(p_key), new Unit(p_value));
         }
-        public void Set(Unit p_key, Number p_value){
+        public void Set(Unit p_key, Float p_value){
             Set(p_key, new Unit(p_value));
         }
         public void Set(Unit p_key, Integer p_value){
