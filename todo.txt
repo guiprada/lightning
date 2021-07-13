@@ -1,4 +1,6 @@
 ﻿todo
+	add makeNumericIterator
+	think if we should error on overriding a map value with table value
 	remove append, replace with +
 	try , protected call
 	tuple and nuple class
