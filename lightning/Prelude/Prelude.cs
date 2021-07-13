@@ -181,6 +181,32 @@ namespace lightning
             {
                 TableUnit list = new TableUnit(null, null);
 
+                Unit listNew(VM vm)
+                {
+                    Integer size = vm.GetInteger(0);
+                    TableUnit list = new TableUnit(null, null);
+                    for(int i=0; i<size; i++)
+                        list.elements.Add(new Unit(UnitType.Null));
+
+                    return new Unit(list);
+                }
+                list.Set("new", new IntrinsicUnit("new", listNew, 1));
+
+                //////////////////////////////////////////////////////
+
+                Unit listInit(VM vm)
+                {
+                    TableUnit list = vm.GetTable(0);
+                    Integer new_end = vm.GetInteger(1);
+                    int size = list.Count;
+                    for(int i=size; i<(new_end); i++)
+                        list.elements.Add(new Unit(UnitType.Null));
+
+                    return new Unit(UnitType.Null);
+                }
+                list.Set("init", new IntrinsicUnit("init", listInit, 2));
+
+                //////////////////////////////////////////////////////
                 Unit listPush(VM vm)
                 {
                     TableUnit list = vm.GetTable(0);

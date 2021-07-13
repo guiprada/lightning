@@ -682,9 +682,10 @@ namespace lightning
                         Consume(TokenType.COLON, "Expected ':' separating key:values in table constructor", true);
                         if(((LiteralNode)item).ValueType == typeof(Number)){
                             LiteralNode number_value = (LiteralNode)item;
-                            for(int i = elements.Count; i<((Number)(number_value.Value)); i++)
-                                elements.Add(new LiteralNode(item.Line));
-                            elements.Add(Primary());
+                            if((Number)(number_value.Value) == elements.Count)
+                                elements.Add(Primary());
+                            else
+                                table.Add(number_value, Primary());
                         }else if(((LiteralNode)item).ValueType == typeof(string)){
                             LiteralNode string_value = (LiteralNode)item;
                             table.Add(string_value, Primary());
@@ -713,9 +714,10 @@ namespace lightning
                             Consume(TokenType.COLON, "Expected ':' separating key:values in table constructor", true);
                             if(((LiteralNode)item).ValueType == typeof(Number)){
                                 LiteralNode number_value = (LiteralNode)item;
-                                for(int i = elements.Count; i<((Number)(number_value.Value)); i++)
-                                    elements.Add(new LiteralNode(item.Line));
-                                elements.Add(Primary());
+                                if((Number)(number_value.Value) == elements.Count)
+                                    elements.Add(Primary());
+                                else
+                                    table.Add(number_value, Primary());
                             }else if(((LiteralNode)item).ValueType == typeof(string)){
                                 LiteralNode string_value = (LiteralNode)item;
                                 table.Add(string_value, Primary());

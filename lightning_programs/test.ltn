@@ -99,17 +99,18 @@ function clear_errors()
 
     var this_array = this_list
     this_array[0] = 100
+    this_array[1] = null
     this_array[99] = 0
     assert(this_array[0], 100, "Failed Array test 1.")
     assert(this_array[1], null, "Failed Array test 2.")
     assert(this_array[99], 0, "Failed Array test 3.")
-    assert(count_all(this_list), 102, "Failed Array test 4")
-    assert(list.count(this_array), 100, "Failed Array test 5.")
-    assert(table.count(this_list), 2, "Failed Array test 6.")
+    assert(count_all(this_list), 5, "Failed Array test 4")
+    assert(list.count(this_array), 2, "Failed Array test 5.")
+    assert(table.count(this_list), 3, "Failed Array test 6.")
 }
 {
     // Table literal test
-    var this_table = [5:"hello"]
+    var this_table = [null, null, null, null, null, 5:"hello"]
     for(var i = 0; i<5; i++){
         assert(this_table[i], null, "Failed Table Literal test " .. (i+1) .. ".")
     }
@@ -514,9 +515,9 @@ function clear_errors()
 }
 {
     // Testing for_range
-    var table1 = []
     var n = 100
-    table1[n - 1] = null
+    var table1 = []
+    list.init(table1, n)
     function many_for (start, end, this_table)
     {
         for (var i = start; i<end; i++)
@@ -550,12 +551,8 @@ function clear_errors()
 }
 {
     // Testing for_each
-    var table1 = []
-    table1[99] = null
-    // for (var i = 0; i< 100; i++)
-    // {
-    //     table1[i] = []
-    // }
+    var n = 100
+    var table1 = list.new(n)
 
     function many(index, collection)
     {
@@ -563,32 +560,30 @@ function clear_errors()
         collection[index].x = 1
     }
     for_each(table1, many)
-    for (var i = 0; i< 100; i++)
+    for (var i = 0; i<n; i++)
     {
-        assert(table1[i].x, 1, "Failed for_each Test " .. i .. ".")
+        assert(table1[i].x, 1, "Failed for_each Test 1, iteration:" .. i .. ".")
     }
 
-    table1 = []
-    table1[99] = null
+    table1 = list.new(n)
     function many_number(index, collection)
     {
         collection[index] = 1
     }
     for_each(table1, many_number)
-    for (var i = 0; i< 100; i++)
+    for (var i = 0; i<n; i++)
     {
-        assert(table1[i], 1, "Failed for_each Test " .. i .. ".")
+        assert(table1[i], 1, "Failed for_each Test 2, iteration: " .. i .. ".")
     }
 
-    table1 = []
-    table1[99] = null
+    table1 = list.new(n)
     for_each(table1, function(index, collection)
     {
         collection[index] = 100 - index
     })
-    for (var i = 0; i< 100; i++)
+    for (var i = 0; i<n; i++)
     {
-        assert(table1[i], 100 - i, "Failed for_each Test " .. (99+i) .. ".")
+        assert(table1[i], n - i, "Failed for_each Test 3, iteration: " .. i .. ".")
     }
 }
 // Testing Global Lock
@@ -815,4 +810,4 @@ write_line("Elapsed time: " .. time.span(start_time, end_time) .. " ms")
 write_line("Loaded modules: " .. machine.modules())
 write_line(machine.memory_use())
 
-////////////////////////////// scratch
+// ////////////////////////////// scratch

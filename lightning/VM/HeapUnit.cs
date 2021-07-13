@@ -415,7 +415,7 @@ namespace lightning
         }
         public int Count {
             get{
-                return ECount + TCount;
+                return elements.Count + table.Count;
             }
         }
         public TableUnit(List<Unit> p_elements, Dictionary<Unit, Unit> p_table)
@@ -464,7 +464,7 @@ namespace lightning
             UnitType key_type = p_key.Type;
             switch(key_type){
                 case UnitType.Integer:
-                    ElementSet((int)p_key.integerValue, p_value);
+                    ElementSet(p_key, p_value);
                     break;
                 default:
                     TableSet(p_key, p_value);
@@ -476,25 +476,51 @@ namespace lightning
             UnitType key_type = p_key.Type;
             switch(key_type){
                 case UnitType.Integer:
-                    return elements[(int)p_key.integerValue];
+                    return GetElement(p_key);
                 default:
                     return GetTable(p_key);
             }
         }
-        public Unit GetTable(Unit p_value){
-            if(table.ContainsKey(p_value)){
-                return table[p_value];
+        Unit GetTable(Unit p_key){
+            if(table.ContainsKey(p_key)){
+                return table[p_key];
             }else if(superTable != null){
-                return superTable.GetTable(p_value);
+                return superTable.GetTable(p_key);
             }else{
-                throw new Exception("Table or Super Table does not contain index: " + p_value.ToString());
+                throw new Exception("Table or Super Table does not contain index: " + p_key.ToString());
             }
         }
-        void ElementSet(int index, Unit value)
+
+        Unit GetElement(Unit p_key){
+            if(p_key.integerValue <= (elements.Count - 1))
+                return elements[(int)p_key.integerValue];
+            if(table.ContainsKey(p_key)){
+                // if(p_key.integerValue == (elements.Count)){
+                //     MoveToList(p_key);
+                //     return elements[(int)p_key.integerValue];
+                // }else
+                    return table[p_key];
+            }
+            throw new Exception("List does not contain index: " + p_key.ToString());
+        }
+        void ElementSet(Unit p_key, Unit value)
         {
-            if (index > (ECount - 1))
-                ElementsStretch(index - (ECount - 1));
-            elements[index] = value;
+            Integer index = p_key.integerValue;
+            if (index <= elements.Count - 1)
+                elements[(int)index] = value;
+            else if (index > elements.Count)
+                TableSet(p_key, value);
+            else if (index == elements.Count){
+                if (table.ContainsKey(p_key))
+                    MoveToList(p_key);
+                else
+                    elements.Add(value);
+            }
+        }
+
+        void MoveToList(Unit p_key){
+            elements.Add(table[p_key]);
+            table.Remove(p_key);
         }
 
         void ElementAdd(Unit value)
@@ -505,14 +531,6 @@ namespace lightning
         void TableSet(Unit index, Unit value)
         {
             table[index] = value;
-        }
-
-        void ElementsStretch(int n)
-        {
-            for (int i = 0; i < n; i++)
-            {
-                elements.Add(new Unit(UnitType.Null));
-            }
         }
 
         public override string ToString()
