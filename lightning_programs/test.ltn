@@ -1,4 +1,8 @@
-﻿write_line("*** Welcome to lightning Zzz :) ***")
+﻿var table_teste = [5:0, -11, -1:2]
+table_teste[-5] = 0
+write_line(table_teste)
+
+write_line("*** Welcome to lightning Zzz :) ***")
 
 var os_string = get_os()
 var os = "Unknown"

@@ -33,4 +33,4 @@ arguments       -> expression ( "," expression )*
 table           -> [ tableEntry (, tableEntry )* ]
 tableEntry      -> primary | IDENTIFIER : primary
 compoundVar     -> IDENTIFIER ( ([ expression ]) | (. IDENTIFIER) )*
-primary         ->  NUMBER | STRING | "false" | "true" | "null" | "(" expression ")" | compoundVar | list | funExpr | table
+primary         ->  (-)? NUMBER | STRING | "false" | "true" | "null" | "(" expression ")" | compoundVar | list | funExpr | table

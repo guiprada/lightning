@@ -464,7 +464,10 @@ namespace lightning
             UnitType key_type = p_key.Type;
             switch(key_type){
                 case UnitType.Integer:
-                    ElementSet(p_key, p_value);
+                    if(p_key.integerValue >= 0)
+                        ElementSet(p_key, p_value);
+                    else
+                        TableSet(p_key, p_value);
                     break;
                 default:
                     TableSet(p_key, p_value);
@@ -476,7 +479,10 @@ namespace lightning
             UnitType key_type = p_key.Type;
             switch(key_type){
                 case UnitType.Integer:
-                    return GetElement(p_key);
+                    if(p_key.integerValue >= 0)
+                        return GetElement(p_key);
+                    else
+                        return GetTable(p_key);
                 default:
                     return GetTable(p_key);
             }
