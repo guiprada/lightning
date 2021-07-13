@@ -1,9 +1,4 @@
-﻿var table_teste = [5:0, -11, -1:2]
-table_teste[-5] = 0 - 1 + 5 - 3
-write_line(table_teste)
-
-
-write_line("*** Welcome to lightning Zzz :) ***")
+﻿write_line("*** Welcome to lightning Zzz :) ***")
 
 var os_string = get_os()
 var os = "Unknown"
@@ -112,6 +107,10 @@ function clear_errors()
     assert(count_all(this_list), 5, "Failed Array test 4")
     assert(list.count(this_array), 2, "Failed Array test 5.")
     assert(table.count(this_list), 3, "Failed Array test 6.")
+
+    var table_negative = []
+    table_negative[-1] = 5
+    assert(table_negative[-1], 5, "Failed Table Negative Index Test 1.")
 }
 {
     // Table literal test
@@ -124,6 +123,11 @@ function clear_errors()
     var another_table = [ "brazil":"Brasilia", eua:"Washington", australia:"Canberra",]
     assert(another_table.brazil, "Brasilia", "Failed Table Literal test 7.")
     assert(another_table.australia, "Canberra", "Failed Super Table Test 3.")
+
+    // Testing Table negative
+    var table_teste = [5:0, -11, -1:2]
+    assert(table_teste[0], -11, "Failed Table Literal Negative Value Test 1.")
+    assert(table_teste[-1], 2, "Failde Table Literal Negatiev Index Test 1.")
 }
 {
     // Testing lexical scoping
@@ -751,6 +755,10 @@ var global_lock_test_counter = 5
     }
     assert(common_table:a_function(), "hello", "Failed Super Table Test 4.")
     assert(super_table:a_function(), "Brasilia", "Failed Super Table Test 5.")
+
+    var Table = list.new(5)
+    table.set_super(Table, table)
+    write_line(Table:count())
 }
 {
     // Testing Char
