@@ -394,7 +394,7 @@ namespace lightning
     public class TableUnit : HeapUnit
     {
         public List<Unit> elements;
-        public Dictionary<StringUnit, Unit> table;
+        public Dictionary<Unit, Unit> table;
 
         public TableUnit superTable;
 
@@ -418,81 +418,93 @@ namespace lightning
                 return ECount + TCount;
             }
         }
-        public TableUnit(List<Unit> p_elements, Dictionary<StringUnit, Unit> p_table)
+        public TableUnit(List<Unit> p_elements, Dictionary<Unit, Unit> p_table)
         {
             elements = p_elements ??= new List<Unit>();
-            table = p_table ??= new Dictionary<StringUnit, Unit>();
+            table = p_table ??= new Dictionary<Unit, Unit>();
+        }
+
+        public void Set(Unit p_value){
+            ElementAdd(p_value);
+        }
+        public void Set(string p_key, Unit p_value){
+            Set(new Unit(p_key), p_value);
+        }
+        public void Set(string p_key, Number p_value){
+            Set(new Unit(p_key), new Unit(p_value));
+        }
+        public void Set(string p_key, Integer p_value){
+            Set(new Unit(p_key), new Unit(p_value));
+        }
+        public void Set(string p_key, char p_value){
+            Set(new Unit(p_key), new Unit(p_value));
+        }
+        public void Set(string p_key, bool p_value){
+            Set(new Unit(p_key), new Unit(p_value));
+        }
+        public void Set(string p_key, HeapUnit p_value){
+            Set(new Unit(p_key), new Unit(p_value));
+        }
+        public void Set(Unit p_key, Number p_value){
+            Set(p_key, new Unit(p_value));
+        }
+        public void Set(Unit p_key, Integer p_value){
+            Set(p_key, new Unit(p_value));
+        }
+        public void Set(Unit p_key, char p_value){
+            Set(p_key, new Unit(p_value));
+        }
+        public void Set(Unit p_key, bool p_value){
+            Set(p_key, new Unit(p_value));
+        }
+        public void Set(Unit p_key, HeapUnit p_value){
+            Set(p_key, new Unit(p_value));
+        }
+        public void Set(Unit p_key, Unit p_value){
+            UnitType key_type = p_key.Type;
+            switch(key_type){
+                case UnitType.Integer:
+                    ElementSet((int)p_key.integerValue, p_value);
+                    break;
+                default:
+                    TableSet(p_key, p_value);
+                    break;
+            }
         }
 
         public Unit Get(Unit p_key){
-            if (p_key.Type == UnitType.String)
-                return GetTable((StringUnit)(p_key.heapUnitValue));
-            if (p_key.Type == UnitType.Number)
-                return elements[(int)p_key.numberValue];
-            if (p_key.Type == UnitType.Integer)
-                return elements[(int)p_key.integerValue];
-            else
-                throw new Exception("Table can not be indexed by: " + p_key.Type);
-        }
-        public Unit GetTable(StringUnit p_string){
-            if(table.ContainsKey(p_string)){
-                return table[p_string];
-            }else if(superTable != null){
-                return superTable.GetTable(p_string);
-            }else{
-                throw new Exception("Table or Super Table does not contain index: " + p_string.ToString());
+            UnitType key_type = p_key.Type;
+            switch(key_type){
+                case UnitType.Integer:
+                    return elements[(int)p_key.integerValue];
+                default:
+                    return GetTable(p_key);
             }
         }
-        public void ElementSet(int index, Unit value)
+        public Unit GetTable(Unit p_value){
+            if(table.ContainsKey(p_value)){
+                return table[p_value];
+            }else if(superTable != null){
+                return superTable.GetTable(p_value);
+            }else{
+                throw new Exception("Table or Super Table does not contain index: " + p_value.ToString());
+            }
+        }
+        void ElementSet(int index, Unit value)
         {
             if (index > (ECount - 1))
                 ElementsStretch(index - (ECount - 1));
             elements[index] = value;
         }
 
-        public void ElementAdd(Unit value)
+        void ElementAdd(Unit value)
         {
             elements.Add(value);
         }
 
-        public void TableSet(StringUnit index, Unit value)
+        void TableSet(Unit index, Unit value)
         {
             table[index] = value;
-        }
-
-        public void TableSet(string index, Unit value)
-        {
-            table[new StringUnit(index)] = value;
-        }
-
-        public void TableSet(StringUnit index, Number value)
-        {
-            table[index] = new Unit(value);
-        }
-
-        public void TableSet(string index, Number value)
-        {
-            table[new StringUnit(index)] = new Unit(value);
-        }
-
-        public void TableSet(StringUnit index, HeapUnit value)
-        {
-            table[index] = new Unit(value);
-        }
-
-        public void TableSet(string index, HeapUnit value)
-        {
-            table[new StringUnit(index)] = new Unit(value);
-        }
-
-        public void TableSet(StringUnit index, bool value)
-        {
-            table[index] = new Unit(value);
-        }
-
-        public void TableSet(string index, bool value)
-        {
-            table[new StringUnit(index)] = new Unit(value);
         }
 
         void ElementsStretch(int n)
@@ -523,7 +535,7 @@ namespace lightning
             if (counter > 0)
                 this_string += " ";
             bool first = true;
-            foreach (KeyValuePair<StringUnit, Unit> entry in table)
+            foreach (KeyValuePair<Unit, Unit> entry in table)
             {
                 if (first)
                 {
@@ -577,7 +589,7 @@ namespace lightning
                 return UnitType.Module;
             }
         }
-        public ModuleUnit(string p_name, List<Unit> p_elements, Dictionary<StringUnit, Unit> p_table, List<Unit> p_globals, List<Unit> p_constants)
+        public ModuleUnit(string p_name, List<Unit> p_elements, Dictionary<Unit, Unit> p_table, List<Unit> p_globals, List<Unit> p_constants)
             : base(p_elements, p_table)
         {
             name = p_name;

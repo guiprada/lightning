@@ -627,45 +627,18 @@ namespace lightning
                                 this_table = ((TableUnit)(this_table.heapUnitValue)).Get(v);
                             }
                             Unit new_value = stack.Peek();
+                            Unit index = indexes[indexes_counter - 1];
                             UnitType index_type = indexes[indexes_counter - 1].Type;
                             if (op == 0)
                             {
-                                if (index_type == UnitType.Number)
-                                {
-                                    if (((TableUnit)(this_table.heapUnitValue)).elements.Count - 1 >= ((int)(indexes[indexes_counter - 1].numberValue)))
-                                    {
-                                        Unit old_value = ((TableUnit)(this_table.heapUnitValue)).elements[(int)(indexes[indexes_counter - 1].numberValue)];
-                                    }
-                                    ((TableUnit)(this_table.heapUnitValue)).ElementSet((int)(indexes[indexes_counter - 1].numberValue), new_value);
-                                }
-                                else if (index_type == UnitType.Integer)
-                                {
-                                    if (((TableUnit)(this_table.heapUnitValue)).elements.Count - 1 >= ((int)(indexes[indexes_counter - 1].integerValue)))
-                                    {
-                                        Unit old_value = ((TableUnit)(this_table.heapUnitValue)).elements[(int)(indexes[indexes_counter - 1].integerValue)];
-                                    }
-                                    ((TableUnit)(this_table.heapUnitValue)).ElementSet((int)(indexes[indexes_counter - 1].integerValue), new_value);
-                                }
-                                else
-                                {
-                                    if (((TableUnit)(this_table.heapUnitValue)).table.ContainsKey((StringUnit)indexes[indexes_counter - 1].heapUnitValue))
-                                    {
-                                        Unit old_value = ((TableUnit)(this_table.heapUnitValue)).table[(StringUnit)indexes[indexes_counter - 1].heapUnitValue];
-                                    }
-                                    ((TableUnit)(this_table.heapUnitValue)).TableSet((StringUnit)indexes[indexes_counter - 1].heapUnitValue, new_value);
-                                }
+                                ((TableUnit)(this_table.heapUnitValue)).Set(index, new_value);
                             }
                             else if(parallelVM == true)
                             {
                                 Unit old_value;
                                 Unit result;
                                 lock(((TableUnit)(this_table.heapUnitValue)).elements){
-                                    if (index_type == UnitType.Number)
-                                        old_value = ((TableUnit)(this_table.heapUnitValue)).elements[(int)(indexes[indexes_counter - 1].numberValue)];
-                                    else if (index_type == UnitType.Integer)
-                                        old_value = ((TableUnit)(this_table.heapUnitValue)).elements[(int)(indexes[indexes_counter - 1].integerValue)];
-                                    else
-                                        old_value = ((TableUnit)(this_table.heapUnitValue)).table[(StringUnit)indexes[indexes_counter - 1].heapUnitValue];
+                                    old_value = ((TableUnit)(this_table.heapUnitValue)).Get(index);
 
                                     if (op == 1)
                                         result = old_value + new_value;
@@ -678,24 +651,12 @@ namespace lightning
                                     else
                                         throw new Exception("Unknown operator");
 
-                                    if (index_type == UnitType.Number)
-                                        ((TableUnit)(this_table.heapUnitValue)).elements[(int)(indexes[indexes_counter - 1].numberValue)] = result;
-                                    else if (index_type == UnitType.Integer)
-                                        ((TableUnit)(this_table.heapUnitValue)).elements[(int)(indexes[indexes_counter - 1].integerValue)] = result;
-                                    else
-                                        ((TableUnit)(this_table.heapUnitValue)).table[(StringUnit)indexes[indexes_counter - 1].heapUnitValue] = result;
+                                    ((TableUnit)(this_table.heapUnitValue)).Set(index, result);
                                 }
                             }
                             else
                             {
-                                Unit old_value;
-                                if (index_type == UnitType.Number)
-                                    old_value = ((TableUnit)(this_table.heapUnitValue)).elements[(int)(indexes[indexes_counter - 1].numberValue)];
-                                else if (index_type == UnitType.Integer)
-                                    old_value = ((TableUnit)(this_table.heapUnitValue)).elements[(int)(indexes[indexes_counter - 1].integerValue)];
-                                else
-                                    old_value = ((TableUnit)(this_table.heapUnitValue)).table[(StringUnit)indexes[indexes_counter - 1].heapUnitValue];
-
+                                Unit old_value = ((TableUnit)(this_table.heapUnitValue)).Get(index);
                                 Unit result;
                                 if (op == 1)
                                     result = old_value + new_value;
@@ -708,12 +669,7 @@ namespace lightning
                                 else
                                     throw new Exception("Unknown operator");
 
-                                if (index_type == UnitType.Number)
-                                    ((TableUnit)(this_table.heapUnitValue)).elements[(int)(indexes[indexes_counter - 1].numberValue)] = result;
-                                else if (index_type == UnitType.Integer)
-                                    ((TableUnit)(this_table.heapUnitValue)).elements[(int)(indexes[indexes_counter - 1].integerValue)] = result;
-                                else
-                                    ((TableUnit)(this_table.heapUnitValue)).table[(StringUnit)indexes[indexes_counter - 1].heapUnitValue] = result;
+                                ((TableUnit)(this_table.heapUnitValue)).Set(index, result);
 
                             }
                             break;
@@ -1082,7 +1038,7 @@ namespace lightning
                             {
                                 Unit val = stack.Pop();
                                 Unit key = stack.Pop();
-                                new_table.table.Add((StringUnit)key.heapUnitValue, val);
+                                new_table.table.Add(key, val);
                             }
 
                             int n_elements = instruction.opA;
