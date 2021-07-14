@@ -690,7 +690,7 @@ namespace lightning
             if(superTable.table.ContainsKey(p_key))
                 return superTable.table[p_key];
             else
-                throw new Exception("Wrapper Super Table does not contain index: " + p_key.ToString());
+            throw new Exception("Wrapper<" + typeof(T) +"> Super Table does not contain index: " + p_key.ToString());
         }
 
         public void Set(Unit p_key, Unit p_value){
@@ -729,7 +729,7 @@ namespace lightning
 
         public override bool ToBool()
         {
-            throw new Exception("Can not convert a Wrapper to Bool.");
+            throw new Exception("Can not convert a Wrapper<" + typeof(T) +"> to Bool.");
         }
 
         public T UnWrapp()
@@ -740,7 +740,7 @@ namespace lightning
             }
             else
             {
-                throw new Exception("UnWrapp<>() type Error!");
+                throw new Exception("UnWrapp<" + typeof(T) +">() type Error!");
             }
         }
     }

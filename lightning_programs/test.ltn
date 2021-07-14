@@ -737,17 +737,17 @@ var global_lock_test_counter = 5
 }
 {
     // Testing nuples
-    function get_nuple(list){
-        return nuple(list)
-    }
-    var nuple1 = get_nuple([1, "hello"])
-    assert(nuple_get(nuple1, 0), 1, "Failed Nuples Test 1.")
-    assert(nuple_get(nuple1, 1), "hello", "Failed Nuples Test 2.")
+    var nuple1 = nuple.from_table([1, "hello"])
+    assert(nuple1:get(0), 1, "Failed Nuples Test 1.")
+    assert(nuple1:get(1), "hello", "Failed Nuples Test 2.")
 
-    nuple_set(nuple1, 0, "hello")
-    nuple_set(nuple1, 1, "world")
-    assert(nuple_get(nuple1, 0), "hello", "Failed Nuples Test 3.")
-    assert(nuple_get(nuple1, 1), "world", "Failed Nuples Test 4.")
+    nuple1:set(0, "hello")
+    nuple1:set(1, "world")
+    assert(nuple1:get(0), "hello", "Failed Nuples Test 3.")
+    assert(nuple1:get(1), "world", "Failed Nuples Test 4.")
+
+    var nuple2 = nuple.new(5)
+    assert(nuple2:size(), 5, "Failed Nuples Test 5")
 }
 {
     // Testing super table
@@ -848,8 +848,10 @@ else{
     write_line(":( " + count_errors() + " errors found!")
 }
 write_line("-- Finished tests! --")
-write_line("Elapsed time: " + start_time:elapsed_time() + " ms")
+write_line("Elapsed time: " + start_time:elapsed() + " ms")
 write_line("Loaded modules: " + machine.modules())
 write_line(machine.memory_use())
 
 //////////////////////////////// scratch
+start_time:reset()
+write_line("Elapsed time: " + start_time:elapsed() + " ms")

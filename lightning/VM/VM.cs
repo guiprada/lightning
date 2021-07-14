@@ -184,8 +184,12 @@ namespace lightning
             return (TableUnit)(stack.Peek(n).heapUnitValue);
         }
 
-        public T GetWrapperUnit<T>(int n){
+        public T GetWrappedContent<T>(int n){
             return ((WrapperUnit<T>)(stack.Peek(n).heapUnitValue)).UnWrapp();
+        }
+
+        public WrapperUnit<T> GetWrapperUnit<T>(int n){
+            return ((WrapperUnit<T>)(stack.Peek(n).heapUnitValue));
         }
 
         public StringUnit GetStringUnit(int n){

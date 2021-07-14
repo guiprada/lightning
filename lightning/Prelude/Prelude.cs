@@ -130,6 +130,7 @@ namespace lightning
             ////////////////////////////////////////////////////////////////////////////////////////////////////// tuple
             {
                 TableUnit tuple = new TableUnit(null, null);
+                TableUnit tupleMethods = new TableUnit(null, null);
 
                 Unit TupleNew(VM vm)
                 {
@@ -138,51 +139,115 @@ namespace lightning
                     new_tuple[1] = vm.GetUnit(1);
 
                     WrapperUnit<Unit[]> tuple_object = new WrapperUnit<Unit[]>(new_tuple);
-                    tuple_object.superTable = tuple;
+                    tuple_object.superTable = tupleMethods;
 
                     return new Unit(tuple_object);
                 }
                 tuple.Set("new", new IntrinsicUnit("tuple_new", TupleNew, 2));
 
                 //////////////////////////////////////////////////////
-                Unit getTupleX(VM vm)
+                Unit TupleGetX(VM vm)
                 {
-                    Unit[] x = vm.GetWrapperUnit<Unit[]>(0);
+                    Unit[] this_tuple = vm.GetWrappedContent<Unit[]>(0);
 
-                    return x[0];
+                    return this_tuple[0];
                 }
-                tuple.Set("get_x", new IntrinsicUnit("tuple_get_x", getTupleX, 1));
+                tupleMethods.Set("get_x", new IntrinsicUnit("tuple_get_x", TupleGetX, 1));
 
                 //////////////////////////////////////////////////////
-                Unit getTupleY(VM vm)
+                Unit TupleGetY(VM vm)
                 {
-                    Unit y = vm.GetWrapperUnit<Unit[]>(0)[1];
+                    Unit[] this_tuple = vm.GetWrappedContent<Unit[]>(0);
 
-                    return y;
+                    return this_tuple[1];
                 }
-                tuple.Set("get_y", new IntrinsicUnit("tuple_get_y", getTupleY, 1));
+                tupleMethods.Set("get_y", new IntrinsicUnit("tuple_get_y", TupleGetY, 1));
 
                 //////////////////////////////////////////////////////
-                Unit setTupleX(VM vm)
+                Unit TupleSetX(VM vm)
                 {
-                    vm.GetWrapperUnit<Unit[]>(0)[0] = vm.GetUnit(1);
+                    vm.GetWrappedContent<Unit[]>(0)[0] = vm.GetUnit(1);
 
                     return new Unit(UnitType.Null);
                 }
-                tuple.Set("set_x", new IntrinsicUnit("tuple_set_x", setTupleX, 2));
+                tupleMethods.Set("set_x", new IntrinsicUnit("tuple_set_x", TupleSetX, 2));
 
                 //////////////////////////////////////////////////////
-                Unit setTupleY(VM vm)
+                Unit TupleSetY(VM vm)
                 {
-                    vm.GetWrapperUnit<Unit[]>(0)[1] = vm.GetUnit(1);
+                    vm.GetWrappedContent<Unit[]>(0)[1] = vm.GetUnit(1);
 
                     return new Unit(UnitType.Null);
                 }
-                tuple.Set("set_y", new IntrinsicUnit("tuple_set_y", setTupleY, 2));
+                tupleMethods.Set("set_y", new IntrinsicUnit("tuple_set_y", TupleSetY, 2));
 
                 tables.Add("tuple", tuple);
             }
 
+            ////////////////////////////////////////////////////////////////////////////////////////////////////////////
+            ////////////////////////////////////////////////////////////////////////////////////////////////////// nuple
+            {
+                TableUnit nuple = new TableUnit(null, null);
+                TableUnit nupleMethods = new TableUnit(null, null);
+
+                Unit NupleNew(VM vm)
+                {
+                    Integer size = vm.GetInteger(0);
+                    Unit[] new_nuple = new Unit[size];
+                    for(int i = 0; i < size; i++)
+                        new_nuple[i] = new Unit(UnitType.Null);
+                    WrapperUnit<Unit[]> new_nuple_object = new WrapperUnit<Unit[]>(new_nuple);
+                    new_nuple_object.superTable = nupleMethods;
+
+                    return new Unit(new_nuple_object);
+                }
+                nuple.Set("new", new IntrinsicUnit("tuple_new", NupleNew, 1));
+
+                //////////////////////////////////////////////////////
+
+                Unit NupleFromTable(VM vm)
+                {
+                    TableUnit table = vm.GetTable(0);
+                    int size = table.ECount;
+                    Unit[] new_nuple = new Unit[size];
+                    for(int i = 0; i < size; i++)
+                        new_nuple[i] = table.elements[i];
+                    WrapperUnit<Unit[]> new_nuple_object = new WrapperUnit<Unit[]>(new_nuple);
+                    new_nuple_object.superTable = nupleMethods;
+
+                    return new Unit(new_nuple_object);
+                }
+                nuple.Set("from_table", new IntrinsicUnit("tuple_from_table", NupleFromTable, 1));
+
+                //////////////////////////////////////////////////////
+                Unit NupleGet(VM vm)
+                {
+                    Unit[] this_nuple = vm.GetWrappedContent<Unit[]>(0);
+
+                    return this_nuple[(int)vm.GetNumber(1)];
+                }
+                nupleMethods.Set("get", new IntrinsicUnit("nuple_get", NupleGet, 2));
+
+                //////////////////////////////////////////////////////
+                Unit NupleSet(VM vm)
+                {
+                    vm.GetWrappedContent<Unit[]>(0)[(int)vm.GetNumber(1)] = vm.GetUnit(2);
+
+                    return new Unit(UnitType.Null);
+                }
+                nupleMethods.Set("set", new IntrinsicUnit("nuple_set", NupleSet, 3));
+
+                //////////////////////////////////////////////////////
+                Unit NupleSize(VM vm)
+                {
+                    Unit[] this_nuple = vm.GetWrappedContent<Unit[]>(0);
+
+                    return new Unit(this_nuple.Length);
+                }
+                nupleMethods.Set("size", new IntrinsicUnit("nuple_size", NupleSize, 1));
+
+                tables.Add("nuple", nuple);
+            }
             ////////////////////////////////////////////////////////////////////////////////////////////////////////////
             ////////////////////////////////////////////////////////////////////////////////////////////////// intrinsic
             {
@@ -833,20 +898,31 @@ namespace lightning
             /////////////////////////////////////////////////////////////////////////////////////////////////////// time
             {
                 TableUnit time = new TableUnit(null, null);
+                TableUnit timeMethods = new TableUnit(null, null);
 
-                Unit now(VM vm)
+                Unit TimeNow(VM vm)
                 {
-                    return new Unit(new WrapperUnit<long>(DateTime.Now.Ticks, time));
+                    return new Unit(new WrapperUnit<long>(DateTime.Now.Ticks, timeMethods));
                 }
-                time.Set("now", new IntrinsicUnit("now", now, 0));
+                time.Set("now", new IntrinsicUnit("time_now", TimeNow, 0));
 
-                Unit ElapsedTime(VM vm)
+                //////////////////////////////////////////////////////
+                Unit TimeReset(VM vm)
                 {
-                    long timeStart = vm.GetWrapperUnit<long>(0);
+                    WrapperUnit<long> this_time = vm.GetWrapperUnit<long>(0);
+                    this_time.content = DateTime.Now.Ticks;
+                    return new Unit(UnitType.Null);
+                }
+                timeMethods.Set("reset", new IntrinsicUnit("time_reset", TimeReset, 1));
+
+                //////////////////////////////////////////////////////
+                Unit TimeElapsed(VM vm)
+                {
+                    long timeStart = vm.GetWrappedContent<long>(0);
                     long timeEnd = DateTime.Now.Ticks;
                     return new Unit((Integer)(new TimeSpan(timeEnd - timeStart).TotalMilliseconds));// Convert to milliseconds
                 }
-                time.Set("elapsed_time", new IntrinsicUnit("time_elapsed_time", ElapsedTime, 1));
+                timeMethods.Set("elapsed", new IntrinsicUnit("time_elapsed", TimeElapsed, 1));
 
                 tables.Add("time", time);
             }
@@ -1320,37 +1396,6 @@ namespace lightning
             }
 
             functions.Add(new IntrinsicUnit("for_range", ForRange, 3));
-
-            //////////////////////////////////////////////////////
-            Unit nuple(VM vm)
-            {
-                TableUnit table = vm.GetTable(0);
-                int size = table.ECount;
-                Unit[] nuple = new Unit[size];
-                for(int i = 0; i < size; i++)
-                    nuple[i] = table.elements[i];
-
-                return new Unit(new WrapperUnit<Unit[]>(nuple));
-            }
-            functions.Add(new IntrinsicUnit("nuple", nuple, 1));
-
-            //////////////////////////////////////////////////////
-            Unit getNuple(VM vm)
-            {
-                Unit x = vm.GetWrapperUnit<Unit[]>(0)[(int)vm.GetNumber(1)];
-
-                return x;
-            }
-            functions.Add(new IntrinsicUnit("nuple_get", getNuple, 2));
-
-            //////////////////////////////////////////////////////
-            Unit setNuple(VM vm)
-            {
-                vm.GetWrapperUnit<Unit[]>(0)[(int)vm.GetNumber(1)] = vm.GetUnit(2);
-
-                return new Unit(UnitType.Null);
-            }
-            functions.Add(new IntrinsicUnit("nuple_set", setNuple, 3));
 
             //////////////////////////////////////////////////////
             Unit getOs(VM vm)
