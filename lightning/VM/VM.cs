@@ -336,11 +336,9 @@ namespace lightning
                 switch (instruction.opCode)
                 {
                     case OpCode.POP:
-                        {
-                            IP++;
-                            Unit value = stack.Pop();
-                            break;
-                        }
+                        IP++;
+                        stack.Pop();
+                        break;
                     case OpCode.LOAD_CONSTANT:
                         {
                             IP++;
@@ -395,23 +393,17 @@ namespace lightning
                             break;
                         }
                     case OpCode.LOAD_NIL:
-                        {
-                            IP++;
-                            stack.Push(new Unit(UnitType.Null));
-                            break;
-                        }
+                        IP++;
+                        stack.Push(new Unit(UnitType.Null));
+                        break;
                     case OpCode.LOAD_TRUE:
-                        {
-                            IP++;
-                            stack.Push(new Unit(true));
-                            break;
-                        }
+                        IP++;
+                        stack.Push(new Unit(true));
+                        break;
                     case OpCode.LOAD_FALSE:
-                        {
-                            IP++;
-                            stack.Push(new Unit(false));
-                            break;
-                        }
+                        IP++;
+                        stack.Push(new Unit(false));
+                        break;
                     case OpCode.LOAD_INTRINSIC:
                         {
                             IP++;
@@ -560,34 +552,24 @@ namespace lightning
                                         throw new Exception("Unknown operator" + VM.ErrorString(this));
                                 }
                             }else{
+                                Unit result;
                                 switch(op){
                                     case ADDITION_ASSIGN:
-                                        {
-                                            Unit result = globals.Get(address) + new_value;
-                                            globals.Set(result, address);
-                                        }
+                                        result = globals.Get(address) + new_value;
                                         break;
                                     case SUBTRACTION_ASSIGN:
-                                        {
-                                            Unit result = globals.Get(address) - new_value;
-                                            globals.Set(result, address);
-                                        }
+                                        result = globals.Get(address) - new_value;
                                         break;
                                     case MULTIPLICATION_ASSIGN:
-                                        {
-                                            Unit result = globals.Get(address) * new_value;
-                                            globals.Set(result, address);
-                                        }
+                                        result = globals.Get(address) * new_value;
                                         break;
                                     case DIVISION_ASSIGN:
-                                        {
-                                            Unit result = globals.Get(address) / new_value;
-                                            globals.Set(result, address);
-                                        }
+                                        result = globals.Get(address) / new_value;
                                         break;
                                     default:
                                         throw new Exception("Unknown operator" + VM.ErrorString(this));
                                 }
+                                globals.Set(result, address);
                             }
                             break;
                         }
@@ -628,24 +610,16 @@ namespace lightning
                             }else{
                                 switch(op){
                                     case ADDITION_ASSIGN:
-                                        {
-                                            this_upValue.UpValue = this_upValue.UpValue + new_value;
-                                        }
+                                        this_upValue.UpValue = this_upValue.UpValue + new_value;
                                         break;
                                     case SUBTRACTION_ASSIGN:
-                                        {
-                                            this_upValue.UpValue = this_upValue.UpValue - new_value;
-                                        }
+                                        this_upValue.UpValue = this_upValue.UpValue - new_value;
                                         break;
                                     case MULTIPLICATION_ASSIGN:
-                                        {
-                                            this_upValue.UpValue = this_upValue.UpValue * new_value;
-                                        }
+                                        this_upValue.UpValue = this_upValue.UpValue * new_value;
                                         break;
                                     case DIVISION_ASSIGN:
-                                        {
-                                            this_upValue.UpValue = this_upValue.UpValue / new_value;
-                                        }
+                                        this_upValue.UpValue = this_upValue.UpValue / new_value;
                                         break;
                                     default:
                                         throw new Exception("Unknown operator" + VM.ErrorString(this));
@@ -1182,24 +1156,17 @@ namespace lightning
                             break;
                         }
                     case OpCode.PUSH_STASH:
-                        {
-                            IP++;
-                            stack.PushStash();
-                            break;
-                        }
+                        IP++;
+                        stack.PushStash();
+                        break;
                     case OpCode.POP_STASH:
-                        {
-                            IP++;
-                            stack.PopStash();
-                            break;
-                        }
+                        IP++;
+                        stack.PopStash();
+                        break;
                     case OpCode.EXIT:
-                        {
-                            Unit result = new Unit(UnitType.Null);
-                            if (stack.top > 0)
-                                result = stack.Pop();
-                            return new VMResult(VMResultType.OK, result);
-                        }
+                        if (stack.top > 0)
+                            return new VMResult(VMResultType.OK, stack.Pop());
+                        return new VMResult(VMResultType.OK, new Unit(UnitType.Null));
                     default:
                         Error("Unkown OpCode: " + instruction.opCode);
                         return new VMResult(VMResultType.ERROR, new Unit(UnitType.Null));
