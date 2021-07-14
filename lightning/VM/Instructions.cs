@@ -65,7 +65,7 @@ namespace lightning{
             currentInstructionsIndex++;
 
             funCallEnv[currentInstructionsIndex] = p_env;
-            stack[currentInstructionsIndex] = p_function.body;
+            stack[currentInstructionsIndex] = p_function.Body;
             functions[currentInstructionsIndex] = p_function;
 
             p_instructions_cache = ExecutingInstructions;

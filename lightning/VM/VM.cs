@@ -298,9 +298,9 @@ namespace lightning
             else
             {
                 Console.Write("Error: " + msg);
-                Console.Write(" on function: " + instructions.ExecutingFunction.name);
-                Console.Write(" from module: " + instructions.ExecutingFunction.module);
-                Console.WriteLine(" on line: " + instructions.ExecutingFunction.lineCounter.GetLine(IP));
+                Console.Write(" on function: " + instructions.ExecutingFunction.Name);
+                Console.Write(" from module: " + instructions.ExecutingFunction.Module);
+                Console.WriteLine(" on line: " + instructions.ExecutingFunction.LineCounter.GetLine(IP));
             }
         }
 
@@ -313,9 +313,9 @@ namespace lightning
                 return "Line: " + vm.chunk.lineCounter.GetLine(vm.IP);
             else
             {
-                return "Function: " + vm.instructions.ExecutingFunction.name +
-                " from module: " + vm.instructions.ExecutingFunction.module +
-                " on line: " + vm.instructions.ExecutingFunction.lineCounter.GetLine(vm.IP);
+                return "Function: " + vm.instructions.ExecutingFunction.Name +
+                " from module: " + vm.instructions.ExecutingFunction.Module +
+                " on line: " + vm.instructions.ExecutingFunction.LineCounter.GetLine(vm.IP);
             }
         }
 

@@ -281,7 +281,7 @@ namespace lightning
             foreach(Unit v in constants)
             {
                 if(v.Type == UnitType.Function)
-                    if( ((FunctionUnit)(v.heapUnitValue)).name == name)
+                    if( ((FunctionUnit)(v.heapUnitValue)).Name == name)
                     {
                         return (FunctionUnit)(v.heapUnitValue);
                     }

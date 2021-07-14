@@ -97,12 +97,12 @@ namespace lightning
 
     public class FunctionUnit : HeapUnit
     {
-        public string name;
-        public Operand arity;
-        public List<Instruction> body;
-        public LineCounter lineCounter;
-        public string module;
-        public Operand originalPosition;
+        public string Name{get; private set;}
+        public Operand Arity{get; private set;}
+        public List<Instruction> Body{get; private set;}
+        public LineCounter LineCounter{get; private set;}
+        public string Module{get; private set;}
+        public Operand OriginalPosition{get; private set;}
 
         public override UnitType Type{
             get{
@@ -112,15 +112,20 @@ namespace lightning
 
         public FunctionUnit(string p_name, string p_module)
         {
-            name = p_name;
-            arity = 0;
-            body = new List<Instruction>();
-            module = p_module;
+            Name = p_name;
+            Module = p_module;
+        }
+
+        public void Set(Operand p_arity, List<Instruction> p_body, LineCounter p_lineCounter, Operand p_originalPosition){
+            Arity = p_arity;
+            Body = p_body;
+            LineCounter = p_lineCounter;
+            OriginalPosition = p_originalPosition;
         }
         public override string ToString()
         {
-            string str = new string("fun" + " " + name + ":" + module +  " " + " (" + arity + ")");
-            foreach (Instruction i in body)
+            string str = new string("fun" + " " + Name + ":" + Module +  " " + " (" + Arity + ")");
+            foreach (Instruction i in Body)
             {
                 str += i.ToString() + "\n";
             }
@@ -140,20 +145,20 @@ namespace lightning
                 if(((Unit)other).Type == UnitType.Function)
                 {
                     FunctionUnit other_val_func = (FunctionUnit)((Unit)(other)).heapUnitValue;
-                    if (other_val_func.name == this.name && other_val_func.module == this.module) return true;
+                    if (other_val_func.Name == this.Name && other_val_func.Module == this.Module) return true;
                 }
             }
             if (other_type == typeof(FunctionUnit))
             {
                 FunctionUnit other_val_func = other as FunctionUnit;
-                if (other_val_func.name == this.name && other_val_func.module == this.module) return true;
+                if (other_val_func.Name == this.Name && other_val_func.Module == this.Module) return true;
             }
             return false;
         }
 
         public override int GetHashCode()
         {
-            return name.GetHashCode() + module.GetHashCode();
+            return Name.GetHashCode() + Module.GetHashCode();
         }
 
         public override Unit Get(Unit p_key){

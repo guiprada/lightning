@@ -904,12 +904,13 @@ namespace lightning
             int exit_instruction_address = instructionCounter;
             Add(OpCode.RETURN_SET, 0, line);
 
+            Operand arity = 0;
             foreach (string p in p_node.Parameters)
             {
                 SetVar(p);// it is always local
                 Add(OpCode.DECLARE_VARIABLE, line);
                 //Add(OpCode.POP, line);
-                new_function.arity++;
+                arity++;
             }
 
             upvalueStack.Push(new List<Variable>());
@@ -942,9 +943,11 @@ namespace lightning
             else
                 Add(OpCode.CLOSE_FUNCTION, line);
 
-            new_function.body = code.Slice(function_start, instructionCounter);
-            new_function.lineCounter = code.lineCounter.Slice(function_start, instructionCounter);
-            new_function.originalPosition = (Operand)function_start;
+            new_function.Set(
+                arity,
+                code.Slice(function_start, instructionCounter),
+                code.lineCounter.Slice(function_start, instructionCounter),
+                (Operand)function_start);
             instructionCounter = function_start;
 
             //Console.WriteLine("Removed env");

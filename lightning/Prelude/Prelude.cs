@@ -1447,9 +1447,9 @@ namespace lightning
 
         static void RelocateChunk(FunctionUnit function, RelocationInfo relocationInfo)
         {
-            for (Operand i = 0; i < function.body.Count; i++)
+            for (Operand i = 0; i < function.Body.Count; i++)
             {
-                Instruction next = function.body[i];
+                Instruction next = function.Body[i];
 
                 if (next.opCode == OpCode.LOAD_GLOBAL)
                 {
@@ -1525,7 +1525,7 @@ namespace lightning
                         bool found = false;
                         foreach (ModuleUnit v in relocationInfo.importingVM.modules)
                         {
-                            if (function.module == v.name)
+                            if (function.Module == v.name)
                             {
                                 next.opB = v.importIndex;
                                 found = true;
@@ -1533,7 +1533,7 @@ namespace lightning
                             }
                         }
                         if (found == false)
-                            Console.WriteLine("Can not find LOAD_IMPORTED_GLOBAL index" + function.module);
+                            Console.WriteLine("Can not find LOAD_IMPORTED_GLOBAL index" + function.Module);
                     }
                 }
                 else if (next.opCode == OpCode.LOAD_IMPORTED_CONSTANT)
@@ -1547,7 +1547,7 @@ namespace lightning
                         bool found = false;
                         foreach (ModuleUnit v in relocationInfo.importingVM.modules)
                         {
-                            if (function.module == v.name)
+                            if (function.Module == v.name)
                             {
                                 next.opB = v.importIndex;
                                 found = true;
@@ -1555,13 +1555,13 @@ namespace lightning
                             }
                         }
                         if (found == false)
-                            Console.WriteLine("Can not find LOAD_IMPORTED_CONSTANT index" + function.module);
+                            Console.WriteLine("Can not find LOAD_IMPORTED_CONSTANT index" + function.Module);
                     }
                 }
 
                 //Chunk.PrintInstruction(next);
                 //Console.WriteLine();
-                function.body[i] = next;
+                function.Body[i] = next;
             }
         }
         static void ImportModule(ModuleUnit module, Operand new_index)
@@ -1571,14 +1571,14 @@ namespace lightning
                 if (entry.Value.Type == UnitType.Function)
                 {
                     FunctionUnit function = (FunctionUnit)entry.Value.heapUnitValue;
-                    for (Operand i = 0; i < function.body.Count; i++)
+                    for (Operand i = 0; i < function.Body.Count; i++)
                     {
-                        Instruction next = function.body[i];
+                        Instruction next = function.Body[i];
 
                         if (next.opCode == OpCode.LOAD_IMPORTED_GLOBAL || next.opCode == OpCode.LOAD_IMPORTED_CONSTANT)
                         {
                             next.opB = new_index;
-                            function.body[i] = next;
+                            function.Body[i] = next;
                         }
                     }
                 }
