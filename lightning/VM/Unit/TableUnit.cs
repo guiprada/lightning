@@ -15,7 +15,6 @@ namespace lightning
     {
         public List<Unit> elements;
         public Dictionary<Unit, Unit> table;
-
         public TableUnit superTable;
 
         public override UnitType Type{
@@ -38,10 +37,11 @@ namespace lightning
                 return elements.Count + table.Count;
             }
         }
-        public TableUnit(List<Unit> p_elements, Dictionary<Unit, Unit> p_table)
+        public TableUnit(List<Unit> p_elements, Dictionary<Unit, Unit> p_table, TableUnit p_superTable = null)
         {
             elements = p_elements ??= new List<Unit>();
             table = p_table ??= new Dictionary<Unit, Unit>();
+            superTable = p_superTable;
         }
 
         public void Set(Unit p_value){
@@ -80,7 +80,7 @@ namespace lightning
         public void Set(Unit p_key, HeapUnit p_value){
             Set(p_key, new Unit(p_value));
         }
-        public void Set(Unit p_key, Unit p_value){
+        public override void Set(Unit p_key, Unit p_value){
             UnitType key_type = p_key.Type;
             switch(key_type){
                 case UnitType.Integer:
@@ -108,25 +108,18 @@ namespace lightning
             }
         }
         Unit GetTable(Unit p_key){
-            if(table.ContainsKey(p_key)){
+            if(table.ContainsKey(p_key))
                 return table[p_key];
-            }else if(superTable != null){
+            else if(superTable != null)
                 return superTable.GetTable(p_key);
-            }else{
-                throw new Exception("Table or Super Table does not contain index: " + p_key.ToString());
-            }
+            throw new Exception("Table or Super Table does not contain index: " + p_key.ToString());
         }
 
         Unit GetElement(Unit p_key){
             if(p_key.integerValue <= (elements.Count - 1))
                 return elements[(int)p_key.integerValue];
-            if(table.ContainsKey(p_key)){
-                // if(p_key.integerValue == (elements.Count)){
-                //     MoveToList(p_key);
-                //     return elements[(int)p_key.integerValue];
-                // }else
+            if(table.ContainsKey(p_key))
                     return table[p_key];
-            }
             throw new Exception("List does not contain index: " + p_key.ToString());
         }
         void ElementSet(Unit p_key, Unit value)

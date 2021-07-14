@@ -645,20 +645,20 @@ namespace lightning
                             for (int i = 0; i < indexes_counter - 1; i++)
                             {
                                 Unit v = indexes[i];
-                                this_table = ((TableUnit)(this_table.heapUnitValue)).Get(v);
+                                this_table = (this_table.heapUnitValue).Get(v);
                             }
                             Unit new_value = stack.Peek();
                             Unit index = indexes[indexes_counter - 1];
                             UnitType index_type = indexes[indexes_counter - 1].Type;
                             if (op == 0)
                             {
-                                ((TableUnit)(this_table.heapUnitValue)).Set(index, new_value);
+                                ((this_table.heapUnitValue)).Set(index, new_value);
                             }
                             else if(parallelVM == true)
                             {
                                 Unit old_value;
                                 Unit result;
-                                lock(((TableUnit)(this_table.heapUnitValue)).elements){
+                                lock(this_table.heapUnitValue){
                                     old_value = ((TableUnit)(this_table.heapUnitValue)).Get(index);
 
                                     if (op == 1)
@@ -672,12 +672,12 @@ namespace lightning
                                     else
                                         throw new Exception("Unknown operator" + VM.ErrorString(this));
 
-                                    ((TableUnit)(this_table.heapUnitValue)).Set(index, result);
+                                    (this_table.heapUnitValue).Set(index, result);
                                 }
                             }
                             else
                             {
-                                Unit old_value = ((TableUnit)(this_table.heapUnitValue)).Get(index);
+                                Unit old_value = (this_table.heapUnitValue).Get(index);
                                 Unit result;
                                 if (op == 1)
                                     result = old_value + new_value;
@@ -690,7 +690,7 @@ namespace lightning
                                 else
                                     throw new Exception("Unknown operator" + VM.ErrorString(this));
 
-                                ((TableUnit)(this_table.heapUnitValue)).Set(index, result);
+                                (this_table.heapUnitValue).Set(index, result);
 
                             }
                             break;

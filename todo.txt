@@ -1,4 +1,5 @@
 ﻿todo
+	add check for arity before call
 	add makeNumericIterator
 	remove append, replace with +
 	try , protected call

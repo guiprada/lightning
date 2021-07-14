@@ -855,3 +855,9 @@ write_line(machine.memory_use())
 //////////////////////////////// scratch
 start_time:reset()
 write_line("Elapsed time: " + start_time:elapsed() + " ms")
+var str = "hey"
+str.teste = function(self){
+    write_line(self)
+    return null
+}
+str:teste()

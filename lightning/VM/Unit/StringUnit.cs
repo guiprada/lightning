@@ -14,19 +14,16 @@ namespace lightning
 	public class StringUnit : HeapUnit
     {
         public string content;
-
+        private Dictionary<Unit, Unit> table;
         public override UnitType Type{
             get{
                 return UnitType.String;
             }
         }
-
-        static StringUnit(){
-            initSuperTable();
-        }
         public StringUnit(string value)
         {
             content = value;
+            table = new Dictionary<Unit, Unit>();
         }
         public override string ToString()
         {
@@ -56,23 +53,30 @@ namespace lightning
             return false;
         }
 
+        public override void Set(Unit index, Unit value)
+        {
+            table[index] = value;
+        }
+
+        public override Unit Get(Unit p_key){
+            if(table.ContainsKey(p_key))
+                return table[p_key];
+            else if(superTable != null)
+                return superTable.Get(p_key);
+            throw new Exception("String Table or Super Table does not contain index: " + p_key.ToString());
+        }
+
         public override int GetHashCode()
         {
             return content.GetHashCode();
         }
 
-        public override Unit Get(Unit p_key){
-            if(superTable.table.ContainsKey(p_key))
-                return superTable.table[p_key];
-            else
-            throw new Exception("StringUnit Super Table does not contain index: " + p_key.ToString());
-        }
-
-        public void Set(Unit p_key, Unit p_value){
-            superTable.table.Add(p_key, p_value);
-        }
-
+        ////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        ///////////////////////////////////////////////////////////////////////////////////////////////////// String
         private static TableUnit superTable = new TableUnit(null, null);
+        static StringUnit(){
+            initSuperTable();
+        }
         private static void initSuperTable(){
             Unit stringSlice(VM vm)
             {

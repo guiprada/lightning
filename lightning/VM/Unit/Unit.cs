@@ -99,7 +99,7 @@ namespace lightning
                     heapUnitValue = TypeUnit.Char;
                     break;
                 default:
-                    throw new Exception("Trying to create a Unit of unknown type." + VM.ErrorString(null));
+                    throw new Exception("Trying to create a Unit of unknown type. " + VM.ErrorString(null));
             }
         }
 
@@ -127,11 +127,11 @@ namespace lightning
             UnitType this_type = this.Type;
             switch(this_type){
                 case UnitType.Float:
-                    throw new Exception("Can not convert Float to Bool." + VM.ErrorString(null));
+                    throw new Exception("Can not convert Float to Bool. " + VM.ErrorString(null));
                 case UnitType.Integer:
-                    throw new Exception("Can not convert Integer to Bool." + VM.ErrorString(null));
+                    throw new Exception("Can not convert Integer to Bool. " + VM.ErrorString(null));
                 case UnitType.Char:
-                    throw new Exception("Can not convert Char to Bool." + VM.ErrorString(null));
+                    throw new Exception("Can not convert Char to Bool. " + VM.ErrorString(null));
                 case UnitType.Null:
                     return false;
                 case UnitType.Boolean:
@@ -143,7 +143,7 @@ namespace lightning
 
         public override bool Equals(object other){
             if(other.GetType() != typeof(Unit))
-                throw new Exception("Trying to compare Unit to non Unit type." + VM.ErrorString(null));
+                throw new Exception("Trying to compare Unit to non Unit type. " + VM.ErrorString(null));
 
             UnitType this_type = this.Type;
             UnitType other_type = ((Unit)other).Type;
@@ -206,7 +206,7 @@ namespace lightning
             if(op_type == UnitType.Integer){
                 return new Unit(- op.integerValue);
             }
-            throw new Exception("Trying to negate non numeric UnitType" + VM.ErrorString(null));
+            throw new Exception("Trying to negate non numeric UnitType. " + VM.ErrorString(null));
         }
         public static Unit operator +(Unit opA, Unit opB){
             UnitType opA_type = opA.Type;
@@ -230,7 +230,7 @@ namespace lightning
             }
             if(opA_type == UnitType.String || opA_type == UnitType.Char)
                 return new Unit(opA.ToString() + opB.ToString());
-            throw new Exception("Trying to add non alphanumeric UnitType" + VM.ErrorString(null));
+            throw new Exception("Trying to add non alphanumeric UnitType. " + VM.ErrorString(null));
         }
 
         public static Unit operator +(Unit opA, Float opB){
@@ -242,7 +242,7 @@ namespace lightning
             if(opA_type == UnitType.Integer){
                 return new Unit(opA.integerValue + opB);
             }
-            throw new Exception("Trying to increment non numeric UnitType" + VM.ErrorString(null));
+            throw new Exception("Trying to increment non numeric UnitType. " + VM.ErrorString(null));
         }
 
         public static Unit operator +(Unit opA, Integer opB){
@@ -254,7 +254,7 @@ namespace lightning
             if(opA_type == UnitType.Integer){
                 return new Unit(opA.integerValue + opB);
             }
-            throw new Exception("Trying to increment non numeric UnitType" + VM.ErrorString(null));
+            throw new Exception("Trying to increment non numeric UnitType. " + VM.ErrorString(null));
         }
 
         public static Unit operator -(Unit opA, Unit opB){
@@ -273,7 +273,7 @@ namespace lightning
                 if(opB_type == UnitType.Integer)
                     return new Unit(opA.integerValue - opB.integerValue);
             }
-            throw new Exception("Trying to subtract non numeric UnitType" + VM.ErrorString(null));
+            throw new Exception("Trying to subtract non numeric UnitType. " + VM.ErrorString(null));
         }
 
         public static Unit operator -(Unit opA, Float opB){
@@ -285,7 +285,7 @@ namespace lightning
             if(opA_type == UnitType.Integer){
                 return new Unit(opA.integerValue - opB);
             }
-            throw new Exception("Trying to decrement non numeric UnitType" + VM.ErrorString(null));
+            throw new Exception("Trying to decrement non numeric UnitType. " + VM.ErrorString(null));
         }
 
         public static Unit operator -(Unit opA, Integer opB){
@@ -297,7 +297,7 @@ namespace lightning
             if(opA_type == UnitType.Integer){
                 return new Unit(opA.integerValue - opB);
             }
-            throw new Exception("Trying to decrement non numeric UnitType" + VM.ErrorString(null));
+            throw new Exception("Trying to decrement non numeric UnitType. " + VM.ErrorString(null));
         }
 
         public static Unit operator *(Unit opA, Unit opB){
@@ -316,7 +316,7 @@ namespace lightning
                 if(opB_type == UnitType.Integer)
                     return new Unit(opA.integerValue * opB.integerValue);
             }
-            throw new Exception("Trying to multiply non numeric UnitType" + VM.ErrorString(null));
+            throw new Exception("Trying to multiply non numeric UnitType. " + VM.ErrorString(null));
         }
 
         public static Unit operator /(Unit opA, Unit opB){
@@ -335,7 +335,7 @@ namespace lightning
                 if(opB_type == UnitType.Integer)
                     return new Unit(opA.integerValue / opB.integerValue);
             }
-            throw new Exception("Trying to divide non numeric UnitType" + VM.ErrorString(null));
+            throw new Exception("Trying to divide non numeric UnitType. " + VM.ErrorString(null));
         }
 
         public static bool isNumeric(Unit p_value){

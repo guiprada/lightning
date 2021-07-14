@@ -137,8 +137,7 @@ namespace lightning
                     new_tuple[0] = vm.GetUnit(0);
                     new_tuple[1] = vm.GetUnit(1);
 
-                    WrapperUnit<Unit[]> tuple_object = new WrapperUnit<Unit[]>(new_tuple);
-                    tuple_object.superTable = tupleMethods;
+                    WrapperUnit<Unit[]> tuple_object = new WrapperUnit<Unit[]>(new_tuple, tupleMethods);
 
                     return new Unit(tuple_object);
                 }
@@ -195,8 +194,7 @@ namespace lightning
                     Unit[] new_nuple = new Unit[size];
                     for(int i = 0; i < size; i++)
                         new_nuple[i] = new Unit(UnitType.Null);
-                    WrapperUnit<Unit[]> new_nuple_object = new WrapperUnit<Unit[]>(new_nuple);
-                    new_nuple_object.superTable = nupleMethods;
+                    WrapperUnit<Unit[]> new_nuple_object = new WrapperUnit<Unit[]>(new_nuple, nupleMethods);
 
                     return new Unit(new_nuple_object);
                 }
@@ -211,8 +209,7 @@ namespace lightning
                     Unit[] new_nuple = new Unit[size];
                     for(int i = 0; i < size; i++)
                         new_nuple[i] = table.elements[i];
-                    WrapperUnit<Unit[]> new_nuple_object = new WrapperUnit<Unit[]>(new_nuple);
-                    new_nuple_object.superTable = nupleMethods;
+                    WrapperUnit<Unit[]> new_nuple_object = new WrapperUnit<Unit[]>(new_nuple, nupleMethods);
 
                     return new Unit(new_nuple_object);
                 }

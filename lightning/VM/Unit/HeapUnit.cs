@@ -37,6 +37,7 @@ namespace lightning
         public abstract override bool Equals(object other);
         public abstract override int GetHashCode();
         public abstract Unit Get(Unit p_key);
+        public abstract void Set(Unit p_key, Unit p_value);
     }
 
     public class TypeUnit : HeapUnit{
@@ -73,7 +74,7 @@ namespace lightning
                 return "Unknown UnitType";
         }
         public override bool ToBool(){
-            throw new Exception("Trying to get a boolean value of TypeUnit" + VM.ErrorString(null));
+            throw new Exception("Trying to get a boolean value of TypeUnit. " + VM.ErrorString(null));
         }
 
         public override bool Equals(object other){
@@ -86,7 +87,11 @@ namespace lightning
         }
 
         public override Unit Get(Unit p_key){
-            throw new Exception("Trying to get Table value of TypeUnit" + VM.ErrorString(null));
+            throw new Exception("Trying to Get a Table value of TypeUnit. " + VM.ErrorString(null));
+        }
+
+        public override void Set(Unit p_key, Unit p_value){
+            throw new Exception("Trying to Set a Table value of TypeUnit. " + VM.ErrorString(null));
         }
     }
 
@@ -124,7 +129,7 @@ namespace lightning
 
         public override bool ToBool()
         {
-            throw new Exception("Can not convert Function to Bool." + VM.ErrorString(null));
+            throw new Exception("Can not convert Function to Bool. " + VM.ErrorString(null));
         }
 
         public override bool Equals(object other)
@@ -152,7 +157,11 @@ namespace lightning
         }
 
         public override Unit Get(Unit p_key){
-            throw new Exception("Trying to get Table value of FunctionUnit" + VM.ErrorString(null));
+            throw new Exception("Trying to Get a Table value of FunctionUnit. " + VM.ErrorString(null));
+        }
+
+        public override void Set(Unit p_key, Unit p_value){
+            throw new Exception("Trying to Set a Table value of FunctionUnit. " + VM.ErrorString(null));
         }
     }
 
@@ -182,7 +191,7 @@ namespace lightning
 
         public override bool ToBool()
         {
-            throw new Exception("Can not convert Intrinsic to Bool." + VM.ErrorString(null));
+            throw new Exception("Can not convert Intrinsic to Bool. " + VM.ErrorString(null));
         }
 
         public override bool Equals(object other)
@@ -208,7 +217,11 @@ namespace lightning
         }
 
         public override Unit Get(Unit p_key){
-            throw new Exception("Trying to get Table value of IntrinsicUnit" + VM.ErrorString(null));
+            throw new Exception("Trying to Get a Table value of IntrinsicUnit. " + VM.ErrorString(null));
+        }
+
+        public override void Set(Unit p_key, Unit p_value){
+            throw new Exception("Trying to Set a Table value of IntrinsicUnit. " + VM.ErrorString(null));
         }
     }
 
@@ -241,7 +254,7 @@ namespace lightning
 
         public override bool ToBool()
         {
-            throw new Exception("Can not convert Clojure to Bool." + VM.ErrorString(null));
+            throw new Exception("Can not convert Clojure to Bool. " + VM.ErrorString(null));
         }
 
         public override bool Equals(object other)
@@ -267,7 +280,11 @@ namespace lightning
         }
 
         public override Unit Get(Unit p_key){
-            throw new Exception("Trying to get Table value of ClosureUnit" + VM.ErrorString(null));
+            throw new Exception("Trying to Get a Table value of ClosureUnit. " + VM.ErrorString(null));
+        }
+
+        public override void Set(Unit p_key, Unit p_value){
+            throw new Exception("Trying to Set a Table value of ClosureUnit. " + VM.ErrorString(null));
         }
     }
 
@@ -356,13 +373,19 @@ namespace lightning
         }
 
         public override Unit Get(Unit p_key){
-            throw new Exception("Trying to get Table value of UpValueUnit" + VM.ErrorString(null));
+            throw new Exception("Trying to Get a Table value of UpValueUnit. " + VM.ErrorString(null));
+        }
+
+        public override void Set(Unit p_key, Unit p_value){
+            throw new Exception("Trying to Set a Table value of UpValueUnit. " + VM.ErrorString(null));
         }
     }
 
-    public class ModuleUnit : TableUnit
+    public class ModuleUnit : HeapUnit
     {
         public string name;
+        public List<Unit> elements;
+        public Dictionary<Unit, Unit> table;
         public List<Unit> globals;
         public List<Unit> constants;
         public Operand importIndex;
@@ -372,12 +395,17 @@ namespace lightning
             }
         }
         public ModuleUnit(string p_name, List<Unit> p_elements, Dictionary<Unit, Unit> p_table, List<Unit> p_globals, List<Unit> p_constants)
-            : base(p_elements, p_table)
         {
             name = p_name;
+            elements = p_elements ?? new List<Unit>();
+            table = p_table ?? new Dictionary<Unit, Unit>();
             globals = p_globals ??= new List<Unit>();
             constants = p_constants ??= new List<Unit>();
             importIndex = 0;
+        }
+        public override bool ToBool()
+        {
+            throw new Exception("Can not convert Module to Bool. " + VM.ErrorString(null));
         }
 
         public override bool Equals(object other)
@@ -403,13 +431,26 @@ namespace lightning
         {
             return name.GetHashCode();
         }
+
+        public override void Set(Unit index, Unit value)
+        {
+            table[index] = value;
+        }
+
+        public override Unit Get(Unit p_key){
+            if(table.ContainsKey(p_key)){
+                return table[p_key];
+            }else{
+                throw new Exception("Module Table does not contain index: " + p_key.ToString());
+            }
+        }
     }
 
     public class WrapperUnit<T> : HeapUnit
     {
         public object content;
-
-        public TableUnit superTable;
+        Dictionary<Unit, Unit> table;
+        private TableUnit superTable;
         public override UnitType Type{
             get{
                 return UnitType.Wrapper;
@@ -418,18 +459,21 @@ namespace lightning
         public WrapperUnit(object p_content, TableUnit p_superTable = null)
         {
             content = p_content;
+            table = new Dictionary<Unit, Unit>();
             superTable = p_superTable;
         }
 
-        public override Unit Get(Unit p_key){
-            if(superTable.table.ContainsKey(p_key))
-                return superTable.table[p_key];
-            else
-            throw new Exception("Wrapper<" + typeof(T) +"> Super Table does not contain index: " + p_key.ToString());
+        public override void Set(Unit index, Unit value)
+        {
+            table[index] = value;
         }
 
-        public void Set(Unit p_key, Unit p_value){
-            superTable.table.Add(p_key, p_value);
+        public override Unit Get(Unit p_key){
+            if(table.ContainsKey(p_key))
+                return table[p_key];
+            else if(superTable != null)
+                return superTable.Get(p_key);
+            throw new Exception("Wrapper<" + typeof(T) +"> Super Table does not contain index: " + p_key.ToString());
         }
 
         public override string ToString()
@@ -464,7 +508,7 @@ namespace lightning
 
         public override bool ToBool()
         {
-            throw new Exception("Can not convert a Wrapper<" + typeof(T) +"> to Bool.");
+            throw new Exception("Can not convert a Wrapper<" + typeof(T) +"> to Bool. " + VM.ErrorString(null));
         }
 
         public T UnWrapp()
@@ -475,7 +519,7 @@ namespace lightning
             }
             else
             {
-                throw new Exception("UnWrapp<" + typeof(T) +">() type Error!");
+                throw new Exception("UnWrapp<" + typeof(T) +">() type Error! " + VM.ErrorString(null));
             }
         }
     }
