@@ -13,10 +13,10 @@ namespace lightning
 {
     public class Parser
     {
-        List<Token> tokens;
-        bool hasParsed;
-        Node ast;
-        int current;
+        private List<Token> tokens;
+        private bool hasParsed;
+        private Node ast;
+        private int current;
         public List<string> Errors { get; private set; }
         public List<string> Warnings { get; private set; }
 
@@ -361,7 +361,7 @@ namespace lightning
                 Node value = assignment();
 
                 if (expr.Type == NodeType.VARIABLE)
-                    return new assignmentOpNode((VariableNode)expr, value, OperatorType.PLUS, expr.Line);
+                    return new assignmentOpNode((VariableNode)expr, value, AssignmentOperatorType.PLUS, expr.Line);
                 else
                     Error("Invalid assignment.");
             }
@@ -370,7 +370,7 @@ namespace lightning
                 Node value = new LiteralNode(1, expr.Line);
 
                 if (expr.Type == NodeType.VARIABLE)
-                    return new assignmentOpNode((VariableNode)expr, value, OperatorType.PLUS, expr.Line);
+                    return new assignmentOpNode((VariableNode)expr, value, AssignmentOperatorType.PLUS, expr.Line);
                 else
                     Error("Invalid assignment.");
             }
@@ -379,7 +379,7 @@ namespace lightning
                 Node value = assignment();
 
                 if (expr.Type == NodeType.VARIABLE)
-                    return new assignmentOpNode((VariableNode)expr, value, OperatorType.MINUS, expr.Line);
+                    return new assignmentOpNode((VariableNode)expr, value, AssignmentOperatorType.MINUS, expr.Line);
                 else
                     Error("Invalid assignment.");
             }
@@ -388,7 +388,7 @@ namespace lightning
                 Node value = new LiteralNode(1, expr.Line);
 
                 if (expr.Type == NodeType.VARIABLE)
-                    return new assignmentOpNode((VariableNode)expr, value, OperatorType.MINUS, expr.Line);
+                    return new assignmentOpNode((VariableNode)expr, value, AssignmentOperatorType.MINUS, expr.Line);
                 else
                     Error("Invalid assignment.");
             }
@@ -397,7 +397,7 @@ namespace lightning
                 Node value = assignment();
 
                 if (expr.Type == NodeType.VARIABLE)
-                    return new assignmentOpNode((VariableNode)expr, value, OperatorType.MULTIPLICATION, expr.Line);
+                    return new assignmentOpNode((VariableNode)expr, value, AssignmentOperatorType.MULTIPLICATION, expr.Line);
                 else
                     Error("Invalid assignment.");
             }
@@ -406,7 +406,7 @@ namespace lightning
                 Node value = assignment();
 
                 if (expr.Type == NodeType.VARIABLE)
-                    return new assignmentOpNode((VariableNode)expr, value, OperatorType.DIVISION, expr.Line);
+                    return new assignmentOpNode((VariableNode)expr, value, AssignmentOperatorType.DIVISION, expr.Line);
                 else
                     Error("Invalid assignment.");
             }

@@ -57,6 +57,12 @@ namespace lightning
 
         int Env{ get{ return variables.Env; } }
 
+        const Operand EQUAL = (Operand)AssignmentOperatorType.EQUAL;
+        const Operand PLUS = (Operand)AssignmentOperatorType.PLUS;
+        const Operand MINUS = (Operand)AssignmentOperatorType.MINUS;
+        const Operand MULTIPLICATION = (Operand)AssignmentOperatorType.MULTIPLICATION;
+        const Operand DIVISION = (Operand)AssignmentOperatorType.DIVISION;
+
 //////////////////////////////////////////////////// Public
         public VM(Chunk p_chunk, int p_function_deepness = 100, Memory<Unit> p_globals = null, bool p_parallelVM = false)
         {
@@ -136,7 +142,7 @@ namespace lightning
 
         public Operand AddModule(ModuleUnit this_module)
         {
-            loadedModules.Add(this_module.name, loadedModules.Count);
+            loadedModules.Add(this_module.Name, loadedModules.Count);
             modules.Add(this_module);
             return (Operand)(loadedModules.Count - 1);
         }
@@ -366,7 +372,7 @@ namespace lightning
                             IP++;
                             Operand address = instruction.opA;
                             Operand module = instruction.opB;
-                            Unit global = modules[module].globals[address];
+                            Unit global = modules[module].Globals[address];
                             stack.Push(global);
                             break;
                         }
@@ -375,7 +381,7 @@ namespace lightning
                             IP++;
                             Operand address = instruction.opA;
                             Operand module = instruction.opB;
-                            Unit constant = modules[module].constants[address];
+                            Unit constant = modules[module].Constants[address];
 
                             stack.Push(constant);
                             break;
@@ -490,24 +496,28 @@ namespace lightning
                             Operand n_shift = instruction.opB;
                             Operand op = instruction.opC;
                             Unit new_value = stack.Peek();
-                            if (op == 0)
-                            {
+                            if (op == EQUAL){
                                 variables.SetAt(new_value, address, CalculateEnvShift(n_shift));
-                            }
-                            else
-                            {
+                            }else{
                                 Unit old_value = variables.GetAt(address, CalculateEnvShift(n_shift));
                                 Unit result;
-                                if (op == 1)
-                                    result = old_value + new_value;
-                                else if (op == 2)
-                                    result = old_value - new_value;
-                                else if (op == 3)
-                                    result = old_value * new_value;
-                                else if (op == 4)
-                                    result = old_value / new_value;
-                                else
-                                    throw new Exception("Unknown operator" + VM.ErrorString(this));
+                                switch(op){
+                                    case PLUS:
+                                        result = old_value + new_value;
+                                        break;
+                                    case MINUS:
+                                        result = old_value - new_value;
+                                        break;
+                                    case MULTIPLICATION:
+                                        result = old_value * new_value;
+                                        break;
+                                    case DIVISION:
+                                        result = old_value / new_value;
+                                        break;
+                                    default:
+                                        throw new Exception("Unknown operator" + VM.ErrorString(this));
+                                }
+
                                 variables.SetAt(result, address, CalculateEnvShift(n_shift));
                             }
                             break;
@@ -518,49 +528,65 @@ namespace lightning
                             Operand address = instruction.opA;
                             Operand op = instruction.opB;
                             Unit new_value = stack.Peek();
-                            if (op == 0)
-                            {
+                            if (op == EQUAL){
                                 globals.Set(new_value, address);
                             }else if(parallelVM == true){
-                                if (op == 1)
-                                    lock(globals){
-                                        Unit result = globals.Get(address) + new_value;
-                                        globals.Set(result, address);
-                                    }
-                                else if (op == 2)
-                                    lock(globals){
-                                        Unit result = globals.Get(address) - new_value;
-                                        globals.Set(result, address);
-                                    }
-                                else if (op == 3)
-                                    lock(globals){
-                                        Unit result = globals.Get(address) * new_value;
-                                        globals.Set(result, address);
-                                    }
-                                else if (op == 4)
-                                    lock(globals){
-                                        Unit result = globals.Get(address) / new_value;
-                                        globals.Set(result, address);
-                                    }
+                                switch(op){
+                                    case PLUS:
+                                        lock(globals){
+                                            Unit result = globals.Get(address) + new_value;
+                                            globals.Set(result, address);
+                                        }
+                                        break;
+                                    case MINUS:
+                                        lock(globals){
+                                            Unit result = globals.Get(address) - new_value;
+                                            globals.Set(result, address);
+                                        }
+                                        break;
+                                    case MULTIPLICATION:
+                                        lock(globals){
+                                            Unit result = globals.Get(address) * new_value;
+                                            globals.Set(result, address);
+                                        }
+                                        break;
+                                    case DIVISION:
+                                        lock(globals){
+                                            Unit result = globals.Get(address) / new_value;
+                                            globals.Set(result, address);
+                                        }
+                                        break;
+                                    default:
+                                        throw new Exception("Unknown operator" + VM.ErrorString(this));
+                                }
                             }else{
-                                if (op == 1){
-                                    Unit result = globals.Get(address) + new_value;
-                                    globals.Set(result, address);
-                                }
-                                else if (op == 2)
-                                {
-                                    Unit result = globals.Get(address) - new_value;
-                                    globals.Set(result, address);
-                                }
-                                else if (op == 3)
-                                {
-                                    Unit result = globals.Get(address) * new_value;
-                                    globals.Set(result, address);
-                                }
-                                else if (op == 4)
-                                {
-                                    Unit result = globals.Get(address) / new_value;
-                                    globals.Set(result, address);
+                                switch(op){
+                                    case PLUS:
+                                        {
+                                            Unit result = globals.Get(address) + new_value;
+                                            globals.Set(result, address);
+                                        }
+                                        break;
+                                    case MINUS:
+                                        {
+                                            Unit result = globals.Get(address) - new_value;
+                                            globals.Set(result, address);
+                                        }
+                                        break;
+                                    case MULTIPLICATION:
+                                        {
+                                            Unit result = globals.Get(address) * new_value;
+                                            globals.Set(result, address);
+                                        }
+                                        break;
+                                    case DIVISION:
+                                        {
+                                            Unit result = globals.Get(address) / new_value;
+                                            globals.Set(result, address);
+                                        }
+                                        break;
+                                    default:
+                                        throw new Exception("Unknown operator" + VM.ErrorString(this));
                                 }
                             }
                             break;
@@ -572,42 +598,57 @@ namespace lightning
                             Operand op = instruction.opB;
                             UpValueUnit this_upValue = upValues.GetAt(address);
                             Unit new_value = stack.Peek();
-                            if (op == 0)
-                            {
+                            if (op == EQUAL){
                                 this_upValue.UpValue = new_value;
                             }else if(parallelVM == true){
-                                if (op == 1)
-                                    lock(this_upValue){
-                                        this_upValue.UpValue = this_upValue.UpValue + new_value;
-                                    }
-                                else if (op == 2)
-                                    lock(this_upValue){
-                                        this_upValue.UpValue = this_upValue.UpValue - new_value;
-                                    }
-                                else if (op == 3)
-                                    lock(this_upValue){
-                                        this_upValue.UpValue = this_upValue.UpValue * new_value;
-                                    }
-                                else if (op == 4)
-                                    lock(this_upValue){
-                                        this_upValue.UpValue = this_upValue.UpValue / new_value;
-                                    }
+                                switch(op){
+                                    case PLUS:
+                                        lock(this_upValue){
+                                            this_upValue.UpValue = this_upValue.UpValue + new_value;
+                                        }
+                                        break;
+                                    case MINUS:
+                                        lock(this_upValue){
+                                            this_upValue.UpValue = this_upValue.UpValue - new_value;
+                                        }
+                                        break;
+                                    case MULTIPLICATION:
+                                        lock(this_upValue){
+                                            this_upValue.UpValue = this_upValue.UpValue * new_value;
+                                        }
+                                        break;
+                                    case DIVISION:
+                                        lock(this_upValue){
+                                            this_upValue.UpValue = this_upValue.UpValue / new_value;
+                                        }
+                                        break;
+                                    default:
+                                        throw new Exception("Unknown operator" + VM.ErrorString(this));
+                                }
                             }else{
-                                if (op == 1)
-                                {
-                                    this_upValue.UpValue = new Unit(this_upValue.UpValue.floatValue + new_value.floatValue);
-                                }
-                                else if (op == 2)
-                                {
-                                    this_upValue.UpValue = this_upValue.UpValue - new_value;
-                                }
-                                else if (op == 3)
-                                {
-                                    this_upValue.UpValue = this_upValue.UpValue * new_value;
-                                }
-                                else if (op == 4)
-                                {
-                                    this_upValue.UpValue = this_upValue.UpValue / new_value;
+                                switch(op){
+                                    case PLUS:
+                                        {
+                                            this_upValue.UpValue = this_upValue.UpValue + new_value;
+                                        }
+                                        break;
+                                    case MINUS:
+                                        {
+                                            this_upValue.UpValue = this_upValue.UpValue - new_value;
+                                        }
+                                        break;
+                                    case MULTIPLICATION:
+                                        {
+                                            this_upValue.UpValue = this_upValue.UpValue * new_value;
+                                        }
+                                        break;
+                                    case DIVISION:
+                                        {
+                                            this_upValue.UpValue = this_upValue.UpValue / new_value;
+                                        }
+                                        break;
+                                    default:
+                                        throw new Exception("Unknown operator" + VM.ErrorString(this));
                                 }
                             }
                             break;
@@ -650,7 +691,7 @@ namespace lightning
                             Unit new_value = stack.Peek();
                             Unit index = indexes[indexes_counter - 1];
                             UnitType index_type = indexes[indexes_counter - 1].Type;
-                            if (op == 0)
+                            if (op == EQUAL)
                             {
                                 ((this_table.heapUnitValue)).Set(index, new_value);
                             }
@@ -658,40 +699,62 @@ namespace lightning
                             {
                                 Unit old_value;
                                 Unit result;
-                                lock(this_table.heapUnitValue){
-                                    old_value = ((TableUnit)(this_table.heapUnitValue)).Get(index);
-
-                                    if (op == 1)
-                                        result = old_value + new_value;
-                                    else if (op == 2)
-                                        result = old_value - new_value;
-                                    else if (op == 3)
-                                        result = old_value * new_value;
-                                    else if (op == 4)
-                                        result = old_value / new_value;
-                                    else
+                                switch(op){
+                                    case PLUS:
+                                        lock(this_table.heapUnitValue){
+                                            old_value = ((TableUnit)(this_table.heapUnitValue)).Get(index);
+                                            result = old_value + new_value;
+                                            (this_table.heapUnitValue).Set(index, result);
+                                        }
+                                        break;
+                                    case MINUS:
+                                        lock(this_table.heapUnitValue){
+                                            old_value = ((TableUnit)(this_table.heapUnitValue)).Get(index);
+                                            result = old_value - new_value;
+                                            (this_table.heapUnitValue).Set(index, result);
+                                        }
+                                        break;
+                                    case MULTIPLICATION:
+                                        lock(this_table.heapUnitValue){
+                                            old_value = ((TableUnit)(this_table.heapUnitValue)).Get(index);
+                                            result = old_value * new_value;
+                                            (this_table.heapUnitValue).Set(index, result);
+                                        }
+                                        break;
+                                    case DIVISION:
+                                        lock(this_table.heapUnitValue){
+                                            old_value = ((TableUnit)(this_table.heapUnitValue)).Get(index);
+                                            result = old_value / new_value;
+                                            (this_table.heapUnitValue).Set(index, result);
+                                        }
+                                        break;
+                                    default:
                                         throw new Exception("Unknown operator" + VM.ErrorString(this));
 
-                                    (this_table.heapUnitValue).Set(index, result);
                                 }
                             }
                             else
                             {
                                 Unit old_value = (this_table.heapUnitValue).Get(index);
                                 Unit result;
-                                if (op == 1)
-                                    result = old_value + new_value;
-                                else if (op == 2)
-                                    result = old_value - new_value;
-                                else if (op == 3)
-                                    result = old_value * new_value;
-                                else if (op == 4)
-                                    result = old_value / new_value;
-                                else
-                                    throw new Exception("Unknown operator" + VM.ErrorString(this));
+                                switch(op){
+                                    case PLUS:
+                                        result = old_value + new_value;
+                                        break;
+                                    case MINUS:
+                                        result = old_value - new_value;
+                                        break;
+                                    case MULTIPLICATION:
+                                        result = old_value * new_value;
+                                        break;
+                                    case DIVISION:
+                                        result = old_value / new_value;
+                                        break;
+                                    default:
+                                        throw new Exception("Unknown operator" + VM.ErrorString(this));
 
+                                }
                                 (this_table.heapUnitValue).Set(index, result);
-
                             }
                             break;
                         }
@@ -1059,14 +1122,14 @@ namespace lightning
                             {
                                 Unit val = stack.Pop();
                                 Unit key = stack.Pop();
-                                new_table.table.Add(key, val);
+                                new_table.Table.Add(key, val);
                             }
 
                             int n_elements = instruction.opA;
                             for (int i = 0; i < n_elements; i++)
                             {
                                 Unit new_value = stack.Pop();
-                                new_table.elements.Add(new_value);
+                                new_table.Elements.Add(new_value);
                             }
 
                             stack.Push(new Unit(new_table));

@@ -30,7 +30,7 @@ namespace lightning
 
         VAR_DECLARATION,
         ASSIGMENT,
-        ASSIGMENTOP,
+        ASSIGMENT_OP,
 
         BLOCK,
         FUNCTION_CALL,
@@ -66,6 +66,15 @@ namespace lightning
         LESS,
         LESS_EQUAL,
         VOID
+    }
+
+    public enum AssignmentOperatorType
+    {
+        EQUAL,
+        PLUS,
+        MINUS,
+        MULTIPLICATION,
+        DIVISION,
     }
 
     public enum VarAccessType
@@ -268,28 +277,28 @@ namespace lightning
 
     public class assignmentNode : Node
     {
-        public VariableNode ASSIGN_VARIABLEed { get; private set; }
+        public VariableNode assigned { get; private set; }
         public Node Value { get; private set; }
 
-        public assignmentNode(VariableNode p_ASSIGN_VARIABLEed, Node p_Value, int p_Line)
+        public assignmentNode(VariableNode p_assigned, Node p_Value, int p_Line)
         : base(NodeType.ASSIGMENT, p_Line)
         {
-            ASSIGN_VARIABLEed = p_ASSIGN_VARIABLEed;
+            assigned = p_assigned;
             Value = p_Value;
         }
     }
 
     public class assignmentOpNode : Node
     {
-        public VariableNode ASSIGN_VARIABLEed { get; private set; }
+        public VariableNode assigned { get; private set; }
         public Node Value { get; private set; }
 
-        public OperatorType Op { get; private set; }
+        public AssignmentOperatorType Op { get; private set; }
 
-        public assignmentOpNode(VariableNode p_ASSIGN_VARIABLEed, Node p_Value, OperatorType p_op, int p_Line)
-        : base(NodeType.ASSIGMENTOP, p_Line)
+        public assignmentOpNode(VariableNode p_assigned, Node p_Value, AssignmentOperatorType p_op, int p_Line)
+        : base(NodeType.ASSIGMENT_OP, p_Line)
         {
-            ASSIGN_VARIABLEed = p_ASSIGN_VARIABLEed;
+            assigned = p_assigned;
             Value = p_Value;
             Op = p_op;
         }

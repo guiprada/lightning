@@ -208,7 +208,7 @@ namespace lightning
                     int size = table.ECount;
                     Unit[] new_nuple = new Unit[size];
                     for(int i = 0; i < size; i++)
-                        new_nuple[i] = table.elements[i];
+                        new_nuple[i] = table.Elements[i];
                     WrapperUnit<Unit[]> new_nuple_object = new WrapperUnit<Unit[]>(new_nuple, nupleMethods);
 
                     return new Unit(new_nuple_object);
@@ -301,8 +301,7 @@ namespace lightning
 
                 Unit TableNew(VM vm)
                 {
-                    TableUnit new_table = new TableUnit(null, null);
-                    new_table.superTable = table;
+                    TableUnit new_table = new TableUnit(null, null, table);
 
                     return new Unit(new_table);
                 }
@@ -312,21 +311,19 @@ namespace lightning
                 {
                     TableUnit this_table = vm.GetTable(0);
                     Dictionary<Unit, Unit> table_copy = new Dictionary<Unit, Unit>();
-                    foreach (KeyValuePair<Unit, Unit> entry in this_table.table)
+                    foreach (KeyValuePair<Unit, Unit> entry in this_table.Table)
                     {
                         table_copy.Add(entry.Key, entry.Value);
                     }
 
                     List<Unit> new_list_elements = new List<Unit>();
-                    foreach (Unit v in this_table.elements)
+                    foreach (Unit v in this_table.Elements)
                     {
                         new_list_elements.Add(v);
                     }
                     TableUnit new_list = new TableUnit(new_list_elements, null);
 
-                    TableUnit copy = new TableUnit(new_list_elements, table_copy);
-
-                    copy.superTable = this_table.superTable;
+                    TableUnit copy = new TableUnit(new_list_elements, table_copy, this_table.SuperTable);
 
                     return new Unit(copy);
                 }
@@ -338,7 +335,7 @@ namespace lightning
                     Integer size = vm.GetInteger(0);
                     TableUnit list = new TableUnit(null, null);
                     for(int i=0; i<size; i++)
-                        list.elements.Add(new Unit(UnitType.Null));
+                        list.Elements.Add(new Unit(UnitType.Null));
 
                     return new Unit(list);
                 }
@@ -352,7 +349,7 @@ namespace lightning
                     Integer new_end = vm.GetInteger(1);
                     int size = list.Count;
                     for(int i=size; i<(new_end); i++)
-                        list.elements.Add(new Unit(UnitType.Null));
+                        list.Elements.Add(new Unit(UnitType.Null));
 
                     return new Unit(UnitType.Null);
                 }
@@ -363,7 +360,7 @@ namespace lightning
                 {
                     TableUnit list = vm.GetTable(0);
                     Unit value = vm.GetUnit(1);
-                    list.elements.Add(value);
+                    list.Elements.Add(value);
 
                     return new Unit(UnitType.Null);
                 }
@@ -373,8 +370,8 @@ namespace lightning
                 Unit listPop(VM vm)
                 {
                     TableUnit list = vm.GetTable(0);
-                    Float value = list.elements[^1].floatValue;
-                    list.elements.RemoveRange(list.elements.Count - 1, 1);
+                    Float value = list.Elements[^1].floatValue;
+                    list.Elements.RemoveRange(list.Elements.Count - 1, 1);
 
                     return new Unit(value);
                 }
@@ -386,7 +383,7 @@ namespace lightning
                     TableUnit this_table = vm.GetTable(0);
                     bool first = true;
                     string value = "";
-                    foreach (Unit v in this_table.elements)
+                    foreach (Unit v in this_table.Elements)
                     {
                         if (first)
                         {
@@ -415,7 +412,7 @@ namespace lightning
                 Unit listClear(VM vm)
                 {
                     TableUnit list = vm.GetTable(0);
-                    list.elements.Clear();
+                    list.Elements.Clear();
                     return new Unit(UnitType.Null);
                 }
                 table.Set("list_clear", new IntrinsicUnit("list_clear", listClear, 1));
@@ -426,7 +423,7 @@ namespace lightning
                     TableUnit list = vm.GetTable(0);
                     int range_init = (int)vm.GetNumber(1);
                     int range_end = (int)vm.GetNumber(2);
-                    list.elements.RemoveRange(range_init, range_end - range_init + 1);
+                    list.Elements.RemoveRange(range_init, range_end - range_init + 1);
 
                     return new Unit(UnitType.Null);
                 }
@@ -437,7 +434,7 @@ namespace lightning
                 {
                     TableUnit list = vm.GetTable(0);
                     List<Unit> new_list_elements = new List<Unit>();
-                    foreach (Unit v in list.elements)
+                    foreach (Unit v in list.Elements)
                     {
                         new_list_elements.Add(v);
                     }
@@ -452,8 +449,8 @@ namespace lightning
                 {
                     TableUnit list = vm.GetTable(0);
                     int range_init = (int)vm.GetNumber(1);
-                    List<Unit> new_list_elements = list.elements.GetRange(range_init, list.elements.Count - range_init);
-                    list.elements.RemoveRange(range_init, list.elements.Count - range_init);
+                    List<Unit> new_list_elements = list.Elements.GetRange(range_init, list.Elements.Count - range_init);
+                    list.Elements.RemoveRange(range_init, list.Elements.Count - range_init);
                     TableUnit new_list = new TableUnit(new_list_elements, null);
 
                     return new Unit(new_list);
@@ -467,8 +464,8 @@ namespace lightning
                     int range_init = (int)vm.GetNumber(1);
                     int range_end = (int)vm.GetNumber(2);
 
-                    List<Unit> new_list_elements = list.elements.GetRange(range_init, range_end - range_init + 1);
-                    list.elements.RemoveRange(range_init, range_end - range_init + 1);
+                    List<Unit> new_list_elements = list.Elements.GetRange(range_init, range_end - range_init + 1);
+                    list.Elements.RemoveRange(range_init, range_end - range_init + 1);
                     TableUnit new_list = new TableUnit(new_list_elements, null);
 
                     return new Unit(new_list);
@@ -478,7 +475,7 @@ namespace lightning
                 Unit listReverse(VM vm)
                 {
                     TableUnit list = vm.GetTable(0);
-                    list.elements.Reverse();
+                    list.Elements.Reverse();
 
                     return new Unit(UnitType.Null);
                 }
@@ -498,7 +495,7 @@ namespace lightning
                         {
                             i++;
                             iterator.Set("key", i);
-                            iterator.Set("value", this_table.elements[i]);
+                            iterator.Set("value", this_table.Elements[i]);
                             return new Unit(true);
                         }
                         return new Unit(false);
@@ -522,7 +519,7 @@ namespace lightning
                         if (i < (this_table.ECount - 1))
                         {
                             i++;
-                            iterator.Set("value", this_table.elements[i]);
+                            iterator.Set("value", this_table.Elements[i]);
                             return new Unit(true);
                         }
                         return new Unit(false);
@@ -556,9 +553,9 @@ namespace lightning
                     TableUnit this_table = vm.GetTable(0);
                     TableUnit indexes = new TableUnit(null, null);
 
-                    foreach (Unit v in this_table.table.Keys)
+                    foreach (Unit v in this_table.Table.Keys)
                     {
-                        indexes.elements.Add(v);
+                        indexes.Elements.Add(v);
                     }
 
                     return new Unit(indexes);
@@ -571,10 +568,10 @@ namespace lightning
                     TableUnit this_table = vm.GetTable(0);
                     TableUnit indexes = new TableUnit(null, null);
 
-                    foreach (Unit v in this_table.table.Keys)
+                    foreach (Unit v in this_table.Table.Keys)
                     {
                         if(Unit.isNumeric(v))
-                            indexes.elements.Add(v);
+                            indexes.Elements.Add(v);
                     }
 
                     return new Unit(indexes);
@@ -586,7 +583,7 @@ namespace lightning
                 {
                     TableUnit this_table = vm.GetTable(0);
                     Dictionary<Unit, Unit> table_copy = new Dictionary<Unit, Unit>();
-                    foreach (KeyValuePair<Unit, Unit> entry in this_table.table)
+                    foreach (KeyValuePair<Unit, Unit> entry in this_table.Table)
                     {
                         table_copy.Add(entry.Key, entry.Value);
                     }
@@ -601,7 +598,7 @@ namespace lightning
                 Unit MapClear(VM vm)
                 {
                     TableUnit this_table = vm.GetTable(0);
-                    this_table.table.Clear();
+                    this_table.Table.Clear();
                     return new Unit(UnitType.Null);
                 }
                 table.Set("map_clear", new IntrinsicUnit("map_clear", MapClear, 1));
@@ -610,8 +607,8 @@ namespace lightning
                 Unit Clear(VM vm)
                 {
                     TableUnit this_table = vm.GetTable(0);
-                    this_table.elements.Clear();
-                    this_table.table.Clear();
+                    this_table.Elements.Clear();
+                    this_table.Table.Clear();
                     return new Unit(UnitType.Null);
                 }
                 table.Set("clear", new IntrinsicUnit("table_clear", Clear, 1));
@@ -620,7 +617,7 @@ namespace lightning
                 Unit MapMakeIterator(VM vm)
                 {
                     TableUnit this_table = vm.GetTable(0);
-                    System.Collections.IDictionaryEnumerator enumerator = this_table.table.GetEnumerator();
+                    System.Collections.IDictionaryEnumerator enumerator = this_table.Table.GetEnumerator();
 
                     TableUnit iterator = new TableUnit(null, null);
                     iterator.Set("key", new Unit(UnitType.Null));
@@ -648,7 +645,7 @@ namespace lightning
                     TableUnit this_table = vm.GetTable(0);
                     string value = "";
                     bool first = true;
-                    foreach (KeyValuePair<Unit, Unit> entry in this_table.table)
+                    foreach (KeyValuePair<Unit, Unit> entry in this_table.Table)
                     {
                         if (first)
                         {
@@ -674,7 +671,7 @@ namespace lightning
                 {
                     TableUnit this_table = vm.GetTable(0);
                     TableUnit super_table = vm.GetTable(1);
-                    this_table.superTable = super_table;
+                    this_table.SuperTable = super_table;
 
                     return new Unit(UnitType.Null);
                 }
@@ -685,8 +682,8 @@ namespace lightning
                 {
                     TableUnit this_table = vm.GetTable(0);
                     TableUnit super_table = vm.GetTable(1);
-                    super_table.superTable = this_table.superTable;
-                    this_table.superTable = super_table;
+                    super_table.SuperTable = this_table.SuperTable;
+                    this_table.SuperTable = super_table;
 
                     return new Unit(UnitType.Null);
                 }
@@ -696,7 +693,7 @@ namespace lightning
                 Unit UnsetSuperTable(VM vm)
                 {
                     TableUnit this_table = vm.GetTable(0);
-                    this_table.superTable = null;
+                    this_table.SuperTable = null;
 
                     return new Unit(UnitType.Null);
                 }
@@ -707,7 +704,7 @@ namespace lightning
                 {
                     TableUnit this_table = vm.GetTable(0);
 
-                    return new Unit(this_table.superTable);
+                    return new Unit(this_table.SuperTable);
                 }
                 table.Set("get_super", new IntrinsicUnit("get_super", GetSuperTable, 0));
 
@@ -1070,7 +1067,7 @@ namespace lightning
                 string path = vm.GetString(0);
                 foreach (ModuleUnit v in vm.modules)// skip already imported modules
                 {
-                    if (v.name == path)
+                    if (v.Name == path)
                         return new Unit(v);
                 }
                 string module_code;
@@ -1343,7 +1340,7 @@ namespace lightning
             Dictionary<Operand, Operand> relocated_modules = new Dictionary<Operand, Operand>();
             foreach (ModuleUnit m in imported_vm.modules)
             {
-                Operand old_module_index = m.importIndex;
+                Operand old_module_index = m.ImportIndex;
                 Operand copied_module_index;
                 if (!importing_vm.modules.Contains(m))
                 {
@@ -1352,14 +1349,14 @@ namespace lightning
                 else
                     copied_module_index = (Operand)importing_vm.modules.IndexOf(m);
 
-                m.importIndex = copied_module_index;// ready for next import
+                m.ImportIndex = copied_module_index;// ready for next import
                 relocated_modules.Add(old_module_index, copied_module_index);
                 ImportModule(m, (Operand)copied_module_index);
             }
 
-            ModuleUnit module = new ModuleUnit(name, null, null, null, null);
+            ModuleUnit module = new ModuleUnit(name, null, null, null);
             Operand module_index = importing_vm.AddModule(module);
-            module.importIndex = module_index;
+            module.ImportIndex = module_index;
             RelocationInfo relocationInfo = new RelocationInfo(
                 importing_vm,
                 imported_vm,
@@ -1384,7 +1381,7 @@ namespace lightning
             if (!relocationInfo.relocatedTables.Contains(table.GetHashCode()))
             {
                 relocationInfo.relocatedTables.Add(table.GetHashCode());
-                foreach (KeyValuePair<Unit, Unit> entry in table.table)
+                foreach (KeyValuePair<Unit, Unit> entry in table.Table)
                 {
                     if (entry.Value.Type == UnitType.Function) RelocateFunction((FunctionUnit)entry.Value.heapUnitValue, relocationInfo);
                     else if (entry.Value.Type == UnitType.Closure) RelocateClosure((ClosureUnit)entry.Value.heapUnitValue, relocationInfo);
@@ -1421,8 +1418,8 @@ namespace lightning
             {
                 Unit new_value = relocationInfo.importedVM.GetGlobal(relocationInfo.toBeRelocatedGlobals[i]);
 
-                relocationInfo.module.globals.Add(new_value);
-                relocationInfo.relocatedGlobals.Add(relocationInfo.toBeRelocatedGlobals[i], (Operand)(relocationInfo.module.globals.Count - 1));
+                relocationInfo.module.Globals.Add(new_value);
+                relocationInfo.relocatedGlobals.Add(relocationInfo.toBeRelocatedGlobals[i], (Operand)(relocationInfo.module.Globals.Count - 1));
 
                 if (new_value.Type == UnitType.Table) relocation_stack.Add((TableUnit)new_value.heapUnitValue);
             }
@@ -1432,8 +1429,8 @@ namespace lightning
             {
                 Unit new_value = relocationInfo.importedVM.GetChunk().GetConstant(relocationInfo.toBeRelocatedConstants[i]);
 
-                relocationInfo.module.constants.Add(new_value);
-                relocationInfo.relocatedConstants.Add(relocationInfo.toBeRelocatedConstants[i], (Operand)(relocationInfo.module.constants.Count - 1));
+                relocationInfo.module.Constants.Add(new_value);
+                relocationInfo.relocatedConstants.Add(relocationInfo.toBeRelocatedConstants[i], (Operand)(relocationInfo.module.Constants.Count - 1));
 
                 if (new_value.Type == UnitType.Table) relocation_stack.Add((TableUnit)new_value.heapUnitValue);
             }
@@ -1525,9 +1522,9 @@ namespace lightning
                         bool found = false;
                         foreach (ModuleUnit v in relocationInfo.importingVM.modules)
                         {
-                            if (function.Module == v.name)
+                            if (function.Module == v.Name)
                             {
-                                next.opB = v.importIndex;
+                                next.opB = v.ImportIndex;
                                 found = true;
                                 break;
                             }
@@ -1547,9 +1544,9 @@ namespace lightning
                         bool found = false;
                         foreach (ModuleUnit v in relocationInfo.importingVM.modules)
                         {
-                            if (function.Module == v.name)
+                            if (function.Module == v.Name)
                             {
-                                next.opB = v.importIndex;
+                                next.opB = v.ImportIndex;
                                 found = true;
                                 break;
                             }
@@ -1559,14 +1556,12 @@ namespace lightning
                     }
                 }
 
-                //Chunk.PrintInstruction(next);
-                //Console.WriteLine();
                 function.Body[i] = next;
             }
         }
         static void ImportModule(ModuleUnit module, Operand new_index)
         {
-            foreach (KeyValuePair<Unit, Unit> entry in module.table)
+            foreach (KeyValuePair<Unit, Unit> entry in module.Table)
             {
                 if (entry.Value.Type == UnitType.Function)
                 {

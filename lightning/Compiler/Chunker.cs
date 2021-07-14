@@ -15,7 +15,7 @@ namespace lightning
 {
     public class Chunker
     {
-        enum ValType
+        enum ValueType
         {
             UpValue,
             Global,
@@ -27,8 +27,8 @@ namespace lightning
             public string name;
             public int address;
             public int envIndex;
-            public ValType type;
-            public Variable(string p_name, int p_address, int p_envIndex, ValType p_type)
+            public ValueType type;
+            public Variable(string p_name, int p_address, int p_envIndex, ValueType p_type)
             {
                 name = p_name;
                 address = p_address;
@@ -37,9 +37,9 @@ namespace lightning
             }
         }
 
-        Node ast;
-        Chunk code;
-        string module_name;
+        private Node ast;
+        private Chunk code;
+        private string module_name;
         public Chunk Code
         {
             get
@@ -61,12 +61,12 @@ namespace lightning
         }
 
         public bool HasChunked { get; private set; }
-        int instructionCounter;
-        List<object> constants;
-        List<List<string>> env;
-        List<string> globals;
-        Stack<List<Variable>> upvalueStack;
-        Stack<int> funStartEnv;
+        private int instructionCounter;
+        private List<object> constants;
+        private List<List<string>> env;
+        private List<string> globals;
+        private Stack<List<Variable>> upvalueStack;
+        private Stack<int> funStartEnv;
         int lambdaCounter;
 
         public List<string> Errors { get; private set; }
@@ -101,7 +101,7 @@ namespace lightning
             }
         }
 
-        void ChunkIt(Node p_node)
+        private void ChunkIt(Node p_node)
         {
             NodeType this_type = p_node.Type;
             //Console.WriteLine(this_type.ToString());
@@ -140,7 +140,7 @@ namespace lightning
                 case NodeType.ASSIGMENT:
                     Chunkassignment(p_node as assignmentNode);
                     break;
-                case NodeType.ASSIGMENTOP:
+                case NodeType.ASSIGMENT_OP:
                     ChunkassignmentOp(p_node as assignmentOpNode);
                     break;
                 case NodeType.LOGICAL:
@@ -173,7 +173,7 @@ namespace lightning
             }
         }
 
-        void ChunkProgram(ProgramNode p_node)
+        private void ChunkProgram(ProgramNode p_node)
         {
             int line = p_node.Line;
             if (p_node.Statements != null)
@@ -189,7 +189,7 @@ namespace lightning
             Add(OpCode.EXIT, line);
         }
 
-        void ChunkBinary(BinaryNode p_node)
+        private void ChunkBinary(BinaryNode p_node)
         {
             ChunkIt(p_node.Left);
             ChunkIt(p_node.Right);
@@ -239,7 +239,7 @@ namespace lightning
             Add(this_opcode, p_node.Line);
         }
 
-        void ChunkUnary(UnaryNode p_node)
+        private void ChunkUnary(UnaryNode p_node)
         {
             ChunkIt(p_node.Right);
 
@@ -268,7 +268,7 @@ namespace lightning
             }
         }
 
-        void ChunkTable(TableNode p_node)
+        private void ChunkTable(TableNode p_node)
         {
             int n_elements = 0;
             if (p_node.elements != null)
@@ -294,7 +294,7 @@ namespace lightning
             Add(OpCode.NEW_TABLE, (Operand)n_elements, (Operand)n_table, p_node.Line);
         }
 
-        void ChunkLiteral(LiteralNode p_node)
+        private void ChunkLiteral(LiteralNode p_node)
         {
             if (p_node.ValueType == typeof(bool))
             {
@@ -333,18 +333,18 @@ namespace lightning
             }
         }
 
-        void ChunkGrouping(GroupingNode p_node)
+        private void ChunkGrouping(GroupingNode p_node)
         {
             ChunkIt(p_node.Expr);
         }
 
-        void ChunkStmtExpr(StmtExprNode p_node)
+        private void ChunkStmtExpr(StmtExprNode p_node)
         {
             ChunkIt(p_node.Expr);
             Add(OpCode.POP, p_node.Line);
         }
 
-        void ChunkIf(IfNode p_node)
+        private void ChunkIf(IfNode p_node)
         {
             ChunkIt(p_node.Condition);
             int then_address = instructionCounter;
@@ -360,7 +360,7 @@ namespace lightning
             code.FixInstruction(else_address, null, (Operand)(instructionCounter - else_address), null, null);
         }
 
-        void ChunkFor(ForNode p_node)
+        private void ChunkFor(ForNode p_node)
         {
             Add(OpCode.OPEN_ENV, p_node.Line);
             env.Add(new List<string>());
@@ -396,7 +396,7 @@ namespace lightning
 
         }
 
-        void ChunkWhile(WhileNode p_node)
+        private void ChunkWhile(WhileNode p_node)
         {
             int condition_address = instructionCounter;
             ChunkIt(p_node.Condition);
@@ -413,7 +413,7 @@ namespace lightning
             code.FixInstruction(go_back_address, null, (Operand)(go_back_address - condition_address), null, null);
         }
 
-        void ChunkVariable(VariableNode p_node)
+        private void ChunkVariable(VariableNode p_node)
         {
             Nullable<Variable> maybe_var = GetVar(p_node.Name);
             if (maybe_var.HasValue)
@@ -421,13 +421,13 @@ namespace lightning
                 Variable this_var = maybe_var.Value;
                 switch (this_var.type)
                 {
-                    case ValType.Local:
+                    case ValueType.Local:
                         Add(OpCode.LOAD_VARIABLE, (Operand)this_var.address, (Operand)this_var.envIndex, p_node.Line);
                         break;
-                    case ValType.Global:
+                    case ValueType.Global:
                         Add(OpCode.LOAD_GLOBAL, (Operand)this_var.address, p_node.Line);
                         break;
-                    case ValType.UpValue:
+                    case ValueType.UpValue:
                         int this_index = upvalueStack.Peek().IndexOf(this_var);
                         Add(OpCode.LOAD_UPVALUE, (Operand)this_index, p_node.Line);
                         break;
@@ -455,7 +455,7 @@ namespace lightning
 
         }
 
-        void ChunkVarDeclaration(VarDeclarationNode p_node)
+        private void ChunkVarDeclaration(VarDeclarationNode p_node)
         {
             if (p_node.Initializer == null)
             {
@@ -468,7 +468,7 @@ namespace lightning
             if (maybe_var.HasValue)
             {
                 Variable this_var = maybe_var.Value;
-                if (this_var.type == ValType.Global)
+                if (this_var.type == ValueType.Global)
                     Add(OpCode.DECLARE_GLOBAL, p_node.Line);
                 else
                     Add(OpCode.DECLARE_VARIABLE, p_node.Line);
@@ -479,111 +479,25 @@ namespace lightning
             }
         }
 
-        void Chunkassignment(assignmentNode p_node)
+        private void Chunkassignment(assignmentNode p_node)
         {
             ChunkIt(p_node.Value);
-            Nullable<Variable> maybe_var = GetVar(p_node.ASSIGN_VARIABLEed.Name);
-
+            Nullable<Variable> maybe_var = GetVar(p_node.assigned.Name);
+            Operand op = (Operand)AssignmentOperatorType.EQUAL;
             if (maybe_var.HasValue)
             {
                 Variable this_var = maybe_var.Value;
-                if (p_node.ASSIGN_VARIABLEed.Indexes.Count == 0)
+                if (p_node.assigned.Indexes.Count == 0)
                 {
                     switch (this_var.type)
                     {
-                        case ValType.Local:
-                            Add(OpCode.ASSIGN_VARIABLE, (Operand)this_var.address, (Operand)this_var.envIndex, 0,p_node.Line);
-                            break;
-                        case ValType.Global:
-                            Add(OpCode.ASSIGN_GLOBAL, (Operand)this_var.address, 0, p_node.Line);
-                            break;
-                        case ValType.UpValue:
-                            int this_index = upvalueStack.Peek().IndexOf(this_var);
-                            Add(OpCode.ASSIGN_UPVALUE, (Operand)this_index, 0, p_node.Line);
-                            break;
-
-                    }
-                }
-                else//  it is a compoundVar
-                {
-                    switch (this_var.type)
-                    {
-                        case ValType.Local:
-                            Add(OpCode.LOAD_VARIABLE, (Operand)this_var.address, (Operand)this_var.envIndex, p_node.Line);
-                            break;
-                        case ValType.Global:
-                            Add(OpCode.LOAD_GLOBAL, (Operand)this_var.address, p_node.Line);
-                            break;
-                        case ValType.UpValue:
-                            int this_index = upvalueStack.Peek().IndexOf(this_var);
-                            Add(OpCode.LOAD_UPVALUE, (Operand)this_index, p_node.Line);
-                            break;
-                    }
-
-                    foreach (Node n in p_node.ASSIGN_VARIABLEed.Indexes)
-                    {
-                        if (n.GetType() != typeof(VariableNode) || (n as VariableNode).AccessType == VarAccessType.PLAIN)
-                            ChunkIt(n);
-                        else
-                        {
-                            Operand string_address = (Operand)AddConstant((n as VariableNode).Name);
-                            Add(OpCode.LOAD_CONSTANT, string_address, p_node.Line);
-                        }
-                    }
-
-                    Add(OpCode.TABLE_SET, (Operand)p_node.ASSIGN_VARIABLEed.Indexes.Count, 0, p_node.Line);
-                }
-            }
-            else
-            {
-                Error("assignment to non existing variable!", p_node.Line);
-            }
-        }
-
-        void ChunkassignmentOp(assignmentOpNode p_node)
-        {
-            ChunkIt(p_node.Value);
-            Nullable<Variable> maybe_var = GetVar(p_node.ASSIGN_VARIABLEed.Name);
-
-            Operand op = 0;
-            switch (p_node.Op)
-            {
-                case OperatorType.PLUS:
-                    {
-                        op = 1;
-                    }
-                    break;
-                case OperatorType.MINUS:
-                    {
-                        op = 2;
-                    }
-                    break;
-                case OperatorType.MULTIPLICATION:
-                    {
-                        op = 3;
-                    }
-                    break;
-                case OperatorType.DIVISION:
-                    {
-                        op = 4;
-                    }
-                    break;
-            }
-
-            if (maybe_var.HasValue)
-            {
-                Variable this_var = maybe_var.Value;
-                if (p_node.ASSIGN_VARIABLEed.Indexes.Count == 0)
-                {
-                    switch (this_var.type)
-                    {
-                        case ValType.Local:
+                        case ValueType.Local:
                             Add(OpCode.ASSIGN_VARIABLE, (Operand)this_var.address, (Operand)this_var.envIndex, op, p_node.Line);
                             break;
-                        case ValType.Global:
+                        case ValueType.Global:
                             Add(OpCode.ASSIGN_GLOBAL, (Operand)this_var.address, op, p_node.Line);
                             break;
-                        case ValType.UpValue:
+                        case ValueType.UpValue:
                             int this_index = upvalueStack.Peek().IndexOf(this_var);
                             Add(OpCode.ASSIGN_UPVALUE, (Operand)this_index, op, p_node.Line);
                             break;
@@ -594,19 +508,19 @@ namespace lightning
                 {
                     switch (this_var.type)
                     {
-                        case ValType.Local:
+                        case ValueType.Local:
                             Add(OpCode.LOAD_VARIABLE, (Operand)this_var.address, (Operand)this_var.envIndex, p_node.Line);
                             break;
-                        case ValType.Global:
+                        case ValueType.Global:
                             Add(OpCode.LOAD_GLOBAL, (Operand)this_var.address, p_node.Line);
                             break;
-                        case ValType.UpValue:
+                        case ValueType.UpValue:
                             int this_index = upvalueStack.Peek().IndexOf(this_var);
                             Add(OpCode.LOAD_UPVALUE, (Operand)this_index, p_node.Line);
                             break;
                     }
 
-                    foreach (Node n in p_node.ASSIGN_VARIABLEed.Indexes)
+                    foreach (Node n in p_node.assigned.Indexes)
                     {
                         if (n.GetType() != typeof(VariableNode) || (n as VariableNode).AccessType == VarAccessType.PLAIN)
                             ChunkIt(n);
@@ -617,7 +531,7 @@ namespace lightning
                         }
                     }
 
-                    Add(OpCode.TABLE_SET, (Operand)p_node.ASSIGN_VARIABLEed.Indexes.Count, op, p_node.Line);
+                    Add(OpCode.TABLE_SET, (Operand)p_node.assigned.Indexes.Count, op, p_node.Line);
                 }
             }
             else
@@ -626,7 +540,70 @@ namespace lightning
             }
         }
 
-        void ChunkLogical(LogicalNode p_node)
+        private void ChunkassignmentOp(assignmentOpNode p_node)
+        {
+            ChunkIt(p_node.Value);
+            Nullable<Variable> maybe_var = GetVar(p_node.assigned.Name);
+
+            Operand op = (Operand) p_node.Op;
+
+            if (maybe_var.HasValue)
+            {
+                Variable this_var = maybe_var.Value;
+                if (p_node.assigned.Indexes.Count == 0)
+                {
+                    switch (this_var.type)
+                    {
+                        case ValueType.Local:
+                            Add(OpCode.ASSIGN_VARIABLE, (Operand)this_var.address, (Operand)this_var.envIndex, op, p_node.Line);
+                            break;
+                        case ValueType.Global:
+                            Add(OpCode.ASSIGN_GLOBAL, (Operand)this_var.address, op, p_node.Line);
+                            break;
+                        case ValueType.UpValue:
+                            int this_index = upvalueStack.Peek().IndexOf(this_var);
+                            Add(OpCode.ASSIGN_UPVALUE, (Operand)this_index, op, p_node.Line);
+                            break;
+
+                    }
+                }
+                else//  it is a compoundVar
+                {
+                    switch (this_var.type)
+                    {
+                        case ValueType.Local:
+                            Add(OpCode.LOAD_VARIABLE, (Operand)this_var.address, (Operand)this_var.envIndex, p_node.Line);
+                            break;
+                        case ValueType.Global:
+                            Add(OpCode.LOAD_GLOBAL, (Operand)this_var.address, p_node.Line);
+                            break;
+                        case ValueType.UpValue:
+                            int this_index = upvalueStack.Peek().IndexOf(this_var);
+                            Add(OpCode.LOAD_UPVALUE, (Operand)this_index, p_node.Line);
+                            break;
+                    }
+
+                    foreach (Node n in p_node.assigned.Indexes)
+                    {
+                        if (n.GetType() != typeof(VariableNode) || (n as VariableNode).AccessType == VarAccessType.PLAIN)
+                            ChunkIt(n);
+                        else
+                        {
+                            Operand string_address = (Operand)AddConstant((n as VariableNode).Name);
+                            Add(OpCode.LOAD_CONSTANT, string_address, p_node.Line);
+                        }
+                    }
+
+                    Add(OpCode.TABLE_SET, (Operand)p_node.assigned.Indexes.Count, op, p_node.Line);
+                }
+            }
+            else
+            {
+                Error("assignment to non existing variable!", p_node.Line);
+            }
+        }
+
+        private void ChunkLogical(LogicalNode p_node)
         {
             ChunkIt(p_node.Left);
             ChunkIt(p_node.Right);
@@ -661,7 +638,7 @@ namespace lightning
             Add(this_opcode, p_node.Line);
         }
 
-        void ChunkBlock(BlockNode p_node)
+        private void ChunkBlock(BlockNode p_node)
         {
             Add(OpCode.OPEN_ENV, p_node.Line);
             env.Add(new List<string>());
@@ -671,7 +648,7 @@ namespace lightning
             Add(OpCode.CLOSE_ENV, p_node.Line);
         }
 
-        void ChunkFunctionCall(FunctionCallNode p_node)
+        private void ChunkFunctionCall(FunctionCallNode p_node)
         {
             //push parameters on stack
             p_node.Calls[0].Reverse();
@@ -690,13 +667,13 @@ namespace lightning
                 {
                     switch (this_func.type)
                     {
-                        case ValType.Local:
+                        case ValueType.Local:
                             Add(OpCode.LOAD_VARIABLE, (Operand)this_func.address, (Operand)this_func.envIndex, p_node.Line);
                             break;
-                        case ValType.Global:
+                        case ValueType.Global:
                             Add(OpCode.LOAD_GLOBAL, (Operand)this_func.address, p_node.Line);
                             break;
-                        case ValType.UpValue:
+                        case ValueType.UpValue:
                             int this_index = upvalueStack.Peek().IndexOf(this_func);
                             Add(OpCode.LOAD_UPVALUE, (Operand)this_index, p_node.Line);
                             break;
@@ -710,13 +687,13 @@ namespace lightning
                     {// it is a method so we push the table again, to be used as parameter
                         switch (this_func.type)
                         {
-                            case ValType.Local:
+                            case ValueType.Local:
                                 Add(OpCode.LOAD_VARIABLE, (Operand)this_func.address, (Operand)this_func.envIndex, p_node.Line);
                                 break;
-                            case ValType.Global:
+                            case ValueType.Global:
                                 Add(OpCode.LOAD_GLOBAL, (Operand)this_func.address, p_node.Line);
                                 break;
-                            case ValType.UpValue:
+                            case ValueType.UpValue:
                                 int this_index = upvalueStack.Peek().IndexOf(this_func);
                                 Add(OpCode.LOAD_UPVALUE, (Operand)this_index, p_node.Line);
                                 break;
@@ -740,13 +717,13 @@ namespace lightning
 
                     switch (this_func.type)
                     {
-                        case ValType.Local:
+                        case ValueType.Local:
                             Add(OpCode.LOAD_VARIABLE, (Operand)this_func.address, (Operand)this_func.envIndex, p_node.Line);
                             break;
-                        case ValType.Global:
+                        case ValueType.Global:
                             Add(OpCode.LOAD_GLOBAL, (Operand)this_func.address, p_node.Line);
                             break;
-                        case ValType.UpValue:
+                        case ValueType.UpValue:
                             int this_index = upvalueStack.Peek().IndexOf(this_func);
                             Add(OpCode.LOAD_UPVALUE, (Operand)this_index, p_node.Line);
                             break;
@@ -820,7 +797,7 @@ namespace lightning
             }
         }
 
-        void ChunkReturn(ReturnNode p_node)
+        private void ChunkReturn(ReturnNode p_node)
         {
             if (p_node.Expr == null)
             {
@@ -833,7 +810,7 @@ namespace lightning
             Add(OpCode.RETURN, p_node.Line);
         }
 
-        void ChunkFunctionExpression(FunctionExpressionNode p_node)
+        private void ChunkFunctionExpression(FunctionExpressionNode p_node)
         {
             //set the address
 
@@ -841,7 +818,7 @@ namespace lightning
             lambdaCounter++;
         }
 
-        void ChunkFunctionDeclaration(FunctionDeclarationNode p_node)
+        private void ChunkFunctionDeclaration(FunctionDeclarationNode p_node)
         {
             //register name
             if (globals.Contains(p_node.Name))
@@ -853,7 +830,7 @@ namespace lightning
             {
                 Variable this_function = maybe_name.Value;
 
-                if (this_function.type == ValType.Global)
+                if (this_function.type == ValueType.Global)
                 {
                     CompileFunction(this_function.name, p_node.Line, p_node, true);
                 }
@@ -869,7 +846,7 @@ namespace lightning
             }
         }
 
-        void CompileFunction(string name, int line, FunctionExpressionNode p_node, bool isGlobal)
+        private void CompileFunction(string name, int line, FunctionExpressionNode p_node, bool isGlobal)
         {
 
             FunctionUnit new_function = new FunctionUnit(name, module_name);
@@ -959,7 +936,7 @@ namespace lightning
 
         //////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-        Nullable<Variable> GetVar(string name)
+        private Nullable<Variable> GetVar(string name)
         {
             int top_index = env.Count - 1;
             for (int i = top_index; i >= 0; i--)
@@ -979,11 +956,11 @@ namespace lightning
                             return this_upvalue;
                         }
                         // local var
-                        return new Variable(name, this_env.IndexOf(name), top_index - i, ValType.Local);
+                        return new Variable(name, this_env.IndexOf(name), top_index - i, ValueType.Local);
                     }
                     if (isGlobal && globals.Contains(name))// Sanity check
                     {
-                        return new Variable(name, this_env.IndexOf(name), 0, ValType.Global);
+                        return new Variable(name, this_env.IndexOf(name), 0, ValueType.Global);
                     }
                     Console.WriteLine("Var finding gone mad!");
                     return null;
@@ -992,18 +969,18 @@ namespace lightning
             return null;
         }
 
-        Variable GetOrSetInUpValue(string name, int adress, int env, List<Variable> list)
+        private Variable GetOrSetInUpValue(string name, int adress, int env, List<Variable> list)
         {
             foreach (Variable v in list)
             {
                 if (name == v.name) return v;
             }
-            Variable this_upvalue = new Variable(name, adress, env, ValType.UpValue);
+            Variable this_upvalue = new Variable(name, adress, env, ValueType.UpValue);
             list.Add(this_upvalue);
             return this_upvalue;
         }
 
-        bool IsLocalVar(string name)
+        private bool IsLocalVar(string name)
         {
             int top_index = env.Count - 1;
             var this_env = env[top_index];
@@ -1014,7 +991,7 @@ namespace lightning
                 return false;
         }
 
-        Nullable<Variable> SetVar(string name)
+        private Nullable<Variable> SetVar(string name)
         {
             if (env.Count == 1)// we are in global scope
             {
@@ -1028,19 +1005,19 @@ namespace lightning
                     int top_index = env.Count - 1;
                     var this_env = env[top_index];
                     this_env.Add(name);
-                    return new Variable(name, this_env.IndexOf(name), 0, ValType.Local);
+                    return new Variable(name, this_env.IndexOf(name), 0, ValueType.Local);
                 }
             }
             return null;
         }
 
-        Nullable<Variable> SetGlobalVar(string name)
+        private Nullable<Variable> SetGlobalVar(string name)
         {
             if (!globals.Contains(name))
             {
                 //Console.WriteLine("added global " + name);
                 globals.Add(name);
-                return new Variable(name, globals.IndexOf(name), 0, ValType.Global);
+                return new Variable(name, globals.IndexOf(name), 0, ValueType.Global);
             }
 
             return null;
@@ -1048,7 +1025,7 @@ namespace lightning
 
         //////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-        int AddConstant(string p_string)
+        private int AddConstant(string p_string)
         {
             if (constants.Contains(p_string))
             {
@@ -1062,7 +1039,7 @@ namespace lightning
             }
         }
 
-        int AddConstant(char p_char)
+        private int AddConstant(char p_char)
         {
             if (constants.Contains(p_char))
             {
@@ -1076,7 +1053,7 @@ namespace lightning
             }
         }
 
-        int AddConstant(Float p_number)
+        private int AddConstant(Float p_number)
         {
             if (constants.Contains(p_number))
             {
@@ -1090,7 +1067,7 @@ namespace lightning
             }
         }
 
-        int AddConstant(Integer p_number)
+        private int AddConstant(Integer p_number)
         {
             if (constants.Contains(p_number))
             {
@@ -1104,7 +1081,7 @@ namespace lightning
             }
         }
 
-        int AddConstant(FunctionUnit new_function)
+        private int AddConstant(FunctionUnit new_function)
         {
             constants.Add(new_function);
             code.AddConstant(new Unit(new_function));
@@ -1113,31 +1090,31 @@ namespace lightning
 
         //////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-        void Add(OpCode p_opcode, int p_line)
+        private void Add(OpCode p_opcode, int p_line)
         {
             code.WriteInstruction(p_opcode, 0, 0, 0, (uint)p_line);
             instructionCounter++;
         }
 
-        void Add(OpCode p_opcode, Operand p_opA, int p_line)
+        private void Add(OpCode p_opcode, Operand p_opA, int p_line)
         {
             code.WriteInstruction(p_opcode, p_opA, 0, 0, (uint)p_line);
             instructionCounter++;
         }
 
-        void Add(OpCode p_opcode, Operand p_opA, Operand p_opB, int p_line)
+        private void Add(OpCode p_opcode, Operand p_opA, Operand p_opB, int p_line)
         {
             code.WriteInstruction(p_opcode, p_opA, p_opB, 0, (uint)p_line);
             instructionCounter++;
         }
 
-        void Add(OpCode p_opcode, Operand p_opA, Operand p_opB, Operand p_opC, int p_line)
+        private void Add(OpCode p_opcode, Operand p_opA, Operand p_opB, Operand p_opC, int p_line)
         {
             code.WriteInstruction(p_opcode, p_opA, p_opB, p_opC, (uint)p_line);
             instructionCounter++;
         }
 
-        void Error(string p_msg, int p_line)
+        private void Error(string p_msg, int p_line)
         {
             Errors.Add(p_msg + " on line: " + p_line);
         }

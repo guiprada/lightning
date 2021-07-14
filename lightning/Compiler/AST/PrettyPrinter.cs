@@ -52,7 +52,7 @@ namespace lightning
                 case NodeType.ASSIGMENT:
                     Printassignment(p_node as assignmentNode);
                     break;
-                case NodeType.ASSIGMENTOP:
+                case NodeType.ASSIGMENT_OP:
                     PrintassignmentOp(p_node as assignmentOpNode);
                     break;
                 case NodeType.LOGICAL:
@@ -85,7 +85,7 @@ namespace lightning
             }
         }
 
-        public void PrintProgram(ProgramNode p_node)
+        private void PrintProgram(ProgramNode p_node)
         {
             Console.WriteLine("[PROGRAM");
             if (p_node.Statements != null)
@@ -104,7 +104,7 @@ namespace lightning
             Console.WriteLine("]");
         }
 
-        public void PrintBinary(BinaryNode p_node)
+        private void PrintBinary(BinaryNode p_node)
         {
             Console.Write("[BINARY ");
             Print(p_node.Left);
@@ -126,7 +126,7 @@ namespace lightning
             Console.Write("]");
         }
 
-        public void PrintUnary(UnaryNode p_node)
+        private void PrintUnary(UnaryNode p_node)
         {
             Console.Write("[UNARY ");
             if (p_node.Op == OperatorType.MINUS) Console.Write(" - ");
@@ -139,7 +139,7 @@ namespace lightning
             Console.Write("]");
         }
 
-        public void PrintLiteral(LiteralNode p_node)
+        private void PrintLiteral(LiteralNode p_node)
         {
             Console.Write("[LITERAL ");
             if (p_node.ValueType == typeof(string))
@@ -153,7 +153,7 @@ namespace lightning
             Console.Write("]");
         }
 
-        public void PrintTable(TableNode p_node)
+        private void PrintTable(TableNode p_node)
         {
             Console.Write("[LIST ");
             if (p_node.elements != null)
@@ -192,21 +192,21 @@ namespace lightning
             }
         }
 
-        public void PrintGrouping(GroupingNode p_node)
+        private void PrintGrouping(GroupingNode p_node)
         {
             Console.Write("[GROUPING ");
             Print(p_node.Expr);
             Console.Write("]");
         }
 
-        public void PrintStmtExpr(StmtExprNode p_node)
+        private void PrintStmtExpr(StmtExprNode p_node)
         {
             Console.Write(identString + "[EXPR_STMT ");
             Print(p_node.Expr);
             Console.WriteLine("]");
         }
 
-        public void PrintIf(IfNode p_node)
+        private void PrintIf(IfNode p_node)
         {
             Console.Write(identString + "[IF ");
             Print(p_node.Condition);
@@ -226,7 +226,7 @@ namespace lightning
             Console.WriteLine(identString + "]");
         }
 
-        public void PrintFor(ForNode p_node)
+        private void PrintFor(ForNode p_node)
         {
             Console.WriteLine(identString + "[FOR ");
             if (p_node.Initializer != null)
@@ -268,7 +268,7 @@ namespace lightning
             Console.WriteLine(identString + "]");
         }
 
-        public void PrintWhile(WhileNode p_node)
+        private void PrintWhile(WhileNode p_node)
         {
             Console.Write(identString + "[WHILE ");
             if (p_node.Condition != null)
@@ -285,7 +285,7 @@ namespace lightning
             Console.WriteLine("\n" + identString + "]");
         }
 
-        public void PrintVariable(VariableNode p_node)
+        private void PrintVariable(VariableNode p_node)
         {
 
             if (p_node.AccessType == VarAccessType.METHOD)
@@ -316,7 +316,7 @@ namespace lightning
             Console.Write("]");
         }
 
-        public void PrintVarDeclaration(VarDeclarationNode p_node)
+        private void PrintVarDeclaration(VarDeclarationNode p_node)
         {
             Console.Write(identString + "[VARIABLE DECLARATION " + p_node.Name);
             if (p_node.Initializer != null)
@@ -327,28 +327,28 @@ namespace lightning
             Console.WriteLine("]");
         }
 
-        public void Printassignment(assignmentNode p_node)
+        private void Printassignment(assignmentNode p_node)
         {
-            Console.Write("[ASSIGMENT " + p_node.ASSIGN_VARIABLEed.Name + " = ");
+            Console.Write("[ASSIGMENT " + p_node.assigned.Name + " = ");
             Print(p_node.Value);
             Console.Write("]");
         }
 
-        public void PrintassignmentOp(assignmentOpNode p_node)
+        private void PrintassignmentOp(assignmentOpNode p_node)
         {
-            Console.Write("[ASSIGMENTOP " + p_node.ASSIGN_VARIABLEed.Name);
+            Console.Write("[ASSIGMENT_OP " + p_node.assigned.Name);
             string op;
             switch (p_node.Op) {
-                case OperatorType.PLUS:
+                case AssignmentOperatorType.PLUS:
                     op = " += ";
                     break;
-                case OperatorType.MINUS:
+                case AssignmentOperatorType.MINUS:
                     op = " -= ";
                     break;
-                case OperatorType.MULTIPLICATION:
+                case AssignmentOperatorType.MULTIPLICATION:
                     op = " *= ";
                     break;
-                case OperatorType.DIVISION:
+                case AssignmentOperatorType.DIVISION:
                     op = " /= ";
                     break;
                 default:
@@ -360,7 +360,7 @@ namespace lightning
             Console.Write("]");
         }
 
-        public void PrintLogical(LogicalNode p_node)
+        private void PrintLogical(LogicalNode p_node)
         {
             Console.Write("[LOGICAL ");
             Print(p_node.Left);
@@ -377,7 +377,7 @@ namespace lightning
             Console.Write("]");
         }
 
-        public void PrintBlock(BlockNode p_node)
+        private void PrintBlock(BlockNode p_node)
         {
             Console.WriteLine(identString + "[BLOCK");
             IdentPlus();
@@ -389,7 +389,7 @@ namespace lightning
             Console.WriteLine(identString + "]");
         }
 
-        public void PrintFunctionCall(FunctionCallNode p_node)
+        private void PrintFunctionCall(FunctionCallNode p_node)
         {
             Console.Write("[FUNCTION CALL ");
             Print(p_node.Name);
@@ -425,7 +425,7 @@ namespace lightning
             Console.Write("]");
         }
 
-        public void PrintReturn(ReturnNode p_node)
+        private void PrintReturn(ReturnNode p_node)
         {
             Console.Write(identString + "[RETURN");
             if (p_node.Expr != null)
@@ -436,7 +436,7 @@ namespace lightning
             Console.WriteLine("]");
         }
 
-        public void PrintFunctionExpression(FunctionExpressionNode p_node)
+        private void PrintFunctionExpression(FunctionExpressionNode p_node)
         {
             IdentPlus();
             Console.Write("\n" + identString + "[FUNCTION EXPRESSION (");
@@ -464,7 +464,7 @@ namespace lightning
             IdentMinus();
         }
 
-        public void PrintFunctionDeclaration(FunctionDeclarationNode p_node)
+        private void PrintFunctionDeclaration(FunctionDeclarationNode p_node)
         {
             Console.Write(identString + "[FUNCTION DECLARATION " + p_node.Name + " (");
             bool is_first = true;

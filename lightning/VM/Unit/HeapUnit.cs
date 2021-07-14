@@ -388,25 +388,23 @@ namespace lightning
 
     public class ModuleUnit : HeapUnit
     {
-        public string name;
-        public List<Unit> elements;
-        public Dictionary<Unit, Unit> table;
-        public List<Unit> globals;
-        public List<Unit> constants;
-        public Operand importIndex;
+        public string Name{get; private set;}
+        public Dictionary<Unit, Unit> Table{get; private set;}
+        public List<Unit> Globals{get; private set;}
+        public List<Unit> Constants{get; private set;}
+        public Operand ImportIndex{get; set;}
         public override UnitType Type{
             get{
                 return UnitType.Module;
             }
         }
-        public ModuleUnit(string p_name, List<Unit> p_elements, Dictionary<Unit, Unit> p_table, List<Unit> p_globals, List<Unit> p_constants)
+        public ModuleUnit(string p_name, Dictionary<Unit, Unit> p_table, List<Unit> p_globals, List<Unit> p_constants)
         {
-            name = p_name;
-            elements = p_elements ?? new List<Unit>();
-            table = p_table ?? new Dictionary<Unit, Unit>();
-            globals = p_globals ??= new List<Unit>();
-            constants = p_constants ??= new List<Unit>();
-            importIndex = 0;
+            Name = p_name;
+            Table = p_table ?? new Dictionary<Unit, Unit>();
+            Globals = p_globals ??= new List<Unit>();
+            Constants = p_constants ??= new List<Unit>();
+            ImportIndex = 0;
         }
         public override bool ToBool()
         {
@@ -418,33 +416,33 @@ namespace lightning
             Type other_type = other.GetType();
             if (other_type == typeof(Unit))
             {
-                if (this.name == (((Unit)other).heapUnitValue as ModuleUnit).name) return true;
+                if (this.Name == (((Unit)other).heapUnitValue as ModuleUnit).Name) return true;
             }
             if (other_type == typeof(ModuleUnit))
             {
-                if ((other as ModuleUnit).name == this.name) return true;
+                if ((other as ModuleUnit).Name == this.Name) return true;
             }
 
             return false;
         }
         public override string ToString()
         {
-            return "module" + name;
+            return "module" + Name;
         }
 
         public override int GetHashCode()
         {
-            return name.GetHashCode();
+            return Name.GetHashCode();
         }
 
         public override void Set(Unit index, Unit value)
         {
-            table[index] = value;
+            Table[index] = value;
         }
 
         public override Unit Get(Unit p_key){
-            if(table.ContainsKey(p_key)){
-                return table[p_key];
+            if(Table.ContainsKey(p_key)){
+                return Table[p_key];
             }else{
                 throw new Exception("Module Table does not contain index: " + p_key.ToString());
             }
@@ -454,7 +452,7 @@ namespace lightning
     public class WrapperUnit<T> : HeapUnit
     {
         public object content;
-        Dictionary<Unit, Unit> table;
+        private Dictionary<Unit, Unit> table;
         private TableUnit superTable;
         public override UnitType Type{
             get{

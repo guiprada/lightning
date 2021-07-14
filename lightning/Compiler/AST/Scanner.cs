@@ -34,10 +34,10 @@ namespace lightning
             {"xnor", TokenType.XNOR},
         };
 
-        char[] source;
-        int line;
-        int start;
-        int current;
+        private char[] source;
+        private int line;
+        private int start;
+        private int current;
 
         public List<string> Errors {
             get{
@@ -46,8 +46,8 @@ namespace lightning
         }
         private List<string> errors;
 
-        List<Token> tokens;
-        bool hasScanned;
+        private List<Token> tokens;
+        private bool hasScanned;
         public List<Token> Tokens{
             get
             {

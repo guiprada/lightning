@@ -13,9 +13,9 @@ namespace lightning
 {
 	public class TableUnit : HeapUnit
     {
-        public List<Unit> elements;
-        public Dictionary<Unit, Unit> table;
-        public TableUnit superTable;
+        public List<Unit> Elements{get; private set;}
+        public Dictionary<Unit, Unit> Table{get; private set;}
+        public TableUnit SuperTable{get; set;}
 
         public override UnitType Type{
             get{
@@ -24,24 +24,24 @@ namespace lightning
         }
         public int ECount {
             get{
-                return elements.Count;
+                return Elements.Count;
             }
         }
         public int TCount {
             get{
-                return table.Count;
+                return Table.Count;
             }
         }
         public int Count {
             get{
-                return elements.Count + table.Count;
+                return Elements.Count + Table.Count;
             }
         }
         public TableUnit(List<Unit> p_elements, Dictionary<Unit, Unit> p_table, TableUnit p_superTable = null)
         {
-            elements = p_elements ??= new List<Unit>();
-            table = p_table ??= new Dictionary<Unit, Unit>();
-            superTable = p_superTable;
+            Elements = p_elements ??= new List<Unit>();
+            Table = p_table ??= new Dictionary<Unit, Unit>();
+            SuperTable = p_superTable;
         }
 
         public void Set(Unit p_value){
@@ -108,55 +108,55 @@ namespace lightning
             }
         }
         Unit GetTable(Unit p_key){
-            if(table.ContainsKey(p_key))
-                return table[p_key];
-            else if(superTable != null)
-                return superTable.GetTable(p_key);
+            if(Table.ContainsKey(p_key))
+                return Table[p_key];
+            else if(SuperTable != null)
+                return SuperTable.GetTable(p_key);
             throw new Exception("Table or Super Table does not contain index: " + p_key.ToString());
         }
 
         Unit GetElement(Unit p_key){
-            if(p_key.integerValue <= (elements.Count - 1))
-                return elements[(int)p_key.integerValue];
-            if(table.ContainsKey(p_key))
-                    return table[p_key];
+            if(p_key.integerValue <= (Elements.Count - 1))
+                return Elements[(int)p_key.integerValue];
+            if(Table.ContainsKey(p_key))
+                    return Table[p_key];
             throw new Exception("List does not contain index: " + p_key.ToString());
         }
         void ElementSet(Unit p_key, Unit value)
         {
             Integer index = p_key.integerValue;
-            if (index <= elements.Count - 1)
-                elements[(int)index] = value;
-            else if (index > elements.Count)
+            if (index <= Elements.Count - 1)
+                Elements[(int)index] = value;
+            else if (index > Elements.Count)
                 TableSet(p_key, value);
-            else if (index == elements.Count){
-                if (table.ContainsKey(p_key))
+            else if (index == Elements.Count){
+                if (Table.ContainsKey(p_key))
                     MoveToList(p_key);
                 else
-                    elements.Add(value);
+                    Elements.Add(value);
             }
         }
 
         void MoveToList(Unit p_key){
-            elements.Add(table[p_key]);
-            table.Remove(p_key);
+            Elements.Add(Table[p_key]);
+            Table.Remove(p_key);
         }
 
         void ElementAdd(Unit value)
         {
-            elements.Add(value);
+            Elements.Add(value);
         }
 
         void TableSet(Unit index, Unit value)
         {
-            table[index] = value;
+            Table[index] = value;
         }
 
         public override string ToString()
         {
             string this_string = "table: ";
             int counter = 0;
-            foreach (Unit v in elements)
+            foreach (Unit v in Elements)
             {
                 if (counter == 0)
                 {
@@ -172,7 +172,7 @@ namespace lightning
             if (counter > 0)
                 this_string += " ";
             bool first = true;
-            foreach (KeyValuePair<Unit, Unit> entry in table)
+            foreach (KeyValuePair<Unit, Unit> entry in Table)
             {
                 if (first)
                 {
@@ -211,7 +211,7 @@ namespace lightning
 
         public override int GetHashCode()
         {
-            return elements.GetHashCode() + table.GetHashCode();
+            return Elements.GetHashCode() + Table.GetHashCode();
         }
     }
 }
