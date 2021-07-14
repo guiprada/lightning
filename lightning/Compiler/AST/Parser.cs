@@ -361,7 +361,7 @@ namespace lightning
                 Node value = assignment();
 
                 if (expr.Type == NodeType.VARIABLE)
-                    return new assignmentOpNode((VariableNode)expr, value, AssignmentOperatorType.PLUS, expr.Line);
+                    return new assignmentOpNode((VariableNode)expr, value, AssignmentOperatorType.ADDITION_ASSIGN, expr.Line);
                 else
                     Error("Invalid assignment.");
             }
@@ -370,7 +370,7 @@ namespace lightning
                 Node value = new LiteralNode(1, expr.Line);
 
                 if (expr.Type == NodeType.VARIABLE)
-                    return new assignmentOpNode((VariableNode)expr, value, AssignmentOperatorType.PLUS, expr.Line);
+                    return new assignmentOpNode((VariableNode)expr, value, AssignmentOperatorType.ADDITION_ASSIGN, expr.Line);
                 else
                     Error("Invalid assignment.");
             }
@@ -379,7 +379,7 @@ namespace lightning
                 Node value = assignment();
 
                 if (expr.Type == NodeType.VARIABLE)
-                    return new assignmentOpNode((VariableNode)expr, value, AssignmentOperatorType.MINUS, expr.Line);
+                    return new assignmentOpNode((VariableNode)expr, value, AssignmentOperatorType.SUBTRACTION_ASSIGN, expr.Line);
                 else
                     Error("Invalid assignment.");
             }
@@ -388,7 +388,7 @@ namespace lightning
                 Node value = new LiteralNode(1, expr.Line);
 
                 if (expr.Type == NodeType.VARIABLE)
-                    return new assignmentOpNode((VariableNode)expr, value, AssignmentOperatorType.MINUS, expr.Line);
+                    return new assignmentOpNode((VariableNode)expr, value, AssignmentOperatorType.SUBTRACTION_ASSIGN, expr.Line);
                 else
                     Error("Invalid assignment.");
             }
@@ -397,7 +397,7 @@ namespace lightning
                 Node value = assignment();
 
                 if (expr.Type == NodeType.VARIABLE)
-                    return new assignmentOpNode((VariableNode)expr, value, AssignmentOperatorType.MULTIPLICATION, expr.Line);
+                    return new assignmentOpNode((VariableNode)expr, value, AssignmentOperatorType.MULTIPLICATION_ASSIGN, expr.Line);
                 else
                     Error("Invalid assignment.");
             }
@@ -406,7 +406,7 @@ namespace lightning
                 Node value = assignment();
 
                 if (expr.Type == NodeType.VARIABLE)
-                    return new assignmentOpNode((VariableNode)expr, value, AssignmentOperatorType.DIVISION, expr.Line);
+                    return new assignmentOpNode((VariableNode)expr, value, AssignmentOperatorType.DIVISION_ASSIGN, expr.Line);
                 else
                     Error("Invalid assignment.");
             }
@@ -557,8 +557,8 @@ namespace lightning
                 Token op = Previous();
                 OperatorType this_op;
 
-                if (op.Type == TokenType.MINUS) this_op = OperatorType.MINUS;
-                else if (op.Type == TokenType.PLUS) this_op = OperatorType.PLUS;
+                if (op.Type == TokenType.MINUS) this_op = OperatorType.SUBTRACTION;
+                else if (op.Type == TokenType.PLUS) this_op = OperatorType.ADDITION;
                 else this_op = OperatorType.APPEND;
 
                 Node right = Multiplication();
@@ -597,11 +597,11 @@ namespace lightning
                 if (op.Type == TokenType.BANG)
                     this_op = OperatorType.NOT;
                 else if (op.Type == TokenType.PLUS_PLUS)
-                    this_op = OperatorType.PLUS_PLUS;
+                    this_op = OperatorType.INCREMENT;
                 else if (op.Type == TokenType.MINUS_MINUS)
-                    this_op = OperatorType.MINUS_MINUS;
+                    this_op = OperatorType.DECREMENT;
                 else if (op.Type == TokenType.MINUS)
-                    this_op = OperatorType.MINUS;
+                    this_op = OperatorType.SUBTRACTION;
                 else
                 {
                     Error("Unkown unary operator!");

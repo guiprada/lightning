@@ -57,11 +57,11 @@ namespace lightning
 
         int Env{ get{ return variables.Env; } }
 
-        const Operand EQUAL = (Operand)AssignmentOperatorType.EQUAL;
-        const Operand PLUS = (Operand)AssignmentOperatorType.PLUS;
-        const Operand MINUS = (Operand)AssignmentOperatorType.MINUS;
-        const Operand MULTIPLICATION = (Operand)AssignmentOperatorType.MULTIPLICATION;
-        const Operand DIVISION = (Operand)AssignmentOperatorType.DIVISION;
+        const Operand ASSIGN = (Operand)AssignmentOperatorType.ASSIGN;
+        const Operand ADDITION_ASSIGN = (Operand)AssignmentOperatorType.ADDITION_ASSIGN;
+        const Operand SUBTRACTION_ASSIGN = (Operand)AssignmentOperatorType.SUBTRACTION_ASSIGN;
+        const Operand MULTIPLICATION_ASSIGN = (Operand)AssignmentOperatorType.MULTIPLICATION_ASSIGN;
+        const Operand DIVISION_ASSIGN = (Operand)AssignmentOperatorType.DIVISION_ASSIGN;
 
 //////////////////////////////////////////////////// Public
         public VM(Chunk p_chunk, int p_function_deepness = 100, Memory<Unit> p_globals = null, bool p_parallelVM = false)
@@ -496,22 +496,22 @@ namespace lightning
                             Operand n_shift = instruction.opB;
                             Operand op = instruction.opC;
                             Unit new_value = stack.Peek();
-                            if (op == EQUAL){
+                            if (op == ASSIGN){
                                 variables.SetAt(new_value, address, CalculateEnvShift(n_shift));
                             }else{
                                 Unit old_value = variables.GetAt(address, CalculateEnvShift(n_shift));
                                 Unit result;
                                 switch(op){
-                                    case PLUS:
+                                    case ADDITION_ASSIGN:
                                         result = old_value + new_value;
                                         break;
-                                    case MINUS:
+                                    case SUBTRACTION_ASSIGN:
                                         result = old_value - new_value;
                                         break;
-                                    case MULTIPLICATION:
+                                    case MULTIPLICATION_ASSIGN:
                                         result = old_value * new_value;
                                         break;
-                                    case DIVISION:
+                                    case DIVISION_ASSIGN:
                                         result = old_value / new_value;
                                         break;
                                     default:
@@ -528,29 +528,29 @@ namespace lightning
                             Operand address = instruction.opA;
                             Operand op = instruction.opB;
                             Unit new_value = stack.Peek();
-                            if (op == EQUAL){
+                            if (op == ASSIGN){
                                 globals.Set(new_value, address);
                             }else if(parallelVM == true){
                                 switch(op){
-                                    case PLUS:
+                                    case ADDITION_ASSIGN:
                                         lock(globals){
                                             Unit result = globals.Get(address) + new_value;
                                             globals.Set(result, address);
                                         }
                                         break;
-                                    case MINUS:
+                                    case SUBTRACTION_ASSIGN:
                                         lock(globals){
                                             Unit result = globals.Get(address) - new_value;
                                             globals.Set(result, address);
                                         }
                                         break;
-                                    case MULTIPLICATION:
+                                    case MULTIPLICATION_ASSIGN:
                                         lock(globals){
                                             Unit result = globals.Get(address) * new_value;
                                             globals.Set(result, address);
                                         }
                                         break;
-                                    case DIVISION:
+                                    case DIVISION_ASSIGN:
                                         lock(globals){
                                             Unit result = globals.Get(address) / new_value;
                                             globals.Set(result, address);
@@ -561,25 +561,25 @@ namespace lightning
                                 }
                             }else{
                                 switch(op){
-                                    case PLUS:
+                                    case ADDITION_ASSIGN:
                                         {
                                             Unit result = globals.Get(address) + new_value;
                                             globals.Set(result, address);
                                         }
                                         break;
-                                    case MINUS:
+                                    case SUBTRACTION_ASSIGN:
                                         {
                                             Unit result = globals.Get(address) - new_value;
                                             globals.Set(result, address);
                                         }
                                         break;
-                                    case MULTIPLICATION:
+                                    case MULTIPLICATION_ASSIGN:
                                         {
                                             Unit result = globals.Get(address) * new_value;
                                             globals.Set(result, address);
                                         }
                                         break;
-                                    case DIVISION:
+                                    case DIVISION_ASSIGN:
                                         {
                                             Unit result = globals.Get(address) / new_value;
                                             globals.Set(result, address);
@@ -598,26 +598,26 @@ namespace lightning
                             Operand op = instruction.opB;
                             UpValueUnit this_upValue = upValues.GetAt(address);
                             Unit new_value = stack.Peek();
-                            if (op == EQUAL){
+                            if (op == ASSIGN){
                                 this_upValue.UpValue = new_value;
                             }else if(parallelVM == true){
                                 switch(op){
-                                    case PLUS:
+                                    case ADDITION_ASSIGN:
                                         lock(this_upValue){
                                             this_upValue.UpValue = this_upValue.UpValue + new_value;
                                         }
                                         break;
-                                    case MINUS:
+                                    case SUBTRACTION_ASSIGN:
                                         lock(this_upValue){
                                             this_upValue.UpValue = this_upValue.UpValue - new_value;
                                         }
                                         break;
-                                    case MULTIPLICATION:
+                                    case MULTIPLICATION_ASSIGN:
                                         lock(this_upValue){
                                             this_upValue.UpValue = this_upValue.UpValue * new_value;
                                         }
                                         break;
-                                    case DIVISION:
+                                    case DIVISION_ASSIGN:
                                         lock(this_upValue){
                                             this_upValue.UpValue = this_upValue.UpValue / new_value;
                                         }
@@ -627,22 +627,22 @@ namespace lightning
                                 }
                             }else{
                                 switch(op){
-                                    case PLUS:
+                                    case ADDITION_ASSIGN:
                                         {
                                             this_upValue.UpValue = this_upValue.UpValue + new_value;
                                         }
                                         break;
-                                    case MINUS:
+                                    case SUBTRACTION_ASSIGN:
                                         {
                                             this_upValue.UpValue = this_upValue.UpValue - new_value;
                                         }
                                         break;
-                                    case MULTIPLICATION:
+                                    case MULTIPLICATION_ASSIGN:
                                         {
                                             this_upValue.UpValue = this_upValue.UpValue * new_value;
                                         }
                                         break;
-                                    case DIVISION:
+                                    case DIVISION_ASSIGN:
                                         {
                                             this_upValue.UpValue = this_upValue.UpValue / new_value;
                                         }
@@ -691,7 +691,7 @@ namespace lightning
                             Unit new_value = stack.Peek();
                             Unit index = indexes[indexes_counter - 1];
                             UnitType index_type = indexes[indexes_counter - 1].Type;
-                            if (op == EQUAL)
+                            if (op == ASSIGN)
                             {
                                 ((this_table.heapUnitValue)).Set(index, new_value);
                             }
@@ -700,28 +700,28 @@ namespace lightning
                                 Unit old_value;
                                 Unit result;
                                 switch(op){
-                                    case PLUS:
+                                    case ADDITION_ASSIGN:
                                         lock(this_table.heapUnitValue){
                                             old_value = ((TableUnit)(this_table.heapUnitValue)).Get(index);
                                             result = old_value + new_value;
                                             (this_table.heapUnitValue).Set(index, result);
                                         }
                                         break;
-                                    case MINUS:
+                                    case SUBTRACTION_ASSIGN:
                                         lock(this_table.heapUnitValue){
                                             old_value = ((TableUnit)(this_table.heapUnitValue)).Get(index);
                                             result = old_value - new_value;
                                             (this_table.heapUnitValue).Set(index, result);
                                         }
                                         break;
-                                    case MULTIPLICATION:
+                                    case MULTIPLICATION_ASSIGN:
                                         lock(this_table.heapUnitValue){
                                             old_value = ((TableUnit)(this_table.heapUnitValue)).Get(index);
                                             result = old_value * new_value;
                                             (this_table.heapUnitValue).Set(index, result);
                                         }
                                         break;
-                                    case DIVISION:
+                                    case DIVISION_ASSIGN:
                                         lock(this_table.heapUnitValue){
                                             old_value = ((TableUnit)(this_table.heapUnitValue)).Get(index);
                                             result = old_value / new_value;
@@ -738,16 +738,16 @@ namespace lightning
                                 Unit old_value = (this_table.heapUnitValue).Get(index);
                                 Unit result;
                                 switch(op){
-                                    case PLUS:
+                                    case ADDITION_ASSIGN:
                                         result = old_value + new_value;
                                         break;
-                                    case MINUS:
+                                    case SUBTRACTION_ASSIGN:
                                         result = old_value - new_value;
                                         break;
-                                    case MULTIPLICATION:
+                                    case MULTIPLICATION_ASSIGN:
                                         result = old_value * new_value;
                                         break;
-                                    case DIVISION:
+                                    case DIVISION_ASSIGN:
                                         result = old_value / new_value;
                                         break;
                                     default:

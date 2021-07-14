@@ -197,10 +197,10 @@ namespace lightning
             OpCode this_opcode;
             switch (p_node.Op)
             {
-                case OperatorType.MINUS:
+                case OperatorType.SUBTRACTION:
                     this_opcode = OpCode.SUBTRACT;
                     break;
-                case OperatorType.PLUS:
+                case OperatorType.ADDITION:
                     this_opcode = OpCode.ADD;
                     break;
                 case OperatorType.DIVISION:
@@ -250,15 +250,15 @@ namespace lightning
                     this_opcode = OpCode.NOT;
                     Add(this_opcode, p_node.Line);
                     break;
-                case OperatorType.MINUS:
+                case OperatorType.SUBTRACTION:
                     this_opcode = OpCode.NEGATE;
                     Add(this_opcode, p_node.Line);
                     break;
-                case OperatorType.PLUS_PLUS:
+                case OperatorType.INCREMENT:
                     this_opcode = OpCode.INCREMENT;
                     Add(this_opcode, p_node.Line);
                     break;
-                case OperatorType.MINUS_MINUS:
+                case OperatorType.DECREMENT:
                     this_opcode = OpCode.DECREMENT;
                     Add(this_opcode, p_node.Line);
                     break;
@@ -483,7 +483,7 @@ namespace lightning
         {
             ChunkIt(p_node.Value);
             Nullable<Variable> maybe_var = GetVar(p_node.assigned.Name);
-            Operand op = (Operand)AssignmentOperatorType.EQUAL;
+            Operand op = (Operand)AssignmentOperatorType.ASSIGN;
             if (maybe_var.HasValue)
             {
                 Variable this_var = maybe_var.Value;

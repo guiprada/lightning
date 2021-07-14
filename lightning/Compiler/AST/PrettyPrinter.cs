@@ -108,8 +108,8 @@ namespace lightning
         {
             Console.Write("[BINARY ");
             Print(p_node.Left);
-            if (p_node.Op == OperatorType.PLUS) Console.Write(" + ");
-            else if (p_node.Op == OperatorType.MINUS) Console.Write(" - ");
+            if (p_node.Op == OperatorType.ADDITION) Console.Write(" + ");
+            else if (p_node.Op == OperatorType.SUBTRACTION) Console.Write(" - ");
             else if (p_node.Op == OperatorType.MULTIPLICATION) Console.Write(" * ");
             else if (p_node.Op == OperatorType.DIVISION) Console.Write(" / ");
             else if (p_node.Op == OperatorType.APPEND) Console.Write(" .. ");
@@ -129,10 +129,10 @@ namespace lightning
         private void PrintUnary(UnaryNode p_node)
         {
             Console.Write("[UNARY ");
-            if (p_node.Op == OperatorType.MINUS) Console.Write(" - ");
+            if (p_node.Op == OperatorType.SUBTRACTION) Console.Write(" - ");
             else if (p_node.Op == OperatorType.NOT) Console.Write(" ! ");
-            else if (p_node.Op == OperatorType.PLUS_PLUS) Console.Write(" ++ ");
-            else if (p_node.Op == OperatorType.MINUS_MINUS) Console.Write(" -- ");
+            else if (p_node.Op == OperatorType.INCREMENT) Console.Write(" ++ ");
+            else if (p_node.Op == OperatorType.DECREMENT) Console.Write(" -- ");
             else
                 Error("Invalid unary operator.", p_node.Line);
             Print(p_node.Right);
@@ -339,16 +339,16 @@ namespace lightning
             Console.Write("[ASSIGMENT_OP " + p_node.assigned.Name);
             string op;
             switch (p_node.Op) {
-                case AssignmentOperatorType.PLUS:
+                case AssignmentOperatorType.ADDITION_ASSIGN:
                     op = " += ";
                     break;
-                case AssignmentOperatorType.MINUS:
+                case AssignmentOperatorType.SUBTRACTION_ASSIGN:
                     op = " -= ";
                     break;
-                case AssignmentOperatorType.MULTIPLICATION:
+                case AssignmentOperatorType.MULTIPLICATION_ASSIGN:
                     op = " *= ";
                     break;
-                case AssignmentOperatorType.DIVISION:
+                case AssignmentOperatorType.DIVISION_ASSIGN:
                     op = " /= ";
                     break;
                 default:

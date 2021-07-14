@@ -42,10 +42,10 @@ namespace lightning
 
     public enum OperatorType
     {
-        PLUS,
-        PLUS_PLUS,
-        MINUS,
-        MINUS_MINUS,
+        ADDITION,
+        INCREMENT,
+        SUBTRACTION,
+        DECREMENT,
         MULTIPLICATION,
         DIVISION,
 
@@ -70,11 +70,11 @@ namespace lightning
 
     public enum AssignmentOperatorType
     {
-        EQUAL,
-        PLUS,
-        MINUS,
-        MULTIPLICATION,
-        DIVISION,
+        ASSIGN,
+        ADDITION_ASSIGN,
+        SUBTRACTION_ASSIGN,
+        MULTIPLICATION_ASSIGN,
+        DIVISION_ASSIGN,
     }
 
     public enum VarAccessType
