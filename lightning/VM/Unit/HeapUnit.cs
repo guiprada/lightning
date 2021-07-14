@@ -232,8 +232,8 @@ namespace lightning
 
     public class ClosureUnit : HeapUnit
     {
-        public FunctionUnit function;
-        public List<UpValueUnit> upValues;
+        public FunctionUnit Function{get; private set;}
+        public List<UpValueUnit> UpValues{get; private set;}
         public override UnitType Type{
             get{
                 return UnitType.Closure;
@@ -242,19 +242,19 @@ namespace lightning
 
         public ClosureUnit(FunctionUnit p_function, List<UpValueUnit> p_upValues)
         {
-            function = p_function;
-            upValues = p_upValues;
+            Function = p_function;
+            UpValues = p_upValues;
         }
 
         public void Register(Memory<Unit> p_variables)
         {
-            foreach (UpValueUnit u in upValues)
+            foreach (UpValueUnit u in UpValues)
                 u.Attach(p_variables);
         }
 
         public override string ToString()
         {
-            return new string("Closure of " + function.ToString());
+            return new string("Closure of " + Function.ToString());
         }
 
         public override bool ToBool()
@@ -281,7 +281,7 @@ namespace lightning
 
         public override int GetHashCode()
         {
-            return upValues.GetHashCode() + function.GetHashCode();
+            return UpValues.GetHashCode() + Function.GetHashCode();
         }
 
         public override Unit Get(Unit p_key){

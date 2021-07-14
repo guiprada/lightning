@@ -1397,7 +1397,7 @@ namespace lightning
 
         static void RelocateClosure(ClosureUnit closure, RelocationInfo relocationInfo)
         {
-            foreach (UpValueUnit v in closure.upValues)
+            foreach (UpValueUnit v in closure.UpValues)
             {
                 if (v.UpValue.Type == UnitType.Closure/* && relocationInfo.module.name != closure.function.module*/)
                 {
@@ -1409,7 +1409,7 @@ namespace lightning
                 }
             }
 
-            RelocateFunction(closure.function, relocationInfo);
+            RelocateFunction(closure.Function, relocationInfo);
         }
 
         static void RelocateFunction(FunctionUnit function, RelocationInfo relocationInfo)
@@ -1511,7 +1511,7 @@ namespace lightning
                     {
                         relocationInfo.importingVM.GetChunk().GetConstants().Add(this_value);
                         next.opC = (Operand)(relocationInfo.importingVM.GetChunk().GetConstants().Count - 1);
-                        RelocateChunk(((ClosureUnit)this_value.heapUnitValue).function, relocationInfo);
+                        RelocateChunk(((ClosureUnit)this_value.heapUnitValue).Function, relocationInfo);
                     }
                 }
                 else if (next.opCode == OpCode.LOAD_IMPORTED_GLOBAL)

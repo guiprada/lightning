@@ -225,11 +225,11 @@ namespace lightning
 
                 upValues.PushEnv();
 
-                foreach (UpValueUnit u in this_closure.upValues)
+                foreach (UpValueUnit u in this_closure.UpValues)
                 {
                     upValues.Add(u);
                 }
-                instructions.PushFunction(this_closure.function, Env, out instructionsCache);
+                instructions.PushFunction(this_closure.Function, Env, out instructionsCache);
 
                 IP = 0;
             }
@@ -455,16 +455,16 @@ namespace lightning
 
                                 // new upvalues
                                 List<UpValueUnit> new_upValues = new List<UpValueUnit>();
-                                foreach (UpValueUnit u in this_closure.upValues)
+                                foreach (UpValueUnit u in this_closure.UpValues)
                                 {
                                     // here we convert env from shift based to absolute based
                                     UpValueUnit new_upvalue = new UpValueUnit(u.address, CalculateEnvShiftUpVal(u.env));
                                     new_upValues.Add(new_upvalue);
                                 }
-                                ClosureUnit new_closure = new ClosureUnit(this_closure.function, new_upValues);
+                                ClosureUnit new_closure = new ClosureUnit(this_closure.Function, new_upValues);
 
                                 new_closure.Register(variables);
-                                foreach (UpValueUnit u in new_closure.upValues)
+                                foreach (UpValueUnit u in new_closure.UpValues)
                                 {
                                     RegisterUpValue(u);
                                 }
@@ -1094,13 +1094,13 @@ namespace lightning
 
                                 upValues.PushEnv();
 
-                                foreach (UpValueUnit u in this_closure.upValues)
+                                foreach (UpValueUnit u in this_closure.UpValues)
                                 {
                                     upValues.Add(u);
                                 }
 
                                 instructions.PushRET(IP);
-                                instructions.PushFunction(this_closure.function, Env, out instructionsCache);
+                                instructions.PushFunction(this_closure.Function, Env, out instructionsCache);
 
                                 IP = 0;
                             }
