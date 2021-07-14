@@ -1,9 +1,5 @@
 ﻿using System;
 using System.Runtime.InteropServices;
-using System.Collections.Generic;
-using System.Text;
-
-using Operand = System.UInt16;
 
 #if DOUBLE
     using Float = System.Double;

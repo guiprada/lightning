@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Text;
 
 using Operand = System.UInt16;
 
@@ -928,121 +927,6 @@ namespace lightning
             }
 
             ////////////////////////////////////////////////////////////////////////////////////////////////////////////
-            ///////////////////////////////////////////////////////////////////////////////////////////////////// string
-            {
-                TableUnit string_table = new TableUnit(null, null);
-
-                Unit stringSlice(VM vm)
-                {
-                    string input_string = vm.GetString(0);
-                    Float start = vm.GetNumber(1);
-                    Float end = vm.GetNumber(2);
-
-                    if (end < input_string.Length)
-                    {
-                        string result = input_string.Substring((int)start, (int)(end - start));
-                        return new Unit(result);
-                    }
-                    return new Unit(UnitType.Null);
-                }
-                string_table.Set("slice", new IntrinsicUnit("string_slice", stringSlice, 3));
-
-                //////////////////////////////////////////////////////
-
-                Unit stringSplit(VM vm)
-                {
-                    StringUnit val_input_string = vm.GetStringUnit(0);
-                    string input_string = val_input_string.ToString();
-                    Float start = vm.GetNumber(1);
-                    if (start < input_string.Length)
-                    {
-                        Float end = input_string.Length;
-                        string result = input_string.Substring((int)start, (int)(end - start));
-                        val_input_string.content = input_string.Substring(0, (int)start);
-                        return new Unit(result);
-                    }
-                    return new Unit(UnitType.Null);
-                }
-                string_table.Set("split", new IntrinsicUnit("string_split", stringSplit, 2));
-
-                //////////////////////////////////////////////////////
-
-                Unit stringLength(VM vm)
-                {
-                    StringUnit val_input_string = vm.GetStringUnit(0);
-                    return new Unit(val_input_string.content.Length);
-                }
-                string_table.Set("length", new IntrinsicUnit("string_length", stringLength, 1));
-
-                //////////////////////////////////////////////////////
-
-                Unit stringCopy(VM vm)
-                {
-                    Unit val_input_string = vm.GetUnit(0);
-                    if (val_input_string.Type == UnitType.String)
-                        return new Unit(val_input_string.ToString());
-                    else
-                        return new Unit(UnitType.Null);
-                }
-                string_table.Set("copy", new IntrinsicUnit("string_copy", stringCopy, 1));
-
-                //////////////////////////////////////////////////////
-                Unit toList(VM vm)
-                {
-                    string val_input_string = vm.GetString(0);
-                    List<Unit> string_list = new List<Unit>();
-                    foreach(char c in val_input_string.ToCharArray()){
-                        string_list.Add(new Unit(c));
-                    }
-                    return new Unit(new TableUnit(string_list, null));
-                }
-                string_table.Set("to_list", new IntrinsicUnit("string_to_list", toList, 1));
-
-                //////////////////////////////////////////////////////
-                Unit charAt(VM vm)
-                {
-                    Integer index = vm.GetInteger(0);
-                    string input_string = vm.GetString(1);
-                    if (index < input_string.Length)
-                    {
-                        char result = input_string[(int)index];
-                        return new Unit(result);
-                    }
-                    return new Unit(UnitType.Null);
-                }
-                string_table.Set("char_at", new IntrinsicUnit("string_char_at", charAt, 2));
-
-                //////////////////////////////////////////////////////
-                Unit Contains(VM vm)
-                {
-                    string input_string = vm.GetString(0);
-                    string contained_string = vm.GetString(1);
-
-                    return new Unit(input_string.Contains(contained_string));
-                }
-                string_table.Set("contains", new IntrinsicUnit("string_contains", Contains, 2));
-
-                //////////////////////////////////////////////////////
-                Unit ContainsChar(VM vm)
-                {
-                    string input_string = vm.GetString(0);
-                    char contained_char = vm.GetChar(1);
-
-                    return new Unit(input_string.Contains(contained_char));
-                }
-                string_table.Set("contains_char", new IntrinsicUnit("string_contains_char", ContainsChar, 2));
-
-                //////////////////////////////////////////////////////
-                Unit NewLine(VM vm)
-                {
-                    return new Unit(Environment.NewLine);
-                }
-                string_table.Set("new_line", new IntrinsicUnit("string_new_line", NewLine, 0));
-
-                tables.Add("string", string_table);
-            }
-
-            ////////////////////////////////////////////////////////////////////////////////////////////////////////////
             /////////////////////////////////////////////////////////////////////////////////////////////////////// char
             {
                 TableUnit char_table = new TableUnit(null, null);
@@ -1403,6 +1287,13 @@ namespace lightning
                 return new Unit(Environment.OSVersion.VersionString);
             }
             functions.Add(new IntrinsicUnit("get_os", getOs, 0));
+
+            //////////////////////////////////////////////////////
+            Unit NewLine(VM vm)
+            {
+                return new Unit(Environment.NewLine);
+            }
+            functions.Add(new IntrinsicUnit("new_line", NewLine, 0));
 
             //////////////////////////////////////////////////////
             Library prelude = new Library(functions, tables);

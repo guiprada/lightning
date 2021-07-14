@@ -2,9 +2,9 @@
 
 var os_string = get_os()
 var os = "Unknown"
-if(string.contains(os_string, "Windows"))
+if(os_string:contains("Windows"))
     os = "Windows"
-else if(string.contains(os_string, "Unix"))
+else if(os_string:contains("Unix"))
     os = "Unix"
 
 write_line(get_os())
@@ -774,38 +774,38 @@ var global_lock_test_counter = 5
     var another_a = 'a'
     assert(another_a, 'a', "Failed Char Test 1.")
     var hello_string = "hello"
-    assert('h', string.char_at(0, hello_string), "Failed Char Test 2.")
-    assert('o', string.char_at(4, hello_string), "Failed Char Test 3.")
-    var char_list = string.to_list(hello_string)
+    assert('h', hello_string:char_at(0), "Failed Char Test 2.")
+    assert('o', hello_string:char_at(4), "Failed Char Test 3.")
+    var char_list = hello_string:to_list()
     assert('h', char_list[0], "Failed Char Test 4.")
     assert('o', char_list[4], "Failed Char Test 5.")
     var line_skip_string =
 "a
 a"
-    var new_line = string.new_line()
-    var new_line_size = string.length(new_line)
+    var new_line = new_line()
+    var new_line_size = new_line:length()
     if(new_line_size == 2){
-        assert('\n', string.char_at(2,line_skip_string), "Failed Char Test 6.")
-        assert('a', string.char_at(3,line_skip_string), "Failed Char Test 7.")
-        assert('a', string.char_at(0,line_skip_string), "Failed Char Test 8.")
-        assert('\r', string.char_at(1,line_skip_string), "Failed Char Test 9.")
+        assert('\n', line_skip_string:char_at(2), "Failed Char Test 6.")
+        assert('a', line_skip_string:char_at(3), "Failed Char Test 7.")
+        assert('a', line_skip_string:char_at(0), "Failed Char Test 8.")
+        assert('\r', line_skip_string:char_at(1), "Failed Char Test 9.")
     }else if(new_line_size == 1){
-        assert('\n', string.char_at(1,line_skip_string), "Failed Char Test 6.")
-        assert('a', string.char_at(2,line_skip_string), "Failed Char Test 7.")
-        assert('a', string.char_at(0,line_skip_string), "Failed Char Test 8.")
+        assert('\n', line_skip_string:char_at(1), "Failed Char Test 6.")
+        assert('a', line_skip_string:char_at(2), "Failed Char Test 7.")
+        assert('a', line_skip_string:char_at(0), "Failed Char Test 8.")
     }
 }
 {
     // Testing String Contains
     var hello_world_string = "hello world"
-    assert(string.contains(hello_world_string, "hello"), true, "Failed String Contains Test 1.")
-    assert(string.contains(hello_world_string, "world"), true, "Failed String Contains Test 2.")
-    assert(string.contains(hello_world_string, "llo wo"), true, "Failed String Contains Test 3.")
-    assert(string.contains(hello_world_string, "hey"), false, "Failed String Contains Test 4.")
-    assert(string.contains(hello_world_string, "_wor"), false, "Failed String Contains Test 5.")
-    assert(string.contains_char(hello_world_string, 'e'), true, "Failed String Contains Test 6.")
-    assert(string.contains_char(hello_world_string, 'l'), true, "Failed String Contains Test 7.")
-    assert(string.contains_char(hello_world_string, 'g'), false, "Failed String Contains Test 8.")
+    assert(hello_world_string:contains("hello"), true, "Failed String Contains Test 1.")
+    assert(hello_world_string:contains("world"), true, "Failed String Contains Test 2.")
+    assert(hello_world_string:contains("llo wo"), true, "Failed String Contains Test 3.")
+    assert(hello_world_string:contains("hey"), false, "Failed String Contains Test 4.")
+    assert(hello_world_string:contains("_wor"), false, "Failed String Contains Test 5.")
+    assert(hello_world_string:contains_char('e'), true, "Failed String Contains Test 6.")
+    assert(hello_world_string:contains_char('l'), true, "Failed String Contains Test 7.")
+    assert(hello_world_string:contains_char('g'), false, "Failed String Contains Test 8.")
 }
 {
     // Testing Integer
