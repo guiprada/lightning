@@ -295,11 +295,11 @@ namespace lightning
 
     public class UpValueUnit : HeapUnit
     {
-        public Operand address;
-        public Operand env;
-        bool isCaptured;
-        Memory<Unit> variables;
-        Unit value;
+        public Operand Address{get; private set;}
+        public Operand Env{get; private set;}
+        private bool isCaptured;
+        private Memory<Unit> variables;
+        private Unit value;
         public override UnitType Type{
             get{
                 return UnitType.UpValue;
@@ -312,21 +312,21 @@ namespace lightning
                 if (isCaptured)
                     return value;
                 else
-                    return variables.GetAt(address, env);
+                    return variables.GetAt(Address, Env);
             }
             set
             {
                 if (isCaptured)
                     this.value = value;
                 else
-                    variables.SetAt(value, address, env);
+                    variables.SetAt(value, Address, Env);
             }
         }
 
         public UpValueUnit(Operand p_address, Operand p_env)
         {
-            address = p_address;
-            env = p_env;
+            Address = p_address;
+            Env = p_env;
             isCaptured = false;
             variables = null;
             value = new Unit(UnitType.Null);
@@ -342,12 +342,12 @@ namespace lightning
             if (isCaptured == false)
             {
                 isCaptured = true;
-                value = variables.GetAt(address, env);
+                value = variables.GetAt(Address, Env);
             }
         }
         public override string ToString()
         {
-            return new string("upvalue " + address + " on env " + env + " HeapUnit: " + UpValue.ToString());
+            return new string("upvalue " + Address + " on env " + Env + " HeapUnit: " + UpValue.ToString());
         }
 
         public override bool ToBool()

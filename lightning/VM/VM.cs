@@ -458,7 +458,7 @@ namespace lightning
                                 foreach (UpValueUnit u in this_closure.UpValues)
                                 {
                                     // here we convert env from shift based to absolute based
-                                    UpValueUnit new_upvalue = new UpValueUnit(u.address, CalculateEnvShiftUpVal(u.env));
+                                    UpValueUnit new_upvalue = new UpValueUnit(u.Address, CalculateEnvShiftUpVal(u.Env));
                                     new_upValues.Add(new_upvalue);
                                 }
                                 ClosureUnit new_closure = new ClosureUnit(this_closure.Function, new_upValues);
