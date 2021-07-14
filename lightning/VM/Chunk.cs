@@ -288,7 +288,7 @@ namespace lightning
             }
             foreach (IntrinsicUnit v in Prelude.intrinsics)
             {
-                if (v.name == name)
+                if (v.Name == name)
                 {
                     return v;
                 }

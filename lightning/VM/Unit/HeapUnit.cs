@@ -172,9 +172,9 @@ namespace lightning
 
     public class IntrinsicUnit : HeapUnit
     {
-        public string name;
-        public Func<VM, Unit> function;
-        public int arity;
+        public string Name{get; private set;}
+        public Func<VM, Unit> Function{get; private set;}
+        public int Arity{get; private set;}
 
         public override UnitType Type{
             get{
@@ -184,14 +184,14 @@ namespace lightning
 
         public IntrinsicUnit(string p_name, Func<VM, Unit> p_function, int p_arity)
         {
-            name = p_name;
-            function = p_function;
-            arity = p_arity;
+            Name = p_name;
+            Function = p_function;
+            Arity = p_arity;
         }
 
         public override string ToString()
         {
-            return new string("Intrinsic " + name + "(" + arity + ")");
+            return new string("Intrinsic " + Name + "(" + Arity + ")");
         }
 
         public override bool ToBool()
@@ -206,19 +206,19 @@ namespace lightning
             {
                 if(((Unit)other).Type == UnitType.Intrinsic)
                 {
-                    if (function == (((Unit)other).heapUnitValue as IntrinsicUnit).function) return true;
+                    if (Function == (((Unit)other).heapUnitValue as IntrinsicUnit).Function) return true;
                 }
             }
             if (other_type == typeof(IntrinsicUnit))
             {
-                if (function == (other as IntrinsicUnit).function) return true;
+                if (Function == (other as IntrinsicUnit).Function) return true;
             }
             return false;
         }
 
         public override int GetHashCode()
         {
-            return name.GetHashCode();
+            return Name.GetHashCode();
         }
 
         public override Unit Get(Unit p_key){

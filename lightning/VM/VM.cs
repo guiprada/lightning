@@ -236,8 +236,8 @@ namespace lightning
             else if (this_type == UnitType.Intrinsic)
             {
                 IntrinsicUnit this_intrinsic = (IntrinsicUnit)(this_callable.heapUnitValue);
-                Unit intrinsic_result = this_intrinsic.function(this);
-                stack.top -= this_intrinsic.arity;
+                Unit intrinsic_result = this_intrinsic.Function(this);
+                stack.top -= this_intrinsic.Arity;
                 stack.Push(intrinsic_result);
             }
             VMResult result = Run();
@@ -1107,8 +1107,8 @@ namespace lightning
                             else if (this_type == UnitType.Intrinsic)
                             {
                                 IntrinsicUnit this_intrinsic = (IntrinsicUnit)this_callable.heapUnitValue;
-                                Unit result = this_intrinsic.function(this);
-                                stack.top -= this_intrinsic.arity;
+                                Unit result = this_intrinsic.Function(this);
+                                stack.top -= this_intrinsic.Arity;
                                 stack.Push(result);
                             }
                             else

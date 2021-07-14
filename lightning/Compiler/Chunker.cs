@@ -90,7 +90,7 @@ namespace lightning
             // place prelude functions on constans
             foreach (IntrinsicUnit v in prelude.intrinsics)
             {
-                SetGlobalVar(v.name);
+                SetGlobalVar(v.Name);
             }
 
             // load prelude tables
