@@ -733,62 +733,41 @@ namespace lightning
                             break;
                         }
                     case OpCode.JUMP:
-                        {
-                            Operand value = instruction.opA;
-                            IP += value;
-                            break;
-                        }
+                        IP += instruction.opA;
+                        break;
                     case OpCode.JUMP_IF_NOT_TRUE:
+                        if (stack.Pop().ToBool() == false)
                         {
-                            bool value = stack.Pop().ToBool();
-                            if (value == false)
-                            {
-                                IP += instruction.opA;
-                            }
-                            else
-                            {
-                                IP++;
-                            }
-                            break;
+                            IP += instruction.opA;
                         }
+                        else
+                        {
+                            IP++;
+                        }
+                        break;
                     case OpCode.JUMP_BACK:
-                        {
-                            Operand value = instruction.opA;
-                            IP -= value;
-                            break;
-                        }
+                        IP -= instruction.opA;
+                        break;
                     case OpCode.OPEN_ENV:
-                        {
-                            IP++;
-                            EnvPush();
-                            break;
-                        }
+                        IP++;
+                        EnvPush();
+                        break;
                     case OpCode.CLOSE_ENV:
-                        {
-                            IP++;
-                            EnvPop();
-                            break;
-                        }
+                        IP++;
+                        EnvPop();
+                        break;
                     case OpCode.RETURN:
-                        {
-                            IP = instructions.PopRET();
-                            break;
-                        }
+                        IP = instructions.PopRET();
+                        break;
                     case OpCode.RETURN_SET:
-                        {
-                            Operand value = instruction.opA;
-                            instructions.PushRET((Operand)(value + IP));
-
-                            IP++;
-                            break;
-                        }
+                        instructions.PushRET((Operand)(instruction.opA + IP));
+                        IP++;
+                        break;
                     case OpCode.ADD:
                         {
                             IP++;
                             Unit opB = stack.Pop();
-                            Unit opA = stack.Pop();
-
-                            stack.Push(opA + opB);
+                            stack.Push(stack.Pop() + opB);
 
                             break;
                         }
@@ -796,295 +775,121 @@ namespace lightning
                         {
                             IP++;
                             Unit opB = stack.Pop();
-                            Unit opA = stack.Pop();
-
-                            string result = opA.ToString() + opB.ToString();
-                            Unit new_value = new Unit(result);
-                            stack.Push(new_value);
-
+                            string result = stack.Pop().ToString() + opB.ToString();
+                            stack.Push(new Unit(result));
                             break;
                         }
                     case OpCode.SUBTRACT:
                         {
                             IP++;
                             Unit opB = stack.Pop();
-                            Unit opA = stack.Pop();
-
-                            stack.Push(opA - opB);
-
+                            stack.Push(stack.Pop() - opB);
                             break;
                         }
                     case OpCode.MULTIPLY:
-                        {
-                            IP++;
-                            Unit opB = stack.Pop();
-                            Unit opA = stack.Pop();
-
-                            stack.Push(opA * opB);
-
-                            break;
-                        }
+                        IP++;
+                        stack.Push(stack.Pop() * stack.Pop());
+                        break;
                     case OpCode.DIVIDE:
                         {
                             IP++;
                             Unit opB = stack.Pop();
-                            Unit opA = stack.Pop();
-
-                            stack.Push(opA / opB);
-
+                            stack.Push(stack.Pop() / opB);
                             break;
                         }
                     case OpCode.NEGATE:
-                        {
-                            IP++;
-                            Unit opA = stack.Pop();
-                            stack.Push(-opA);
-                            break;
-                        }
+                        IP++;
+                        stack.Push(-stack.Pop());
+                        break;
                     case OpCode.INCREMENT:
-                        {
-                            IP++;
-                            Unit opA = stack.Pop();
-                            Unit new_value = opA + 1;
-                            stack.Push(new_value);
-                            break;
-                        }
+                        IP++;
+                        stack.Push(stack.Pop() + 1);
+                        break;
                     case OpCode.DECREMENT:
-                        {
-                            IP++;
-                            Unit opA = stack.Pop();
-                            Unit new_value = opA - 1;
-                            stack.Push(new_value);
-                            break;
-                        }
+                        IP++;
+                        stack.Push(stack.Pop() - 1);
+                        break;
                     case OpCode.EQUALS:
-                        {
-                            IP++;
-                            Unit opB = stack.Pop();
-                            Unit opA = stack.Pop();
-                            if (opA.Equals(opB))
-                            {
-                                stack.Push(new Unit(true));
-                            }
-                            else
-                            {
-                                stack.Push(new Unit(false));
-                            }
-
-                            break;
-                        }
+                        IP++;
+                        stack.Push(new Unit(stack.Pop().Equals(stack.Pop())));
+                        break;
                     case OpCode.NOT_EQUALS:
-                        {
-                            IP++;
-                            Unit opB = stack.Pop();
-                            Unit opA = stack.Pop();
-
-                            if (!opA.Equals(opB))
-                            {
-                                stack.Push(new Unit(true));
-                            }
-                            else
-                            {
-                                stack.Push(new Unit(false));
-                            }
-
-                            break;
-                        }
+                        IP++;
+                        stack.Push(new Unit(!stack.Pop().Equals(stack.Pop())));
+                        break;
                     case OpCode.GREATER_EQUALS:
-                        {
-                            IP++;
-                            Float opB = stack.Pop().floatValue;
-                            Float opA = stack.Pop().floatValue;
-                            bool truthness = opA >= opB;
-                            if (truthness == true)
-                            {
-                                stack.Push(new Unit(true));
-                            }
-                            else
-                            {
-                                stack.Push(new Unit(false));
-                            }
-                            break;
-                        }
+                        IP++;
+                        stack.Push(new Unit(stack.Pop().floatValue <= stack.Pop().floatValue));
+                        break;
                     case OpCode.LESS_EQUALS:
-                        {
-                            IP++;
-                            Float opB = stack.Pop().floatValue;
-                            Float opA = stack.Pop().floatValue;
-                            bool truthness = opA <= opB;
-                            if (truthness == true)
-                            {
-                                stack.Push(new Unit(true));
-                            }
-                            else
-                            {
-                                stack.Push(new Unit(false));
-                            }
-                            break;
-                        }
+                        IP++;
+                        stack.Push(new Unit(stack.Pop().floatValue >= stack.Pop().floatValue));
+                        break;
                     case OpCode.GREATER:
-                        {
-                            IP++;
-                            Float opB = stack.Pop().floatValue;
-                            Float opA = stack.Pop().floatValue;
-                            bool truthness = opA > opB;
-                            if (truthness == true)
-                            {
-                                stack.Push(new Unit(true));
-                            }
-                            else
-                            {
-                                stack.Push(new Unit(false));
-                            }
-                            break;
-                        }
+                        IP++;
+                        stack.Push(new Unit(stack.Pop().floatValue < stack.Pop().floatValue));
+                        break;
                     case OpCode.LESS:
-                        {
-                            IP++;
-                            Float opB = stack.Pop().floatValue;
-                            Float opA = stack.Pop().floatValue;
-                            bool truthness = opA < opB;
-                            if (truthness == true)
-                            {
-                                stack.Push(new Unit(true));
-                            }
-                            else
-                            {
-                                stack.Push(new Unit(false));
-                            }
-                            break;
-                        }
+                        IP++;
+                        stack.Push(new Unit(stack.Pop().floatValue > stack.Pop().floatValue));
+                        break;
                     case OpCode.NOT:
-                        {
-                            IP++;
-                            bool truthness = stack.Pop().ToBool();
-                            if (truthness == true)
-                                stack.Push(new Unit(false));
-                            else if (truthness == false)
-                                stack.Push(new Unit(true));
-                            else
-                            {
-                                Error("NOT is insane!");
-                                return new VMResult(VMResultType.ERROR, new Unit(UnitType.Null));
-                            }
-
-                            break;
-                        }
+                        IP++;
+                        stack.Push(new Unit(!stack.Pop().ToBool()));
+                        break;
                     case OpCode.AND:
                         {
                             IP++;
-                            bool opB_truthness = stack.Pop().ToBool();
-                            bool opA_truthness = stack.Pop().ToBool();
-                            bool result = opA_truthness && opB_truthness;
-                            if (result == true)
-                            {
-                                stack.Push(new Unit(true));
-                            }
-                            else
-                            {
-                                stack.Push(new Unit(false));
-                            }
+                            Unit opB = stack.Pop();
+                            stack.Push(new Unit(stack.Pop().ToBool() && opB.ToBool()));
                             break;
                         }
                     case OpCode.OR:
                         {
                             IP++;
-                            bool opB_truthness = stack.Pop().ToBool();
-                            bool opA_truthness = stack.Pop().ToBool();
-
-                            bool result = opA_truthness || opB_truthness;
-                            if (result == true)
-                            {
-                                stack.Push(new Unit(true));
-                            }
-                            else
-                            {
-                                stack.Push(new Unit(false));
-                            }
+                            Unit opB = stack.Pop();
+                            stack.Push(new Unit(stack.Pop().ToBool() || opB.ToBool()));
                             break;
                         }
                     case OpCode.XOR:
                         {
                             IP++;
-                            bool opB_truthness = stack.Pop().ToBool();
-                            bool opA_truthness = stack.Pop().ToBool();
-                            bool result = opA_truthness ^ opB_truthness;
-                            if (result == true)
-                            {
-                                stack.Push(new Unit(true));
-                            }
-                            else
-                            {
-                                stack.Push(new Unit(false));
-                            }
+                            Unit opB = stack.Pop();
+                            stack.Push(new Unit(stack.Pop().ToBool() ^ opB.ToBool()));
                             break;
                         }
                     case OpCode.NAND:
                         {
                             IP++;
-                            bool opB_truthness = stack.Pop().ToBool();
-                            bool opA_truthness = stack.Pop().ToBool();
-                            bool result = !(opA_truthness && opB_truthness);
-                            if (result == true)
-                            {
-                                stack.Push(new Unit(true));
-                            }
-                            else
-                            {
-                                stack.Push(new Unit(false));
-                            }
+                            Unit opB = stack.Pop();
+                            stack.Push(new Unit(!(stack.Pop().ToBool() && opB.ToBool())));
                             break;
                         }
                     case OpCode.NOR:
                         {
                             IP++;
-                            bool opB_truthness = stack.Pop().ToBool();
-                            bool opA_truthness = stack.Pop().ToBool();
-                            bool result = !(opA_truthness || opB_truthness);
-                            if (result == true)
-                            {
-                                stack.Push(new Unit(true));
-                            }
-                            else
-                            {
-                                stack.Push(new Unit(false));
-                            }
+                            Unit opB = stack.Pop();
+                            stack.Push(new Unit(!(stack.Pop().ToBool() || opB.ToBool())));
                             break;
                         }
                     case OpCode.XNOR:
                         {
                             IP++;
-                            bool opB_truthness = stack.Pop().ToBool();
-                            bool opA_truthness = stack.Pop().ToBool();
-                            bool result = !(opA_truthness ^ opB_truthness);
-                            if (result == true)
-                            {
-                                stack.Push(new Unit(true));
-                            }
-                            else
-                            {
-                                stack.Push(new Unit(false));
-                            }
+                            Unit opB = stack.Pop();
+                            stack.Push(new Unit(!(stack.Pop().ToBool() ^ opB.ToBool())));
                             break;
                         }
                     case OpCode.CLOSE_CLOSURE:
-                        {
-                            upValues.PopEnv();
+                        upValues.PopEnv();
+                        EnvSet(instructions.TargetEnv);
+                        IP = instructions.PopFunction(out instructionsCache);
 
-                            int target_env = instructions.TargetEnv;
-                            EnvSet(target_env);
-                            IP = instructions.PopFunction(out instructionsCache);
-
-                            break;
-                        }
+                        break;
                     case OpCode.CLOSE_FUNCTION:
-                        {
-                            int target_env = instructions.TargetEnv;
-                            EnvSet(target_env);
-                            IP = instructions.PopFunction(out instructionsCache);
+                        EnvSet(instructions.TargetEnv);
+                        IP = instructions.PopFunction(out instructionsCache);
 
-                            break;
-                        }
+                        break;
                     case OpCode.NEW_TABLE:
                         {
                             IP++;
