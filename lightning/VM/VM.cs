@@ -819,18 +819,22 @@ namespace lightning
                         break;
                     case OpCode.GREATER_EQUALS:
                         IP++;
+                        // the values are popped out of order from stack, so the logic is inverted!
                         stack.Push(new Unit(stack.Pop().floatValue <= stack.Pop().floatValue));
                         break;
                     case OpCode.LESS_EQUALS:
                         IP++;
+                        // the values are popped out of order from stack, so the logic is inverted!
                         stack.Push(new Unit(stack.Pop().floatValue >= stack.Pop().floatValue));
                         break;
                     case OpCode.GREATER:
                         IP++;
+                        // the values are popped out of order from stack, so the logic is inverted!
                         stack.Push(new Unit(stack.Pop().floatValue < stack.Pop().floatValue));
                         break;
                     case OpCode.LESS:
                         IP++;
+                        // the values are popped out of order from stack, so the logic is inverted!
                         stack.Push(new Unit(stack.Pop().floatValue > stack.Pop().floatValue));
                         break;
                     case OpCode.NOT:
