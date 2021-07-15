@@ -406,6 +406,15 @@ namespace lightning
             Constants = p_constants ??= new List<Unit>();
             ImportIndex = 0;
         }
+
+        public Unit GetGlobal(Operand p_index){
+            return Globals[p_index];
+        }
+
+        public Unit GetConstant(Operand p_index){
+            return Constants[p_index];
+        }
+
         public override bool ToBool()
         {
             throw new Exception("Can not convert Module to Bool. " + VM.ErrorString(null));

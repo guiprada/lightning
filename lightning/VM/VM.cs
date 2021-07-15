@@ -340,58 +340,30 @@ namespace lightning
                         stack.Pop();
                         break;
                     case OpCode.LOAD_CONSTANT:
-                        {
-                            IP++;
-                            Operand address = instruction.opA;
-                            Unit constant = chunk.GetConstant(address);
-                            stack.Push(constant);
-                            break;
-                        }
+                        IP++;
+                        stack.Push(chunk.GetConstant(instruction.opA));
+                        break;
                     case OpCode.LOAD_VARIABLE:
-                        {
-                            IP++;
-                            Operand address = instruction.opA;
-                            Operand n_shift = instruction.opB;
-                            var variable = variables.GetAt(address, CalculateEnvShift(n_shift));
-                            stack.Push(variable);
-                            break;
-                        }
+                        IP++;
+                        stack.Push(variables.GetAt(instruction.opA, CalculateEnvShift(instruction.opB)));
+                        break;
                     case OpCode.LOAD_GLOBAL:
-                        {
-                            IP++;
-                            Operand address = instruction.opA;
-                            Unit global;
-                            global = globals.Get(address);
-                            stack.Push(global);
-                            break;
-                        }
+                        IP++;
+                        stack.Push(globals.Get(instruction.opA));
+                        break;
                     case OpCode.LOAD_IMPORTED_GLOBAL:
-                        {
-                            IP++;
-                            Operand address = instruction.opA;
-                            Operand module = instruction.opB;
-                            Unit global = modules[module].Globals[address];
-                            stack.Push(global);
-                            break;
-                        }
+                        IP++;
+                        Unit global = modules[instruction.opB].GetGlobal(instruction.opA);
+                        stack.Push(global);
+                        break;
                     case OpCode.LOAD_IMPORTED_CONSTANT:
-                        {
-                            IP++;
-                            Operand address = instruction.opA;
-                            Operand module = instruction.opB;
-                            Unit constant = modules[module].Constants[address];
-
-                            stack.Push(constant);
-                            break;
-                        }
+                        IP++;
+                        stack.Push(modules[instruction.opB].GetConstant(instruction.opA));
+                        break;
                     case OpCode.LOAD_UPVALUE:
-                        {
-                            IP++;
-                            Operand address = instruction.opA;
-                            UpValueUnit up_val = upValues.GetAt(address);
-                            stack.Push(up_val.UpValue);
-                            break;
-                        }
+                        IP++;
+                        stack.Push(upValues.GetAt(instruction.opA).UpValue);
+                        break;
                     case OpCode.LOAD_NIL:
                         IP++;
                         stack.Push(new Unit(UnitType.Null));
@@ -405,27 +377,17 @@ namespace lightning
                         stack.Push(new Unit(false));
                         break;
                     case OpCode.LOAD_INTRINSIC:
-                        {
-                            IP++;
-                            Operand value = instruction.opA;
-                            stack.Push(new Unit(Intrinsics[value]));
-                            break;
-                        }
+                        IP++;
+                        stack.Push(new Unit(Intrinsics[instruction.opA]));
+                        break;
                     case OpCode.DECLARE_VARIABLE:
-                        {
-                            IP++;
-                            Unit new_value = stack.Pop();
-                            variables.Add(new_value);
-                            break;
-                        }
+                        IP++;
+                        variables.Add(stack.Pop());
+                        break;
                     case OpCode.DECLARE_GLOBAL:
-                        {
-                            IP++;
-                            Unit new_value = stack.Pop();
-                            globals.Add(new_value);
-
-                            break;
-                        }
+                        IP++;
+                        globals.Add(stack.Pop());
+                        break;
                     case OpCode.DECLARE_FUNCTION:
                         {
                             IP++;
