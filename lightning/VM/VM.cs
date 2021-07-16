@@ -33,8 +33,10 @@ namespace lightning
 
     public class VM
     {
-        FunctionUnit main;
+
         Operand IP;
+        FunctionUnit main;
+        private bool parallelVM;
 
         Instructions instructions;
         List<Instruction> instructionsCache;
@@ -53,7 +55,6 @@ namespace lightning
         public Dictionary<string, int> LoadedModules { get; private set; }
         public List<ModuleUnit> modules;
         public List<Unit> Constants{ get {return constants;}}
-        bool parallelVM;
         int Env{ get{ return variables.Env; } }
 
         const Operand ASSIGN = (Operand)AssignmentOperatorType.ASSIGN;
@@ -101,14 +102,14 @@ namespace lightning
             modules = new List<ModuleUnit>();
         }
 
-        public VM(
+        private VM(
             FunctionUnit p_main,
             List<Unit> p_constants,
             Memory<Unit> p_globals,
             Library p_Prelude,
             Dictionary<string,int> p_LoadedModules,
             List<ModuleUnit> p_modules,
-            bool p_parallelVM = false)
+            bool p_parallelVM)
         {
             main = p_main;
             constants = p_constants;
@@ -162,19 +163,30 @@ namespace lightning
             vmPool.Push(vm);
         }
 
-        public VM GetVM(bool isParallelVM = true)
+        public VM GetVM(){
+            return GetVM(parallelVM);
+        }
+        public VM GetParallelVM(){
+            return GetVM(true);
+        }
+        private VM GetVM(bool p_parallelVM)
         {
+
             if (vmPool.Count > 0)
             {
                 VM new_vm = vmPool.Pop();
-                new_vm.parallelVM = isParallelVM;
+                new_vm.SetParallel(p_parallelVM);
                 return new_vm;
             }
             else
             {
-                VM new_vm = new VM(main, constants, globals, Prelude, LoadedModules, modules, isParallelVM);
+                VM new_vm = new VM(main, constants, globals, Prelude, LoadedModules, modules, p_parallelVM);
                 return new_vm;
             }
+        }
+
+        public void SetParallel(bool p_parallelVM){
+            parallelVM = p_parallelVM;
         }
 
         public Operand AddModule(ModuleUnit this_module)

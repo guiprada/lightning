@@ -1165,7 +1165,7 @@ namespace lightning
             {
                 Unit this_callable = vm.GetUnit(0);
                 TableUnit this_arguments = vm.GetTable(1);
-                VM try_vm = vm.GetVM(false);
+                VM try_vm = vm.GetVM();
                 try{
                     try_vm.CallFunction(this_callable, this_arguments.Elements);
                     VM.RecycleVM(try_vm);
@@ -1285,7 +1285,7 @@ namespace lightning
                 VM[] vms = new VM[end];
                 for (int i = init; i < end; i++)
                 {
-                    vms[i] = vm.GetVM();
+                    vms[i] = vm.GetParallelVM();
                 }
                 System.Threading.Tasks.Parallel.For(init, end, (index) =>
                 {
@@ -1316,7 +1316,7 @@ namespace lightning
                 VM[] vms = new VM[end];
                 for (int i = 0; i < end; i++)
                 {
-                    vms[i] = vm.GetVM();
+                    vms[i] = vm.GetParallelVM();
                 }
 
                 int count = table.ECount;
