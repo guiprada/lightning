@@ -482,6 +482,16 @@ namespace lightning
                 table.Set("list_reverse", new IntrinsicUnit("list_reverse", listReverse, 1));
 
                 //////////////////////////////////////////////////////
+                Unit listSort(VM vm)
+                {
+                    TableUnit list = vm.GetTable(0);
+                    list.Elements.Sort();
+
+                    return new Unit(UnitType.Null);
+                }
+                table.Set("list_sort", new IntrinsicUnit("list_sort", listSort, 1));
+
+                //////////////////////////////////////////////////////
 
                 Unit ListMakeIndexesIterator(VM vm)
                 {
@@ -638,6 +648,37 @@ namespace lightning
                     return new Unit(iterator);
                 }
                 table.Set("map_iterator", new IntrinsicUnit("map_iterator", MapMakeIterator, 1));
+
+                //////////////////////////////////////////////////////
+                Unit MapMakeNumericIterator(VM vm)
+                {
+                    TableUnit this_table = vm.GetTable(0);
+                    System.Collections.IDictionaryEnumerator enumerator = this_table.Table.GetEnumerator();
+
+                    TableUnit iterator = new TableUnit(null, null);
+                    iterator.Set("key", new Unit(UnitType.Null));
+                    iterator.Set("value", new Unit(UnitType.Null));
+
+                    Unit next(VM vm)
+                    {
+                        while (true)
+                        {
+                            if(enumerator.MoveNext()){
+                                if(Unit.isNumeric((Unit)enumerator.Key)){
+                                    iterator.Set("key", (Unit)(enumerator.Key));
+                                    iterator.Set("value", (Unit)(enumerator.Value));
+                                    return new Unit(true);
+                                }
+                            }else{
+                                return new Unit(false);
+                            }
+                        }
+                    };
+
+                    iterator.Set("next", new IntrinsicUnit("map_iterator_next", next, 0));
+                    return new Unit(iterator);
+                }
+                table.Set("map_numeric_iterator", new IntrinsicUnit("map_numeric_iterator", MapMakeNumericIterator, 1));
 
                 //////////////////////////////////////////////////////
                 Unit MapToString(VM vm)

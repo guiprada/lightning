@@ -12,7 +12,7 @@ using System.Runtime.InteropServices;
 namespace lightning
 {
     [StructLayout(LayoutKind.Explicit)]
-    public struct Unit{
+    public struct Unit : IComparable{
 
         [FieldOffset(0)]
         public Float floatValue;
@@ -114,7 +114,7 @@ namespace lightning
                 case UnitType.Char:
                     return charValue.ToString();
                 case UnitType.Null:
-                    return "null";
+                    return "Null";
                 case UnitType.Boolean:
                     return boolValue.ToString();
                 default:
@@ -338,6 +338,96 @@ namespace lightning
             throw new Exception("Trying to divide non numeric UnitType. " + VM.ErrorString(null));
         }
 
+        public int CompareTo(object compareTo){
+            UnitType this_type = this.Type;
+            if(compareTo.GetType() != typeof(Unit)) return -1;
+            Unit other = (Unit)compareTo;
+            UnitType other_type = ((Unit)other).Type;
+            switch(this_type){
+                case UnitType.Float:
+                    switch(other_type){
+                        case UnitType.Float:
+                            return floatValue.CompareTo(other.floatValue);
+                        case UnitType.Integer:
+                            return floatValue.CompareTo(other.integerValue);
+                        case UnitType.Char:
+                            return 1;
+                        case UnitType.Null:
+                            return 1;
+                        case UnitType.Boolean:
+                            return 1;
+                        default:
+                            return -1;
+                    }
+                case UnitType.Integer:
+                    switch(other_type){
+                        case UnitType.Float:
+                            return integerValue.CompareTo(other.floatValue);
+                        case UnitType.Integer:
+                            return integerValue.CompareTo(other.integerValue);
+                        case UnitType.Char:
+                            return 1;
+                        case UnitType.Null:
+                            return 1;
+                        case UnitType.Boolean:
+                            return 1;
+                        default:
+                            return -1;
+                    }
+                case UnitType.Char:
+                    switch(other_type){
+                        case UnitType.Float:
+                            return -1;
+                        case UnitType.Integer:
+                            return -1;
+                        case UnitType.Char:
+                            return charValue.CompareTo(other.charValue);
+                        case UnitType.Null:
+                            return 1;
+                        case UnitType.Boolean:
+                            return 1;
+                        default:
+                            return -1;
+                    }
+                case UnitType.Null:
+                    switch(other_type){
+                        case UnitType.Null:
+                            return 0;
+                        default:
+                            return -1;
+                    }
+                case UnitType.Boolean:
+                    switch(other_type){
+                        case UnitType.Float:
+                            return -1;
+                        case UnitType.Integer:
+                            return -1;
+                        case UnitType.Char:
+                            return -1;
+                        case UnitType.Null:
+                            return 1;
+                        case UnitType.Boolean:
+                            return boolValue.CompareTo(other.boolValue);
+                        default:
+                            return -1;
+                    }
+                default:
+                    switch(other_type){
+                        case UnitType.Float:
+                            return 1;
+                        case UnitType.Integer:
+                            return 1;
+                        case UnitType.Char:
+                            return 1;
+                        case UnitType.Null:
+                            return 1;
+                        case UnitType.Boolean:
+                            return 1;
+                        default:
+                            return 0;
+                    }
+            }
+        }
         public static bool isNumeric(Unit p_value){
             UnitType type = p_value.Type;
             return (type == UnitType.Float || type  == UnitType.Integer);

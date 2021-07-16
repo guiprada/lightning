@@ -723,6 +723,14 @@ var global_lock_test_counter = 5
         assert(it.value, list1[counter], "Failed iterator value Test 5, iteration: " + counter)
         counter++
     }
+
+    var sparse_array = [5:5, 10:10, 15:15]
+    counter = 0
+    for(var it=table.map_numeric_iterator(sparse_array); it.next()){
+        assert(sparse_array[it.key], it.value, "Failed iterator value Test 6, iteration: " + counter)
+        counter++
+    }
+    assert(counter, 3, "Failed iterator value Test 6, iteration: " + counter)
 }
 {
     // Testing tuples
@@ -853,6 +861,13 @@ write_line("Loaded modules: " + machine.modules())
 write_line(machine.memory_use())
 
 //////////////////////////////// scratch
+{
+    // Testing List sort
+    var this_list = [3, 1, false, 2, 'a', null, 0, '0', "string"]
+    table.list_sort(this_list)
+    write_line(this_list)
+
+}
 start_time:reset()
 write_line("Elapsed time: " + start_time:elapsed() + " ms")
 var str = "hey"
