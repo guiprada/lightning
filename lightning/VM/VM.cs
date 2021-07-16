@@ -343,29 +343,19 @@ namespace lightning
 
         void Error(string msg)
         {
-            if (instructions.ExecutingInstructionsIndex == 0)
-                Console.WriteLine("Error: " + msg + " on line: "+ main.LineCounter.GetLine(IP));
-            else
-            {
-                Console.Write("Error: " + msg);
-                Console.Write(" on function: " + instructions.ExecutingFunction.Name);
-                Console.Write(" from module: " + instructions.ExecutingFunction.Module);
-                Console.WriteLine(" on line: " + instructions.ExecutingFunction.LineCounter.GetLine(IP));
-            }
+            Console.Write("Error: " + msg);
+            Console.Write(" on function: " + instructions.ExecutingFunction.Name);
+            Console.Write(" from module: " + instructions.ExecutingFunction.Module);
+            Console.WriteLine(" on line: " + instructions.ExecutingFunction.LineCounter.GetLine(IP));
         }
 
         public static string ErrorString(VM vm)
         {
             if (vm == null)
                 return null;
-            if (vm.instructions.ExecutingInstructionsIndex == 0)
-                return "Line: " + vm.main.LineCounter.GetLine(vm.IP);
-            else
-            {
-                return "Function: " + vm.instructions.ExecutingFunction.Name +
-                " from module: " + vm.instructions.ExecutingFunction.Module +
-                " on line: " + vm.instructions.ExecutingFunction.LineCounter.GetLine(vm.IP);
-            }
+            return "Function: " + vm.instructions.ExecutingFunction.Name +
+            " from module: " + vm.instructions.ExecutingFunction.Module +
+            " on line: " + vm.instructions.ExecutingFunction.LineCounter.GetLine(vm.IP);
         }
 
         public VMResult Run()

@@ -4,7 +4,6 @@ using Operand = System.UInt16;
 namespace lightning{
     public struct Instructions
     {
-        List<Instruction>[] stack;
         int currentInstructionsIndex;
         FunctionUnit[] functions;
         int returnAdressTop;
@@ -25,7 +24,7 @@ namespace lightning{
 
         public List<Instruction> ExecutingInstructions{
             get{
-                return stack[currentInstructionsIndex];
+                return functions[currentInstructionsIndex].Body;
             }
         }
 
@@ -36,17 +35,15 @@ namespace lightning{
         }
 
         public Instructions(int p_function_deepness, FunctionUnit p_main, out List<Instruction> p_instructions_cache){
-            stack = new List<Instruction>[p_function_deepness];
             functions = new FunctionUnit[p_function_deepness];
             returnAdress = new Operand[2 * p_function_deepness];
             funCallEnv = new int[p_function_deepness];
 
             returnAdressTop = 0;
-            returnAdress[returnAdressTop] = (Operand)(p_main.Body.Count - 1);
-            returnAdressTop++;
-
             currentInstructionsIndex = 0;
-            stack[currentInstructionsIndex] = p_main.Body;
+
+            PushRET((Operand)(p_main.Body.Count - 1));
+            functions[currentInstructionsIndex] = p_main;
 
             p_instructions_cache = ExecutingInstructions;
         }
@@ -69,7 +66,6 @@ namespace lightning{
             currentInstructionsIndex++;
 
             funCallEnv[currentInstructionsIndex] = p_env;
-            stack[currentInstructionsIndex] = p_function.Body;
             functions[currentInstructionsIndex] = p_function;
 
             p_instructions_cache = ExecutingInstructions;
