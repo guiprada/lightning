@@ -8,7 +8,8 @@
 	add Get and Set? to Unit :)
 	convert StringUnit to use char[]
 	add check for arity before call
-	add type to List and Wrapper
+	add type to List and Wrapper so they can be retrieved from lightining
+	add load externally compiled prelude extensions
 
 	try , protected call
 	tuple and nuple class
