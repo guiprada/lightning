@@ -1,5 +1,8 @@
 ﻿todo
 	anonimous assignment compound Grouping/expression
+	move bool back to heapval
+	use unit value to count heapval references
+	examine overflows
 	nuples to call and return from try
 	separate test in modules
 	add Get and Set? to Unit :)
