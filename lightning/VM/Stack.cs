@@ -15,6 +15,11 @@ namespace lightning{
             stashTop = 0;
         }
 
+        public void Clear(){
+            top = 0;
+            stashTop = 0;
+        }
+
         public void Push(Unit p_value)
         {
             values[top] = p_value;

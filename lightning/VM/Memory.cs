@@ -42,6 +42,11 @@ namespace lightning
             values.TrimExcess();
         }
 
+        public void Clear(){
+            values.Clear();
+            markers.Clear();
+        }
+
         public T Get(int index){
             return values[index];
         }

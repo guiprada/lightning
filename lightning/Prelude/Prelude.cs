@@ -1165,12 +1165,14 @@ namespace lightning
             {
                 Unit this_callable = vm.GetUnit(0);
                 TableUnit this_arguments = vm.GetTable(1);
-                VM try_vm = vm.InternalVM;
+                VM try_vm = vm.GetVM(false);
                 try{
                     try_vm.CallFunction(this_callable, this_arguments.Elements);
+                    VM.RecycleVM(try_vm);
                     return new Unit(true);
                 }catch{//(Exception e){
                     // return new Unit(e.ToString());
+                    VM.RecycleVM(try_vm);
                     return new Unit(false);
                 }
             }

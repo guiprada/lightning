@@ -56,14 +56,6 @@ namespace lightning
         bool parallelVM;
 
         int Env{ get{ return variables.Env; } }
-        private VM internalVM = null;
-        public VM InternalVM{
-            get{
-                if(internalVM == null)
-                    internalVM = GetVM(false);
-                return internalVM;
-            }
-        }
 
         const Operand ASSIGN = (Operand)AssignmentOperatorType.ASSIGN;
         const Operand ADDITION_ASSIGN = (Operand)AssignmentOperatorType.ADDITION_ASSIGN;
@@ -72,6 +64,9 @@ namespace lightning
         const Operand DIVISION_ASSIGN = (Operand)AssignmentOperatorType.DIVISION_ASSIGN;
 
 //////////////////////////////////////////////////// Public
+        static VM(){
+            vmPool = new Stack<VM>();
+        }
         public VM(Chunk p_chunk, int p_function_deepness = 100, Memory<Unit> p_globals = null, bool p_parallelVM = false)
         {
             if(vm0 == null)
@@ -107,8 +102,6 @@ namespace lightning
 
             loadedModules = new Dictionary<string, int>();
             modules = new List<ModuleUnit>();
-
-            vmPool = new Stack<VM>();
         }
 
         public void ResoursesTrim(){
@@ -130,8 +123,21 @@ namespace lightning
         public static int CountVMs(){
             return vmPool.Count;
         }
+
+        void Reset(){
+            IP = 0;
+            parallelVM = true;
+            instructions.Clear(out instructionsCache);
+            stack.Clear();
+            variables.Clear();
+            upValues.Clear();
+            upValuesRegistry.Clear();
+            loadedModules.Clear();
+            modules.Clear();
+        }
         public static void RecycleVM(VM vm)
         {
+            vm.Reset();
             vmPool.Push(vm);
         }
 
@@ -139,7 +145,9 @@ namespace lightning
         {
             if (vmPool.Count > 0)
             {
-                return vmPool.Pop();
+                VM new_vm = vmPool.Pop();
+                new_vm.parallelVM = isParallelVM;
+                return new_vm;
             }
             else
             {
