@@ -1,9 +1,9 @@
 ﻿todo
+	anonimous assignment compound Grouping/expression
 	nuples to call and return from try
 	separate test in modules
 	add Get and Set? to Unit :)
 	convert StringUnit to use char[]
-	compound Grouping/expression
 	add check for arity before call
 	add type to List and Wrapper
 
