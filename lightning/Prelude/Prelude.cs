@@ -1175,7 +1175,6 @@ namespace lightning
                 }
             }
             functions.Add(new IntrinsicUnit("try", Try, 2));
-            //////////////////////////////////////////////////////
 
             //////////////////////////////////////////////////////
             Unit WriteLine(VM vm)
@@ -1435,9 +1434,12 @@ namespace lightning
                 module,
                 (Operand)module_index);
 
-            if (this_value.Type == UnitType.Function) RelocateFunction((FunctionUnit)this_value.heapUnitValue, relocationInfo);
-            else if (this_value.Type == UnitType.Closure) RelocateClosure((ClosureUnit)this_value.heapUnitValue, relocationInfo);
-            else if (this_value.Type == UnitType.Table) FindFunction((TableUnit)this_value.heapUnitValue, relocationInfo);
+            if (this_value.Type == UnitType.Function)
+                RelocateFunction((FunctionUnit)this_value.heapUnitValue, relocationInfo);
+            else if (this_value.Type == UnitType.Closure)
+                RelocateClosure((ClosureUnit)this_value.heapUnitValue, relocationInfo);
+            else if (this_value.Type == UnitType.Table)
+                FindFunction((TableUnit)this_value.heapUnitValue, relocationInfo);
 
             return module;
         }
@@ -1449,9 +1451,12 @@ namespace lightning
                 relocationInfo.relocatedTables.Add(table.GetHashCode());
                 foreach (KeyValuePair<Unit, Unit> entry in table.Table)
                 {
-                    if (entry.Value.Type == UnitType.Function) RelocateFunction((FunctionUnit)entry.Value.heapUnitValue, relocationInfo);
-                    else if (entry.Value.Type == UnitType.Closure) RelocateClosure((ClosureUnit)entry.Value.heapUnitValue, relocationInfo);
-                    else if (entry.Value.Type == UnitType.Table) FindFunction((TableUnit)entry.Value.heapUnitValue, relocationInfo);
+                    if (entry.Value.Type == UnitType.Function)
+                        RelocateFunction((FunctionUnit)entry.Value.heapUnitValue, relocationInfo);
+                    else if (entry.Value.Type == UnitType.Closure)
+                        RelocateClosure((ClosureUnit)entry.Value.heapUnitValue, relocationInfo);
+                    else if (entry.Value.Type == UnitType.Table)
+                        FindFunction((TableUnit)entry.Value.heapUnitValue, relocationInfo);
 
                     relocationInfo.module.Set(entry.Key, entry.Value);
                 }
@@ -1462,11 +1467,11 @@ namespace lightning
         {
             foreach (UpValueUnit v in closure.UpValues)
             {
-                if (v.UpValue.Type == UnitType.Closure/* && relocationInfo.module.name != closure.function.module*/)
+                if (v.UpValue.Type == UnitType.Closure)
                 {
                     RelocateClosure((ClosureUnit)v.UpValue.heapUnitValue, relocationInfo);
                 }
-                else if (v.UpValue.Type == UnitType.Function/* && relocationInfo.module.name != closure.function.module*/)
+                else if (v.UpValue.Type == UnitType.Function)
                 {
                     RelocateFunction((FunctionUnit)v.UpValue.heapUnitValue, relocationInfo);
                 }
@@ -1485,20 +1490,27 @@ namespace lightning
                 Unit new_value = relocationInfo.importedVM.GetGlobal(relocationInfo.toBeRelocatedGlobals[i]);
 
                 relocationInfo.module.Globals.Add(new_value);
-                relocationInfo.relocatedGlobals.Add(relocationInfo.toBeRelocatedGlobals[i], (Operand)(relocationInfo.module.Globals.Count - 1));
+                relocationInfo.relocatedGlobals.Add(
+                    relocationInfo.toBeRelocatedGlobals[i],
+                    (Operand)(relocationInfo.module.Globals.Count - 1));
 
-                if (new_value.Type == UnitType.Table) relocation_stack.Add((TableUnit)new_value.heapUnitValue);
+                if (new_value.Type == UnitType.Table)
+                    relocation_stack.Add((TableUnit)new_value.heapUnitValue);
             }
             relocationInfo.toBeRelocatedGlobals.Clear();
 
             for (Operand i = 0; i < relocationInfo.toBeRelocatedConstants.Count; i++)
             {
-                Unit new_value = relocationInfo.importedVM.GetChunk().GetConstant(relocationInfo.toBeRelocatedConstants[i]);
+                Unit new_value =
+                    relocationInfo.importedVM.GetChunk().GetConstant(relocationInfo.toBeRelocatedConstants[i]);
 
                 relocationInfo.module.Constants.Add(new_value);
-                relocationInfo.relocatedConstants.Add(relocationInfo.toBeRelocatedConstants[i], (Operand)(relocationInfo.module.Constants.Count - 1));
+                relocationInfo.relocatedConstants.Add(
+                    relocationInfo.toBeRelocatedConstants[i],
+                    (Operand)(relocationInfo.module.Constants.Count - 1));
 
-                if (new_value.Type == UnitType.Table) relocation_stack.Add((TableUnit)new_value.heapUnitValue);
+                if (new_value.Type == UnitType.Table)
+                    relocation_stack.Add((TableUnit)new_value.heapUnitValue);
             }
             relocationInfo.toBeRelocatedConstants.Clear();
 
@@ -1516,7 +1528,8 @@ namespace lightning
 
                 if (next.opCode == OpCode.LOAD_GLOBAL)
                 {
-                    if ((next.opCode == OpCode.LOAD_GLOBAL && next.opA >= relocationInfo.importedVM.GetChunk().Prelude.intrinsics.Count))
+                    if ((next.opCode == OpCode.LOAD_GLOBAL) &&
+                        (next.opA >= relocationInfo.importedVM.GetChunk().Prelude.intrinsics.Count))
                     {
                         if (relocationInfo.relocatedGlobals.ContainsKey(next.opA))
                         {
@@ -1527,12 +1540,16 @@ namespace lightning
                         else if (relocationInfo.toBeRelocatedGlobals.Contains(next.opA))
                         {
                             next.opCode = OpCode.LOAD_IMPORTED_GLOBAL;
-                            next.opA = (Operand)(relocationInfo.toBeRelocatedGlobals.IndexOf(next.opA) + relocationInfo.relocatedGlobals.Count);
+                            next.opA =
+                                (Operand)(relocationInfo.toBeRelocatedGlobals.IndexOf(next.opA) +
+                                relocationInfo.relocatedGlobals.Count);
                             next.opB = relocationInfo.moduleIndex;
                         }
                         else
                         {
-                            Operand global_count = (Operand)(relocationInfo.relocatedGlobals.Count + relocationInfo.toBeRelocatedGlobals.Count);
+                            Operand global_count =
+                                (Operand)(relocationInfo.relocatedGlobals.Count +
+                                relocationInfo.toBeRelocatedGlobals.Count);
                             relocationInfo.toBeRelocatedGlobals.Add(next.opA);
                             next.opCode = OpCode.LOAD_IMPORTED_GLOBAL;
                             next.opA = global_count;
@@ -1551,12 +1568,16 @@ namespace lightning
                     else if (relocationInfo.toBeRelocatedConstants.Contains(next.opA))
                     {
                         next.opCode = OpCode.LOAD_IMPORTED_CONSTANT;
-                        next.opA = (Operand)(relocationInfo.toBeRelocatedConstants.IndexOf(next.opA) + relocationInfo.relocatedConstants.Count);
+                        next.opA =
+                            (Operand)(relocationInfo.toBeRelocatedConstants.IndexOf(next.opA) +
+                            relocationInfo.relocatedConstants.Count);
                         next.opB = relocationInfo.moduleIndex;
                     }
                     else
                     {
-                        Operand global_count = (Operand)(relocationInfo.relocatedConstants.Count + relocationInfo.toBeRelocatedConstants.Count);
+                        Operand global_count =
+                            (Operand)(relocationInfo.relocatedConstants.Count +
+                            relocationInfo.toBeRelocatedConstants.Count);
                         relocationInfo.toBeRelocatedConstants.Add(next.opA);
                         next.opCode = OpCode.LOAD_IMPORTED_CONSTANT;
                         next.opA = global_count;
@@ -1568,7 +1589,8 @@ namespace lightning
                     Unit this_value = relocationInfo.importedVM.GetChunk().GetConstant(next.opC);
                     if (relocationInfo.importingVM.GetChunk().GetConstants().Contains(this_value))
                     {
-                        next.opC = (Operand)relocationInfo.importingVM.GetChunk().GetConstants().IndexOf(this_value);
+                        next.opC =
+                            (Operand)relocationInfo.importingVM.GetChunk().GetConstants().IndexOf(this_value);
                     }
                     else
                     {
@@ -1636,7 +1658,8 @@ namespace lightning
                     {
                         Instruction next = function.Body[i];
 
-                        if (next.opCode == OpCode.LOAD_IMPORTED_GLOBAL || next.opCode == OpCode.LOAD_IMPORTED_CONSTANT)
+                        if ((next.opCode == OpCode.LOAD_IMPORTED_GLOBAL) ||
+                            (next.opCode == OpCode.LOAD_IMPORTED_CONSTANT))
                         {
                             next.opB = new_index;
                             function.Body[i] = next;
