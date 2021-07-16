@@ -34,6 +34,7 @@ namespace lightning
     public class VM
     {
         Chunk chunk;
+        FunctionUnit main;
         Operand IP;
 
         Instructions instructions;
@@ -41,6 +42,7 @@ namespace lightning
 
         Memory<Unit> globals; // used for global variables
         Memory<Unit> variables; // used for scoped variables
+        List<Unit> constants;
 
         public Stack stack;
 
@@ -67,7 +69,7 @@ namespace lightning
         static VM(){
             vmPool = new Stack<VM>();
         }
-        public VM(Chunk p_chunk, int p_function_deepness = 100, Memory<Unit> p_globals = null, bool p_parallelVM = false)
+        public VM(Chunk p_chunk, int p_function_deepness = 30)
         {
             if(vm0 == null)
                 vm0 = this;
@@ -75,9 +77,12 @@ namespace lightning
             chunk = p_chunk;
             IP = 0;
             functionDeepness = p_function_deepness;
-            parallelVM = p_parallelVM;
+            parallelVM = false;
 
-            instructions = new Instructions(functionDeepness, chunk, out instructionsCache);
+            main = new FunctionUnit("main", "main");
+            main.Set(0, chunk.Program, chunk.lineCounter, 0);
+
+            instructions = new Instructions(functionDeepness, main, out instructionsCache);
 
             stack = new Stack(functionDeepness);
 
@@ -85,20 +90,42 @@ namespace lightning
             upValues = new Memory<UpValueUnit>();
             upValuesRegistry = new Memory<UpValueUnit>();
 
-            if(p_globals == null){
-                globals = new Memory<Unit>();
-                Intrinsics = chunk.Prelude.intrinsics;
-                foreach (IntrinsicUnit v in Intrinsics)
-                {
-                    globals.Add(new Unit(v));
-                }
-                foreach (KeyValuePair<string, TableUnit> entry in chunk.Prelude.tables)
-                {
-                    globals.Add(new Unit(entry.Value));
-                }
+            globals = new Memory<Unit>();
+            Intrinsics = chunk.Prelude.intrinsics;
+            foreach (IntrinsicUnit v in Intrinsics)
+            {
+                globals.Add(new Unit(v));
             }
-            else
-                globals = p_globals;
+            foreach (KeyValuePair<string, TableUnit> entry in chunk.Prelude.tables)
+            {
+                globals.Add(new Unit(entry.Value));
+            }
+
+            constants = chunk.GetConstants;
+
+            loadedModules = new Dictionary<string, int>();
+            modules = new List<ModuleUnit>();
+        }
+
+        public VM(FunctionUnit p_main, List<Unit> p_constants, Memory<Unit> p_globals,  bool p_parallelVM = false)
+        {
+            if(vm0 == null)
+                vm0 = this;
+            main = p_main;
+            IP = 0;
+            functionDeepness = 10;
+            parallelVM = p_parallelVM;
+
+            instructions = new Instructions(functionDeepness, p_main, out instructionsCache);
+
+            stack = new Stack(functionDeepness);
+
+            variables = new Memory<Unit>();
+            upValues = new Memory<UpValueUnit>();
+            upValuesRegistry = new Memory<UpValueUnit>();
+
+            globals = p_globals;
+            constants = p_constants;
 
             loadedModules = new Dictionary<string, int>();
             modules = new List<ModuleUnit>();
@@ -151,7 +178,7 @@ namespace lightning
             }
             else
             {
-                VM new_vm = new VM(chunk, 5, globals, isParallelVM);
+                VM new_vm = new VM(main, constants, globals, isParallelVM);
                 return new_vm;
             }
         }
@@ -234,7 +261,7 @@ namespace lightning
 
             if (this_type == UnitType.Function)
             {
-                instructions.PushRET((Operand)(chunk.ProgramSize - 1));
+                instructions.PushRET((Operand)(main.Body.Count - 1));
                 FunctionUnit this_func = (FunctionUnit)(this_callable.heapUnitValue);
                 instructions.PushFunction(this_func, Env, out instructionsCache);
 
@@ -242,7 +269,7 @@ namespace lightning
             }
             else if (this_type == UnitType.Closure)
             {
-                instructions.PushRET((Operand)(chunk.ProgramSize - 1));
+                instructions.PushRET((Operand)(main.Body.Count - 1));
                 ClosureUnit this_closure = (ClosureUnit)(this_callable.heapUnitValue);
 
                 upValues.PushEnv();
@@ -357,7 +384,7 @@ namespace lightning
                         break;
                     case OpCode.LOAD_CONSTANT:
                         IP++;
-                        stack.Push(chunk.GetConstant(instruction.opA));
+                        stack.Push(constants[instruction.opA]);
                         break;
                     case OpCode.LOAD_VARIABLE:
                         IP++;
@@ -410,7 +437,7 @@ namespace lightning
                             Operand env = instruction.opA;
                             Operand lambda = instruction.opB;
                             Operand new_fun_address = instruction.opC;
-                            Unit this_callable = chunk.GetConstant(new_fun_address);
+                            Unit this_callable = constants[new_fun_address];
                             if (this_callable.Type == UnitType.Function)
                             {
                                 if (lambda == 0)

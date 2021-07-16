@@ -35,19 +35,18 @@ namespace lightning{
             }
         }
 
-        public Instructions(int p_function_deepness, Chunk p_chunk, out List<Instruction> p_instructions_cache){
+        public Instructions(int p_function_deepness, FunctionUnit p_main, out List<Instruction> p_instructions_cache){
             stack = new List<Instruction>[p_function_deepness];
             functions = new FunctionUnit[p_function_deepness];
             returnAdress = new Operand[2 * p_function_deepness];
             funCallEnv = new int[p_function_deepness];
 
             returnAdressTop = 0;
-
-            stack[0] = p_chunk.Program;
-            currentInstructionsIndex = 0;
-
-            returnAdress[returnAdressTop] = (Operand)(p_chunk.ProgramSize - 1);
+            returnAdress[returnAdressTop] = (Operand)(p_main.Body.Count - 1);
             returnAdressTop++;
+
+            currentInstructionsIndex = 0;
+            stack[currentInstructionsIndex] = p_main.Body;
 
             p_instructions_cache = ExecutingInstructions;
         }

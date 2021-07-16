@@ -188,20 +188,12 @@ namespace lightning
         List<Instruction> program;
         List<Unit> constants;
         public LineCounter lineCounter;
-        public Library Prelude { get; private set; }
 
-        public Operand ProgramSize
-        {
-            get
-            {
-                return (Operand)program.Count;
-            }
-        }
+        public Library Prelude { get; private set; }
+        public Operand ProgramSize { get { return (Operand)program.Count; } }
         public List<Instruction> Program { get { return program; } }
-        public Operand ConstantsCount()
-        {
-            return (Operand)constants.Count;
-        }
+        public Operand ConstantsCount { get { return (Operand)constants.Count; } }
+        public List<Unit> GetConstants { get{ return constants; } }
 
         public Chunk(Library p_prelude)
         {
@@ -269,11 +261,6 @@ namespace lightning
         public Unit GetConstant(Operand address)
         {
             return constants[address];
-        }
-
-        public List<Unit> GetConstants()
-        {
-            return constants;
         }
 
         public HeapUnit GetFunction(string name)

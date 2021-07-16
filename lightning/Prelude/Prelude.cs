@@ -1589,15 +1589,15 @@ namespace lightning
                 else if (next.opCode == OpCode.DECLARE_FUNCTION)
                 {
                     Unit this_value = relocationInfo.importedVM.GetChunk().GetConstant(next.opC);
-                    if (relocationInfo.importingVM.GetChunk().GetConstants().Contains(this_value))
+                    if (relocationInfo.importingVM.GetChunk().GetConstants.Contains(this_value))
                     {
                         next.opC =
-                            (Operand)relocationInfo.importingVM.GetChunk().GetConstants().IndexOf(this_value);
+                            (Operand)relocationInfo.importingVM.GetChunk().GetConstants.IndexOf(this_value);
                     }
                     else
                     {
-                        relocationInfo.importingVM.GetChunk().GetConstants().Add(this_value);
-                        next.opC = (Operand)(relocationInfo.importingVM.GetChunk().GetConstants().Count - 1);
+                        relocationInfo.importingVM.GetChunk().GetConstants.Add(this_value);
+                        next.opC = (Operand)(relocationInfo.importingVM.GetChunk().GetConstants.Count - 1);
                         RelocateChunk(((ClosureUnit)this_value.heapUnitValue).Function, relocationInfo);
                     }
                 }
