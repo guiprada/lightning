@@ -56,6 +56,14 @@ namespace lightning
         bool parallelVM;
 
         int Env{ get{ return variables.Env; } }
+        private VM internalVM = null;
+        public VM InternalVM{
+            get{
+                if(internalVM == null)
+                    internalVM = GetVM(false);
+                return internalVM;
+            }
+        }
 
         const Operand ASSIGN = (Operand)AssignmentOperatorType.ASSIGN;
         const Operand ADDITION_ASSIGN = (Operand)AssignmentOperatorType.ADDITION_ASSIGN;
@@ -127,7 +135,7 @@ namespace lightning
             vmPool.Push(vm);
         }
 
-        public VM GetVM()
+        public VM GetVM(bool isParallelVM = true)
         {
             if (vmPool.Count > 0)
             {
@@ -135,7 +143,7 @@ namespace lightning
             }
             else
             {
-                VM new_vm = new VM(chunk, 5, globals, true);
+                VM new_vm = new VM(chunk, 5, globals, isParallelVM);
                 return new_vm;
             }
         }
@@ -209,20 +217,16 @@ namespace lightning
         }
 
 //////////////////////////// End Accessors
-        public Unit CallFunction(Unit this_callable, List<Unit> args, bool isInternal = false)
+        public Unit CallFunction(Unit this_callable, List<Unit> args)
         {
             UnitType this_type = this_callable.Type;
             if (args != null)
                 for (int i = args.Count - 1; i >= 0; i--)
                     stack.Push(args[i]);
 
-            if(isInternal){
-                instructions.PushRET(IP);
-            }else{
-                instructions.PushRET((Operand)(chunk.ProgramSize - 1));
-            }
             if (this_type == UnitType.Function)
             {
+                instructions.PushRET((Operand)(chunk.ProgramSize - 1));
                 FunctionUnit this_func = (FunctionUnit)(this_callable.heapUnitValue);
                 instructions.PushFunction(this_func, Env, out instructionsCache);
 
@@ -230,6 +234,7 @@ namespace lightning
             }
             else if (this_type == UnitType.Closure)
             {
+                instructions.PushRET((Operand)(chunk.ProgramSize - 1));
                 ClosureUnit this_closure = (ClosureUnit)(this_callable.heapUnitValue);
 
                 upValues.PushEnv();

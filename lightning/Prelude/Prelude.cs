@@ -1165,17 +1165,17 @@ namespace lightning
             {
                 Unit this_callable = vm.GetUnit(0);
                 TableUnit this_arguments = vm.GetTable(1);
+                VM try_vm = vm.InternalVM;
                 try{
-                    Console.WriteLine("inside");
-                    Unit result = vm.CallFunction(this_callable, this_arguments.Elements, true);
-                    Console.WriteLine("outside");
-                    return result;
-                }catch(Exception e){
+                    try_vm.CallFunction(this_callable, this_arguments.Elements);
+                    return new Unit(true);
+                }catch{//(Exception e){
                     // return new Unit(e.ToString());
-                    return new Unit(UnitType.Null);
+                    return new Unit(false);
                 }
             }
             functions.Add(new IntrinsicUnit("try", Try, 2));
+            //////////////////////////////////////////////////////
 
             //////////////////////////////////////////////////////
             Unit WriteLine(VM vm)

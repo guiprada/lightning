@@ -60,11 +60,7 @@ namespace lightning
 
         public Unit(bool p_value):this()
         {
-            if(p_value == true){
-                boolValue = true;
-            }else{
-                boolValue = false;
-            }
+            boolValue = p_value;
             heapUnitValue = TypeUnit.Boolean;
         }
 

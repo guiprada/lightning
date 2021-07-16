@@ -867,8 +867,6 @@ write_line(machine.memory_use())
     // Testing List sort
     var this_list = [3, 1, false, 2, 'a', null, 0, '0', "string"]
     table.list_sort(this_list)
-    write_line(this_list)
-    write_line(this_list[0] .. this_list[8])
 }
 
 var str = "hey"
@@ -886,8 +884,11 @@ var array1 = []
 function wrong(text, more_text){
     write_line(text)
     write_line(more_text)
-    return array1[0]
+    write_line(array1[0])
 }
-var args = ["oi", "mundo"]
-write_line(try(wrong, args))
-write_line("recovered")
+var success = try(wrong, ["oi", "mundo"])
+write_line("success: " .. success)
+if(!success)
+    write_line("recovered")
+
+write_line(machine.memory_use())
