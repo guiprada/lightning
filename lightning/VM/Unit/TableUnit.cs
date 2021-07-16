@@ -116,7 +116,7 @@ namespace lightning
         }
 
         Unit GetElement(Unit p_key){
-            if(p_key.integerValue <= (Elements.Count - 1))
+            if(p_key.integerValue < Elements.Count)
                 return Elements[(int)p_key.integerValue];
             if(Table.ContainsKey(p_key))
                     return Table[p_key];

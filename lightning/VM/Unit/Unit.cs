@@ -428,7 +428,7 @@ namespace lightning
                     }
             }
         }
-        public static bool isNumeric(Unit p_value){
+        public static bool IsNumeric(Unit p_value){
             UnitType type = p_value.Type;
             return (type == UnitType.Float || type  == UnitType.Integer);
         }

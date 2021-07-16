@@ -78,7 +78,7 @@ namespace lightning
             initSuperTable();
         }
         private static void initSuperTable(){
-            Unit stringSlice(VM vm)
+            Unit StringSlice(VM vm)
             {
                 string input_string = vm.GetString(0);
                 Float start = vm.GetNumber(1);
@@ -91,11 +91,11 @@ namespace lightning
                 }
                 return new Unit(UnitType.Null);
             }
-            superTable.Set("slice", new IntrinsicUnit("string_slice", stringSlice, 3));
+            superTable.Set("slice", new IntrinsicUnit("string_slice", StringSlice, 3));
 
             //////////////////////////////////////////////////////
 
-            Unit stringSplit(VM vm)
+            Unit StringSplit(VM vm)
             {
                 StringUnit val_input_string = vm.GetStringUnit(0);
                 string input_string = val_input_string.ToString();
@@ -109,20 +109,20 @@ namespace lightning
                 }
                 return new Unit(UnitType.Null);
             }
-            superTable.Set("split", new IntrinsicUnit("string_split", stringSplit, 2));
+            superTable.Set("split", new IntrinsicUnit("string_split", StringSplit, 2));
 
             //////////////////////////////////////////////////////
 
-            Unit stringLength(VM vm)
+            Unit StringLength(VM vm)
             {
                 StringUnit val_input_string = vm.GetStringUnit(0);
                 return new Unit(val_input_string.content.Length);
             }
-            superTable.Set("length", new IntrinsicUnit("string_length", stringLength, 1));
+            superTable.Set("length", new IntrinsicUnit("string_length", StringLength, 1));
 
             //////////////////////////////////////////////////////
 
-            Unit stringCopy(VM vm)
+            Unit StringCopy(VM vm)
             {
                 Unit val_input_string = vm.GetUnit(0);
                 if (val_input_string.Type == UnitType.String)
@@ -130,10 +130,10 @@ namespace lightning
                 else
                     return new Unit(UnitType.Null);
             }
-            superTable.Set("copy", new IntrinsicUnit("string_copy", stringCopy, 1));
+            superTable.Set("copy", new IntrinsicUnit("string_copy", StringCopy, 1));
 
             //////////////////////////////////////////////////////
-            Unit toList(VM vm)
+            Unit ToList(VM vm)
             {
                 string val_input_string = vm.GetString(0);
                 List<Unit> string_list = new List<Unit>();
@@ -142,10 +142,10 @@ namespace lightning
                 }
                 return new Unit(new TableUnit(string_list, null));
             }
-            superTable.Set("to_list", new IntrinsicUnit("string_to_list", toList, 1));
+            superTable.Set("to_list", new IntrinsicUnit("string_to_list", ToList, 1));
 
             //////////////////////////////////////////////////////
-            Unit charAt(VM vm)
+            Unit CharAt(VM vm)
             {
                 string input_string = vm.GetString(0);
                 Integer index = vm.GetInteger(1);
@@ -156,7 +156,7 @@ namespace lightning
                 }
                 return new Unit(UnitType.Null);
             }
-            superTable.Set("char_at", new IntrinsicUnit("string_char_at", charAt, 2));
+            superTable.Set("char_at", new IntrinsicUnit("string_char_at", CharAt, 2));
 
             //////////////////////////////////////////////////////
             Unit Contains(VM vm)
@@ -177,6 +177,23 @@ namespace lightning
                 return new Unit(input_string.Contains(contained_char));
             }
             superTable.Set("contains_char", new IntrinsicUnit("string_contains_char", ContainsChar, 2));
+
+            //////////////////////////////////////////////////////
+            Unit Escape(VM vm)
+            {
+                string input_string = vm.GetString(0);
+                return new Unit(System.Text.RegularExpressions.Regex.Escape(input_string));
+            }
+            superTable.Set("escape", new IntrinsicUnit("escape", Escape, 1));
+
+            //////////////////////////////////////////////////////
+            Unit Unescape(VM vm)
+            {
+                string input_string = vm.GetString(0);
+                return new Unit(System.Text.RegularExpressions.Regex.Unescape(input_string));
+            }
+            superTable.Set("unescape", new IntrinsicUnit("unescape", Unescape, 1));
+
         }
     }
 }

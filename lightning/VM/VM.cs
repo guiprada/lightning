@@ -209,15 +209,18 @@ namespace lightning
         }
 
 //////////////////////////// End Accessors
-        public Unit CallFunction(Unit this_callable, List<Unit> args)
+        public Unit CallFunction(Unit this_callable, List<Unit> args, bool isInternal = false)
         {
+            UnitType this_type = this_callable.Type;
             if (args != null)
                 for (int i = args.Count - 1; i >= 0; i--)
                     stack.Push(args[i]);
 
-            UnitType this_type = this_callable.Type;
-
-            instructions.PushRET((Operand)(chunk.ProgramSize - 1));
+            if(isInternal){
+                instructions.PushRET(IP);
+            }else{
+                instructions.PushRET((Operand)(chunk.ProgramSize - 1));
+            }
             if (this_type == UnitType.Function)
             {
                 FunctionUnit this_func = (FunctionUnit)(this_callable.heapUnitValue);

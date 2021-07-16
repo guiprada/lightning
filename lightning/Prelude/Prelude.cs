@@ -580,7 +580,7 @@ namespace lightning
 
                     foreach (Unit v in this_table.Table.Keys)
                     {
-                        if(Unit.isNumeric(v))
+                        if(Unit.IsNumeric(v))
                             indexes.Elements.Add(v);
                     }
 
@@ -664,7 +664,7 @@ namespace lightning
                         while (true)
                         {
                             if(enumerator.MoveNext()){
-                                if(Unit.isNumeric((Unit)enumerator.Key)){
+                                if(Unit.IsNumeric((Unit)enumerator.Key)){
                                     iterator.Set("key", (Unit)(enumerator.Key));
                                     iterator.Set("value", (Unit)(enumerator.Value));
                                     return new Unit(true);
@@ -1024,7 +1024,7 @@ namespace lightning
                 file.Set("load", new IntrinsicUnit("file_load_file", loadFile, 1));
 
                 //////////////////////////////////////////////////////
-                Unit writeFile(VM vm)
+                Unit WriteFile(VM vm)
                 {
                     string path = vm.GetString(0);
                     string output = vm.GetString(1);
@@ -1035,10 +1035,10 @@ namespace lightning
 
                     return new Unit(UnitType.Null);
                 }
-                file.Set("write", new IntrinsicUnit("file_write_file", writeFile, 2));
+                file.Set("write", new IntrinsicUnit("file_write_file", WriteFile, 2));
 
                 //////////////////////////////////////////////////////
-                Unit appendFile(VM vm)
+                Unit AppendFile(VM vm)
                 {
                     string path = vm.GetString(0);
                     string output = vm.GetString(1);
@@ -1049,7 +1049,7 @@ namespace lightning
 
                     return new Unit(UnitType.Null);
                 }
-                file.Set("append", new IntrinsicUnit("file_append_file", appendFile, 2));
+                file.Set("append", new IntrinsicUnit("file_append_file", AppendFile, 2));
 
                 tables.Add("file", file);
             }
@@ -1059,7 +1059,7 @@ namespace lightning
             List<IntrinsicUnit> functions = new List<IntrinsicUnit>();
 
             //////////////////////////////////////////////////////
-            Unit eval(VM vm)
+            Unit Eval(VM vm)
             {
                 string eval_code = vm.GetString(0);;
                 Scanner scanner = new Scanner(eval_code);
@@ -1100,10 +1100,10 @@ namespace lightning
                 }
                 return new Unit(UnitType.Null);
             }
-            functions.Add(new IntrinsicUnit("eval", eval, 1));
+            functions.Add(new IntrinsicUnit("eval", Eval, 1));
 
             ////////////////////////////////////////////////////
-            Unit require(VM vm)
+            Unit Require(VM vm)
             {
                 string path = vm.GetString(0);
                 foreach (ModuleUnit v in vm.modules)// skip already imported modules
@@ -1158,47 +1158,64 @@ namespace lightning
                 }
                 return new Unit(UnitType.Null);
             }
-            functions.Add(new IntrinsicUnit("require", require, 1));
+            functions.Add(new IntrinsicUnit("require", Require, 1));
 
             //////////////////////////////////////////////////////
-            Unit writeLine(VM vm)
+            Unit Try(VM vm)
             {
-                Console.WriteLine(System.Text.RegularExpressions.Regex.Unescape(vm.GetUnit(0).ToString()));
-                return new Unit(UnitType.Null);
+                Unit this_callable = vm.GetUnit(0);
+                TableUnit this_arguments = vm.GetTable(1);
+                try{
+                    Console.WriteLine("inside");
+                    Unit result = vm.CallFunction(this_callable, this_arguments.Elements, true);
+                    Console.WriteLine("outside");
+                    return result;
+                }catch(Exception e){
+                    // return new Unit(e.ToString());
+                    return new Unit(UnitType.Null);
+                }
             }
-            functions.Add(new IntrinsicUnit("write_line", writeLine, 1));
+            functions.Add(new IntrinsicUnit("try", Try, 2));
 
             //////////////////////////////////////////////////////
-            Unit write(VM vm)
-            {
-                Console.Write(System.Text.RegularExpressions.Regex.Unescape(vm.GetUnit(0).ToString()));
-                return new Unit(UnitType.Null);
-            }
-            functions.Add(new IntrinsicUnit("write", write, 1));
-
-            //////////////////////////////////////////////////////
-            Unit writeLineRaw(VM vm)
+            Unit WriteLine(VM vm)
             {
                 Console.WriteLine(vm.GetUnit(0).ToString());
                 return new Unit(UnitType.Null);
             }
-            functions.Add(new IntrinsicUnit("write_line_raw", writeLineRaw, 1));
+            functions.Add(new IntrinsicUnit("write_line", WriteLine, 1));
 
             //////////////////////////////////////////////////////
-            Unit writeRaw(VM vm)
+            Unit Write(VM vm)
             {
                 Console.Write(vm.GetUnit(0).ToString());
                 return new Unit(UnitType.Null);
             }
-            functions.Add(new IntrinsicUnit("write_raw", writeRaw, 1));
+            functions.Add(new IntrinsicUnit("write", Write, 1));
 
             //////////////////////////////////////////////////////
-            Unit readln(VM vm)
+            Unit WriteLineRaw(VM vm)
+            {
+                Console.WriteLine(System.Text.RegularExpressions.Regex.Escape(vm.GetUnit(0).ToString()));
+                return new Unit(UnitType.Null);
+            }
+            functions.Add(new IntrinsicUnit("write_line_raw", WriteLineRaw, 1));
+
+            //////////////////////////////////////////////////////
+            Unit WriteRaw(VM vm)
+            {
+                Console.Write(System.Text.RegularExpressions.Regex.Escape(vm.GetUnit(0).ToString()));
+                return new Unit(UnitType.Null);
+            }
+            functions.Add(new IntrinsicUnit("write_raw", WriteRaw, 1));
+
+            //////////////////////////////////////////////////////
+            Unit Readln(VM vm)
             {
                 string read = Console.ReadLine();
                 return new Unit(read);
             }
-            functions.Add(new IntrinsicUnit("read_line", readln, 0));
+            functions.Add(new IntrinsicUnit("read_line", Readln, 0));
 
             //////////////////////////////////////////////////////
             Unit readNumber(VM vm)
@@ -1212,7 +1229,7 @@ namespace lightning
             functions.Add(new IntrinsicUnit("read_number", readNumber, 0));
 
             //////////////////////////////////////////////////////
-            Unit read(VM vm)
+            Unit Read(VM vm)
             {
                 int read = Console.Read();
                 if (read > 0)
@@ -1226,18 +1243,26 @@ namespace lightning
                 else
                     return new Unit(UnitType.Null);
             }
-            functions.Add(new IntrinsicUnit("read", read, 0));
+            functions.Add(new IntrinsicUnit("read", Read, 0));
 
             //////////////////////////////////////////////////////
-            Unit type(VM vm)
+            Unit Type(VM vm)
             {
                 UnitType this_type = vm.GetUnit(0).Type;
                 return new Unit(this_type.ToString());
             }
-            functions.Add(new IntrinsicUnit("type", type, 1));
+            functions.Add(new IntrinsicUnit("type", Type, 1));
 
             //////////////////////////////////////////////////////
-            Unit maybe(VM vm)
+            Unit IsNumber(VM vm)
+            {
+                Unit this_unit = vm.GetUnit(0);
+                return new Unit(Unit.IsNumeric(this_unit));
+            }
+            functions.Add(new IntrinsicUnit("is_number", IsNumber, 1));
+
+            //////////////////////////////////////////////////////
+            Unit Maybe(VM vm)
             {
                 Unit first = vm.stack.Peek(0);
                 Unit second = vm.stack.Peek(1);
@@ -1246,10 +1271,10 @@ namespace lightning
                 else
                     return second;
             }
-            functions.Add(new IntrinsicUnit("maybe", maybe, 2));
+            functions.Add(new IntrinsicUnit("maybe", Maybe, 2));
 
             //////////////////////////////////////////////////////
-            Unit forEach(VM vm)
+            Unit ForEach(VM vm)
             {
                 TableUnit table = vm.GetTable(0);
                 Unit func = vm.GetUnit(1);
@@ -1275,7 +1300,7 @@ namespace lightning
                 return new Unit(UnitType.Null);
             }
 
-            functions.Add(new IntrinsicUnit("for_each", forEach, 2));
+            functions.Add(new IntrinsicUnit("for_each", ForEach, 2));
             //////////////////////////////////////////////////////
 
             Unit ForRange(VM vm)
@@ -1317,11 +1342,11 @@ namespace lightning
             functions.Add(new IntrinsicUnit("for_range", ForRange, 3));
 
             //////////////////////////////////////////////////////
-            Unit getOs(VM vm)
+            Unit GetOS(VM vm)
             {
                 return new Unit(Environment.OSVersion.VersionString);
             }
-            functions.Add(new IntrinsicUnit("get_os", getOs, 0));
+            functions.Add(new IntrinsicUnit("get_os", GetOS, 0));
 
             //////////////////////////////////////////////////////
             Unit NewLine(VM vm)

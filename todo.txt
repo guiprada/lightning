@@ -1,7 +1,12 @@
 ﻿todo
+	nuples to call and return from try
+	separate test in modules
+	add Get and Set? to Unit :)
+	convert StringUnit to use char[]
+	compound Grouping/expression
 	add check for arity before call
-	add makeNumericIterator
-	remove append, replace with +
+	add type to List and Wrapper
+
 	try , protected call
 	tuple and nuple class
 	List Class
@@ -110,3 +115,4 @@ done
 	- methods on wrappers
 	- rename Number to Float
 	- Compiler diferentiates Integer and Float literals
+	- add makeNumericIterator

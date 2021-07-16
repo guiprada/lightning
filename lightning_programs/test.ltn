@@ -790,6 +790,8 @@ var global_lock_test_counter = 5
     var line_skip_string =
 "a
 a"
+    write_raw(line_skip_string)
+    write_line_raw(line_skip_string)
     var new_line = new_line()
     var new_line_size = new_line:length()
     if(new_line_size == 2){
@@ -866,13 +868,26 @@ write_line(machine.memory_use())
     var this_list = [3, 1, false, 2, 'a', null, 0, '0', "string"]
     table.list_sort(this_list)
     write_line(this_list)
-
+    write_line(this_list[0] .. this_list[8])
 }
-start_time:reset()
-write_line("Elapsed time: " + start_time:elapsed() + " ms")
+
 var str = "hey"
+// write_line({"ei"}:char_at(0))
 str.teste = function(self){
     write_line(self)
     return null
 }
 str:teste()
+
+// var str2 = read_line()
+// write_line("lightning" + str2:unescape() + str2:escape())
+// // write_line("lightning" + read_line():unescape() + str2:escape())
+var array1 = []
+function wrong(text, more_text){
+    write_line(text)
+    write_line(more_text)
+    return array1[0]
+}
+var args = ["oi", "mundo"]
+write_line(try(wrong, args))
+write_line("recovered")
