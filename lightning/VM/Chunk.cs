@@ -185,15 +185,22 @@ namespace lightning
 
     public class Chunk
     {
-        List<Instruction> program;
-        List<Unit> constants;
-        public LineCounter lineCounter;
+        private List<Instruction> program;
+        private List<Unit> constants;
+        private LineCounter lineCounter;
 
         public Library Prelude { get; private set; }
-        public Operand ProgramSize { get { return (Operand)program.Count; } }
-        public List<Instruction> Program { get { return program; } }
+        public Operand ExitAddress { get { return (Operand)program.Count; } }
+        public List<Instruction> Body { get { return program; } }
         public Operand ConstantsCount { get { return (Operand)constants.Count; } }
         public List<Unit> GetConstants { get{ return constants; } }
+        public LineCounter LineCounter { get { return lineCounter; } }
+        public FunctionUnit GetFunctionUnit(string p_name, string p_module)
+        {
+            FunctionUnit this_function_unit = new FunctionUnit(p_name, p_module);
+            this_function_unit.Set(0, Body, LineCounter, 0);
+            return this_function_unit;
+        }
 
         public Chunk(Library p_prelude)
         {

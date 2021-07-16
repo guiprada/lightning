@@ -95,7 +95,7 @@ namespace interpreter
 #endif
 
             Chunker code_generator = new Chunker(program, "main", Prelude.GetPrelude());
-            Chunk chunk = code_generator.Code;
+            Chunk chunk = code_generator.Chunk;
             if(code_generator.Errors.Count > 0)
             {
                 Console.WriteLine("\nCompiling had errors!");

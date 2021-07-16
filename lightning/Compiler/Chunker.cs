@@ -38,9 +38,9 @@ namespace lightning
         }
 
         private Node ast;
-        private Chunk code;
-        private string module_name;
-        public Chunk Code
+        private Chunk chunk;
+        private string moduleName;
+        public Chunk Chunk
         {
             get
             {
@@ -56,7 +56,7 @@ namespace lightning
                         Console.WriteLine(e.ToString());
                     }
                 }
-                return code;
+                return chunk;
             }
         }
 
@@ -73,8 +73,8 @@ namespace lightning
 
         public Chunker(Node p_ast, string p_module_name, Library prelude)
         {
-            code = new Chunk(prelude);
-            module_name = p_module_name;
+            chunk = new Chunk(prelude);
+            moduleName = p_module_name;
             ast = p_ast;
             instructionCounter = 0;
             HasChunked = false;
@@ -352,12 +352,12 @@ namespace lightning
             ChunkIt(p_node.ThenBranch);
             int else_address = instructionCounter;
             Add(OpCode.JUMP, 0, p_node.Line);
-            code.FixInstruction(then_address, null, (Operand)(instructionCounter - then_address), null, null);
+            chunk.FixInstruction(then_address, null, (Operand)(instructionCounter - then_address), null, null);
             if (p_node.ElseBranch != null)
             {
                 ChunkIt(p_node.ElseBranch);
             }
-            code.FixInstruction(else_address, null, (Operand)(instructionCounter - else_address), null, null);
+            chunk.FixInstruction(else_address, null, (Operand)(instructionCounter - else_address), null, null);
         }
 
         private void ChunkFor(ForNode p_node)
@@ -391,8 +391,8 @@ namespace lightning
             Add(OpCode.CLOSE_ENV, p_node.Line);
             env.RemoveAt(env.Count - 1);
 
-            code.FixInstruction(start_address, null, (Operand)(exit_adress - start_address), null, null);
-            code.FixInstruction(go_back_address, null, (Operand)(go_back_address - condition_address), null, null);
+            chunk.FixInstruction(start_address, null, (Operand)(exit_adress - start_address), null, null);
+            chunk.FixInstruction(go_back_address, null, (Operand)(go_back_address - condition_address), null, null);
 
         }
 
@@ -409,8 +409,8 @@ namespace lightning
             Add(OpCode.JUMP_BACK, 0, p_node.Line);
             //int body_end = instructionCounter;
 
-            code.FixInstruction(body_address, null, (Operand)(instructionCounter - body_address), null, null);
-            code.FixInstruction(go_back_address, null, (Operand)(go_back_address - condition_address), null, null);
+            chunk.FixInstruction(body_address, null, (Operand)(instructionCounter - body_address), null, null);
+            chunk.FixInstruction(go_back_address, null, (Operand)(go_back_address - condition_address), null, null);
         }
 
         private void ChunkVariable(VariableNode p_node)
@@ -849,7 +849,7 @@ namespace lightning
         private void CompileFunction(string name, int line, FunctionExpressionNode p_node, bool isGlobal)
         {
 
-            FunctionUnit new_function = new FunctionUnit(name, module_name);
+            FunctionUnit new_function = new FunctionUnit(name, moduleName);
             Operand this_address = (Operand)AddConstant(new_function);
 
             if (p_node.GetType() == typeof(FunctionExpressionNode))
@@ -886,7 +886,6 @@ namespace lightning
             {
                 SetVar(p);// it is always local
                 Add(OpCode.DECLARE_VARIABLE, line);
-                //Add(OpCode.POP, line);
                 arity++;
             }
 
@@ -905,7 +904,7 @@ namespace lightning
                     new_upvalues.Add(new UpValueUnit((Operand)v.address, (Operand)v.envIndex));
                 }
                 ClosureUnit new_closure = new ClosureUnit(new_function, new_upvalues);
-                code.SwapConstant(this_address, new Unit(new_closure));
+                chunk.SwapConstant(this_address, new Unit(new_closure));
             }
             else
             {
@@ -913,7 +912,7 @@ namespace lightning
             }
 
             // fix the exit address
-            code.FixInstruction(exit_instruction_address, null, (Operand)(instructionCounter - exit_instruction_address), null, null);
+            chunk.FixInstruction(exit_instruction_address, null, (Operand)(instructionCounter - exit_instruction_address), null, null);
 
             if (is_closure == true)
                 Add(OpCode.CLOSE_CLOSURE, line);
@@ -922,8 +921,8 @@ namespace lightning
 
             new_function.Set(
                 arity,
-                code.Slice(function_start, instructionCounter),
-                code.lineCounter.Slice(function_start, instructionCounter),
+                chunk.Slice(function_start, instructionCounter),
+                chunk.LineCounter.Slice(function_start, instructionCounter),
                 (Operand)function_start);
             instructionCounter = function_start;
 
@@ -1034,7 +1033,7 @@ namespace lightning
             else
             {
                 constants.Add(p_string);
-                code.AddConstant(new Unit(p_string));
+                chunk.AddConstant(new Unit(p_string));
                 return constants.Count - 1;
             }
         }
@@ -1048,7 +1047,7 @@ namespace lightning
             else
             {
                 constants.Add(p_char);
-                code.AddConstant(new Unit(p_char));
+                chunk.AddConstant(new Unit(p_char));
                 return constants.Count - 1;
             }
         }
@@ -1062,7 +1061,7 @@ namespace lightning
             else
             {
                 constants.Add(p_number);
-                code.AddConstant(new Unit(p_number));
+                chunk.AddConstant(new Unit(p_number));
                 return constants.Count - 1;
             }
         }
@@ -1076,7 +1075,7 @@ namespace lightning
             else
             {
                 constants.Add(p_number);
-                code.AddConstant(new Unit(p_number));
+                chunk.AddConstant(new Unit(p_number));
                 return constants.Count - 1;
             }
         }
@@ -1084,7 +1083,7 @@ namespace lightning
         private int AddConstant(FunctionUnit new_function)
         {
             constants.Add(new_function);
-            code.AddConstant(new Unit(new_function));
+            chunk.AddConstant(new Unit(new_function));
             return constants.Count - 1;
         }
 
@@ -1092,25 +1091,25 @@ namespace lightning
 
         private void Add(OpCode p_opcode, int p_line)
         {
-            code.WriteInstruction(p_opcode, 0, 0, 0, (uint)p_line);
+            chunk.WriteInstruction(p_opcode, 0, 0, 0, (uint)p_line);
             instructionCounter++;
         }
 
         private void Add(OpCode p_opcode, Operand p_opA, int p_line)
         {
-            code.WriteInstruction(p_opcode, p_opA, 0, 0, (uint)p_line);
+            chunk.WriteInstruction(p_opcode, p_opA, 0, 0, (uint)p_line);
             instructionCounter++;
         }
 
         private void Add(OpCode p_opcode, Operand p_opA, Operand p_opB, int p_line)
         {
-            code.WriteInstruction(p_opcode, p_opA, p_opB, 0, (uint)p_line);
+            chunk.WriteInstruction(p_opcode, p_opA, p_opB, 0, (uint)p_line);
             instructionCounter++;
         }
 
         private void Add(OpCode p_opcode, Operand p_opA, Operand p_opB, Operand p_opC, int p_line)
         {
-            code.WriteInstruction(p_opcode, p_opA, p_opB, p_opC, (uint)p_line);
+            chunk.WriteInstruction(p_opcode, p_opA, p_opB, p_opC, (uint)p_line);
             instructionCounter++;
         }
 

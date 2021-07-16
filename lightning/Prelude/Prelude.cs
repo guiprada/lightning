@@ -75,7 +75,7 @@ namespace lightning
                 {
                     string modules = "";
                     bool first = true;
-                    foreach (KeyValuePair<string, int> entry in vm.loadedModules)
+                    foreach (KeyValuePair<string, int> entry in vm.LoadedModules)
                     {
                         if (first == true)
                         {
@@ -1078,8 +1078,8 @@ namespace lightning
                 Node program = parser.ParsedTree;
 
                 string eval_name = eval_code.GetHashCode().ToString();
-                Chunker code_generator = new Chunker(program, eval_name, vm.GetChunk().Prelude);
-                Chunk chunk = code_generator.Code;
+                Chunker code_generator = new Chunker(program, eval_name, vm.Prelude);
+                Chunk chunk = code_generator.Chunk;
                 if (code_generator.Errors.Count > 0)
                 {
                     Console.WriteLine("Code generation had errors:");
@@ -1134,8 +1134,8 @@ namespace lightning
 
                     Node program = parser.ParsedTree;
 
-                    Chunker code_generator = new Chunker(program, path, vm.GetChunk().Prelude);
-                    Chunk chunk = code_generator.Code;
+                    Chunker code_generator = new Chunker(program, path, vm.Prelude);
+                    Chunk chunk = code_generator.Chunk;
                     if (code_generator.Errors.Count > 0)
                     {
                         Console.WriteLine("Code generation had errors:");
@@ -1504,7 +1504,7 @@ namespace lightning
             for (Operand i = 0; i < relocationInfo.toBeRelocatedConstants.Count; i++)
             {
                 Unit new_value =
-                    relocationInfo.importedVM.GetChunk().GetConstant(relocationInfo.toBeRelocatedConstants[i]);
+                    relocationInfo.importedVM.Constants[relocationInfo.toBeRelocatedConstants[i]];
 
                 relocationInfo.module.Constants.Add(new_value);
                 relocationInfo.relocatedConstants.Add(
@@ -1531,7 +1531,7 @@ namespace lightning
                 if (next.opCode == OpCode.LOAD_GLOBAL)
                 {
                     if ((next.opCode == OpCode.LOAD_GLOBAL) &&
-                        (next.opA >= relocationInfo.importedVM.GetChunk().Prelude.intrinsics.Count))
+                        (next.opA >= relocationInfo.importedVM.Prelude.intrinsics.Count))
                     {
                         if (relocationInfo.relocatedGlobals.ContainsKey(next.opA))
                         {
@@ -1588,16 +1588,16 @@ namespace lightning
                 }
                 else if (next.opCode == OpCode.DECLARE_FUNCTION)
                 {
-                    Unit this_value = relocationInfo.importedVM.GetChunk().GetConstant(next.opC);
-                    if (relocationInfo.importingVM.GetChunk().GetConstants.Contains(this_value))
+                    Unit this_value = relocationInfo.importedVM.Constants[next.opC];
+                    if (relocationInfo.importingVM.Constants.Contains(this_value))
                     {
                         next.opC =
-                            (Operand)relocationInfo.importingVM.GetChunk().GetConstants.IndexOf(this_value);
+                            (Operand)relocationInfo.importingVM.Constants.IndexOf(this_value);
                     }
                     else
                     {
-                        relocationInfo.importingVM.GetChunk().GetConstants.Add(this_value);
-                        next.opC = (Operand)(relocationInfo.importingVM.GetChunk().GetConstants.Count - 1);
+                        relocationInfo.importingVM.Constants.Add(this_value);
+                        next.opC = (Operand)(relocationInfo.importingVM.Constants.Count - 1);
                         RelocateChunk(((ClosureUnit)this_value.heapUnitValue).Function, relocationInfo);
                     }
                 }

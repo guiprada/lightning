@@ -33,7 +33,6 @@ namespace lightning
 
     public class VM
     {
-        Chunk chunk;
         FunctionUnit main;
         Operand IP;
 
@@ -49,14 +48,12 @@ namespace lightning
         Memory<UpValueUnit> upValues;
         Memory<UpValueUnit> upValuesRegistry;
 
-        List<IntrinsicUnit> Intrinsics { get; set; }
-        public Dictionary<string, int> loadedModules { get; private set; }
+        public List<IntrinsicUnit> Intrinsics { get; private set; }
+        public Library Prelude { get; private set; }
+        public Dictionary<string, int> LoadedModules { get; private set; }
         public List<ModuleUnit> modules;
-        static Stack<VM> vmPool;
-        static VM vm0;
-        int functionDeepness;
+        public List<Unit> Constants{ get {return constants;}}
         bool parallelVM;
-
         int Env{ get{ return variables.Env; } }
 
         const Operand ASSIGN = (Operand)AssignmentOperatorType.ASSIGN;
@@ -65,22 +62,20 @@ namespace lightning
         const Operand MULTIPLICATION_ASSIGN = (Operand)AssignmentOperatorType.MULTIPLICATION_ASSIGN;
         const Operand DIVISION_ASSIGN = (Operand)AssignmentOperatorType.DIVISION_ASSIGN;
 
+        static Stack<VM> vmPool;
+        static int functionDeepness;
+
 //////////////////////////////////////////////////// Public
         static VM(){
             vmPool = new Stack<VM>();
+            functionDeepness = 30;
         }
-        public VM(Chunk p_chunk, int p_function_deepness = 30)
+        public VM(Chunk p_chunk)
         {
-            if(vm0 == null)
-                vm0 = this;
-
-            chunk = p_chunk;
             IP = 0;
-            functionDeepness = p_function_deepness;
             parallelVM = false;
 
-            main = new FunctionUnit("main", "main");
-            main.Set(0, chunk.Program, chunk.lineCounter, 0);
+            main = p_chunk.GetFunctionUnit("main", "main");
 
             instructions = new Instructions(functionDeepness, main, out instructionsCache);
 
@@ -90,45 +85,46 @@ namespace lightning
             upValues = new Memory<UpValueUnit>();
             upValuesRegistry = new Memory<UpValueUnit>();
 
+            constants = p_chunk.GetConstants;
+            Prelude = p_chunk.Prelude;
             globals = new Memory<Unit>();
-            Intrinsics = chunk.Prelude.intrinsics;
+            Intrinsics = p_chunk.Prelude.intrinsics;
             foreach (IntrinsicUnit v in Intrinsics)
             {
                 globals.Add(new Unit(v));
             }
-            foreach (KeyValuePair<string, TableUnit> entry in chunk.Prelude.tables)
+            foreach (KeyValuePair<string, TableUnit> entry in p_chunk.Prelude.tables)
             {
                 globals.Add(new Unit(entry.Value));
             }
-
-            constants = chunk.GetConstants;
-
-            loadedModules = new Dictionary<string, int>();
+            LoadedModules = new Dictionary<string, int>();
             modules = new List<ModuleUnit>();
         }
 
-        public VM(FunctionUnit p_main, List<Unit> p_constants, Memory<Unit> p_globals,  bool p_parallelVM = false)
+        public VM(
+            FunctionUnit p_main,
+            List<Unit> p_constants,
+            Memory<Unit> p_globals,
+            Library p_Prelude,
+            Dictionary<string,int> p_LoadedModules,
+            List<ModuleUnit> p_modules,
+            bool p_parallelVM = false)
         {
-            if(vm0 == null)
-                vm0 = this;
             main = p_main;
+            constants = p_constants;
+            globals = p_globals;
+            Prelude = p_Prelude;
+            LoadedModules = p_LoadedModules;
+            modules = p_modules;
+
             IP = 0;
-            functionDeepness = 10;
             parallelVM = p_parallelVM;
 
-            instructions = new Instructions(functionDeepness, p_main, out instructionsCache);
-
+            instructions = new Instructions(functionDeepness, main, out instructionsCache);
             stack = new Stack(functionDeepness);
-
             variables = new Memory<Unit>();
             upValues = new Memory<UpValueUnit>();
             upValuesRegistry = new Memory<UpValueUnit>();
-
-            globals = p_globals;
-            constants = p_constants;
-
-            loadedModules = new Dictionary<string, int>();
-            modules = new List<ModuleUnit>();
         }
 
         public void ResoursesTrim(){
@@ -154,13 +150,11 @@ namespace lightning
         void Reset(){
             IP = 0;
             parallelVM = true;
-            instructions.Clear(out instructionsCache);
+            instructions.Reset();
             stack.Clear();
             variables.Clear();
             upValues.Clear();
             upValuesRegistry.Clear();
-            loadedModules.Clear();
-            modules.Clear();
         }
         public static void RecycleVM(VM vm)
         {
@@ -178,21 +172,16 @@ namespace lightning
             }
             else
             {
-                VM new_vm = new VM(main, constants, globals, isParallelVM);
+                VM new_vm = new VM(main, constants, globals, Prelude, LoadedModules, modules, isParallelVM);
                 return new_vm;
             }
         }
 
         public Operand AddModule(ModuleUnit this_module)
         {
-            loadedModules.Add(this_module.Name, loadedModules.Count);
+            LoadedModules.Add(this_module.Name, LoadedModules.Count);
             modules.Add(this_module);
-            return (Operand)(loadedModules.Count - 1);
-        }
-
-        public Chunk GetChunk()
-        {
-            return chunk;
+            return (Operand)(LoadedModules.Count - 1);
         }
 
         public Unit GetGlobal(Operand address)
@@ -297,7 +286,7 @@ namespace lightning
 //////////////////////////////////////////////////// End Public
 
         ModuleUnit GetModule(string p_module_name){
-            return modules[loadedModules[p_module_name]];
+            return modules[LoadedModules[p_module_name]];
         }
 
         Operand CalculateEnvShift(Operand n_shift){
@@ -343,7 +332,7 @@ namespace lightning
         void Error(string msg)
         {
             if (instructions.ExecutingInstructionsIndex == 0)
-                Console.WriteLine("Error: " + msg + " on line: "+ chunk.lineCounter.GetLine(IP));
+                Console.WriteLine("Error: " + msg + " on line: "+ main.LineCounter.GetLine(IP));
             else
             {
                 Console.Write("Error: " + msg);
@@ -355,11 +344,10 @@ namespace lightning
 
         public static string ErrorString(VM vm)
         {
-            vm = vm ?? vm0;
             if (vm == null)
                 return null;
             if (vm.instructions.ExecutingInstructionsIndex == 0)
-                return "Line: " + vm.chunk.lineCounter.GetLine(vm.IP);
+                return "Line: " + vm.main.LineCounter.GetLine(vm.IP);
             else
             {
                 return "Function: " + vm.instructions.ExecutingFunction.Name +

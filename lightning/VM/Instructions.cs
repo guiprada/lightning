@@ -51,10 +51,9 @@ namespace lightning{
             p_instructions_cache = ExecutingInstructions;
         }
 
-        public void Clear(out List<Instruction> p_instructions_cache){
+        public void Reset(){
             returnAdressTop = 1;
             currentInstructionsIndex = 0;
-            p_instructions_cache = ExecutingInstructions;
         }
 
         public Operand PopFunction(out List<Instruction> p_instructions_cache){
