@@ -29,7 +29,7 @@ indexedAccess   -> ( ( "[" expression "]" ) | ( "." IDENTIFIER ) )*
 compoundVar     -> ( IDENTIFIER | chainedCall ) indexedAccess
 chainedCall     -> compoundCall ( "|" "(" arguments? ")" )*
 compoundCall    -> functionCall | methodCall
-functionCall            -> primary "(" arguments? ")"
+functionCall    -> primary "(" arguments? ")"
 methodCall      -> compoundVar : IDENTIFIER "(" arguments? ")"
 
 arguments       -> expression ( "," expression )*
