@@ -333,11 +333,9 @@ namespace lightning
 
         private void Printassignment(AssignmentNode p_node)
         {
-            if (p_node.assigned != null){
-                Console.Write("[ASSIGMENT " + p_node.assigned.Name + " = ");
-                Print(p_node.Value);
-                Console.Write("]");
-            }
+            Console.Write("[ASSIGMENT " + p_node.assigned.Name + " = ");
+            Print(p_node.Value);
+            Console.Write("]");
         }
 
         private void PrintassignmentOp(AssignmentOpNode p_node)
