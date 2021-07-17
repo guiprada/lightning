@@ -50,10 +50,10 @@ namespace lightning
                     PrintVarDeclaration(p_node as VarDeclarationNode);
                     break;
                 case NodeType.ASSIGMENT:
-                    Printassignment(p_node as assignmentNode);
+                    Printassignment(p_node as AssignmentNode);
                     break;
                 case NodeType.ASSIGMENT_OP:
-                    PrintassignmentOp(p_node as assignmentOpNode);
+                    PrintassignmentOp(p_node as AssignmentOpNode);
                     break;
                 case NodeType.LOGICAL:
                     PrintLogical(p_node as LogicalNode);
@@ -331,7 +331,7 @@ namespace lightning
             Console.WriteLine("]");
         }
 
-        private void Printassignment(assignmentNode p_node)
+        private void Printassignment(AssignmentNode p_node)
         {
             if (p_node.assigned != null){
                 Console.Write("[ASSIGMENT " + p_node.assigned.Name + " = ");
@@ -340,7 +340,7 @@ namespace lightning
             }
         }
 
-        private void PrintassignmentOp(assignmentOpNode p_node)
+        private void PrintassignmentOp(AssignmentOpNode p_node)
         {
             Console.Write("[ASSIGMENT_OP " + p_node.assigned.Name);
             string op;

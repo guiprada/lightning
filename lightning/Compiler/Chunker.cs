@@ -138,10 +138,10 @@ namespace lightning
                     ChunkVarDeclaration(p_node as VarDeclarationNode);
                     break;
                 case NodeType.ASSIGMENT:
-                    Chunkassignment(p_node as assignmentNode);
+                    Chunkassignment(p_node as AssignmentNode);
                     break;
                 case NodeType.ASSIGMENT_OP:
-                    ChunkassignmentOp(p_node as assignmentOpNode);
+                    ChunkassignmentOp(p_node as AssignmentOpNode);
                     break;
                 case NodeType.LOGICAL:
                     ChunkLogical(p_node as LogicalNode);
@@ -479,7 +479,7 @@ namespace lightning
             }
         }
 
-        private void Chunkassignment(assignmentNode p_node)
+        private void Chunkassignment(AssignmentNode p_node)
         {
             ChunkIt(p_node.Value);
             Nullable<Variable> maybe_var = GetVar(p_node.assigned.Name);
@@ -540,7 +540,7 @@ namespace lightning
             }
         }
 
-        private void ChunkassignmentOp(assignmentOpNode p_node)
+        private void ChunkassignmentOp(AssignmentOpNode p_node)
         {
             ChunkIt(p_node.Value);
             Nullable<Variable> maybe_var = GetVar(p_node.assigned.Name);

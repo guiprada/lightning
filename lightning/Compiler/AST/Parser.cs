@@ -352,19 +352,19 @@ namespace lightning
 
         Node Expression()
         {
-            return assignment();
+            return Assignment();
         }
 
-        Node assignment()
+        Node Assignment()
         {
             Node assigned = LogicalOr();
 
             if (Match(TokenType.PLUS_EQUAL))
             {
-                Node value = assignment();
+                Node value = Assignment();
 
                 if (assigned.Type == NodeType.VARIABLE)
-                    return new assignmentOpNode((VariableNode)assigned, value, AssignmentOperatorType.ADDITION_ASSIGN, assigned.Line);
+                    return new AssignmentOpNode((VariableNode)assigned, value, AssignmentOperatorType.ADDITION_ASSIGN, assigned.Line);
                 else
                     Error("Invalid assignment.");
             }
@@ -373,16 +373,16 @@ namespace lightning
                 Node value = new LiteralNode(1, assigned.Line);
 
                 if (assigned.Type == NodeType.VARIABLE)
-                    return new assignmentOpNode((VariableNode)assigned, value, AssignmentOperatorType.ADDITION_ASSIGN, assigned.Line);
+                    return new AssignmentOpNode((VariableNode)assigned, value, AssignmentOperatorType.ADDITION_ASSIGN, assigned.Line);
                 else
                     Error("Invalid assignment.");
             }
             else if (Match(TokenType.MINUS_EQUAL))
             {
-                Node value = assignment();
+                Node value = Assignment();
 
                 if (assigned.Type == NodeType.VARIABLE)
-                    return new assignmentOpNode((VariableNode)assigned, value, AssignmentOperatorType.SUBTRACTION_ASSIGN, assigned.Line);
+                    return new AssignmentOpNode((VariableNode)assigned, value, AssignmentOperatorType.SUBTRACTION_ASSIGN, assigned.Line);
                 else
                     Error("Invalid assignment.");
             }
@@ -391,34 +391,34 @@ namespace lightning
                 Node value = new LiteralNode(1, assigned.Line);
 
                 if (assigned.Type == NodeType.VARIABLE)
-                    return new assignmentOpNode((VariableNode)assigned, value, AssignmentOperatorType.SUBTRACTION_ASSIGN, assigned.Line);
+                    return new AssignmentOpNode((VariableNode)assigned, value, AssignmentOperatorType.SUBTRACTION_ASSIGN, assigned.Line);
                 else
                     Error("Invalid assignment.");
             }
             else if (Match(TokenType.STAR_EQUAL))
             {
-                Node value = assignment();
+                Node value = Assignment();
 
                 if (assigned.Type == NodeType.VARIABLE)
-                    return new assignmentOpNode((VariableNode)assigned, value, AssignmentOperatorType.MULTIPLICATION_ASSIGN, assigned.Line);
+                    return new AssignmentOpNode((VariableNode)assigned, value, AssignmentOperatorType.MULTIPLICATION_ASSIGN, assigned.Line);
                 else
                     Error("Invalid assignment.");
             }
             if (Match(TokenType.SLASH_EQUAL))
             {
-                Node value = assignment();
+                Node value = Assignment();
 
                 if (assigned.Type == NodeType.VARIABLE)
-                    return new assignmentOpNode((VariableNode)assigned, value, AssignmentOperatorType.DIVISION_ASSIGN, assigned.Line);
+                    return new AssignmentOpNode((VariableNode)assigned, value, AssignmentOperatorType.DIVISION_ASSIGN, assigned.Line);
                 else
                     Error("Invalid assignment.");
             }
             else if (Match(TokenType.EQUAL))
             {
-                Node value = assignment();
+                Node value = Assignment();
 
                 if (assigned.Type == NodeType.VARIABLE)
-                    return new assignmentNode((VariableNode)assigned, value, assigned.Line);
+                    return new AssignmentNode((VariableNode)assigned, value, assigned.Line);
                 else
                     Error("Invalid assignment.");
             }
