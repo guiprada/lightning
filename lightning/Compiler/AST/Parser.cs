@@ -104,7 +104,7 @@ namespace lightning
                 if (Match(TokenType.LEFT_BRACKET))
                 {
                     indexes.Add(Expression());
-                    Consume(TokenType.RIGHT_BRACKET, "Expected ']' after 'compoundVar indentifier'", true);
+                    Consume(TokenType.RIGHT_BRACKET, "Expected ']' after 'compoundVar identifier'", true);
                 }
                 else if (Match(TokenType.DOT))
                 {

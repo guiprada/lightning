@@ -1,25 +1,4 @@
-﻿var eiei = 5
-write_line(eiei++)
-
-var assert_teste = function(value1, value2, msg)
-{
-    write_line(type(eiei++))
-
-    var result = false
-    if(result == false){
-        type(eiei)
-        (eiei ++)
-    }
-    return result
-}
-assert_teste(1, 2, "teste")
-write_line(type(eiei))
-write_line(eiei)
-
-
-
-
-write_line("*** Welcome to lightning test suite Zzz :) ***")
+﻿write_line("*** Welcome to lightning test suite Zzz :) ***")
 
 var os_string = get_os()
 var os = "Unknown"
@@ -376,17 +355,17 @@ var assert_not = lib_assert_counter.assert_not
 }
 {
     // Testing compound calls
-        function return_table_with_function ()
+    function return_table_with_function ()
+    {
+        return function ()
         {
-            return function ()
+            var closure = function (value)
             {
-                var closure = function (value)
-                {
-                    return value
-                }
-                return [another_function: closure]
+                return value
             }
+            return [another_function: closure]
         }
+    }
 
     var func1 = return_table_with_function ()
     assert(func1().another_function("viva"), "viva", "Failed compound calls test 1.")
@@ -405,6 +384,14 @@ var assert_not = lib_assert_counter.assert_not
     }
 
     assert(table1.inner_table:closure().x, 1, "Failed compound calls test 3.")
+}
+{
+    // Testing Grouping after function Call
+    var null_func = function(){}
+    var result = 0
+    null_func()
+    (result++)
+    assert(result, 1, "Failed Grouping after function call Test.")
 }
 {
     // Transient tests
@@ -837,6 +824,7 @@ a"
     assert((1 .. 2  + char_o + 3 + 5 + " " .. char_a), "12o35 a", "Failed Append and Alphanumeric Addition Test 1.")
     assert((1 + 2  + char_o + 3 + " " .. char_a), "3o3 a", "Failed Append and Alphanumeric Addition Test 1.")
 }
+
 machine.trim()
 
 write_line("")
@@ -883,3 +871,7 @@ if(!success)
     write_line("recovered")
 
 write_line(machine.memory_use())
+
+// "eoeoo"|string.char_at(0)
+// [3, 1, false, 2, 'a', null, 0, '0', "string"]|table.list_sort()
+// write_line(5|math.sqroot())
