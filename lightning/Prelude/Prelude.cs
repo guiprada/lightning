@@ -1520,7 +1520,6 @@ namespace lightning
             {
                 FindFunction(v, relocationInfo);
             }
-            Console.WriteLine(function.ToString());
         }
 
         static void RelocateChunk(FunctionUnit function, RelocationInfo relocationInfo)
@@ -1531,9 +1530,8 @@ namespace lightning
 
                 if (next.opCode == OpCode.LOAD_GLOBAL)
                 {
-                    // if ((next.opCode == OpCode.LOAD_GLOBAL) &&
-                    //     (next.opA >= relocationInfo.importedVM.Prelude.intrinsics.Count))
-                    // {
+                    if (next.opA >= relocationInfo.importedVM.Prelude.intrinsics.Count)// do not reimport intrinsics
+                    {
                         if (relocationInfo.relocatedGlobals.ContainsKey(next.opA))
                         {
                             next.opCode = OpCode.LOAD_IMPORTED_GLOBAL;
@@ -1558,13 +1556,12 @@ namespace lightning
                             next.opA = global_count;
                             next.opB = relocationInfo.moduleIndex;
                         }
-                    // }
+                    }
                 }
                 else if (next.opCode == OpCode.ASSIGN_GLOBAL)
                 {
-                    // if (//(next.opCode == OpCode.ASSIGN_GLOBAL) &&
-                    //     (next.opA >= relocationInfo.importedVM.Prelude.intrinsics.Count))
-                    // {
+                    if (next.opA >= relocationInfo.importedVM.Prelude.intrinsics.Count)// do not reimport intrinsics
+                    {
                         next.opC = next.opB;
                         if (relocationInfo.relocatedGlobals.ContainsKey(next.opA))
                         {
@@ -1590,10 +1587,7 @@ namespace lightning
                             next.opA = global_count;
                             next.opB = relocationInfo.moduleIndex;
                         }
-                    // }else
-                    // {
-
-                    // }
+                    }
                 }
                 else if (next.opCode == OpCode.LOAD_CONSTANT)
                 {
