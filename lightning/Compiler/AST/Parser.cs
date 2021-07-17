@@ -15,6 +15,7 @@ namespace lightning
     {
         private List<Token> tokens;
         private bool hasParsed;
+        public bool HasParsed { get { return hasParsed;} }
         private Node ast;
         private int current;
         public List<string> Errors { get; private set; }
@@ -29,7 +30,8 @@ namespace lightning
                     try
                     {
                         Parse();
-                        hasParsed = true;
+                        if(Errors.Count == 0)
+                            hasParsed = true;
                     }
                     catch (Exception e)
                     {
@@ -343,6 +345,7 @@ namespace lightning
         Node StmtExpr()
         {
             Node expr = Expression();
+
             Elide(TokenType.SEMICOLON);
             return new StmtExprNode(expr, expr.Line);
         }
@@ -354,23 +357,23 @@ namespace lightning
 
         Node assignment()
         {
-            Node expr = LogicalOr();
+            Node assigned = LogicalOr();
 
             if (Match(TokenType.PLUS_EQUAL))
             {
                 Node value = assignment();
 
-                if (expr.Type == NodeType.VARIABLE)
-                    return new assignmentOpNode((VariableNode)expr, value, AssignmentOperatorType.ADDITION_ASSIGN, expr.Line);
+                if (assigned.Type == NodeType.VARIABLE)
+                    return new assignmentOpNode((VariableNode)assigned, value, AssignmentOperatorType.ADDITION_ASSIGN, assigned.Line);
                 else
                     Error("Invalid assignment.");
             }
             else if (Match(TokenType.PLUS_PLUS))
             {
-                Node value = new LiteralNode(1, expr.Line);
+                Node value = new LiteralNode(1, assigned.Line);
 
-                if (expr.Type == NodeType.VARIABLE)
-                    return new assignmentOpNode((VariableNode)expr, value, AssignmentOperatorType.ADDITION_ASSIGN, expr.Line);
+                if (assigned.Type == NodeType.VARIABLE)
+                    return new assignmentOpNode((VariableNode)assigned, value, AssignmentOperatorType.ADDITION_ASSIGN, assigned.Line);
                 else
                     Error("Invalid assignment.");
             }
@@ -378,17 +381,17 @@ namespace lightning
             {
                 Node value = assignment();
 
-                if (expr.Type == NodeType.VARIABLE)
-                    return new assignmentOpNode((VariableNode)expr, value, AssignmentOperatorType.SUBTRACTION_ASSIGN, expr.Line);
+                if (assigned.Type == NodeType.VARIABLE)
+                    return new assignmentOpNode((VariableNode)assigned, value, AssignmentOperatorType.SUBTRACTION_ASSIGN, assigned.Line);
                 else
                     Error("Invalid assignment.");
             }
             else if (Match(TokenType.MINUS_MINUS))
             {
-                Node value = new LiteralNode(1, expr.Line);
+                Node value = new LiteralNode(1, assigned.Line);
 
-                if (expr.Type == NodeType.VARIABLE)
-                    return new assignmentOpNode((VariableNode)expr, value, AssignmentOperatorType.SUBTRACTION_ASSIGN, expr.Line);
+                if (assigned.Type == NodeType.VARIABLE)
+                    return new assignmentOpNode((VariableNode)assigned, value, AssignmentOperatorType.SUBTRACTION_ASSIGN, assigned.Line);
                 else
                     Error("Invalid assignment.");
             }
@@ -396,8 +399,8 @@ namespace lightning
             {
                 Node value = assignment();
 
-                if (expr.Type == NodeType.VARIABLE)
-                    return new assignmentOpNode((VariableNode)expr, value, AssignmentOperatorType.MULTIPLICATION_ASSIGN, expr.Line);
+                if (assigned.Type == NodeType.VARIABLE)
+                    return new assignmentOpNode((VariableNode)assigned, value, AssignmentOperatorType.MULTIPLICATION_ASSIGN, assigned.Line);
                 else
                     Error("Invalid assignment.");
             }
@@ -405,8 +408,8 @@ namespace lightning
             {
                 Node value = assignment();
 
-                if (expr.Type == NodeType.VARIABLE)
-                    return new assignmentOpNode((VariableNode)expr, value, AssignmentOperatorType.DIVISION_ASSIGN, expr.Line);
+                if (assigned.Type == NodeType.VARIABLE)
+                    return new assignmentOpNode((VariableNode)assigned, value, AssignmentOperatorType.DIVISION_ASSIGN, assigned.Line);
                 else
                     Error("Invalid assignment.");
             }
@@ -414,14 +417,13 @@ namespace lightning
             {
                 Node value = assignment();
 
-                if (expr.Type == NodeType.VARIABLE)
-                    return new assignmentNode((VariableNode)expr, value, expr.Line);
+                if (assigned.Type == NodeType.VARIABLE)
+                    return new assignmentNode((VariableNode)assigned, value, assigned.Line);
                 else
                     Error("Invalid assignment.");
-
             }
 
-            return expr;
+            return assigned;
         }
 
         Node LogicalOr()
@@ -633,7 +635,7 @@ namespace lightning
 
             List<VariableNode> get_vars = new List<VariableNode>();
 
-            while (Match(TokenType.LEFT_PAREN))
+            if (Match(TokenType.LEFT_PAREN))
             {
                 List<Node> arguments = new List<Node>();
                 if (!Check(TokenType.RIGHT_PAREN))
@@ -646,12 +648,15 @@ namespace lightning
                     }
                 }
                 calls.Add(arguments);
+                Console.WriteLine("here ---------------------");
+                Console.WriteLine(Previous().ToString());
                 Consume(TokenType.RIGHT_PAREN, "Expected ')' after 'function call'.", true);
 
                 if (Check(TokenType.DOT) || Check(TokenType.LEFT_BRACKET))
                     get_vars.Add(FinishCompoundVar((name as VariableNode).Name, name.Line) as VariableNode);
                 else
                     get_vars.Add(null);
+                Console.WriteLine("out ---------------------");
             }
 
             return new FunctionCallNode((name as VariableNode), calls, get_vars, name.Line);

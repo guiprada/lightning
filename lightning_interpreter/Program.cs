@@ -84,12 +84,15 @@ namespace interpreter
                     Console.WriteLine(error);
                 }
             }
+            if(parser.HasParsed == false)
+                return  0;
 
 #if AST
             Console.WriteLine("\n---------------------------------- AST:");
 
             PrettyPrinter astPrinter = new PrettyPrinter();
             astPrinter.Print(program);
+
             Console.WriteLine("\n-------------------------------end AST:");
             skip_line = true;
 #endif

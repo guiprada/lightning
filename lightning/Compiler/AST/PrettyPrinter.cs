@@ -142,7 +142,11 @@ namespace lightning
         private void PrintLiteral(LiteralNode p_node)
         {
             Console.Write("[LITERAL ");
-            if (p_node.ValueType == typeof(string))
+            if (p_node.Value == null)
+            {
+                Console.Write("\"" + ("Null") + "\"");
+            }
+            else if (p_node.ValueType == typeof(string))
             {
                 Console.Write("\"" + (p_node.Value) + "\"");
             }
