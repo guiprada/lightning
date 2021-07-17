@@ -1115,7 +1115,7 @@ namespace lightning
 
         private void Error(string p_msg, int p_line)
         {
-            Errors.Add(p_msg + " on line: " + p_line);
+            Errors.Add(p_msg + " on module: " + moduleName + " on line: " + p_line);
         }
     }
 }

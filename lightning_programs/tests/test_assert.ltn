@@ -1,0 +1,31 @@
+var assert_counter = require("assert_counter.ltn")
+{
+	// write_line(assert_counter.assert)
+	// write_line(assert_counter.assert_not)
+    // Assertions
+    write("assert() ..")
+    assert_counter.assert(1,2," OK!")
+
+    write("assert_not() ..")
+    assert_counter.assert_not(1,1," OK!")
+
+    if (assert_counter.get_error_counter() == 2){
+        write_line("Reseted error count.")
+        assert_counter.reset_error_counter()
+    }else{
+        write_line("Assertion functions are insane!")
+    }
+
+    assert_counter.header = "Failed null sanity check: "
+
+    assert_counter.assert(null, null, "1")
+    assert_counter.assert_not(1, null, "2")
+    assert_counter.assert_not("Nil", null, "3")
+    assert_counter.assert_not("Null", null, "4")
+    assert_counter.assert_not("null", null, "5")
+
+	assert_counter.set_header = "Failed true sanity check: "
+    assert_counter.assert(true, true, "1")
+    assert_counter.assert(false, false, "2")
+    assert_counter.assert_not(true, false, "3")
+}

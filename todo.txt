@@ -1,9 +1,13 @@
 ﻿todo
+	fix open parentheses after call turns into compoundCall
+
+	nuples to call and return from try
+	properties, protected indexes and operator override
 	anonimous assignment compound Grouping/expression
 	move bool back to heapval
 	use unit value to count heapval references
 	examine overflows
-	nuples to call and return from try
+
 	separate test in modules
 	add Get and Set? to Unit :)
 	convert StringUnit to use char[]
@@ -120,3 +124,4 @@ done
 	- rename Number to Float
 	- Compiler diferentiates Integer and Float literals
 	- add makeNumericIterator
+	- added ASSIGN_IMPORTED_CONSTANT

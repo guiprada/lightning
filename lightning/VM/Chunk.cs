@@ -109,6 +109,7 @@ namespace lightning
                 // 3 op
                 case OpCode.ASSIGN_VARIABLE:
                 case OpCode.DECLARE_FUNCTION:
+                case OpCode.ASSIGN_IMPORTED_GLOBAL:
                     return op.ToString() + " " + this.opA + " " + this.opB + " " + this.opC;
                 default:
                     return "Unkown Opcode: " + op.ToString();
@@ -133,6 +134,7 @@ namespace lightning
         DECLARE_FUNCTION,
         ASSIGN_VARIABLE,
         ASSIGN_GLOBAL,
+        ASSIGN_IMPORTED_GLOBAL,
         ASSIGN_UPVALUE,
         TABLE_GET,
         TABLE_SET,

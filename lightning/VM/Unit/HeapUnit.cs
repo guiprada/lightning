@@ -124,7 +124,7 @@ namespace lightning
         }
         public override string ToString()
         {
-            string str = new string("fun" + " " + Name + ":" + Module +  " " + " (" + Arity + ")");
+            string str = new string("fun" + " " + Name + ":" + Module +  " " + " (" + Arity + ")\n");
             foreach (Instruction i in Body)
             {
                 str += i.ToString() + "\n";
@@ -409,6 +409,10 @@ namespace lightning
 
         public Unit GetGlobal(Operand p_index){
             return Globals[p_index];
+        }
+
+        public void SetGlobal(Unit p_value, Operand p_index){
+            Globals[p_index] = p_value;
         }
 
         public Unit GetConstant(Operand p_index){

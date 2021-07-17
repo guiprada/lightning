@@ -1,20 +1,35 @@
 var lib = []
-lib.header = ""
-lib.assert =
-    function (value1, value2, msg){
-        if(value1 != value2){
-            write_line(lib.header .. msg)
-            return true
+
+var header = false
+
+lib.set_header = function(p_header)
+{
+    header = p_header
+}
+
+lib.assert = function(value1, value2, msg)
+{
+    if(value1 != value2){
+        if(header){
+            write_line(header .. " " .. msg)
+        }else{
+            write_line(msg)
         }
         return false
     }
-lib.assert_not =
-    function (value1, value2, msg){
-        if(value1 == value2){
-            write_line(lib.header .. msg)
-            return true
+    return true
+}
+lib.assert_not = function(value1, value2, msg)
+{
+    if(value1 == value2){
+        if(header){
+            write_line(header .. " " .. msg)
+        }else{
+            write_line(msg)
         }
         return false
     }
+    return true
+}
 
 return lib

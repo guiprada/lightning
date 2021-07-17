@@ -1,15 +1,36 @@
 var assert = require("assert.ltn")
 
-var lib = []
+var assert_counter = []
 
-lib.errors = 0
+var errors = 0
 
-lib.assert =
-    function (value1, value2, msg){   
-        var result = assert.assert(value1, value2, msg)
-        if(result == true)
-           lib.errors++
-        return result
-    }
+assert_counter.assert_not = function(value1, value2, msg)
+{
+    var result = assert.assert_not(value1, value2, msg)
+    if(result == false)
+        errors++
+    return true
+}
 
-return lib
+assert_counter.assert = function(value1, value2, msg)
+{
+    var result = assert.assert(value1, value2, msg)
+    if(result == false)
+        errors++
+
+    return result
+}
+
+assert_counter.get_error_counter = function()
+{
+    return errors
+}
+
+assert_counter.reset_error_counter = function()
+{
+    errors = 0
+}
+
+assert_counter.set_header = assert.set_header
+
+return assert_counter

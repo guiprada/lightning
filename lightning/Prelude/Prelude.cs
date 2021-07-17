@@ -1520,6 +1520,7 @@ namespace lightning
             {
                 FindFunction(v, relocationInfo);
             }
+            Console.WriteLine(function.ToString());
         }
 
         static void RelocateChunk(FunctionUnit function, RelocationInfo relocationInfo)
@@ -1530,9 +1531,9 @@ namespace lightning
 
                 if (next.opCode == OpCode.LOAD_GLOBAL)
                 {
-                    if ((next.opCode == OpCode.LOAD_GLOBAL) &&
-                        (next.opA >= relocationInfo.importedVM.Prelude.intrinsics.Count))
-                    {
+                    // if ((next.opCode == OpCode.LOAD_GLOBAL) &&
+                    //     (next.opA >= relocationInfo.importedVM.Prelude.intrinsics.Count))
+                    // {
                         if (relocationInfo.relocatedGlobals.ContainsKey(next.opA))
                         {
                             next.opCode = OpCode.LOAD_IMPORTED_GLOBAL;
@@ -1557,7 +1558,42 @@ namespace lightning
                             next.opA = global_count;
                             next.opB = relocationInfo.moduleIndex;
                         }
-                    }
+                    // }
+                }
+                else if (next.opCode == OpCode.ASSIGN_GLOBAL)
+                {
+                    // if (//(next.opCode == OpCode.ASSIGN_GLOBAL) &&
+                    //     (next.opA >= relocationInfo.importedVM.Prelude.intrinsics.Count))
+                    // {
+                        next.opC = next.opB;
+                        if (relocationInfo.relocatedGlobals.ContainsKey(next.opA))
+                        {
+                            next.opCode = OpCode.ASSIGN_IMPORTED_GLOBAL;
+                            next.opA = relocationInfo.relocatedGlobals[next.opA];
+                            next.opB = relocationInfo.moduleIndex;
+                        }
+                        else if (relocationInfo.toBeRelocatedGlobals.Contains(next.opA))
+                        {
+                            next.opCode = OpCode.ASSIGN_IMPORTED_GLOBAL;
+                            next.opA =
+                                (Operand)(relocationInfo.toBeRelocatedGlobals.IndexOf(next.opA) +
+                                relocationInfo.relocatedGlobals.Count);
+                            next.opB = relocationInfo.moduleIndex;
+                        }
+                        else
+                        {
+                            Operand global_count =
+                                (Operand)(relocationInfo.relocatedGlobals.Count +
+                                relocationInfo.toBeRelocatedGlobals.Count);
+                            relocationInfo.toBeRelocatedGlobals.Add(next.opA);
+                            next.opCode = OpCode.ASSIGN_IMPORTED_GLOBAL;
+                            next.opA = global_count;
+                            next.opB = relocationInfo.moduleIndex;
+                        }
+                    // }else
+                    // {
+
+                    // }
                 }
                 else if (next.opCode == OpCode.LOAD_CONSTANT)
                 {
@@ -1623,6 +1659,28 @@ namespace lightning
                             Console.WriteLine("Can not find LOAD_IMPORTED_GLOBAL index" + function.Module);
                     }
                 }
+                else if (next.opCode == OpCode.ASSIGN_IMPORTED_GLOBAL)
+                {
+                    if (relocationInfo.relocatedModules.ContainsKey(next.opB))
+                    {
+                        next.opB = relocationInfo.relocatedModules[next.opB];
+                    }
+                    else
+                    {
+                        bool found = false;
+                        foreach (ModuleUnit v in relocationInfo.importingVM.modules)
+                        {
+                            if (function.Module == v.Name)
+                            {
+                                next.opB = v.ImportIndex;
+                                found = true;
+                                break;
+                            }
+                        }
+                        if (found == false)
+                            Console.WriteLine("Can not find ASSIGN_IMPORTED_GLOBAL index" + function.Module);
+                    }
+                }
                 else if (next.opCode == OpCode.LOAD_IMPORTED_CONSTANT)
                 {
                     if (relocationInfo.relocatedModules.ContainsKey(next.opB))
@@ -1661,7 +1719,8 @@ namespace lightning
                         Instruction next = function.Body[i];
 
                         if ((next.opCode == OpCode.LOAD_IMPORTED_GLOBAL) ||
-                            (next.opCode == OpCode.LOAD_IMPORTED_CONSTANT))
+                            (next.opCode == OpCode.LOAD_IMPORTED_CONSTANT) ||
+                            (next.opCode == OpCode.ASSIGN_IMPORTED_GLOBAL))
                         {
                             next.opB = new_index;
                             function.Body[i] = next;

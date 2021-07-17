@@ -113,7 +113,7 @@ namespace interpreter
                 chunk.Print();
 #endif
 #if CONSTANTS
-                foreach(Unit v in chunk.GetConstants())
+                foreach(Unit v in chunk.GetConstants)
                 {
                    Console.WriteLine(v);
                 }

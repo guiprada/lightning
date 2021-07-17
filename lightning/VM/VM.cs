@@ -568,6 +568,65 @@ namespace lightning
                             }
                             break;
                         }
+                    case OpCode.ASSIGN_IMPORTED_GLOBAL:
+                        {
+                            IP++;
+                            Operand op = instruction.opC;
+                            Unit new_value = stack.Peek();
+                            if (op == ASSIGN){
+                                modules[instruction.opB].SetGlobal(new_value, instruction.opA);
+                                //modules[instruction.opB].GetGlobal(instruction.opA);
+                            }else if(parallelVM == true){
+                                switch(op){
+                                    case ADDITION_ASSIGN:
+                                        lock(modules[instruction.opB].Globals){
+                                            Unit result = modules[instruction.opB].GetGlobal(instruction.opA) + new_value;
+                                            modules[instruction.opB].SetGlobal(result, instruction.opA);
+                                        }
+                                        break;
+                                    case SUBTRACTION_ASSIGN:
+                                        lock(modules[instruction.opB].Globals){
+                                            Unit result = modules[instruction.opB].GetGlobal(instruction.opA) - new_value;
+                                            modules[instruction.opB].SetGlobal(result, instruction.opA);
+                                        }
+                                        break;
+                                    case MULTIPLICATION_ASSIGN:
+                                        lock(modules[instruction.opB].Globals){
+                                            Unit result = modules[instruction.opB].GetGlobal(instruction.opA) * new_value;
+                                            modules[instruction.opB].SetGlobal(result, instruction.opA);
+                                        }
+                                        break;
+                                    case DIVISION_ASSIGN:
+                                        lock(modules[instruction.opB].Globals){
+                                            Unit result = modules[instruction.opB].GetGlobal(instruction.opA) / new_value;
+                                            modules[instruction.opB].SetGlobal(result, instruction.opA);
+                                        }
+                                        break;
+                                    default:
+                                        throw new Exception("Unknown operator" + VM.ErrorString(this));
+                                }
+                            }else{
+                                Unit result;
+                                switch(op){
+                                    case ADDITION_ASSIGN:
+                                        result = modules[instruction.opB].GetGlobal(instruction.opA) + new_value;
+                                        break;
+                                    case SUBTRACTION_ASSIGN:
+                                        result = modules[instruction.opB].GetGlobal(instruction.opA) - new_value;
+                                        break;
+                                    case MULTIPLICATION_ASSIGN:
+                                        result = modules[instruction.opB].GetGlobal(instruction.opA) * new_value;
+                                        break;
+                                    case DIVISION_ASSIGN:
+                                        result = modules[instruction.opB].GetGlobal(instruction.opA) / new_value;
+                                        break;
+                                    default:
+                                        throw new Exception("Unknown operator" + VM.ErrorString(this));
+                                }
+                                modules[instruction.opB].SetGlobal(result, instruction.opA);
+                            }
+                            break;
+                        }
                     case OpCode.ASSIGN_UPVALUE:
                         {
                             IP++;
