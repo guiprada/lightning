@@ -26,14 +26,13 @@ multiplication  -> unary ( ( "/" | "*" | "++" | "--" ) unary )*
 unary           -> ( "!" | "-" ) unary | compoundCall
 
 indexedAccess   -> ( ( "[" expression "]" ) | ( "." IDENTIFIER ) )*
-accessVar       -> chainedCall indexedAccess
+compoundVar     -> ( IDENTIFIER | chainedCall ) indexedAccess
 chainedCall     -> compoundCall ( "|" "(" arguments? ")" )*
-compoundCall    -> call | methodCall
-call            -> primary "(" arguments? ")"
+compoundCall    -> functionCall | methodCall
+functionCall            -> primary "(" arguments? ")"
 methodCall      -> compoundVar : IDENTIFIER "(" arguments? ")"
 
 arguments       -> expression ( "," expression )*
 table           -> [ tableEntry (, tableEntry )* ]
 tableEntry      -> primary | IDENTIFIER : primary
-compoundVar     -> IDENTIFIER indexedAccess
 primary         ->  (-)? NUMBER | STRING | "false" | "true" | "null" | "(" expression ")" | compoundVar | list | funExpr | table
