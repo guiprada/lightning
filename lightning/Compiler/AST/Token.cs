@@ -27,6 +27,7 @@ namespace lightning
         PLUS_PLUS,
         SEMICOLON,
         COLON,
+        PIPE,
         SLASH,
         SLASH_EQUAL,
         STAR,

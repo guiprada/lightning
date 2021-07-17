@@ -635,7 +635,7 @@ namespace lightning
 
             List<VariableNode> get_vars = new List<VariableNode>();
 
-            if (Match(TokenType.LEFT_PAREN))
+            while(Match(TokenType.LEFT_PAREN))
             {
                 List<Node> arguments = new List<Node>();
                 if (!Check(TokenType.RIGHT_PAREN))
@@ -652,8 +652,12 @@ namespace lightning
 
                 if (Check(TokenType.DOT) || Check(TokenType.LEFT_BRACKET))
                     get_vars.Add(FinishCompoundVar((name as VariableNode).Name, name.Line) as VariableNode);
-                else
+                else{
                     get_vars.Add(null);
+                    if (!Match(TokenType.PIPE))
+                        break;
+                }
+
             }
 
             return new FunctionCallNode((name as VariableNode), calls, get_vars, name.Line);
