@@ -648,15 +648,12 @@ namespace lightning
                     }
                 }
                 calls.Add(arguments);
-                Console.WriteLine("here ---------------------");
-                Console.WriteLine(Previous().ToString());
                 Consume(TokenType.RIGHT_PAREN, "Expected ')' after 'function call'.", true);
 
                 if (Check(TokenType.DOT) || Check(TokenType.LEFT_BRACKET))
                     get_vars.Add(FinishCompoundVar((name as VariableNode).Name, name.Line) as VariableNode);
                 else
                     get_vars.Add(null);
-                Console.WriteLine("out ---------------------");
             }
 
             return new FunctionCallNode((name as VariableNode), calls, get_vars, name.Line);
