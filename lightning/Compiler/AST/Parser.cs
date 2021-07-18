@@ -630,12 +630,9 @@ namespace lightning
             List<Node> arguments = new List<Node>();
             if (!Check(TokenType.RIGHT_PAREN))
             {
-                while (true)
-                {
+                do{
                     arguments.Add(Expression());
-                    if (!Match(TokenType.COMMA))
-                        break;
-                }
+                }while (Match(TokenType.COMMA));
             }
             Consume(TokenType.RIGHT_PAREN, "Expected ')' after 'function call' arguments.", true);
 
@@ -644,7 +641,8 @@ namespace lightning
 
         FunctionCallNode FinishFunctionCall(FunctionCallNode function_call_node)
         {
-            while(Check(TokenType.LEFT_PAREN))
+            bool go_on = true;
+            while(Check(TokenType.LEFT_PAREN) && go_on)
             {
                 function_call_node.Calls.Add(Arguments());
 
@@ -653,7 +651,7 @@ namespace lightning
                 else{
                     function_call_node.IndexedAccess.Add(null);
                     if (!Match(TokenType.PIPE))
-                        break;
+                        go_on = false;
                 }
             }
 
