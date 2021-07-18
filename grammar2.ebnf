@@ -27,10 +27,11 @@ unary           	-> ( "!" | "-" ) unary | chainedCall
 
 chainedCall         -> compoundCall ( "|" arguments )*
 compoundCall    	-> (call | methodCall) indexedAccess
-call            	-> primary arguments
-methodCall      	-> primary : IDENTIFIER arguments
+call            	-> primary parameters
+methodCall      	-> primary : IDENTIFIER parameters
 indexedAccess       -> ( ("[" expression "]") | ("." IDENTIFIER) ) )*
-arguments       	-> "(" expression? ( "," expression )* ")"
+parameters       	-> "(" expression? ( "," expression )* ")"
+arguments			-> expression ( "," expression )*
 
 table           	-> [ tableEntry (, tableEntry )* ]
 tableEntry      	-> primary | IDENTIFIER : primary
@@ -40,6 +41,6 @@ primary         	->  (-)? NUMBER | STRING | "false" | "true" | "null" | "(" expr
 
 chainedCall (unary)
 indexedAccess
-arguments
+parameters
 methodcall receives primary
 remove pipe :)

@@ -334,7 +334,6 @@ namespace lightning
     {
         public VariableNode Name { get; private set; }
         public List<List<Node>> Calls { get; private set; }
-
         public List<VariableNode> IndexedAccess { get; private set; }
 
         public FunctionCallNode(VariableNode p_Name, List<List<Node>> p_Calls, List<VariableNode> p_IndexedAccess, int p_Line)

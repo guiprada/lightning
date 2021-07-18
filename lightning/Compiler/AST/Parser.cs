@@ -604,10 +604,10 @@ namespace lightning
                 return new UnaryNode(this_op, right, op.Line);
             }
 
-            return CompoundFunctionCall();
+            return FunctionCall();
         }
 
-        Node CompoundFunctionCall()
+        Node FunctionCall()
         {
             Node maybe_func = Primary();
 
@@ -618,27 +618,32 @@ namespace lightning
 
             return maybe_func;
         }
+        List<Node> Arguments(){
+            Consume(TokenType.LEFT_PAREN, "Expected '(' before 'function call' arguments.", true);
+            List<Node> arguments = new List<Node>();
+            if (!Check(TokenType.RIGHT_PAREN))
+            {
+                while (true)
+                {
+                    arguments.Add(Expression());
+                    if (!Match(TokenType.COMMA))
+                        break;
+                }
+            }
+            Consume(TokenType.RIGHT_PAREN, "Expected ')' after 'function call' arguments.", true);
 
-        Node FinishFunctionCall(Node name)
+            return arguments;
+        }
+
+        FunctionCallNode FinishFunctionCall(Node name)
         {
             List<List<Node>> calls = new List<List<Node>>();
 
             List<VariableNode> indexed_access = new List<VariableNode>();
 
-            while(Match(TokenType.LEFT_PAREN))
+            while(Check(TokenType.LEFT_PAREN))
             {
-                List<Node> arguments = new List<Node>();
-                if (!Check(TokenType.RIGHT_PAREN))
-                {
-                    while (true)
-                    {
-                        arguments.Add(Expression());
-                        if (!Match(TokenType.COMMA))
-                            break;
-                    }
-                }
-                calls.Add(arguments);
-                Consume(TokenType.RIGHT_PAREN, "Expected ')' after 'function call'.", true);
+                calls.Add(Arguments());
 
                 if (Check(TokenType.DOT) || Check(TokenType.LEFT_BRACKET))
                     indexed_access.Add(IndexedAccess((name as VariableNode).Name, name.Line) as VariableNode);
@@ -647,7 +652,6 @@ namespace lightning
                     if (!Match(TokenType.PIPE))
                         break;
                 }
-
             }
 
             return new FunctionCallNode((name as VariableNode), calls, indexed_access, name.Line);
