@@ -658,52 +658,61 @@ namespace lightning
             return function_call_node;
         }
 
-        Node Table()
+        TableNode TableEntry(TableNode table_node)
         {
-            int line = Previous().Line;
-            List<Node> elements = new List<Node>();
-            Dictionary<Node, Node> table = new Dictionary<Node, Node>();
-
-            if (!Match(TokenType.RIGHT_BRACKET))
+            List<Node> elements = table_node.elements;
+            Dictionary<Node, Node> table = table_node.table;
+            if (Match(TokenType.IDENTIFIER))
             {
+                Node item = new LiteralNode((Previous() as TokenString).value, Previous().Line);
 
-                if (Match(TokenType.IDENTIFIER))
-                {
-                    Node item = new LiteralNode((Previous() as TokenString).value, Previous().Line);
+                Consume(TokenType.COLON, "Expected ':' separating key:values in table constructor", true);
 
+                Node value = Primary();
+
+                table.Add(item, value);
+            }
+            else if(!Check(TokenType.RIGHT_BRACKET))
+            {
+                Node item = Primary();
+                if(Check(TokenType.COLON)){
                     Consume(TokenType.COLON, "Expected ':' separating key:values in table constructor", true);
-
-                    Node value = Primary();
-
-                    table.Add(item, value);
+                    if(((LiteralNode)item).ValueType == typeof(Float)){
+                        LiteralNode number_value = (LiteralNode)item;
+                        if((Float)(number_value.Value) == elements.Count)
+                            elements.Add(Primary());
+                        else
+                            table.Add(number_value, Primary());
+                    }else if(((LiteralNode)item).ValueType == typeof(Integer)){
+                        LiteralNode number_value = (LiteralNode)item;
+                        if((Integer)(number_value.Value) == elements.Count)
+                            elements.Add(Primary());
+                        else
+                            table.Add(number_value, Primary());
+                    }else if(((LiteralNode)item).ValueType == typeof(string)){
+                        LiteralNode string_value = (LiteralNode)item;
+                        table.Add(string_value, Primary());
+                    }
                 }
                 else
                 {
-                    Node item = Primary();
-                    if(Check(TokenType.COLON)){
-                        Consume(TokenType.COLON, "Expected ':' separating key:values in table constructor", true);
-                        if(((LiteralNode)item).ValueType == typeof(Float)){
-                            LiteralNode number_value = (LiteralNode)item;
-                            if((Float)(number_value.Value) == elements.Count)
-                                elements.Add(Primary());
-                            else
-                                table.Add(number_value, Primary());
-                        }else if(((LiteralNode)item).ValueType == typeof(Integer)){
-                            LiteralNode number_value = (LiteralNode)item;
-                            if((Integer)(number_value.Value) == elements.Count)
-                                elements.Add(Primary());
-                            else
-                                table.Add(number_value, Primary());
-                        }else if(((LiteralNode)item).ValueType == typeof(string)){
-                            LiteralNode string_value = (LiteralNode)item;
-                            table.Add(string_value, Primary());
-                        }
-                    }
-                    else
-                    {
-                        elements.Add(item);
-                    }
+                    elements.Add(item);
                 }
+            }
+
+            return table_node;
+        }
+        Node Table()
+        {
+            int line = Previous().Line;
+
+            if (!Match(TokenType.RIGHT_BRACKET))
+            {
+                List<Node> elements = new List<Node>();
+                Dictionary<Node, Node> table = new Dictionary<Node, Node>();
+                TableNode table_node = new TableNode(elements, table, line);
+
+                table_node = TableEntry(table_node);
 
                 while (Match(TokenType.COMMA))
                 {
@@ -745,7 +754,7 @@ namespace lightning
                 }
                 Consume(TokenType.RIGHT_BRACKET, "Expected ']' to close 'table'", true);
 
-                return new TableNode(elements, table, line);
+                return table_node;
             }
             else
             {
