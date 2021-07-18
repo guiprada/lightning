@@ -680,7 +680,7 @@ namespace lightning
                     }
                 }
                 else
-                {// it is a compoundCall/method/Getvars
+                {// it is a compoundCall/method/IndexedAccess
 
                     // is it a method?
                     if ((p_node.Name.Indexes[p_node.Name.Indexes.Count - 1] as VariableNode).AccessType == VarAccessType.METHOD)
@@ -745,10 +745,10 @@ namespace lightning
 
                 // Call
                 Add(OpCode.CALL, p_node.Line);
-                // Does it have GetVars?
-                if (p_node.GetVars[0] != null)
+                // Does it have IndexedAccess?
+                if (p_node.IndexedAccess[0] != null)
                 {
-                    foreach (Node n in p_node.GetVars[0].Indexes)
+                    foreach (Node n in p_node.IndexedAccess[0].Indexes)
                     {
                         if (n.GetType() != typeof(VariableNode) || (n as VariableNode).AccessType == VarAccessType.PLAIN)
                             ChunkIt(n);
@@ -758,7 +758,7 @@ namespace lightning
                             Add(OpCode.LOAD_CONSTANT, string_address, p_node.Line);
                         }
                     }
-                    Add(OpCode.TABLE_GET, (Operand)p_node.GetVars[0].Indexes.Count, p_node.Line);
+                    Add(OpCode.TABLE_GET, (Operand)p_node.IndexedAccess[0].Indexes.Count, p_node.Line);
                 }
 
                 // Is it a compound call?
@@ -775,9 +775,9 @@ namespace lightning
                     Add(OpCode.POP_STASH, p_node.Line);
                     Add(OpCode.CALL, p_node.Line);
 
-                    if (p_node.GetVars[i] != null)
+                    if (p_node.IndexedAccess[i] != null)
                     {
-                        foreach (Node n in p_node.GetVars[i].Indexes)
+                        foreach (Node n in p_node.IndexedAccess[i].Indexes)
                         {
                             if (n.GetType() != typeof(VariableNode) || (n as VariableNode).AccessType == VarAccessType.PLAIN)
                                 ChunkIt(n);
@@ -787,7 +787,7 @@ namespace lightning
                                 Add(OpCode.LOAD_CONSTANT, string_address, p_node.Line);
                             }
                         }
-                        Add(OpCode.TABLE_GET, (Operand)p_node.GetVars[i].Indexes.Count, p_node.Line);
+                        Add(OpCode.TABLE_GET, (Operand)p_node.IndexedAccess[i].Indexes.Count, p_node.Line);
                     }
                 }
             }

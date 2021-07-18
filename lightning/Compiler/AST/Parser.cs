@@ -93,11 +93,11 @@ namespace lightning
             string name = last_token.value;
             int line = last_token.Line;
 
-            return FinishCompoundVar(name, line);
+            return IndexedAccess(name, line);
 
         }
 
-        Node FinishCompoundVar(string name, int line) {
+        Node IndexedAccess(string name, int line) {
             List<Node> indexes = new List<Node>();
             while (Check(TokenType.LEFT_BRACKET) || Check(TokenType.DOT) || Check(TokenType.COLON))
             {
@@ -138,11 +138,7 @@ namespace lightning
             return new VarDeclarationNode(name.value, initializer, name.Line);
         }
 
-        Node FunExpr()
-        {
-            Token fun = Consume(TokenType.FUN, "Expected 'function' to start 'function expression'.", true);
-            Consume(TokenType.LEFT_PAREN, "Expected '(' after 'function expression'.", true);
-
+        List<string> Parameters(){
             List<string> parameters = new List<string>();
             bool has_parameter = Check(TokenType.IDENTIFIER);
             while (has_parameter)
@@ -160,6 +156,16 @@ namespace lightning
                 }
             }
             Consume(TokenType.RIGHT_PAREN, "Expected ')' after 'function expression'.", true);
+
+            return parameters;
+        }
+
+        Node FunExpr()
+        {
+            Token fun = Consume(TokenType.FUN, "Expected 'function' to start 'function expression'.", true);
+            Consume(TokenType.LEFT_PAREN, "Expected '(' after 'function expression'.", true);
+
+            List<string> parameters = Parameters();
 
             Node body = Statement();
             List<Node> statements;
@@ -189,23 +195,7 @@ namespace lightning
             TokenString name = Consume(TokenType.IDENTIFIER, "Expected 'function identifier'.", true) as TokenString;
             Consume(TokenType.LEFT_PAREN, "Expected '(' after 'function declaration'.", true);
 
-            List<string> parameters = new List<string>();
-            bool has_parameter = Check(TokenType.IDENTIFIER);
-            while (has_parameter)
-            {
-                TokenString new_parameter = Consume(TokenType.IDENTIFIER, "Expected 'identifier' as 'function parameter'.", true) as TokenString;
-                parameters.Add(new_parameter.value);
-                if (Check(TokenType.COMMA))
-                {
-                    Consume(TokenType.COMMA, "Expected ',' separating parameter list" , true);
-                    has_parameter = Check(TokenType.IDENTIFIER);
-                }
-                else
-                {
-                    has_parameter = false;
-                }
-            }
-            Consume(TokenType.RIGHT_PAREN, "Expected ')' after 'function declaration'.", true);
+            List<string> parameters = Parameters();
 
             Node body = Statement();
             List<Node> statements;
@@ -633,7 +623,7 @@ namespace lightning
         {
             List<List<Node>> calls = new List<List<Node>>();
 
-            List<VariableNode> get_vars = new List<VariableNode>();
+            List<VariableNode> indexed_access = new List<VariableNode>();
 
             while(Match(TokenType.LEFT_PAREN))
             {
@@ -651,16 +641,16 @@ namespace lightning
                 Consume(TokenType.RIGHT_PAREN, "Expected ')' after 'function call'.", true);
 
                 if (Check(TokenType.DOT) || Check(TokenType.LEFT_BRACKET))
-                    get_vars.Add(FinishCompoundVar((name as VariableNode).Name, name.Line) as VariableNode);
+                    indexed_access.Add(IndexedAccess((name as VariableNode).Name, name.Line) as VariableNode);
                 else{
-                    get_vars.Add(null);
+                    indexed_access.Add(null);
                     if (!Match(TokenType.PIPE))
                         break;
                 }
 
             }
 
-            return new FunctionCallNode((name as VariableNode), calls, get_vars, name.Line);
+            return new FunctionCallNode((name as VariableNode), calls, indexed_access, name.Line);
         }
 
         Node Table()

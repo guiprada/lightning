@@ -23,16 +23,17 @@ equality        -> comparison ( ( "!=" | "==" ) comparison )*
 comparison      -> addition ( ( ">" | ">=" | "<" | "<=" ) addition )*
 addition        -> multiplication ( ( "-" | "+" | "..") multiplication )*
 multiplication  -> unary ( ( "/" | "*" | "++" | "--" ) unary )*
-unary           -> ( "!" | "-" ) unary | compoundCall
+unary           -> ( "!" | "-" ) unary | primary
 
+result          -> compoundVar | chainedCall
+compoundVar     -> expression indexedAccess
 indexedAccess   -> ( ( "[" expression "]" ) | ( "." IDENTIFIER ) )*
-compoundVar     -> ( IDENTIFIER | chainedCall ) indexedAccess
 chainedCall     -> compoundCall ( "|" "(" arguments? ")" )*
 compoundCall    -> functionCall | methodCall
 functionCall    -> primary "(" arguments? ")"
 methodCall      -> compoundVar : IDENTIFIER "(" arguments? ")"
-
 arguments       -> expression ( "," expression )*
+
 table           -> [ tableEntry (, tableEntry )* ]
 tableEntry      -> primary | IDENTIFIER : primary
-primary         ->  (-)? NUMBER | STRING | "false" | "true" | "null" | "(" expression ")" | compoundVar | list | funExpr | table
+primary         ->  (-)? NUMBER | STRING | "false" | "true" | "null" | "(" expression ")" | result | list | funExpr | table

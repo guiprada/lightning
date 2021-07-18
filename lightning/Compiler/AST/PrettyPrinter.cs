@@ -417,10 +417,10 @@ namespace lightning
                     }
                 }
                 Console.Write(")");
-                if(p_node.GetVars[counter] != null)
+                if(p_node.IndexedAccess[counter] != null)
                 {
                     Console.Write(".getVar(");
-                    foreach(Node n in p_node.GetVars[counter].Indexes)
+                    foreach(Node n in p_node.IndexedAccess[counter].Indexes)
                         Print(n);
                     Console.Write(")");
                 }
