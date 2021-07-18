@@ -122,7 +122,6 @@ namespace lightning
                 }
             }
             return new VariableNode(name, indexes, VarAccessType.PLAIN, line);
-
         }
 
         Node VarDeclaration()

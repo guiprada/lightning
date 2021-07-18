@@ -136,6 +136,7 @@ namespace lightning
                 case ';': tokens.Add(new Token(TokenType.SEMICOLON, line)); break;
                 case ':': tokens.Add(new Token(TokenType.COLON, line)); break;
                 case '|': tokens.Add(new Token(TokenType.PIPE, line)); break;
+                case '\\': tokens.Add(new Token(TokenType.FUN, line)); break;
                 case '*':
                     tokens.Add(Match('=') ? new Token(TokenType.STAR_EQUAL, line) : new Token(TokenType.STAR, line));
                     break;
