@@ -332,14 +332,14 @@ namespace lightning
 
     public class FunctionCallNode : Node
     {
-        public VariableNode Name { get; private set; }
+        public VariableNode Variable { get; private set; }
         public List<List<Node>> Calls { get; private set; }
         public List<VariableNode> IndexedAccess { get; private set; }
 
         public FunctionCallNode(VariableNode p_Name, List<List<Node>> p_Calls, List<VariableNode> p_IndexedAccess, int p_Line)
             : base(NodeType.FUNCTION_CALL, p_Line)
         {
-            Name = p_Name;
+            Variable = p_Name;
             Calls = p_Calls;
             IndexedAccess = p_IndexedAccess;
         }

@@ -633,7 +633,7 @@ namespace lightning
                 function_call_node.Calls.Add(Arguments());
 
                 if (Check(TokenType.DOT) || Check(TokenType.LEFT_BRACKET))
-                    function_call_node.IndexedAccess.Add(IndexedAccess(function_call_node.Name.Name, function_call_node.Line) as VariableNode);
+                    function_call_node.IndexedAccess.Add(IndexedAccess(function_call_node.Variable.Name, function_call_node.Line) as VariableNode);
                 else{
                     function_call_node.IndexedAccess.Add(null);
                     if (!Match(TokenType.PIPE))

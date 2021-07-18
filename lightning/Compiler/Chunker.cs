@@ -657,13 +657,13 @@ namespace lightning
                 ChunkIt(n);
             }
             // the first call, we need to decode the function name
-            Nullable<Variable> maybe_func = GetVar(p_node.Name.Name);
+            Nullable<Variable> maybe_func = GetVar(p_node.Variable.Name);
 
             if (maybe_func.HasValue)
             {
                 Variable this_func = maybe_func.Value;
 
-                if (p_node.Name.Indexes.Count == 0)
+                if (p_node.Variable.Indexes.Count == 0)
                 {
                     switch (this_func.type)
                     {
@@ -683,7 +683,7 @@ namespace lightning
                 {// it is a compoundCall/method/IndexedAccess
 
                     // is it a method?
-                    if ((p_node.Name.Indexes[p_node.Name.Indexes.Count - 1] as VariableNode).AccessType == VarAccessType.METHOD)
+                    if ((p_node.Variable.Indexes[p_node.Variable.Indexes.Count - 1] as VariableNode).AccessType == VarAccessType.METHOD)
                     {// it is a method so we push the table again, to be used as parameter
                         switch (this_func.type)
                         {
@@ -699,9 +699,9 @@ namespace lightning
                                 break;
                         }
 
-                        for (int i = 0; i < p_node.Name.Indexes.Count - 1; i++)
+                        for (int i = 0; i < p_node.Variable.Indexes.Count - 1; i++)
                         {
-                            Node n = p_node.Name.Indexes[i];
+                            Node n = p_node.Variable.Indexes[i];
                             if (n.GetType() != typeof(VariableNode) || (n as VariableNode).AccessType == VarAccessType.PLAIN)
                                 ChunkIt(n);
                             else
@@ -712,7 +712,7 @@ namespace lightning
 
                         }
 
-                        Add(OpCode.TABLE_GET, (Operand)(p_node.Name.Indexes.Count - 1), p_node.Line);
+                        Add(OpCode.TABLE_GET, (Operand)(p_node.Variable.Indexes.Count - 1), p_node.Line);
                     }
 
                     switch (this_func.type)
@@ -729,7 +729,7 @@ namespace lightning
                             break;
                     }
 
-                    foreach (Node n in p_node.Name.Indexes)
+                    foreach (Node n in p_node.Variable.Indexes)
                     {
                         if (n.GetType() != typeof(VariableNode) || (n as VariableNode).AccessType == VarAccessType.PLAIN)
                             ChunkIt(n);
@@ -740,7 +740,7 @@ namespace lightning
                         }
 
                     }
-                    Add(OpCode.TABLE_GET, (Operand)p_node.Name.Indexes.Count, p_node.Line);
+                    Add(OpCode.TABLE_GET, (Operand)p_node.Variable.Indexes.Count, p_node.Line);
                 }
 
                 // Call

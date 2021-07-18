@@ -26,7 +26,7 @@ multiplication  -> unary ( ( "/" | "*" | "++" | "--" ) unary )*
 unary           -> ( "!" | "-" ) unary | chainedCall
 
 indexedAccess   -> ( ( "[" expression "]" ) | ( "." IDENTIFIER ) )*
-compoundVar     -> ( IDENTIFIER | chainedCall ) indexedAccess
+compoundVar     -> primary indexedAccess
 chainedCall     -> compoundCall ( "|" "(" arguments? ")" )*
 compoundCall    -> functionCall | methodCall
 functionCall    -> primary "(" arguments? ")"

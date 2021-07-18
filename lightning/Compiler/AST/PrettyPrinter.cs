@@ -396,7 +396,7 @@ namespace lightning
         private void PrintFunctionCall(FunctionCallNode p_node)
         {
             Console.Write("[FUNCTION CALL ");
-            Print(p_node.Name);
+            Print(p_node.Variable);
 
             int counter = 0;
             foreach (List<Node> arguments in p_node.Calls)
