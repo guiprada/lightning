@@ -625,19 +625,6 @@ namespace lightning
 
             return maybe_func;
         }
-        List<Node> Arguments(){
-            Consume(TokenType.LEFT_PAREN, "Expected '(' before 'function call' arguments.", true);
-            List<Node> arguments = new List<Node>();
-            if (!Check(TokenType.RIGHT_PAREN))
-            {
-                do{
-                    arguments.Add(Expression());
-                }while (Match(TokenType.COMMA));
-            }
-            Consume(TokenType.RIGHT_PAREN, "Expected ')' after 'function call' arguments.", true);
-
-            return arguments;
-        }
 
         FunctionCallNode FinishFunctionCall(FunctionCallNode function_call_node)
         {
@@ -656,6 +643,20 @@ namespace lightning
             }
 
             return function_call_node;
+        }
+
+        List<Node> Arguments(){
+            Consume(TokenType.LEFT_PAREN, "Expected '(' before 'function call' arguments.", true);
+            List<Node> arguments = new List<Node>();
+            if (!Check(TokenType.RIGHT_PAREN))
+            {
+                do{
+                    arguments.Add(Expression());
+                }while (Match(TokenType.COMMA));
+            }
+            Consume(TokenType.RIGHT_PAREN, "Expected ')' after 'function call' arguments.", true);
+
+            return arguments;
         }
 
         TableNode TableEntry(TableNode table_node)
@@ -712,46 +713,10 @@ namespace lightning
                 Dictionary<Node, Node> table = new Dictionary<Node, Node>();
                 TableNode table_node = new TableNode(elements, table, line);
 
-                table_node = TableEntry(table_node);
+                do{
+                    table_node = TableEntry(table_node);
+                }while(Match(TokenType.COMMA));
 
-                while (Match(TokenType.COMMA))
-                {
-                    if (Match(TokenType.IDENTIFIER))
-                    {
-                        Node item = new LiteralNode((Previous() as TokenString).value, Previous().Line);
-
-                        Consume(TokenType.COLON, "Expected ':' separating key:values in table constructor", true);
-
-                        Node value = Primary();
-
-                        table.Add(item, value);
-                    }else if(!Check(TokenType.RIGHT_BRACKET)){// trailing comma suport
-                        Node item = Primary();
-                        if(Check(TokenType.COLON)){
-                            Consume(TokenType.COLON, "Expected ':' separating key:values in table constructor", true);
-                            if(((LiteralNode)item).ValueType == typeof(Float)){
-                                LiteralNode number_value = (LiteralNode)item;
-                                if((Float)(number_value.Value) == elements.Count)
-                                    elements.Add(Primary());
-                                else
-                                    table.Add(number_value, Primary());
-                            }else if(((LiteralNode)item).ValueType == typeof(Integer)){
-                                LiteralNode number_value = (LiteralNode)item;
-                                if((Integer)(number_value.Value) == elements.Count)
-                                    elements.Add(Primary());
-                                else
-                                    table.Add(number_value, Primary());
-                            }else if(((LiteralNode)item).ValueType == typeof(string)){
-                                LiteralNode string_value = (LiteralNode)item;
-                                table.Add(string_value, Primary());
-                            }
-                        }
-                        else
-                        {
-                            elements.Add(item);
-                        }
-                    }
-                }
                 Consume(TokenType.RIGHT_BRACKET, "Expected ']' to close 'table'", true);
 
                 return table_node;
