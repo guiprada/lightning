@@ -873,7 +873,7 @@ if(!success)
 
 write_line(machine.memory_use())
 
-// "eo":char_at(0)
+"eo":char_at(0)
 // "eoeoo"|string.char_at(0)
 // [3, 1, false, 2, 'a', null, 0, '0', "string"]|table.list_sort()
 // write_line(5|math.sqroot())

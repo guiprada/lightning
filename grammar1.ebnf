@@ -26,11 +26,11 @@ multiplication  -> unary ( ( "/" | "*" | "++" | "--" ) unary )*
 unary           -> ( "!" | "-" ) unary | chainedCall
 
 indexedAccess   -> ( ( "[" expression "]" ) | ( "." IDENTIFIER ) )*
-compoundVar     -> primary indexedAccess
+compoundVar     -> IDENTIFIER indexedAccess
 chainedCall     -> compoundCall ( "|" "(" arguments? ")" )*
 compoundCall    -> functionCall | methodCall
-functionCall    -> primary "(" arguments? ")"
-methodCall      -> primary : IDENTIFIER "(" arguments? ")"
+functionCall    -> IDENTIFIER "(" arguments? ")"
+methodCall      -> IDENTIFIER : IDENTIFIER "(" arguments? ")"
 
 arguments       -> expression ( "," expression )*
 table           -> [ tableEntry (, tableEntry )* ]
