@@ -613,7 +613,14 @@ namespace lightning
 
             if (Check(TokenType.LEFT_PAREN))
             {
-                maybe_func = FinishFunctionCall(maybe_func);
+                List<List<Node>> calls = new List<List<Node>>();
+                List<VariableNode> indexed_access = new List<VariableNode>();
+                FunctionCallNode function_call_node = new FunctionCallNode(
+                    (maybe_func as VariableNode),
+                    calls, indexed_access,
+                    maybe_func.Line);
+                function_call_node = FinishFunctionCall(function_call_node);
+                return function_call_node;
             }
 
             return maybe_func;
@@ -635,26 +642,22 @@ namespace lightning
             return arguments;
         }
 
-        FunctionCallNode FinishFunctionCall(Node name)
+        FunctionCallNode FinishFunctionCall(FunctionCallNode function_call_node)
         {
-            List<List<Node>> calls = new List<List<Node>>();
-
-            List<VariableNode> indexed_access = new List<VariableNode>();
-
             while(Check(TokenType.LEFT_PAREN))
             {
-                calls.Add(Arguments());
+                function_call_node.Calls.Add(Arguments());
 
                 if (Check(TokenType.DOT) || Check(TokenType.LEFT_BRACKET))
-                    indexed_access.Add(IndexedAccess((name as VariableNode).Name, name.Line) as VariableNode);
+                    function_call_node.IndexedAccess.Add(IndexedAccess(function_call_node.Name.Name, function_call_node.Line) as VariableNode);
                 else{
-                    indexed_access.Add(null);
+                    function_call_node.IndexedAccess.Add(null);
                     if (!Match(TokenType.PIPE))
                         break;
                 }
             }
 
-            return new FunctionCallNode((name as VariableNode), calls, indexed_access, name.Line);
+            return function_call_node;
         }
 
         Node Table()
