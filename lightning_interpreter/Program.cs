@@ -133,7 +133,8 @@ namespace interpreter
                         Console.WriteLine("Program returned ERROR");
                     else if (result.value.Type != UnitType.Null)
                         Console.WriteLine("Program returned: " + result.value);
-                }catch{
+                }catch(Exception e){
+                    Console.WriteLine(e);
                     vm.Error("VM Busted ...");
                 }
             }

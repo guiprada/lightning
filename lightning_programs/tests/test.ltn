@@ -744,33 +744,40 @@ a"
     var this_list = [3, "string", 1, false, 2, 'a', null, 0, '0']
     var ordered_list = [null, false, '0', 'a', 0, 1, 2, 3, "string"]
     table.list_sort(this_list)
+    write_line(this_list)
+    write_line(ordered_list)
+
     for(var i=0; i<(table.list_count(this_list)); i++){
-        assert(this_list[i], ordered_list[i], "Failde List Sort Test " .. (i+1) ..".")
+        assert(this_list[i], ordered_list[i], "Failed List Sort Test " .. (i+1) ..".")
     }
-}
-{
-    // Testing Anonymous Function Call
-    var teste = ('e' .. 'o'):char_at(0) .. "eo":char_at(1)
-    assert("eo", teste, "Failed Anonymous Function Call Test 1.")
 
-    teste = ('e' .. "eo":char_at(1)):char_at(0) .. "eo":char_at(1)
-    assert("eo", teste, "Failed Anonymous Function Call Test 2.")
+    ordered_list = ["a", "ab", "b", "aaa", "aba", "aca", "bb", 2, 3, this_list]
+    table.list_sort(ordered_list)
+    write_line(ordered_list)
 }
-{
-    var array1
-    var a = 1
-    var success = try(\(array){
-        write_line(array[0])
-        a = 2
-    }, ["oi", "mundo"])
-    assert(a, 1, "Failed Try() Test 1.")
+// {
+//     // Testing Anonymous Function Call
+//     var teste = ('e' .. 'o'):char_at(0) .. "eo":char_at(1)
+//     assert("eo", teste, "Failed Anonymous Function Call Test 1.")
 
-    success = try(\{
-        write_line(array1[0])
-        a = 2
-    }, ["oi", "mundo"])
-    assert(a, 1, "Failed Try() Test 2.")
-}
+//     teste = ('e' .. "eo":char_at(1)):char_at(0) .. "eo":char_at(1)
+//     assert("eo", teste, "Failed Anonymous Function Call Test 2.")
+// }
+// {
+//     var array1
+//     var a = 1
+//     var success = try(\(array){
+//         write_line(array[0])
+//         a = 2
+//     }, ["oi", "mundo"])
+//     assert(a, 1, "Failed Try() Test 1.")
+
+//     success = try(\{
+//         write_line(array1[0])
+//         a = 2
+//     }, ["oi", "mundo"])
+//     assert(a, 1, "Failed Try() Test 2.")
+// }
 //////////////////////////////// scratch
 
 

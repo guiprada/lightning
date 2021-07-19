@@ -71,6 +71,24 @@ namespace lightning
             return content.GetHashCode();
         }
 
+        public int CompareTo(object compareTo){
+            if(compareTo.GetType() != typeof(Unit))
+                throw new Exception("Trying to compare StringUnit to non Unit type");
+            Unit other = (Unit)compareTo;
+            UnitType other_type = other.Type;
+            switch(other_type){
+                case UnitType.String:
+                    return this.content.CompareTo(((StringUnit)(other.heapUnitValue)).content);
+                case UnitType.Boolean:
+                case UnitType.Char:
+                case UnitType.Float:
+                case UnitType.Integer:
+                    return 1;
+                default:
+                    return -1;
+            }
+        }
+
         ////////////////////////////////////////////////////////////////////////////////////////////////////////////
         ///////////////////////////////////////////////////////////////////////////////////////////////////// String
         private static TableUnit superTable = new TableUnit(null, null);

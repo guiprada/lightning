@@ -700,11 +700,11 @@ namespace lightning
             {
                 Node item = new LiteralNode((Previous() as TokenString).value, Previous().Line);
 
-                Consume(TokenType.COLON, "Expected ':' separating key:values in table constructor", true);
-
-                Node value = Primary();
-
-                table.Add(item, value);
+                if(Match(TokenType.COLON)){
+                    Node value = Primary();
+                    table.Add(item, value);
+                }else
+                    elements.Add(item);
             }
             else if(!Check(TokenType.RIGHT_BRACKET))
             {

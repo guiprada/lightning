@@ -17,9 +17,9 @@ namespace lightning
         [FieldOffset(0)]
         public Float floatValue;
         [FieldOffset(0)]
-        public char charValue;
-        [FieldOffset(0)]
         public Integer integerValue;
+        [FieldOffset(0)]
+        public char charValue;
         [FieldOffset(0)]
         public bool boolValue;
 
@@ -169,6 +169,13 @@ namespace lightning
                     }
                     return false;
                 case UnitType.Boolean:
+                    if (other_type == UnitType.Float){
+                        return false;
+                    }else if(other_type == UnitType.Integer) {
+                        return false;
+                    }else if(other_type == UnitType.Char) {
+                        return false;
+                    }
                     return ToBool() == ((Unit)other).ToBool();
                 default:
                     return heapUnitValue.Equals(other);
@@ -213,19 +220,13 @@ namespace lightning
                     return new Unit(opA.floatValue + opB.floatValue);
                 if(opB_type == UnitType.Integer)
                     return new Unit(opA.floatValue + opB.integerValue);
-                // if(opB_type == UnitType.String || opB_type == UnitType.Char)
-                //     return new Unit(opA.ToString() + opB.ToString());
             }
             if(opA_type == UnitType.Integer){
                 if(opB_type == UnitType.Float)
                     return new Unit(opA.integerValue + opB.floatValue);
                 if(opB_type == UnitType.Integer)
                     return new Unit(opA.integerValue + opB.integerValue);
-                // if(opB_type == UnitType.String || opB_type == UnitType.Char)
-                //     return new Unit(opA.ToString() + opB.ToString());
             }
-            // if(opA_type == UnitType.String || opA_type == UnitType.Char)
-            //     return new Unit(opA.ToString() + opB.ToString());
             throw new Exception("Trying to add non alphanumeric UnitType. " + VM.ErrorString(null));
         }
 
@@ -362,26 +363,24 @@ namespace lightning
                         case UnitType.Integer:
                             return integerValue.CompareTo(other.integerValue);
                         case UnitType.Char:
-                            return 1;
                         case UnitType.Null:
-                            return 1;
                         case UnitType.Boolean:
                             return 1;
+                        case UnitType.String:
                         default:
                             return -1;
                     }
                 case UnitType.Char:
                     switch(other_type){
                         case UnitType.Float:
-                            return -1;
                         case UnitType.Integer:
                             return -1;
                         case UnitType.Char:
                             return charValue.CompareTo(other.charValue);
                         case UnitType.Null:
-                            return 1;
                         case UnitType.Boolean:
                             return 1;
+                        case UnitType.String:
                         default:
                             return -1;
                     }
@@ -389,24 +388,26 @@ namespace lightning
                     switch(other_type){
                         case UnitType.Null:
                             return 0;
+                        case UnitType.String:
                         default:
                             return -1;
                     }
                 case UnitType.Boolean:
                     switch(other_type){
                         case UnitType.Float:
-                            return -1;
                         case UnitType.Integer:
                             return -1;
                         case UnitType.Char:
-                            return -1;
                         case UnitType.Null:
                             return 1;
                         case UnitType.Boolean:
                             return boolValue.CompareTo(other.boolValue);
+                        case UnitType.String:
                         default:
                             return -1;
                     }
+                case UnitType.String:
+                    return ((StringUnit)this.heapUnitValue).CompareTo(compareTo);
                 default:
                     switch(other_type){
                         case UnitType.Float:
@@ -419,6 +420,7 @@ namespace lightning
                             return 1;
                         case UnitType.Boolean:
                             return 1;
+                        case UnitType.String:
                         default:
                             return 0;
                     }
