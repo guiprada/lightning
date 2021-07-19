@@ -881,5 +881,5 @@ if(!success)
 var oe = "oe"
 oe:char_at(0)
 "eo":char_at(0)
-// write_line("here" + "eo":char_at(0))
+write_line("here" + "eo":char_at(0) + "eo":char_at(1))
 write_line(machine.memory_use())

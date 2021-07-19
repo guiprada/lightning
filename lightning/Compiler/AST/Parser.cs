@@ -20,6 +20,7 @@ namespace lightning
         private int current;
         public List<string> Errors { get; private set; }
         public List<string> Warnings { get; private set; }
+        private int anonymousCounter;
 
         public Node ParsedTree
         {
@@ -49,6 +50,7 @@ namespace lightning
             Errors = new List<string>();
             Warnings = new List<string>();
             current = 0;
+            anonymousCounter = 0;
         }
 
         void Parse()
@@ -631,7 +633,8 @@ namespace lightning
             if(Check(TokenType.COLON))
             {
 
-                string name = "*_" + node.Value.ToString() + "_" + node.Value.GetHashCode();
+                string name = "*(" + anonymousCounter + "_" + node.Value.ToString();
+                anonymousCounter++;
 
                 VarDeclarationNode declaration_node = new VarDeclarationNode(name, node, node.Line);
 
@@ -640,6 +643,7 @@ namespace lightning
                 List<List<Node>> calls = new List<List<Node>>();
                 List<VariableNode> indexed_access = new List<VariableNode>();
                 FunctionCallNode function_call_node = new FunctionCallNode(
+
                     variableNode,
                     calls,
                     indexed_access,
