@@ -624,20 +624,24 @@ namespace lightning
                 return function_call_node;
             }
             if(Check(TokenType.COLON)){
-                return AnonymousFunctionCall((LiteralNode)maybe_func);
+                return AnonymousFunctionCall(maybe_func);
             }
             return maybe_func;
         }
 
-        Node AnonymousFunctionCall(LiteralNode node){
+        Node AnonymousFunctionCall(Node node){
             if(Check(TokenType.COLON))
             {
-
-                string name = "*(" + anonymousCounter + "_" + node.Value.ToString();
-                anonymousCounter++;
+                string name;
+                if(node.Type == NodeType.GROUPING){
+                    Console.WriteLine("here-------------");
+                    name = "*(" + anonymousCounter + ")_grouping";
+                }else{
+                    name = "*(" + anonymousCounter + ")_" + ((LiteralNode)node).Value.ToString();
+                    anonymousCounter++;
+                }
 
                 VarDeclarationNode declaration_node = new VarDeclarationNode(name, node, node.Line);
-
                 VariableNode variableNode = (VariableNode)IndexedAccess(name, node.Line);
 
                 List<List<Node>> calls = new List<List<Node>>();
