@@ -63,12 +63,11 @@ namespace lightning
         const Operand MULTIPLICATION_ASSIGN = (Operand)AssignmentOperatorType.MULTIPLICATION_ASSIGN;
         const Operand DIVISION_ASSIGN = (Operand)AssignmentOperatorType.DIVISION_ASSIGN;
 
-        static Stack<VM> vmPool;
+        Stack<VM> vmPool;
         static int functionDeepness;
 
 //////////////////////////////////////////////////// Public
         static VM(){
-            vmPool = new Stack<VM>();
             functionDeepness = 30;
         }
         public VM(Chunk p_chunk)
@@ -100,6 +99,8 @@ namespace lightning
             }
             LoadedModules = new Dictionary<string, int>();
             modules = new List<ModuleUnit>();
+
+            vmPool = new Stack<VM>();
         }
 
         private VM(
@@ -133,18 +134,18 @@ namespace lightning
             variables.Trim();
             upValues.Trim();
         }
-        public static void ReleaseVMs(int count){
+        public void ReleaseVMs(int count){
             for (int i = 0; i < count; i++)
                 if (vmPool.Count > 0)
                     vmPool.Pop();
                 vmPool.TrimExcess();
         }
-        public static void ReleaseVMs(){
+        public void ReleaseVMs(){
             vmPool.Clear();
             vmPool.TrimExcess();
         }
 
-        public static int CountVMs(){
+        public int CountVMs(){
             return vmPool.Count;
         }
 
@@ -157,7 +158,7 @@ namespace lightning
             upValues.Clear();
             upValuesRegistry.Clear();
         }
-        public static void RecycleVM(VM vm)
+        public void RecycleVM(VM vm)
         {
             vm.Reset();
             vmPool.Push(vm);

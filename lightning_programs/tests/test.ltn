@@ -18,39 +18,17 @@ var lib_assert_counter = require("assert_counter.ltn")
 var count_errors = lib_assert_counter.get_error_counter
 var clear_errors = lib_assert_counter.reset_error_counter
 
-require("tests/test_assert.ltn")
-
+var errors = 0
+errors += require("tests/assert.ltn")
+errors += require("tests/numbers.ltn")
+errors += require("tests/strings.ltn")
+errors += require("tests/for_each.ltn")
 
 
 /////// old
 var assert = lib_assert_counter.assert
 var assert_not = lib_assert_counter.assert_not
-{
-    // Numbers Comparisson
-    var num1 = 1
-    var num2 = 2
-    assert(num1, 1, "Failed numbers comparisson test 1.")
-    assert_not(num1, 2, "Failed numbers comparisson test 2.")
-    assert_not(num1, num2, "Failed numbers comparisson test 3.")
-    num2 = 1
-    assert(num1, num2, "Failed numbers comparisson test 4.")
-}
-{
-    // String Comparisson
-    var hello = "hello"
-    var world = "world"
-    assert("hello", hello, "Failed string concatenation test 1.")
-    assert_not(hello, "world", "Failed string concatenation test 2.")
-    assert_not(hello, world, "Failed string concatenation test 3.")
-}
-{
-    //String concatenation
-    var hello = "hello"
-    var world = "world"
-    var result = "hello" + " " + "world!"
-    assert(result, "hello world!", "Failed string concatenation test 1.")
-    assert_not(result, "world!", "Failed string concatenation test 2.")
-}
+
 {
     // Table test
     var this_list = []
@@ -534,43 +512,7 @@ var assert_not = lib_assert_counter.assert_not
         assert(table1[i], i, "Failed for_range Test 4, iteration: " + i + ".")
     }
 }
-{
-    // Testing for_each
-    var n = 100
-    var table1 = table.list_new(n)
 
-    function many(index, collection)
-    {
-        collection[index] = []
-        collection[index].x = 1
-    }
-    for_each(table1, many)
-    for (var i = 0; i<n; i++)
-    {
-        assert(table1[i].x, 1, "Failed for_each Test 1, iteration:" + i + ".")
-    }
-
-    table1 = table.list_new(n)
-    function many_number(index, collection)
-    {
-        collection[index] = 1
-    }
-    for_each(table1, many_number)
-    for (var i = 0; i<n; i++)
-    {
-        assert(table1[i], 1, "Failed for_each Test 2, iteration: " + i + ".")
-    }
-
-    table1 = table.list_new(n)
-    for_each(table1, function(index, collection)
-    {
-        collection[index] = 100 - index
-    })
-    for (var i = 0; i<n; i++)
-    {
-        assert(table1[i], n - i, "Failed for_each Test 3, iteration: " + i + ".")
-    }
-}
 // Testing Global Lock
 var global_lock_test_counter = 5
 {
@@ -843,11 +785,11 @@ a"
 machine.trim()
 
 write_line("")
-if (count_errors() == 0){
+if (errors == 0){
     write_line("No errors found! :)")
 }
 else{
-    write_line(":( " + count_errors() + " errors found!")
+    write_line(":( " + errors + " errors found!")
 }
 write_line("-- Finished tests! --")
 write_line("Elapsed time: " + start_time:elapsed() + " ms")
@@ -856,11 +798,13 @@ write_line(machine.memory_use())
 
 //////////////////////////////// scratch
 
+var array1
+var a = 1
 var success = try(\(text, more_text){
     write_line(text)
     write_line(more_text)
     write_line(array1[0])
-    a = 2;
+    a = 2
 }, ["oi", "mundo"])
 
 write_line("success: " .. success .. " a: " .. a)

@@ -31,6 +31,4 @@ assert_counter.reset_error_counter = function()
     errors = 0
 }
 
-assert_counter.set_header = assert.set_header
-
 return assert_counter

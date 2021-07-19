@@ -103,7 +103,7 @@ namespace lightning
                 //////////////////////////////////////////////////////
                 Unit ReleaseAllVMs(VM vm)
                 {
-                    VM.ReleaseVMs();
+                    vm.ReleaseVMs();
                     return new Unit(UnitType.Null);
                 }
                 machine.Set("release_all_vms", new IntrinsicUnit("release_all_vms", ReleaseAllVMs, 0));
@@ -111,7 +111,7 @@ namespace lightning
                 //////////////////////////////////////////////////////
                 Unit ReleaseVMs(VM vm)
                 {
-                    VM.ReleaseVMs((int)vm.GetNumber(0));
+                    vm.ReleaseVMs((int)vm.GetNumber(0));
                     return new Unit(UnitType.Null);
                 }
                 machine.Set("release_vms", new IntrinsicUnit("release_vms", ReleaseVMs, 1));
@@ -119,7 +119,7 @@ namespace lightning
                 //////////////////////////////////////////////////////
                 Unit CountVMs(VM vm)
                 {
-                    return new Unit(VM.CountVMs());
+                    return new Unit(vm.CountVMs());
                 }
                 machine.Set("count_vms", new IntrinsicUnit("count_vms", CountVMs, 0));
 
@@ -1168,11 +1168,11 @@ namespace lightning
                 VM try_vm = vm.GetVM();
                 try{
                     try_vm.CallFunction(this_callable, this_arguments.Elements);
-                    VM.RecycleVM(try_vm);
+                    vm.RecycleVM(try_vm);
                     return new Unit(true);
                 }catch{//(Exception e){
                     // return new Unit(e.ToString());
-                    VM.RecycleVM(try_vm);
+                    vm.RecycleVM(try_vm);
                     return new Unit(false);
                 }
             }
@@ -1296,7 +1296,7 @@ namespace lightning
                 });
                 for (int i = init; i < end; i++)
                 {
-                    VM.RecycleVM(vms[i]);
+                    vm.RecycleVM(vms[i]);
                 }
                 return new Unit(UnitType.Null);
             }
@@ -1335,7 +1335,7 @@ namespace lightning
                 });
                 for (int i = 0; i < end; i++)
                 {
-                    VM.RecycleVM(vms[i]);
+                    vm.RecycleVM(vms[i]);
                 }
                 return new Unit(UnitType.Null);
             }
