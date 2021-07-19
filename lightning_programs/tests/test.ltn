@@ -25,6 +25,7 @@ errors += require("tests/strings.ltn")
 errors += require("tests/pmap.ltn")
 errors += require("tests/rmap.ltn")
 errors += require("tests/map.ltn")
+errors += require("tests/reduce.ltn")
 
 /////// old
 var assert = lib_assert_counter.assert
