@@ -8,6 +8,11 @@ else if(os_string:contains("Unix"))
     os = "Unix"
 
 write_line(get_os())
+
+if (intrinsic.create == null){
+    write_line("No inline intrinsic support!")
+}
+
 write_line("-- Starting tests --")
 var start_time = time.now()
 
@@ -588,8 +593,6 @@ var global_lock_test_counter = 5
     if (intrinsic.create != null){
         var sum_intr = intrinsic.create("sum", 2, intr_sum)
         assert(sum_intr(5, 6), 11, "Failed inline Intrinsic test 1.")
-    }else{
-        write_line("No inline intrinsic support!")
     }
 }
 {
@@ -744,16 +747,18 @@ a"
     var this_list = [3, "string", 1, false, 2, 'a', null, 0, '0']
     var ordered_list = [null, false, '0', 'a', 0, 1, 2, 3, "string"]
     table.list_sort(this_list)
-    write_line(this_list)
-    write_line(ordered_list)
 
     for(var i=0; i<(table.list_count(this_list)); i++){
-        assert(this_list[i], ordered_list[i], "Failed List Sort Test " .. (i+1) ..".")
+        assert(this_list[i], ordered_list[i], "Failed List Sort Test 1, iteration: " .. (i+1) ..".")
     }
 
-    ordered_list = ["a", "ab", "b", "aaa", "aba", "aca", "bb", 2, 3, this_list]
-    table.list_sort(ordered_list)
-    write_line(ordered_list)
+    this_list = ["a", "ab", "b", "aaa", "aba", "aca", "bb", 2, 3, this_list]
+    ordered_list = [2, 3, "a", "aaa", "ab", "aba", "aca", "b", "bb", this_list]
+    table.list_sort(this_list)
+
+    for(var i=0; i<(table.list_count(this_list)); i++){
+        assert(this_list[i], ordered_list[i], "Failed List Sort Test 2 iteration: " .. (i+1) ..".")
+    }
 }
 // {
 //     // Testing Anonymous Function Call
