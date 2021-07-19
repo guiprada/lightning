@@ -342,7 +342,7 @@ namespace lightning
             }
         }
 
-        void Error(string msg)
+        public void Error(string msg)
         {
             Console.Write("Error: " + msg);
             Console.Write(" on function: " + instructions.ExecutingFunction.Name);

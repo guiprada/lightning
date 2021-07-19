@@ -5,16 +5,23 @@ var assert_not = assert_counter.assert_not
     // String Comparisson
     var hello = "hello"
     var world = "world"
-    assert("hello", hello, "Failed string concatenation test 1.")
-    assert_not(hello, "world", "Failed string concatenation test 2.")
-    assert_not(hello, world, "Failed string concatenation test 3.")
+    assert("hello", hello, "Failed string comparisson test 1.")
+    assert_not(hello, "world", "Failed string comparisson test 2.")
+    assert_not(hello, world, "Failed string comparisson test 3.")
 }
 {
     //String concatenation
     var hello = "hello"
     var world = "world"
-    var result = "hello" + " " + "world!"
+    var result = "hello" .. " " .. "world!"
     assert(result, "hello world!", "Failed string concatenation test 1.")
     assert_not(result, "world!", "Failed string concatenation test 2.")
+}
+{
+    // Testing Append and Alphanumeric Addition
+    var char_o = 'o'
+    var char_a = 'a'
+    assert((1 .. 2  .. char_o .. 3 .. 5 .. " " .. char_a), "12o35 a", "Failed Append and Alphanumeric Addition Test 1.")
+    assert((1 + 2  .. char_o .. 3 .. " " .. char_a), "3o3 a", "Failed Append and Alphanumeric Addition Test 2.")
 }
 return assert_counter.get_error_counter()

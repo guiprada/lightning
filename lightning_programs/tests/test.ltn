@@ -64,7 +64,7 @@ var assert_not = lib_assert_counter.assert_not
     // Table literal test
     var this_table = [null, null, null, null, null, 5:"hello"]
     for(var i = 0; i<5; i++){
-        assert(this_table[i], null, "Failed Table Literal test " + (i+1) + ".")
+        assert(this_table[i], null, "Failed Table Literal test " .. (i+1) .. ".")
     }
     assert(this_table[5], "hello", "Failed Table Literal test 6.")
 
@@ -130,7 +130,7 @@ var assert_not = lib_assert_counter.assert_not
         var local = "";
         function closure()
         {
-            local = local + " extra";
+            local = local .. " extra";
             return local
         }
         return closure;
@@ -275,7 +275,7 @@ var assert_not = lib_assert_counter.assert_not
     i = make_iterator(0);
     for (var j = 0; j < 10; j = i(1))
     {
-        assert(array[j], j, "Failed iterator test " + j + ".")
+        assert(array[j], j, "Failed iterator test " .. j .. ".")
     }
 }
 {
@@ -445,7 +445,7 @@ var assert_not = lib_assert_counter.assert_not
             var str_upvalue = "up"
             table1.append =
                 function (value1, value2, value3){
-                    return str_global + value1  + value2 + value3 + str_upvalue
+                    return str_global .. value1 .. value2 .. value3 .. str_upvalue
                 }
         }
         return table1
@@ -459,7 +459,7 @@ var assert_not = lib_assert_counter.assert_not
         var str_global = "global"
         var str_upvalue = "up"
         return function (value1, value2, value3){
-                return str_global + value1  + value2 + value3 + str_upvalue
+                return str_global .. value1 .. value2 .. value3 .. str_upvalue
             }
     #
     file.write("file_write_test.ltn", my_prog2)
@@ -599,8 +599,8 @@ var global_lock_test_counter = 5
     var counter = 0
     for (var it = table.map_iterator(table1); it.next())
     {
-        assert(it.key, indexes_table1[counter], "Failed iterator key Test 1, iteration: " + counter)
-        assert(it.value, table1[it.key], "Failed iterator value Test 1, iteration: " + counter)
+        assert(it.key, indexes_table1[counter], "Failed iterator key Test 1, iteration: " .. counter)
+        assert(it.value, table1[it.key], "Failed iterator value Test 1, iteration: " .. counter)
         counter++
     }
     assert(table.list_to_string(table.map_indexes(table1)), "australia, eua, brazil", "Failed iterator Test 2")
@@ -611,7 +611,7 @@ var global_lock_test_counter = 5
     counter = 0
     for (var it = table.list_iterator(list1); it.next())
     {
-        assert(it.value, list1[counter], "Failed iterator value Test 4, iteration: " + counter)
+        assert(it.value, list1[counter], "Failed iterator value Test 4, iteration: " .. counter)
         counter++
     }
 
@@ -619,18 +619,18 @@ var global_lock_test_counter = 5
     counter = 0
     for (var it = table.list_index_iterator(list1); it.next())
     {
-        assert(it.key, counter, "Failed iterator key Test 5, iteration: " + counter)
-        assert(it.value, list1[counter], "Failed iterator value Test 5, iteration: " + counter)
+        assert(it.key, counter, "Failed iterator key Test 5, iteration: " .. counter)
+        assert(it.value, list1[counter], "Failed iterator value Test 5, iteration: " .. counter)
         counter++
     }
 
     var sparse_array = [5:5, 10:10, 15:15]
     counter = 0
     for(var it=table.map_numeric_iterator(sparse_array); it.next()){
-        assert(sparse_array[it.key], it.value, "Failed iterator value Test 6, iteration: " + counter)
+        assert(sparse_array[it.key], it.value, "Failed iterator value Test 6, iteration: " .. counter)
         counter++
     }
-    assert(counter, 3, "Failed iterator value Test 6, iteration: " + counter)
+    assert(counter, 3, "Failed iterator value Test 6, iteration: " .. counter)
 }
 {
     // Testing tuples
@@ -740,13 +740,6 @@ a"
     assert(testTableClone:list_count(), 0, "Failed Table Class Test 6.")
 }
 {
-    // Testing Append and Alphanumeric Addition
-    var char_o = 'o'
-    var char_a = 'a'
-    assert((1 .. 2  + char_o + 3 + 5 + " " .. char_a), "12o35 a", "Failed Append and Alphanumeric Addition Test 1.")
-    assert((1 + 2  + char_o + 3 + " " .. char_a), "3o3 a", "Failed Append and Alphanumeric Addition Test 1.")
-}
-{
     // Testing List sort
     var this_list = [3, "string", 1, false, 2, 'a', null, 0, '0']
     var ordered_list = [null, false, '0', 'a', 0, 1, 2, 3, "string"]
@@ -757,10 +750,10 @@ a"
 }
 {
     // Testing Anonymous Function Call
-    var teste = ('e' + 'o'):char_at(0) + "eo":char_at(1)
+    var teste = ('e' .. 'o'):char_at(0) .. "eo":char_at(1)
     assert("eo", teste, "Failed Anonymous Function Call Test 1.")
 
-    teste = ('e' + "eo":char_at(1)):char_at(0) + "eo":char_at(1)
+    teste = ('e' .. "eo":char_at(1)):char_at(0) .. "eo":char_at(1)
     assert("eo", teste, "Failed Anonymous Function Call Test 2.")
 }
 {
@@ -789,9 +782,9 @@ if (errors == 0){
 }
 else{
     write(new_line())
-    write_line(":( " + errors + " errors found!")
+    write_line(":( " .. errors .. " errors found!")
 }
 write_line("-- Finished tests! --")
-write_line("Elapsed time: " + start_time:elapsed() + " ms")
-write_line("Loaded modules: " + machine.modules())
+write_line("Elapsed time: " .. start_time:elapsed() .. " ms")
+write_line("Loaded modules: " .. machine.modules())
 write_line(machine.memory_use())

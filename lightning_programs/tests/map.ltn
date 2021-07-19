@@ -15,7 +15,7 @@ var assert_not = assert_counter.assert_not
     map(table1, many)
     for (var i = 0; i<n; i++)
     {
-        assert(table1[i].x, 1, "Failed map Test 1, iteration:" + i + ".")
+        assert(table1[i].x, 1, "Failed map Test 1, iteration:" .. i .. ".")
     }
 
     table1 = table.list_new(n)
@@ -26,7 +26,7 @@ var assert_not = assert_counter.assert_not
     map(table1, many_number)
     for (var i = 0; i<n; i++)
     {
-        assert(table1[i], 1, "Failed map Test 2, iteration: " + i + ".")
+        assert(table1[i], 1, "Failed map Test 2, iteration: " .. i .. ".")
     }
 
     table1 = table.list_new(n)
@@ -36,7 +36,7 @@ var assert_not = assert_counter.assert_not
     })
     for (var i = 0; i<n; i++)
     {
-        assert(table1[i], n - i, "Failed map Test 3, iteration: " + i + ".")
+        assert(table1[i], n - i, "Failed map Test 3, iteration: " .. i .. ".")
     }
 }
 return assert_counter.get_error_counter()

@@ -127,11 +127,15 @@ namespace interpreter
                     Console.WriteLine();
 
                 VM vm = new VM(chunk);
-                VMResult result = vm.Run();
-                if (result.status != VMResultType.OK)
-                    Console.WriteLine("Program returned ERROR");
-                else if (result.value.Type != UnitType.Null)
-                    Console.WriteLine("Program returned: " + result.value);
+                try{
+                    VMResult result = vm.Run();
+                    if (result.status != VMResultType.OK)
+                        Console.WriteLine("Program returned ERROR");
+                    else if (result.value.Type != UnitType.Null)
+                        Console.WriteLine("Program returned: " + result.value);
+                }catch{
+                    vm.Error("VM Busted ...");
+                }
             }
             else
             {

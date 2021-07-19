@@ -634,7 +634,6 @@ namespace lightning
             {
                 string name;
                 if(node.Type == NodeType.GROUPING){
-                    Console.WriteLine("here-------------");
                     name = "*(" + anonymousCounter + ")_grouping";
                 }else{
                     name = "*(" + anonymousCounter + ")_" + ((LiteralNode)node).Value.ToString();
