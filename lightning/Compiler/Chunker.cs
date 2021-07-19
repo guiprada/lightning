@@ -274,10 +274,10 @@ namespace lightning
         private void ChunkTable(TableNode p_node)
         {
             int n_elements = 0;
-            if (p_node.elements != null)
+            if (p_node.Elements != null)
             {
-                p_node.elements.Reverse();
-                foreach (Node n in p_node.elements)
+                p_node.Elements.Reverse();
+                foreach (Node n in p_node.Elements)
                 {
                     ChunkIt(n);
                     n_elements++;
@@ -285,9 +285,9 @@ namespace lightning
             }
 
             int n_table = 0;
-            if (p_node.table != null)
+            if (p_node.Table != null)
             {
-                foreach (KeyValuePair<Node, Node> entry in p_node.table)
+                foreach (KeyValuePair<Node, Node> entry in p_node.Table)
                 {
                     ChunkIt(entry.Key);
                     ChunkIt(entry.Value);
@@ -485,12 +485,12 @@ namespace lightning
         private void Chunkassignment(AssignmentNode p_node)
         {
             ChunkIt(p_node.Value);
-            Nullable<Variable> maybe_var = GetVar(p_node.assigned.Name);
+            Nullable<Variable> maybe_var = GetVar(p_node.Assigned.Name);
             Operand op = (Operand)AssignmentOperatorType.ASSIGN;
             if (maybe_var.HasValue)
             {
                 Variable this_var = maybe_var.Value;
-                if (p_node.assigned.Indexes.Count == 0)
+                if (p_node.Assigned.Indexes.Count == 0)
                 {
                     switch (this_var.type)
                     {
@@ -523,7 +523,7 @@ namespace lightning
                             break;
                     }
 
-                    foreach (Node n in p_node.assigned.Indexes)
+                    foreach (Node n in p_node.Assigned.Indexes)
                     {
                         if (n.GetType() != typeof(VariableNode) || (n as VariableNode).AccessType == VarAccessType.PLAIN)
                             ChunkIt(n);
@@ -534,7 +534,7 @@ namespace lightning
                         }
                     }
 
-                    Add(OpCode.TABLE_SET, (Operand)p_node.assigned.Indexes.Count, op, p_node.Line);
+                    Add(OpCode.TABLE_SET, (Operand)p_node.Assigned.Indexes.Count, op, p_node.Line);
                 }
             }
             else
@@ -546,14 +546,14 @@ namespace lightning
         private void ChunkassignmentOp(AssignmentOpNode p_node)
         {
             ChunkIt(p_node.Value);
-            Nullable<Variable> maybe_var = GetVar(p_node.assigned.Name);
+            Nullable<Variable> maybe_var = GetVar(p_node.Assigned.Name);
 
             Operand op = (Operand) p_node.Op;
 
             if (maybe_var.HasValue)
             {
                 Variable this_var = maybe_var.Value;
-                if (p_node.assigned.Indexes.Count == 0)
+                if (p_node.Assigned.Indexes.Count == 0)
                 {
                     switch (this_var.type)
                     {
@@ -586,7 +586,7 @@ namespace lightning
                             break;
                     }
 
-                    foreach (Node n in p_node.assigned.Indexes)
+                    foreach (Node n in p_node.Assigned.Indexes)
                     {
                         if (n.GetType() != typeof(VariableNode) || (n as VariableNode).AccessType == VarAccessType.PLAIN)
                             ChunkIt(n);
@@ -597,7 +597,7 @@ namespace lightning
                         }
                     }
 
-                    Add(OpCode.TABLE_SET, (Operand)p_node.assigned.Indexes.Count, op, p_node.Line);
+                    Add(OpCode.TABLE_SET, (Operand)p_node.Assigned.Indexes.Count, op, p_node.Line);
                 }
             }
             else
@@ -653,8 +653,8 @@ namespace lightning
 
         private void ChunkAnonymousFunctionCall(AnonymousFunctionCallNode p_node)
         {
-            ChunkIt(p_node.declaration);
-            ChunkIt(p_node.functionCall);
+            ChunkIt(p_node.Declaration);
+            ChunkIt(p_node.FunctionCall);
         }
 
         private void ChunkFunctionCall(FunctionCallNode p_node)

@@ -279,20 +279,20 @@ namespace lightning
 
     public class AssignmentNode : Node
     {
-        public VariableNode assigned { get; private set; }
+        public VariableNode Assigned { get; private set; }
         public Node Value { get; private set; }
 
         public AssignmentNode(VariableNode p_assigned, Node p_Value, int p_Line)
         : base(NodeType.ASSIGMENT, p_Line)
         {
-            assigned = p_assigned;
+            Assigned = p_assigned;
             Value = p_Value;
         }
     }
 
     public class AssignmentOpNode : Node
     {
-        public VariableNode assigned { get; private set; }
+        public VariableNode Assigned { get; private set; }
         public Node Value { get; private set; }
 
         public AssignmentOperatorType Op { get; private set; }
@@ -300,7 +300,7 @@ namespace lightning
         public AssignmentOpNode(VariableNode p_assigned, Node p_Value, AssignmentOperatorType p_op, int p_Line)
         : base(NodeType.ASSIGMENT_OP, p_Line)
         {
-            assigned = p_assigned;
+            Assigned = p_assigned;
             Value = p_Value;
             Op = p_op;
         }
@@ -333,16 +333,16 @@ namespace lightning
     }
 
     public class AnonymousFunctionCallNode : Node{
-        public FunctionCallNode functionCall;
-        public VarDeclarationNode declaration;
-        public VariableNode variable;
+        public FunctionCallNode FunctionCall { get; private set; }
+        public VarDeclarationNode Declaration { get; private set; }
+        public VariableNode Variable { get; private set; }
 
         public AnonymousFunctionCallNode(FunctionCallNode p_functionCall, VarDeclarationNode p_declaration, VariableNode p_variable, int p_Line)
             : base (NodeType.ANONYMOUS_FUNCTION_CALL, p_Line)
         {
-            functionCall = p_functionCall;
-            declaration = p_declaration;
-            variable = p_variable;
+            FunctionCall = p_functionCall;
+            Declaration = p_declaration;
+            Variable = p_variable;
         }
     }
 
@@ -373,14 +373,14 @@ namespace lightning
 
     public class TableNode : Node
     {
-        public List<Node> elements;
-        public Dictionary<Node, Node> table;
+        public List<Node> Elements { get; private set; }
+        public Dictionary<Node, Node> Table { get; private set; }
 
         public TableNode(List<Node> p_elements, Dictionary<Node, Node> p_table, int p_Line)
             : base(NodeType.TABLE, p_Line)
         {
-            elements = p_elements;
-            table = p_table;
+            Elements = p_elements;
+            Table = p_table;
         }
     }
 

@@ -163,10 +163,10 @@ namespace lightning
         private void PrintTable(TableNode p_node)
         {
             Console.Write("[LIST ");
-            if (p_node.elements != null)
+            if (p_node.Elements != null)
             {
                 bool first = true;
-                foreach(Node n in p_node.elements)
+                foreach(Node n in p_node.Elements)
                 {
                     if (first)
                     {
@@ -179,7 +179,7 @@ namespace lightning
                         Print(n);
                     }
                 }
-                foreach(KeyValuePair<Node,Node> entry in p_node.table)
+                foreach(KeyValuePair<Node,Node> entry in p_node.Table)
                 {
                     if (first)
                     {
@@ -336,14 +336,14 @@ namespace lightning
 
         private void Printassignment(AssignmentNode p_node)
         {
-            Console.Write("[ASSIGMENT " + p_node.assigned.Name + " = ");
+            Console.Write("[ASSIGMENT " + p_node.Assigned.Name + " = ");
             Print(p_node.Value);
             Console.Write("]");
         }
 
         private void PrintassignmentOp(AssignmentOpNode p_node)
         {
-            Console.Write("[ASSIGMENT_OP " + p_node.assigned.Name);
+            Console.Write("[ASSIGMENT_OP " + p_node.Assigned.Name);
             string op;
             switch (p_node.Op) {
                 case AssignmentOperatorType.ADDITION_ASSIGN:
@@ -435,10 +435,10 @@ namespace lightning
         private void PrintAnonymousFunctionCall(AnonymousFunctionCallNode p_node)
         {
             Console.Write("[ANONYMOUS FUNCTION CALL ");
-            Print(p_node.variable);
+            Print(p_node.Variable);
 
             int counter = 0;
-            foreach (List<Node> arguments in p_node.functionCall.Calls)
+            foreach (List<Node> arguments in p_node.FunctionCall.Calls)
             {
                 Console.Write("(");
                 bool is_first = true;
@@ -456,10 +456,10 @@ namespace lightning
                     }
                 }
                 Console.Write(")");
-                if(p_node.functionCall.IndexedAccess[counter] != null)
+                if(p_node.FunctionCall.IndexedAccess[counter] != null)
                 {
                     Console.Write(".indexedAccess(");
-                    foreach(Node n in p_node.functionCall.IndexedAccess[counter].Indexes)
+                    foreach(Node n in p_node.FunctionCall.IndexedAccess[counter].Indexes)
                         Print(n);
                     Console.Write(")");
                 }

@@ -687,8 +687,8 @@ namespace lightning
 
         TableNode TableEntry(TableNode table_node)
         {
-            List<Node> elements = table_node.elements;
-            Dictionary<Node, Node> table = table_node.table;
+            List<Node> elements = table_node.Elements;
+            Dictionary<Node, Node> table = table_node.Table;
             if (Match(TokenType.IDENTIFIER))
             {
                 Node item = new LiteralNode((Previous() as TokenString).value, Previous().Line);
