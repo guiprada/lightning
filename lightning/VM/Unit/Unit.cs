@@ -366,7 +366,6 @@ namespace lightning
                         case UnitType.Null:
                         case UnitType.Boolean:
                             return 1;
-                        case UnitType.String:
                         default:
                             return -1;
                     }
@@ -380,7 +379,6 @@ namespace lightning
                         case UnitType.Null:
                         case UnitType.Boolean:
                             return 1;
-                        case UnitType.String:
                         default:
                             return -1;
                     }
@@ -388,7 +386,6 @@ namespace lightning
                     switch(other_type){
                         case UnitType.Null:
                             return 0;
-                        case UnitType.String:
                         default:
                             return -1;
                     }
@@ -402,12 +399,13 @@ namespace lightning
                             return 1;
                         case UnitType.Boolean:
                             return boolValue.CompareTo(other.boolValue);
-                        case UnitType.String:
                         default:
                             return -1;
                     }
                 case UnitType.String:
                     return ((StringUnit)this.heapUnitValue).CompareTo(compareTo);
+                case UnitType.Table:
+                    return ((TableUnit)this.heapUnitValue).CompareTo(compareTo);
                 default:
                     switch(other_type){
                         case UnitType.Float:
@@ -420,7 +418,9 @@ namespace lightning
                             return 1;
                         case UnitType.Boolean:
                             return 1;
+                        case UnitType.Table:
                         case UnitType.String:
+                            return -1;
                         default:
                             return 0;
                     }
