@@ -1,6 +1,5 @@
 ﻿todo
-	fix open parentheses after call turns into compoundCall
-
+	Remove add for things other than numbers
 	nuples to call and return from try
 	properties, protected indexes and operator override
 	anonimous assignment compound Grouping/expression
@@ -125,3 +124,4 @@ done
 	- Compiler diferentiates Integer and Float literals
 	- add makeNumericIterator
 	- added ASSIGN_IMPORTED_CONSTANT
+	- Added chained function calls(fix open parentheses after call turns into compoundCall)
