@@ -152,6 +152,9 @@ namespace lightning
                 case NodeType.FUNCTION_CALL:
                     ChunkFunctionCall(p_node as FunctionCallNode);
                     break;
+                case NodeType.ANONYMOUS_FUNCTION_CALL:
+                    ChunkAnonymousFunctionCall(p_node as AnonymousFunctionCallNode);
+                    break;
                 case NodeType.RETURN:
                     ChunkReturn(p_node as ReturnNode);
                     break;
@@ -646,6 +649,12 @@ namespace lightning
                 ChunkIt(n);
             env.RemoveAt(env.Count - 1);
             Add(OpCode.CLOSE_ENV, p_node.Line);
+        }
+
+        private void ChunkAnonymousFunctionCall(AnonymousFunctionCallNode p_node)
+        {
+            ChunkIt(p_node.declaration);
+            ChunkIt(p_node.functionCall);
         }
 
         private void ChunkFunctionCall(FunctionCallNode p_node)

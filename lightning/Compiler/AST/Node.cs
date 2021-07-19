@@ -34,8 +34,10 @@ namespace lightning
 
         BLOCK,
         FUNCTION_CALL,
+        ANONYMOUS_FUNCTION_CALL,
         FUNCTION_DECLARATION,
         FUNCTION_EXPRESSION,
+
         RETURN,
         PROGRAM,
     }
@@ -327,6 +329,20 @@ namespace lightning
             : base(NodeType.BLOCK, p_Line)
         {
             Statements = p_Statements;
+        }
+    }
+
+    public class AnonymousFunctionCallNode : Node{
+        public FunctionCallNode functionCall;
+        public VarDeclarationNode declaration;
+        public VariableNode variable;
+
+        public AnonymousFunctionCallNode(FunctionCallNode p_functionCall, VarDeclarationNode p_declaration, VariableNode p_variable, int p_Line)
+            : base (NodeType.ANONYMOUS_FUNCTION_CALL, p_Line)
+        {
+            functionCall = p_functionCall;
+            declaration = p_declaration;
+            variable = p_variable;
         }
     }
 

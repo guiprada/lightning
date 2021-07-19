@@ -94,7 +94,6 @@ namespace lightning
             int line = last_token.Line;
 
             return IndexedAccess(name, line);
-
         }
 
         Node IndexedAccess(string name, int line) {
@@ -616,13 +615,41 @@ namespace lightning
                 List<VariableNode> indexed_access = new List<VariableNode>();
                 FunctionCallNode function_call_node = new FunctionCallNode(
                     (maybe_func as VariableNode),
-                    calls, indexed_access,
+                    calls,
+                    indexed_access,
                     maybe_func.Line);
                 function_call_node = FinishFunctionCall(function_call_node);
                 return function_call_node;
             }
-
+            if(Check(TokenType.COLON)){
+                return AnonymousFunctionCall((LiteralNode)maybe_func);
+            }
             return maybe_func;
+        }
+
+        Node AnonymousFunctionCall(LiteralNode node){
+            if(Check(TokenType.COLON))
+            {
+
+                string name = "*_" + node.Value.ToString() + "_" + node.Value.GetHashCode();
+
+                VarDeclarationNode declaration_node = new VarDeclarationNode(name, node, node.Line);
+
+                VariableNode variableNode = (VariableNode)IndexedAccess(name, node.Line);
+
+                List<List<Node>> calls = new List<List<Node>>();
+                List<VariableNode> indexed_access = new List<VariableNode>();
+                FunctionCallNode function_call_node = new FunctionCallNode(
+                    variableNode,
+                    calls,
+                    indexed_access,
+                    node.Line);
+
+                function_call_node = FinishFunctionCall(function_call_node);
+                return new AnonymousFunctionCallNode(function_call_node, declaration_node, variableNode, node.Line);
+            }
+            Error("Expected ':' after anonymous function call.");
+            return node;
         }
 
         FunctionCallNode FinishFunctionCall(FunctionCallNode function_call_node)

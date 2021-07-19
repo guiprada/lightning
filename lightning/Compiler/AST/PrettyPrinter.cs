@@ -64,6 +64,9 @@ namespace lightning
                 case NodeType.FUNCTION_CALL:
                     PrintFunctionCall(p_node as FunctionCallNode);
                     break;
+                case NodeType.ANONYMOUS_FUNCTION_CALL:
+                    PrintAnonymousFunctionCall(p_node as AnonymousFunctionCallNode);
+                    break;
                 case NodeType.RETURN:
                     PrintReturn(p_node as ReturnNode);
                     break;
@@ -419,8 +422,44 @@ namespace lightning
                 Console.Write(")");
                 if(p_node.IndexedAccess[counter] != null)
                 {
-                    Console.Write(".getVar(");
+                    Console.Write(".indexedAccess(");
                     foreach(Node n in p_node.IndexedAccess[counter].Indexes)
+                        Print(n);
+                    Console.Write(")");
+                }
+                counter++;
+            }
+            Console.Write("]");
+        }
+
+        private void PrintAnonymousFunctionCall(AnonymousFunctionCallNode p_node)
+        {
+            Console.Write("[ANONYMOUS FUNCTION CALL ");
+            Print(p_node.variable);
+
+            int counter = 0;
+            foreach (List<Node> arguments in p_node.functionCall.Calls)
+            {
+                Console.Write("(");
+                bool is_first = true;
+                foreach (Node n in arguments)
+                {
+                    if (is_first)
+                    {
+                        Print(n);
+                        is_first = false;
+                    }
+                    else
+                    {
+                        Print(n);
+                        Console.Write(", ");
+                    }
+                }
+                Console.Write(")");
+                if(p_node.functionCall.IndexedAccess[counter] != null)
+                {
+                    Console.Write(".indexedAccess(");
+                    foreach(Node n in p_node.functionCall.IndexedAccess[counter].Indexes)
                         Print(n);
                     Console.Write(")");
                 }
