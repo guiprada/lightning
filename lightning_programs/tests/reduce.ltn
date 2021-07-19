@@ -1,0 +1,46 @@
+var assert_counter = require("assert_counter.ltn")
+var assert = assert_counter.assert
+var assert_not = assert_counter.assert_not
+
+{
+    // Testing reduce
+    var n = 100
+    var table1 = table.list_new(n)
+
+    function many(index, collection, accumulator)
+    {
+		var this = collection[index] = []
+        this.x = 1
+		accumulator.sum += this.x
+    }
+
+    var accumulator = reduce(table1, many)
+    for (var i = 0; i<n; i++)
+    {
+        assert(table1[i].x, 1, "Failed reduce Test 1, iteration:" + i + ".")
+    }
+	assert(accumulator.sum, 100, "Failed reduce Test 2.")
+
+    // table1 = table.list_new(n)
+    // function many_number(index, collection)
+    // {
+    //     collection[index] = 1
+    // }
+    // map(table1, many_number)
+    // for (var i = 0; i<n; i++)
+    // {
+    //     assert(table1[i], 1, "Failed map Test 2, iteration: " + i + ".")
+    // }
+
+    // table1 = table.list_new(n)
+    // map(table1, function(index, collection)
+    // {
+    //     collection[index] = 100 - index
+    // })
+    // for (var i = 0; i<n; i++)
+    // {
+    //     assert(table1[i], n - i, "Failed map Test 3, iteration: " + i + ".")
+    // }
+}
+
+return assert_counter.get_error_counter()

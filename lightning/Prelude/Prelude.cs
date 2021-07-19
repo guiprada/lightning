@@ -1362,6 +1362,29 @@ namespace lightning
             }
 
             functions.Add(new IntrinsicUnit("rmap", RangeMap, 3));
+            //////////////////////////////////////////////////////
+            Unit Reduce(VM vm)
+            {
+                TableUnit table = vm.GetTable(0);
+                Unit func = vm.GetUnit(1);
+
+                VM map_vm = vm.GetParallelVM();
+
+                Unit accumulator = new Unit(new TableUnit(null, null, null));
+                for(int index=0; index<table.ECount; index++){
+                    List<Unit> args = new List<Unit>();
+                    args.Add(new Unit(index));
+                    args.Add(new Unit(table));
+                    args.Add(accumulator);
+                    map_vm.CallFunction(func, args);
+                }
+
+                vm.RecycleVM(map_vm);
+
+                return accumulator;
+            }
+
+            functions.Add(new IntrinsicUnit("reduce", Reduce, 2));
 
             //////////////////////////////////////////////////////
             Unit GetOS(VM vm)

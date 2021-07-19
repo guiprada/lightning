@@ -8,9 +8,10 @@ var assert_not = assert_counter.assert_not
 
     function many(index, collection)
     {
-        collection[index] = []
-        collection[index].x = 1
+		var this = collection[index] = []
+        this.x = 1
     }
+
     map(table1, many)
     for (var i = 0; i<n; i++)
     {

@@ -6,23 +6,23 @@ var assert_not = assert_counter.assert_not
     var n = 100
     var table1 = table.list_new(n)
 
-    function many(index, collection)
+    function init(index, collection)
     {
         collection[index] = []
         collection[index].x = 1
     }
-    pmap(table1, many)
+    pmap(table1, init)
     for (var i = 0; i<n; i++)
     {
         assert(table1[i].x, 1, "Failed pmap Test 1, iteration:" + i + ".")
     }
 
     table1 = table.list_new(n)
-    function many_number(index, collection)
+    function init_number(index, collection)
     {
         collection[index] = 1
     }
-    pmap(table1, many_number)
+    pmap(table1, init_number)
     for (var i = 0; i<n; i++)
     {
         assert(table1[i], 1, "Failed pmap Test 2, iteration: " + i + ".")
