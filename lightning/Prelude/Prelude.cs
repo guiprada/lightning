@@ -1273,9 +1273,30 @@ namespace lightning
                     return second;
             }
             functions.Add(new IntrinsicUnit("maybe", Maybe, 2));
+            //////////////////////////////////////////////////////
+            Unit Map(VM vm)
+            {
+                TableUnit table = vm.GetTable(0);
+                Unit func = vm.GetUnit(1);
+
+                VM map_vm = vm.GetParallelVM();
+
+                for(int index=0; index<table.ECount; index++){
+                    List<Unit> args = new List<Unit>();
+                    args.Add(new Unit(index));
+                    args.Add(new Unit(table));
+                    map_vm.CallFunction(func, args);
+                }
+
+                vm.RecycleVM(map_vm);
+
+                return new Unit(UnitType.Null);
+            }
+
+            functions.Add(new IntrinsicUnit("map", Map, 2));
 
             //////////////////////////////////////////////////////
-            Unit ForEach(VM vm)
+            Unit ParallelMap(VM vm)
             {
                 TableUnit table = vm.GetTable(0);
                 Unit func = vm.GetUnit(1);
@@ -1301,10 +1322,10 @@ namespace lightning
                 return new Unit(UnitType.Null);
             }
 
-            functions.Add(new IntrinsicUnit("for_each", ForEach, 2));
+            functions.Add(new IntrinsicUnit("pmap", ParallelMap, 2));
             //////////////////////////////////////////////////////
 
-            Unit ForRange(VM vm)
+            Unit RangeMap(VM vm)
             {
                 Integer n_tasks = vm.GetInteger(0);
                 TableUnit table = vm.GetTable(1);
@@ -1340,7 +1361,7 @@ namespace lightning
                 return new Unit(UnitType.Null);
             }
 
-            functions.Add(new IntrinsicUnit("for_range", ForRange, 3));
+            functions.Add(new IntrinsicUnit("rmap", RangeMap, 3));
 
             //////////////////////////////////////////////////////
             Unit GetOS(VM vm)

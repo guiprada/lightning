@@ -22,8 +22,9 @@ var errors = 0
 errors += require("tests/assert.ltn")
 errors += require("tests/numbers.ltn")
 errors += require("tests/strings.ltn")
-errors += require("tests/for_each.ltn")
-
+errors += require("tests/pmap.ltn")
+errors += require("tests/rmap.ltn")
+errors += require("tests/map.ltn")
 
 /////// old
 var assert = lib_assert_counter.assert
@@ -476,42 +477,6 @@ var assert_not = lib_assert_counter.assert_not
     i-=10
     assert(i, -5, "Failed ASSIGN_VARIABLE Ops Test 4.")
 }
-{
-    // Testing for_range
-    var n = 100
-    var table1 = []
-    table.list_init(table1, n)
-    function many_for (start, end, this_table)
-    {
-        for (var i = start; i<end; i++)
-        {
-            this_table[i] = i
-        }
-    }
-    for_range(6, table1, many_for)
-    for (var i = 0; i<n; i++)
-    {
-        assert(table1[i], i, "Failed for_range Test 1, iteration: " + i + ".")
-    }
-
-    for_range(1, table1, many_for)
-    for (var i = 0; i<n; i++)
-    {
-        assert(table1[i], i, "Failed for_range Test 2, iteration: " + i + ".")
-    }
-
-    for_range(3, table1, many_for)
-    for (var i = 0; i<n; i++)
-    {
-        assert(table1[i], i, "Failed for_range Test 3, iteration: " + i + ".")
-    }
-
-    for_range(200, table1, many_for)
-    for (var i = 0; i<n; i++)
-    {
-        assert(table1[i], i, "Failed for_range Test 4, iteration: " + i + ".")
-    }
-}
 
 // Testing Global Lock
 var global_lock_test_counter = 5
@@ -521,7 +486,7 @@ var global_lock_test_counter = 5
     {
         global_lock_test_counter++;
     }
-    for_range(n, [], many)
+    rmap(n, [], many)
     assert(global_lock_test_counter, n + 5, "Failed Global Lock Test 1.")
 }
 {
@@ -532,7 +497,7 @@ var global_lock_test_counter = 5
     {
         upvalue_lock_test_counter++;
     }
-    for_range(n, [], many)
+    rmap(n, [], many)
     assert(upvalue_lock_test_counter, n + 5, "Failed UpValue Lock Test 1.")
 }
 {

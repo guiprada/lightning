@@ -2,7 +2,7 @@ var assert_counter = require("assert_counter.ltn")
 var assert = assert_counter.assert
 var assert_not = assert_counter.assert_not
 {
-    // Testing for_each
+    // Testing pmap
     var n = 100
     var table1 = table.list_new(n)
 
@@ -11,11 +11,10 @@ var assert_not = assert_counter.assert_not
         collection[index] = []
         collection[index].x = 1
     }
-    for_each(table1, many)
-    write_line("table" .. table1)
+    pmap(table1, many)
     for (var i = 0; i<n; i++)
     {
-        assert(table1[i].x, 1, "Failed for_each Test 1, iteration:" + i + ".")
+        assert(table1[i].x, 1, "Failed pmap Test 1, iteration:" + i + ".")
     }
 
     table1 = table.list_new(n)
@@ -23,20 +22,20 @@ var assert_not = assert_counter.assert_not
     {
         collection[index] = 1
     }
-    for_each(table1, many_number)
+    pmap(table1, many_number)
     for (var i = 0; i<n; i++)
     {
-        assert(table1[i], 1, "Failed for_each Test 2, iteration: " + i + ".")
+        assert(table1[i], 1, "Failed pmap Test 2, iteration: " + i + ".")
     }
 
     table1 = table.list_new(n)
-    for_each(table1, function(index, collection)
+    pmap(table1, function(index, collection)
     {
         collection[index] = 100 - index
     })
     for (var i = 0; i<n; i++)
     {
-        assert(table1[i], n - i, "Failed for_each Test 3, iteration: " + i + ".")
+        assert(table1[i], n - i, "Failed pmap Test 3, iteration: " + i + ".")
     }
 }
 return assert_counter.get_error_counter()

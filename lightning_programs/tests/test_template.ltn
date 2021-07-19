@@ -1,0 +1,5 @@
+var assert_counter = require("assert_counter.ltn")
+var assert = assert_counter.assert
+var assert_not = assert_counter.assert_not
+
+return assert_counter.get_error_counter()
