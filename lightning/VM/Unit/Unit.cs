@@ -403,9 +403,21 @@ namespace lightning
                             return -1;
                     }
                 case UnitType.String:
-                    return ((StringUnit)this.heapUnitValue).CompareTo(compareTo);
+                    // return ((StringUnit)this.heapUnitValue).CompareTo(compareTo);
                 case UnitType.Table:
-                    return ((TableUnit)this.heapUnitValue).CompareTo(compareTo);
+                    // return ((TableUnit)this.heapUnitValue).CompareTo(compareTo);
+                case UnitType.Function:
+                    // return ((FunctionUnit)this.heapUnitValue).CompareTo(compareTo);
+                case UnitType.Intrinsic:
+                    // return ((IntrinsicUnit)this.heapUnitValue).CompareTo(compareTo);
+                case UnitType.Closure:
+                    // return ((ClosureUnit)this.heapUnitValue).CompareTo(compareTo);
+                case UnitType.UpValue:
+                    // return ((UpValueUnit)this.heapUnitValue).CompareTo(compareTo);
+                case UnitType.Module:
+                    // return ((ModuleUnit)this.heapUnitValue).CompareTo(compareTo);
+                case UnitType.Wrapper:
+                    return (this.heapUnitValue).CompareTo(compareTo);
                 default:
                     switch(other_type){
                         case UnitType.Float:
@@ -418,6 +430,10 @@ namespace lightning
                             return 1;
                         case UnitType.Boolean:
                             return 1;
+                        case UnitType.UpValue:
+                        case UnitType.Closure:
+                        case UnitType.Intrinsic:
+                        case UnitType.Function:
                         case UnitType.Table:
                         case UnitType.String:
                             return -1;

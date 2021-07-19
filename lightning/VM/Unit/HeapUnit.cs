@@ -38,6 +38,8 @@ namespace lightning
         public abstract override int GetHashCode();
         public abstract Unit Get(Unit p_key);
         public abstract void Set(Unit p_key, Unit p_value);
+
+        public abstract int CompareTo(object compareTo);
     }
 
     public class TypeUnit : HeapUnit{
@@ -74,7 +76,7 @@ namespace lightning
                 return "Unknown UnitType";
         }
         public override bool ToBool(){
-            throw new Exception("Trying to get a boolean value of TypeUnit. " + VM.ErrorString(null));
+            throw new Exception("Trying to get a boolean value of TypeUnit.");
         }
 
         public override bool Equals(object other){
@@ -87,11 +89,15 @@ namespace lightning
         }
 
         public override Unit Get(Unit p_key){
-            throw new Exception("Trying to Get a Table value of TypeUnit. " + VM.ErrorString(null));
+            throw new Exception("Trying to Get a Table value of TypeUnit.");
         }
 
         public override void Set(Unit p_key, Unit p_value){
-            throw new Exception("Trying to Set a Table value of TypeUnit. " + VM.ErrorString(null));
+            throw new Exception("Trying to Set a Table value of TypeUnit.");
+        }
+
+        public override int CompareTo(object compareTo){
+            throw new Exception("Trying to compare a TypeUnit.");
         }
     }
 
@@ -134,7 +140,7 @@ namespace lightning
 
         public override bool ToBool()
         {
-            throw new Exception("Can not convert Function to Bool. " + VM.ErrorString(null));
+            throw new Exception("Can not convert Function to Bool.");
         }
 
         public override bool Equals(object other)
@@ -162,11 +168,31 @@ namespace lightning
         }
 
         public override Unit Get(Unit p_key){
-            throw new Exception("Trying to Get a Table value of FunctionUnit. " + VM.ErrorString(null));
+            throw new Exception("Trying to Get a Table value of FunctionUnit.");
         }
 
         public override void Set(Unit p_key, Unit p_value){
-            throw new Exception("Trying to Set a Table value of FunctionUnit. " + VM.ErrorString(null));
+            throw new Exception("Trying to Set a Table value of FunctionUnit.");
+        }
+
+        public override int CompareTo(object compareTo){
+            if(compareTo.GetType() != typeof(Unit))
+                throw new Exception("Trying to compare TableUnit to non Unit type");
+            Unit other = (Unit)compareTo;
+            UnitType other_type = other.Type;
+            switch(other_type){
+                case UnitType.Function:
+                    return 0;
+                case UnitType.Table:
+                case UnitType.String:
+                case UnitType.Boolean:
+                case UnitType.Char:
+                case UnitType.Float:
+                case UnitType.Integer:
+                    return 1;
+                default:
+                    return -1;
+            }
         }
     }
 
@@ -196,7 +222,7 @@ namespace lightning
 
         public override bool ToBool()
         {
-            throw new Exception("Can not convert Intrinsic to Bool. " + VM.ErrorString(null));
+            throw new Exception("Can not convert Intrinsic to Bool.");
         }
 
         public override bool Equals(object other)
@@ -222,11 +248,32 @@ namespace lightning
         }
 
         public override Unit Get(Unit p_key){
-            throw new Exception("Trying to Get a Table value of IntrinsicUnit. " + VM.ErrorString(null));
+            throw new Exception("Trying to Get a Table value of IntrinsicUnit.");
         }
 
         public override void Set(Unit p_key, Unit p_value){
-            throw new Exception("Trying to Set a Table value of IntrinsicUnit. " + VM.ErrorString(null));
+            throw new Exception("Trying to Set a Table value of IntrinsicUnit.");
+        }
+
+        public override int CompareTo(object compareTo){
+            if(compareTo.GetType() != typeof(Unit))
+                throw new Exception("Trying to compare TableUnit to non Unit type");
+            Unit other = (Unit)compareTo;
+            UnitType other_type = other.Type;
+            switch(other_type){
+                case UnitType.Intrinsic:
+                    return 0;
+                case UnitType.Function:
+                case UnitType.Table:
+                case UnitType.String:
+                case UnitType.Boolean:
+                case UnitType.Char:
+                case UnitType.Float:
+                case UnitType.Integer:
+                    return 1;
+                default:
+                    return -1;
+            }
         }
     }
 
@@ -259,7 +306,7 @@ namespace lightning
 
         public override bool ToBool()
         {
-            throw new Exception("Can not convert Clojure to Bool. " + VM.ErrorString(null));
+            throw new Exception("Can not convert Clojure to Bool.");
         }
 
         public override bool Equals(object other)
@@ -285,11 +332,33 @@ namespace lightning
         }
 
         public override Unit Get(Unit p_key){
-            throw new Exception("Trying to Get a Table value of ClosureUnit. " + VM.ErrorString(null));
+            throw new Exception("Trying to Get a Table value of ClosureUnit.");
         }
 
         public override void Set(Unit p_key, Unit p_value){
-            throw new Exception("Trying to Set a Table value of ClosureUnit. " + VM.ErrorString(null));
+            throw new Exception("Trying to Set a Table value of ClosureUnit.");
+        }
+
+        public override int CompareTo(object compareTo){
+            if(compareTo.GetType() != typeof(Unit))
+                throw new Exception("Trying to compare TableUnit to non Unit type");
+            Unit other = (Unit)compareTo;
+            UnitType other_type = other.Type;
+            switch(other_type){
+                case UnitType.Closure:
+                    return 0;
+                case UnitType.Intrinsic:
+                case UnitType.Function:
+                case UnitType.Table:
+                case UnitType.String:
+                case UnitType.Boolean:
+                case UnitType.Char:
+                case UnitType.Float:
+                case UnitType.Integer:
+                    return 1;
+                default:
+                    return -1;
+            }
         }
     }
 
@@ -378,11 +447,34 @@ namespace lightning
         }
 
         public override Unit Get(Unit p_key){
-            throw new Exception("Trying to Get a Table value of UpValueUnit. " + VM.ErrorString(null));
+            throw new Exception("Trying to Get a Table value of UpValueUnit.");
         }
 
         public override void Set(Unit p_key, Unit p_value){
-            throw new Exception("Trying to Set a Table value of UpValueUnit. " + VM.ErrorString(null));
+            throw new Exception("Trying to Set a Table value of UpValueUnit.");
+        }
+
+        public override int CompareTo(object compareTo){
+            if(compareTo.GetType() != typeof(Unit))
+                throw new Exception("Trying to compare TableUnit to non Unit type");
+            Unit other = (Unit)compareTo;
+            UnitType other_type = other.Type;
+            switch(other_type){
+                case UnitType.UpValue:
+                    return 0;
+                case UnitType.Closure:
+                case UnitType.Intrinsic:
+                case UnitType.Function:
+                case UnitType.Table:
+                case UnitType.String:
+                case UnitType.Boolean:
+                case UnitType.Char:
+                case UnitType.Float:
+                case UnitType.Integer:
+                    return 1;
+                default:
+                    return -1;
+            }
         }
     }
 
@@ -421,7 +513,7 @@ namespace lightning
 
         public override bool ToBool()
         {
-            throw new Exception("Can not convert Module to Bool. " + VM.ErrorString(null));
+            throw new Exception("Can not convert Module to Bool.");
         }
 
         public override bool Equals(object other)
@@ -457,7 +549,31 @@ namespace lightning
             if(Table.ContainsKey(p_key)){
                 return Table[p_key];
             }else{
-                throw new Exception("Module Table does not contain index: " + p_key.ToString());
+                throw new Exception("Module Table does not contain index:" + p_key.ToString());
+            }
+        }
+
+        public override int CompareTo(object compareTo){
+            if(compareTo.GetType() != typeof(Unit))
+                throw new Exception("Trying to compare TableUnit to non Unit type");
+            Unit other = (Unit)compareTo;
+            UnitType other_type = other.Type;
+            switch(other_type){
+                case UnitType.Module:
+                    return 0;
+                case UnitType.UpValue:
+                case UnitType.Closure:
+                case UnitType.Intrinsic:
+                case UnitType.Function:
+                case UnitType.Table:
+                case UnitType.String:
+                case UnitType.Boolean:
+                case UnitType.Char:
+                case UnitType.Float:
+                case UnitType.Integer:
+                    return 1;
+                default:
+                    return -1;
             }
         }
     }
@@ -524,7 +640,7 @@ namespace lightning
 
         public override bool ToBool()
         {
-            throw new Exception("Can not convert a Wrapper<" + typeof(T) +"> to Bool. " + VM.ErrorString(null));
+            throw new Exception("Can not convert a Wrapper<" + typeof(T) +"> to Bool.");
         }
 
         public T UnWrapp()
@@ -535,7 +651,32 @@ namespace lightning
             }
             else
             {
-                throw new Exception("UnWrapp<" + typeof(T) +">() type Error! " + VM.ErrorString(null));
+                throw new Exception("UnWrapp<" + typeof(T) +">() type Error!");
+            }
+        }
+
+        public override int CompareTo(object compareTo){
+            if(compareTo.GetType() != typeof(Unit))
+                throw new Exception("Trying to compare TableUnit to non Unit type");
+            Unit other = (Unit)compareTo;
+            UnitType other_type = other.Type;
+            switch(other_type){
+                case UnitType.Wrapper:
+                    return 0;
+                case UnitType.Module:
+                case UnitType.UpValue:
+                case UnitType.Closure:
+                case UnitType.Intrinsic:
+                case UnitType.Function:
+                case UnitType.Table:
+                case UnitType.String:
+                case UnitType.Boolean:
+                case UnitType.Char:
+                case UnitType.Float:
+                case UnitType.Integer:
+                    return 1;
+                default:
+                    return -1;
             }
         }
     }

@@ -1090,12 +1090,17 @@ namespace lightning
                 if (code_generator.HasChunked == true)
                 {
                     VM imported_vm = new VM(chunk);
-                    VMResult result = imported_vm.Run();
-                    if (result.status == VMResultType.OK)
-                    {
-                        if (result.value.Type == UnitType.Table || result.value.Type == UnitType.Function)
-                            MakeModule(result.value, eval_name, vm, imported_vm);
-                        return result.value;
+                    try{
+                        VMResult result = imported_vm.Run();
+                        if (result.status == VMResultType.OK)
+                        {
+                            if (result.value.Type == UnitType.Table || result.value.Type == UnitType.Function)
+                                MakeModule(result.value, eval_name, vm, imported_vm);
+                            return result.value;
+                        }
+                    }catch(Exception e){
+                        Console.WriteLine(e);
+                        imported_vm.Error("VM Busted ...");
                     }
                 }
                 return new Unit(UnitType.Null);
@@ -1147,12 +1152,17 @@ namespace lightning
                     if (code_generator.HasChunked == true)
                     {
                         VM imported_vm = new VM(chunk);
-                        VMResult result = imported_vm.Run();
-                        if (result.status == VMResultType.OK)
-                        {
-                            MakeModule(result.value, path, vm, imported_vm);
-                            //vm.GetChunk().Print();
-                            return result.value;
+                        try{
+                            VMResult result = imported_vm.Run();
+                            if (result.status == VMResultType.OK)
+                            {
+                                MakeModule(result.value, path, vm, imported_vm);
+                                //vm.GetChunk().Print();
+                                return result.value;
+                            }
+                        }catch(Exception e){
+                            Console.WriteLine(e);
+                            imported_vm.Error("VM Busted ...");
                         }
                     }
                 }
@@ -1313,7 +1323,12 @@ namespace lightning
                     List<Unit> args = new List<Unit>();
                     args.Add(new Unit(index));
                     args.Add(new Unit(table));
-                    vms[index].CallFunction(func, args);
+                    try{
+                        vms[index].CallFunction(func, args);
+                    }catch(Exception e){
+                        Console.WriteLine(e);
+                        vms[index].Error("VM Busted ...");
+                    }
                 });
                 for (int i = init; i < end; i++)
                 {
@@ -1352,7 +1367,12 @@ namespace lightning
                     if (range_end > count) range_end = count;
                     args.Add(new Unit(range_end));
                     args.Add(new Unit(table));
-                    vms[index].CallFunction(func, args);
+                    try{
+                        vms[index].CallFunction(func, args);
+                    }catch(Exception e){
+                        Console.WriteLine(e);
+                        vms[index].Error("VM Busted ...");
+                    }
                 });
                 for (int i = 0; i < end; i++)
                 {

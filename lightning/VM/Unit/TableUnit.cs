@@ -214,16 +214,15 @@ namespace lightning
             return Elements.GetHashCode() + Table.GetHashCode();
         }
 
-        public int CompareTo(object compareTo){
+        public override int CompareTo(object compareTo){
             if(compareTo.GetType() != typeof(Unit))
-                throw new Exception("Trying to compare StringUnit to non Unit type");
+                throw new Exception("Trying to compare TableUnit to non Unit type");
             Unit other = (Unit)compareTo;
             UnitType other_type = other.Type;
             switch(other_type){
                 case UnitType.Table:
                     return 0;
                 case UnitType.String:
-                    return 1;
                 case UnitType.Boolean:
                 case UnitType.Char:
                 case UnitType.Float:
