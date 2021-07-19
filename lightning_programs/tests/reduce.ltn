@@ -14,7 +14,8 @@ var assert_not = assert_counter.assert_not
 		accumulator.value += this.x
     }
 
-    var accumulator = reduce(table1, many)
+	var accumulator = [value:0];
+    reduce(table1, many, accumulator)
     for (var i = 0; i<n; i++)
     {
         assert(table1[i].x, 1, "Failed reduce Test 1, iteration:" + i + ".")

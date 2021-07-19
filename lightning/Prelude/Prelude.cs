@@ -1367,11 +1367,12 @@ namespace lightning
             {
                 TableUnit table = vm.GetTable(0);
                 Unit func = vm.GetUnit(1);
+                Unit accumulator = vm.GetUnit(2);
 
                 VM map_vm = vm.GetParallelVM();
 
-                Unit accumulator = new Unit(new TableUnit(null, null, null));
-                accumulator.heapUnitValue.Set(new Unit("value"), new Unit((Integer)0));
+                // Unit accumulator = new Unit(new TableUnit(null, null, null));
+                // accumulator.heapUnitValue.Set(new Unit("value"), new Unit((Integer)0));
                 for(int index=0; index<table.ECount; index++){
                     List<Unit> args = new List<Unit>();
                     args.Add(new Unit(index));
