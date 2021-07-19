@@ -891,12 +891,13 @@ namespace lightning
             Add(OpCode.RETURN_SET, 0, line);
 
             Operand arity = 0;
-            foreach (string p in p_node.Parameters)
-            {
-                SetVar(p);// it is always local
-                Add(OpCode.DECLARE_VARIABLE, line);
-                arity++;
-            }
+            if(p_node.Parameters != null)
+                foreach (string p in p_node.Parameters)
+                {
+                    SetVar(p);// it is always local
+                    Add(OpCode.DECLARE_VARIABLE, line);
+                    arity++;
+                }
 
             upvalueStack.Push(new List<Variable>());
             foreach (Node n in p_node.Body)

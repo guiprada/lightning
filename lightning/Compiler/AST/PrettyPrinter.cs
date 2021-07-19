@@ -484,18 +484,19 @@ namespace lightning
             IdentPlus();
             Console.Write("\n" + identString + "[FUNCTION EXPRESSION (");
             bool is_first = true;
-            foreach (string n in p_node.Parameters)
-            {
-                if (is_first)
+            if(p_node.Parameters != null)
+                foreach (string n in p_node.Parameters)
                 {
-                    Console.Write(n);
-                    is_first = false;
+                    if (is_first)
+                    {
+                        Console.Write(n);
+                        is_first = false;
+                    }
+                    else
+                    {
+                        Console.Write(", " + n);
+                    }
                 }
-                else
-                {
-                    Console.Write(", " + n);
-                }
-            }
             Console.WriteLine(")");
             IdentPlus();
             foreach (Node n in p_node.Body)
@@ -511,18 +512,20 @@ namespace lightning
         {
             Console.Write(identString + "[FUNCTION DECLARATION " + p_node.Name + " (");
             bool is_first = true;
-            foreach (string n in p_node.Parameters)
-            {
-                if (is_first)
+
+            if(p_node.Parameters != null)
+                foreach (string n in p_node.Parameters)
                 {
-                    Console.Write(n);
-                    is_first = false;
+                    if (is_first)
+                    {
+                        Console.Write(n);
+                        is_first = false;
+                    }
+                    else
+                    {
+                        Console.Write(", " + n);
+                    }
                 }
-                else
-                {
-                    Console.Write(", " + n);
-                }
-            }
             Console.WriteLine(")");
             IdentPlus();
             foreach (Node n in p_node.Body)

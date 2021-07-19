@@ -10,7 +10,6 @@ var assert_not = assert_counter.assert_not
     assert_not(1,1," OK!")
 
     if (assert_counter.get_error_counter() == 2){
-        write_line("Reseted error count.")
         assert_counter.reset_error_counter()
     }else{
         write_line("Assertion functions are insane!")

@@ -94,6 +94,22 @@ var assert_not = lib_assert_counter.assert_not
 	    return (a+b)/c;
     }
     assert(lambda(1,2,3), 1, "Failed Lambda test 1.")
+
+    lambda = \(a, b, c)
+    {
+	    return (a+b)/c;
+    }
+    assert(lambda(1,2,3), 1, "Failed Lambda test 2.")
+
+    lambda = \{
+        return 1
+    }
+    assert(lambda(), 1, "Failed Lambda test 3.")
+
+    lambda = function{
+        return 1
+    }
+    assert(lambda(), 1, "Failed Lambda test 4.")
 }
 {
     // Testing closures
@@ -747,34 +763,35 @@ a"
     teste = ('e' + "eo":char_at(1)):char_at(0) + "eo":char_at(1)
     assert("eo", teste, "Failed Anonymous Function Call Test 2.")
 }
+{
+    var array1
+    var a = 1
+    var success = try(\(array){
+        write_line(array[0])
+        a = 2
+    }, ["oi", "mundo"])
+    assert(a, 1, "Failed Try() Test 1.")
 
+    success = try(\{
+        write_line(array1[0])
+        a = 2
+    }, ["oi", "mundo"])
+    assert(a, 1, "Failed Try() Test 2.")
+}
+//////////////////////////////// scratch
+
+
+//////////////////////////////// end scratch
 machine.trim()
 
-write_line("")
 if (errors == 0){
     write_line("No errors found! :)")
 }
 else{
+    write(new_line())
     write_line(":( " + errors + " errors found!")
 }
 write_line("-- Finished tests! --")
 write_line("Elapsed time: " + start_time:elapsed() + " ms")
 write_line("Loaded modules: " + machine.modules())
-write_line(machine.memory_use())
-
-//////////////////////////////// scratch
-
-var array1
-var a = 1
-var success = try(\(text, more_text){
-    write_line(text)
-    write_line(more_text)
-    write_line(array1[0])
-    a = 2
-}, ["oi", "mundo"])
-
-write_line("success: " .. success .. " a: " .. a)
-if(!success)
-    write_line("recovered")
-
 write_line(machine.memory_use())

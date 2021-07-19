@@ -162,10 +162,13 @@ namespace lightning
 
         Node FunExpr()
         {
-            Token fun = Consume(TokenType.FUN, "Expected 'function' to start 'function expression'.", true);
-            Consume(TokenType.LEFT_PAREN, "Expected '(' after 'function expression'.", true);
+            Token function_token = Consume(TokenType.FUN, "Expected 'function' to start 'function expression'.", true);
+            int line = function_token.Line;
 
-            List<string> parameters = Parameters();
+            List<string> parameters = null;
+            if(Match(TokenType.LEFT_PAREN)){
+                parameters = Parameters();
+            }
 
             Node body = Statement();
             List<Node> statements;
@@ -181,21 +184,19 @@ namespace lightning
 
             if (statements.Count == 0 || statements[^1].GetType() != typeof(ReturnNode))
             {
-                statements.Add(new ReturnNode(null, fun.Line));
+                statements.Add(new ReturnNode(null, line));
             }
 
-            if (parameters == null) Error("parameters null");
-            if (statements == null) Error("statements null");
-            if (fun == null) Error("fun null");
-            return new FunctionExpressionNode(parameters, statements, fun.Line);
+            return new FunctionExpressionNode(parameters, statements, line);
         }
 
         Node FunctionDeclaration()
         {
             TokenString name = Consume(TokenType.IDENTIFIER, "Expected 'function identifier'.", true) as TokenString;
-            Consume(TokenType.LEFT_PAREN, "Expected '(' after 'function declaration'.", true);
 
-            List<string> parameters = Parameters();
+            List<string> parameters = null;
+            if(Match(TokenType.LEFT_PAREN))
+                parameters = Parameters();
 
             Node body = Statement();
             List<Node> statements;
@@ -213,7 +214,6 @@ namespace lightning
             {
                 statements.Add(new ReturnNode(null, name.Line));
             }
-
 
             return new FunctionDeclarationNode(name.value, parameters, statements, name.Line);
         }
