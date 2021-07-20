@@ -492,6 +492,24 @@ namespace lightning
                 table.Set("list_sort", new IntrinsicUnit("list_sort", ListSort, 1));
 
                 //////////////////////////////////////////////////////
+                var rng = new Random();
+                Unit ListShuffle(VM vm)
+                {
+                    TableUnit listUnit = vm.GetTable(0);
+                    List<Unit> list = listUnit.Elements;
+                    int n = list.Count;
+                    for(int i=0; i<list.Count; i++){
+                        int rand_position = rng.Next(n);
+                        Unit swap = list[rand_position];
+                        list[rand_position] = list[i];
+                        list[i] = swap;
+                    }
+
+                    return new Unit(UnitType.Null);
+                }
+                table.Set("list_shuffle", new IntrinsicUnit("list_shuffle", ListShuffle, 1));
+
+                //////////////////////////////////////////////////////
 
                 Unit ListMakeIndexesIterator(VM vm)
                 {

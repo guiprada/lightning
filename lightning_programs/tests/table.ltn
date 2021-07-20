@@ -165,5 +165,45 @@ var assert_not = assert_counter.assert_not
     for(var i=0; i<(table.list_count(this_list)); i++){
         assert(this_list[i], ordered_list[i], "Failed List Sort Test 2 iteration: " .. (i+1) ..".")
     }
+
+    var a_function = \return 0
+    var a_intrinsic = write_line
+    var a = 1
+    var a_closure = \{return a}
+    var a_table = [1,1]
+    var a_module = require("assert.ltn")
+    var a_wrapper = time.now()
+
+    //this_list = [1, 1.5, null, true, "a_string", 'A', a_function, a_intrinsic, a_closure, a_table, a_module, a_wrapper]
+    this_list = []
+    table.push(this_list, 1)
+    table.push(this_list, 1.5)
+    table.push(this_list, null)
+    table.push(this_list, true)
+    table.push(this_list, "a_string")
+    table.push(this_list, 'A')
+    table.push(this_list, a_function)
+    table.push(this_list, a_intrinsic)
+    table.push(this_list, a_closure)
+    table.push(this_list, a_table)
+    table.push(this_list, a_module)
+    table.push(this_list, a_wrapper)
+
+    table.list_sort(this_list)
+    var sorted_list  = table.clone(this_list)
+
+    for(var i=1; i<=10; i++){
+        table.list_shuffle(this_list)
+        table.list_sort(this_list)
+        for(var j=0; j<table.list_count(this_list); j++){
+            assert(this_list[j], sorted_list[j], "Failed list sort test 1, iteration: " .. i )
+        }
+    }
+
+
+    // this_list = ["a_string"]
+    // table.push(this_list, a_function)
+    // table.list_sort(this_list)
+    // write_line(this_list)
 }
 return assert_counter.get_error_counter()

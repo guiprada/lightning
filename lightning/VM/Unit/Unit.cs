@@ -359,7 +359,12 @@ namespace lightning
                 case UnitType.Integer:
                     switch(other_type){
                         case UnitType.Float:
-                            return integerValue.CompareTo(other.floatValue);
+                            if(this.integerValue > other.floatValue)
+                                return 1;
+                            else if(this.integerValue < other.floatValue)
+                                return -1;
+                            else
+                                return 0;
                         case UnitType.Integer:
                             return integerValue.CompareTo(other.integerValue);
                         case UnitType.Char:
@@ -393,8 +398,8 @@ namespace lightning
                     switch(other_type){
                         case UnitType.Float:
                         case UnitType.Integer:
-                            return -1;
                         case UnitType.Char:
+                            return -1;
                         case UnitType.Null:
                             return 1;
                         case UnitType.Boolean:
@@ -403,43 +408,16 @@ namespace lightning
                             return -1;
                     }
                 case UnitType.String:
-                    // return ((StringUnit)this.heapUnitValue).CompareTo(compareTo);
                 case UnitType.Table:
-                    // return ((TableUnit)this.heapUnitValue).CompareTo(compareTo);
                 case UnitType.Function:
-                    // return ((FunctionUnit)this.heapUnitValue).CompareTo(compareTo);
                 case UnitType.Intrinsic:
-                    // return ((IntrinsicUnit)this.heapUnitValue).CompareTo(compareTo);
                 case UnitType.Closure:
-                    // return ((ClosureUnit)this.heapUnitValue).CompareTo(compareTo);
                 case UnitType.UpValue:
-                    // return ((UpValueUnit)this.heapUnitValue).CompareTo(compareTo);
                 case UnitType.Module:
-                    // return ((ModuleUnit)this.heapUnitValue).CompareTo(compareTo);
                 case UnitType.Wrapper:
                     return (this.heapUnitValue).CompareTo(compareTo);
                 default:
-                    switch(other_type){
-                        case UnitType.Float:
-                            return 1;
-                        case UnitType.Integer:
-                            return 1;
-                        case UnitType.Char:
-                            return 1;
-                        case UnitType.Null:
-                            return 1;
-                        case UnitType.Boolean:
-                            return 1;
-                        case UnitType.UpValue:
-                        case UnitType.Closure:
-                        case UnitType.Intrinsic:
-                        case UnitType.Function:
-                        case UnitType.Table:
-                        case UnitType.String:
-                            return -1;
-                        default:
-                            return 0;
-                    }
+                    throw new Exception("Trying to compare a Unit to unkown UnitType.");
             }
         }
         public static bool IsNumeric(Unit p_value){

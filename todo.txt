@@ -1,20 +1,22 @@
 ﻿todo
-	Remove add for things other than numbers
+	fix bug in instantiate variables in literal tables
+	list sort tests
+	table class
+	nuple type
 	nuples to call and return from try
 	properties, protected indexes and operator override
 	anonimous assignment compound Grouping/expression
 	move bool back to heapval
 	use unit value to count heapval references
-	examine overflows
+	examine overflows in numeric
 
-	separate test in modules
 	add Get and Set? to Unit :)
 	convert StringUnit to use char[]
 	add check for arity before call
 	add type to List and Wrapper so they can be retrieved from lightining
 	add load externally compiled prelude extensions
 
-	try , protected call
+
 	tuple and nuple class
 	List Class
 	table class, returned values should have super table set?
@@ -125,3 +127,5 @@ done
 	- add makeNumericIterator
 	- added ASSIGN_IMPORTED_CONSTANT
 	- Added chained function calls(fix open parentheses after call turns into compoundCall)
+	- try , protected call
+	- separate test suite in modules

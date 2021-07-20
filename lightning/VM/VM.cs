@@ -75,7 +75,7 @@ namespace lightning
             IP = 0;
             parallelVM = false;
 
-            main = p_chunk.GetFunctionUnit("main", "main");
+            main = p_chunk.GetFunctionUnit("main");
 
             instructions = new Instructions(functionDeepness, main, out instructionsCache);
 

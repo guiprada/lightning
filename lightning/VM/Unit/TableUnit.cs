@@ -216,20 +216,28 @@ namespace lightning
 
         public override int CompareTo(object compareTo){
             if(compareTo.GetType() != typeof(Unit))
-                throw new Exception("Trying to compare TableUnit to non Unit type");
+                throw new Exception("Trying to compare a TableUnit to non Unit type");
             Unit other = (Unit)compareTo;
             UnitType other_type = other.Type;
             switch(other_type){
                 case UnitType.Table:
                     return 0;
-                case UnitType.String:
-                case UnitType.Boolean:
-                case UnitType.Char:
                 case UnitType.Float:
                 case UnitType.Integer:
+                case UnitType.Char:
+                case UnitType.Null:
+                case UnitType.Boolean:
+                case UnitType.String:
                     return 1;
-                default:
+                case UnitType.Function:
+                case UnitType.Intrinsic:
+                case UnitType.Closure:
+                case UnitType.UpValue:
+                case UnitType.Module:
+                case UnitType.Wrapper:
                     return -1;
+                default:
+                    throw new Exception("Trying to compare a TableUnit to unkown UnitType.");
             }
         }
     }

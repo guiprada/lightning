@@ -79,13 +79,22 @@ namespace lightning
             switch(other_type){
                 case UnitType.String:
                     return this.content.CompareTo(((StringUnit)(other.heapUnitValue)).content);
-                case UnitType.Boolean:
-                case UnitType.Char:
                 case UnitType.Float:
                 case UnitType.Integer:
+                case UnitType.Char:
+                case UnitType.Null:
+                case UnitType.Boolean:
                     return 1;
-                default:
+                case UnitType.Table:
+                case UnitType.Function:
+                case UnitType.Intrinsic:
+                case UnitType.Closure:
+                case UnitType.UpValue:
+                case UnitType.Module:
+                case UnitType.Wrapper:
                     return -1;
+                default:
+                    throw new Exception("Trying to compare a StringUnit to unkown UnitType.");
             }
         }
 

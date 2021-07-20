@@ -177,21 +177,28 @@ namespace lightning
 
         public override int CompareTo(object compareTo){
             if(compareTo.GetType() != typeof(Unit))
-                throw new Exception("Trying to compare TableUnit to non Unit type");
+                throw new Exception("Trying to compare a FunctionUnit to non Unit type");
             Unit other = (Unit)compareTo;
             UnitType other_type = other.Type;
             switch(other_type){
                 case UnitType.Function:
                     return 0;
-                case UnitType.Table:
-                case UnitType.String:
-                case UnitType.Boolean:
-                case UnitType.Char:
                 case UnitType.Float:
                 case UnitType.Integer:
+                case UnitType.Char:
+                case UnitType.Null:
+                case UnitType.Boolean:
+                case UnitType.String:
+                case UnitType.Table:
                     return 1;
-                default:
+                case UnitType.Intrinsic:
+                case UnitType.Closure:
+                case UnitType.UpValue:
+                case UnitType.Module:
+                case UnitType.Wrapper:
                     return -1;
+                default:
+                    throw new Exception("Trying to compare a FunctionUnit to unkown UnitType.");
             }
         }
     }
@@ -257,22 +264,28 @@ namespace lightning
 
         public override int CompareTo(object compareTo){
             if(compareTo.GetType() != typeof(Unit))
-                throw new Exception("Trying to compare TableUnit to non Unit type");
+                throw new Exception("Trying to compare an IntrinsicUnit to non Unit type");
             Unit other = (Unit)compareTo;
             UnitType other_type = other.Type;
             switch(other_type){
                 case UnitType.Intrinsic:
                     return 0;
-                case UnitType.Function:
-                case UnitType.Table:
-                case UnitType.String:
-                case UnitType.Boolean:
-                case UnitType.Char:
                 case UnitType.Float:
                 case UnitType.Integer:
+                case UnitType.Char:
+                case UnitType.Null:
+                case UnitType.Boolean:
+                case UnitType.String:
+                case UnitType.Table:
+                case UnitType.Function:
                     return 1;
-                default:
+                case UnitType.Closure:
+                case UnitType.UpValue:
+                case UnitType.Module:
+                case UnitType.Wrapper:
                     return -1;
+                default:
+                    throw new Exception("Trying to compare an IntrinsicUnit to unkown UnitType.");
             }
         }
     }
@@ -341,23 +354,28 @@ namespace lightning
 
         public override int CompareTo(object compareTo){
             if(compareTo.GetType() != typeof(Unit))
-                throw new Exception("Trying to compare TableUnit to non Unit type");
+                throw new Exception("Trying to compare a ClosureUnit to non Unit type");
             Unit other = (Unit)compareTo;
             UnitType other_type = other.Type;
             switch(other_type){
                 case UnitType.Closure:
                     return 0;
-                case UnitType.Intrinsic:
-                case UnitType.Function:
-                case UnitType.Table:
-                case UnitType.String:
-                case UnitType.Boolean:
-                case UnitType.Char:
                 case UnitType.Float:
                 case UnitType.Integer:
+                case UnitType.Char:
+                case UnitType.Null:
+                case UnitType.Boolean:
+                case UnitType.String:
+                case UnitType.Table:
+                case UnitType.Function:
+                case UnitType.Intrinsic:
                     return 1;
-                default:
+                case UnitType.UpValue:
+                case UnitType.Module:
+                case UnitType.Wrapper:
                     return -1;
+                default:
+                    throw new Exception("Trying to compare a ClosureUnit to unkown UnitType.");
             }
         }
     }
@@ -456,24 +474,28 @@ namespace lightning
 
         public override int CompareTo(object compareTo){
             if(compareTo.GetType() != typeof(Unit))
-                throw new Exception("Trying to compare TableUnit to non Unit type");
+                throw new Exception("Trying to compare a UpValueUnit to non Unit type");
             Unit other = (Unit)compareTo;
             UnitType other_type = other.Type;
             switch(other_type){
                 case UnitType.UpValue:
                     return 0;
-                case UnitType.Closure:
-                case UnitType.Intrinsic:
-                case UnitType.Function:
-                case UnitType.Table:
-                case UnitType.String:
-                case UnitType.Boolean:
-                case UnitType.Char:
                 case UnitType.Float:
                 case UnitType.Integer:
+                case UnitType.Char:
+                case UnitType.Null:
+                case UnitType.Boolean:
+                case UnitType.String:
+                case UnitType.Table:
+                case UnitType.Function:
+                case UnitType.Intrinsic:
+                case UnitType.Closure:
                     return 1;
-                default:
+                case UnitType.Module:
+                case UnitType.Wrapper:
                     return -1;
+                default:
+                    throw new Exception("Trying to compare a UpValueUnit to unkown UnitType.");
             }
         }
     }
@@ -555,25 +577,28 @@ namespace lightning
 
         public override int CompareTo(object compareTo){
             if(compareTo.GetType() != typeof(Unit))
-                throw new Exception("Trying to compare TableUnit to non Unit type");
+                throw new Exception("Trying to compare a ModuleUnit to non Unit type");
             Unit other = (Unit)compareTo;
             UnitType other_type = other.Type;
             switch(other_type){
                 case UnitType.Module:
                     return 0;
-                case UnitType.UpValue:
-                case UnitType.Closure:
-                case UnitType.Intrinsic:
-                case UnitType.Function:
-                case UnitType.Table:
-                case UnitType.String:
-                case UnitType.Boolean:
-                case UnitType.Char:
                 case UnitType.Float:
                 case UnitType.Integer:
+                case UnitType.Char:
+                case UnitType.Null:
+                case UnitType.Boolean:
+                case UnitType.String:
+                case UnitType.Table:
+                case UnitType.Function:
+                case UnitType.Intrinsic:
+                case UnitType.Closure:
+                case UnitType.UpValue:
                     return 1;
-                default:
+                case UnitType.Wrapper:
                     return -1;
+                default:
+                    throw new Exception("Trying to compare a ModuleUnit to unkown UnitType.");
             }
         }
     }
@@ -657,26 +682,27 @@ namespace lightning
 
         public override int CompareTo(object compareTo){
             if(compareTo.GetType() != typeof(Unit))
-                throw new Exception("Trying to compare TableUnit to non Unit type");
+                throw new Exception("Trying to compare a WrapperUnit to non Unit type");
             Unit other = (Unit)compareTo;
             UnitType other_type = other.Type;
             switch(other_type){
                 case UnitType.Wrapper:
                     return 0;
-                case UnitType.Module:
-                case UnitType.UpValue:
-                case UnitType.Closure:
-                case UnitType.Intrinsic:
-                case UnitType.Function:
-                case UnitType.Table:
-                case UnitType.String:
-                case UnitType.Boolean:
-                case UnitType.Char:
                 case UnitType.Float:
                 case UnitType.Integer:
+                case UnitType.Char:
+                case UnitType.Null:
+                case UnitType.Boolean:
+                case UnitType.String:
+                case UnitType.Table:
+                case UnitType.Function:
+                case UnitType.Intrinsic:
+                case UnitType.Closure:
+                case UnitType.UpValue:
+                case UnitType.Module:
                     return 1;
                 default:
-                    return -1;
+                    throw new Exception("Trying to compare a WrapperUnit to unkown UnitType.");
             }
         }
     }

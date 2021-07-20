@@ -71,10 +71,10 @@ namespace lightning
 
         public List<string> Errors { get; private set; }
 
-        public Chunker(Node p_ast, string p_module_name, Library prelude)
+        public Chunker(Node p_ast, string p_moduleName, Library prelude)
         {
-            chunk = new Chunk(prelude);
-            moduleName = p_module_name;
+            chunk = new Chunk(p_moduleName, prelude);
+            moduleName = p_moduleName;
             ast = p_ast;
             instructionCounter = 0;
             HasChunked = false;

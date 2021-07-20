@@ -197,19 +197,21 @@ namespace lightning
         public Operand ConstantsCount { get { return (Operand)constants.Count; } }
         public List<Unit> GetConstants { get{ return constants; } }
         public LineCounter LineCounter { get { return lineCounter; } }
-        public FunctionUnit GetFunctionUnit(string p_name, string p_module)
+        public string ModuleName { get; private set; }
+        public FunctionUnit GetFunctionUnit(string p_name)
         {
-            FunctionUnit this_function_unit = new FunctionUnit(p_name, p_module);
+            FunctionUnit this_function_unit = new FunctionUnit(p_name, ModuleName);
             this_function_unit.Set(0, Body, LineCounter, 0);
             return this_function_unit;
         }
 
-        public Chunk(Library p_prelude)
+        public Chunk(string p_moduleName, Library p_prelude)
         {
             program = new List<Instruction>();
             lineCounter = new LineCounter(new List<uint>());
             constants = new List<Unit>();
             Prelude = p_prelude;
+            ModuleName = p_moduleName;
         }
 
         public void Print()

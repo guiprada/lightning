@@ -24,5 +24,8 @@ var assert_not = assert_counter.assert_not
         return 1
     }
     assert(lambda(), 1, "Failed Lambda test 4.")
+
+    lambda = \ return 1
+    assert(lambda(), 1, "Failed Lambda test 5.")
 }
 return assert_counter.get_error_counter()
