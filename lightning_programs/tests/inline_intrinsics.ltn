@@ -1,0 +1,23 @@
+var assert_counter = require("assert_counter.ltn")
+var assert = assert_counter.assert
+var assert_not = assert_counter.assert_not
+{
+    // Testing inline Intrinsics
+    var intr_sum =
+    #
+        using Number = System.Double;
+        using System;
+
+        (vm) =>{
+            Number opA = vm.GetNumber(0);
+            Number opB = vm.GetNumber(1);
+
+            return new Unit(opA + opB);
+        }
+    #
+    if (intrinsic.create != null){
+        var sum_intr = intrinsic.create("sum", 2, intr_sum)
+        assert(sum_intr(5, 6), 11, "Failed inline Intrinsic test 1.")
+    }
+}
+return assert_counter.get_error_counter()

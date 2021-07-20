@@ -1,0 +1,95 @@
+var assert_counter = require("assert_counter.ltn")
+var assert = assert_counter.assert
+var assert_not = assert_counter.assert_not
+{
+    // Testing closures
+    function make_say(value)
+    {
+        return function ()
+        {
+            return value
+        }
+    }
+    var doughnut = make_say("doughnut")
+    var bagel = make_say("bagel")
+    assert(doughnut(), "doughnut", "Failed Closure test 1.")
+    assert(bagel(), "bagel", "Failed Closure test 2.")
+
+    function make_changer()
+    {
+        var local = "";
+        function closure()
+        {
+            local = local .. " extra";
+            return local
+        }
+        return closure;
+    }
+
+    var changer = make_changer();
+    assert(changer(), " extra", "Failed Closure test 3.")
+    assert(changer(), " extra extra", "Failed Closure test 4.")
+    assert(changer(), " extra extra extra", "Failed Closure test 5.")
+
+    function make_accumulator(value)
+    {
+        var counter = value
+        return function (x)
+        {
+            counter = counter + x
+            return counter;
+        }
+    }
+    var my_acc = make_accumulator(5)
+    assert(my_acc(-5), 0, "Failed Closure test 6.")
+    assert(my_acc(5), 5, "Failed Closure test 7.")
+}
+{
+    // Testing "hidden properties"
+    function make_player()
+    {
+        var player = []
+        var x = 0
+        var y = 0
+
+        player.move = function (_, p_x, p_y)
+        {
+            x = x + p_x;
+            y = y + p_y;
+            return [x:x, y:y]
+        }
+        return player
+    }
+
+    var p1 = make_player()
+    var p2 = make_player()
+
+    assert(p1:move(1,1).x, 1, "Failed hidden properties test 1.")
+    assert(p1:move(0,2).y, 3, "Failed hidden properties test 2.")
+    assert(p2:move(0,2).y, 2, "Failed hidden properties test 3.")
+}
+{
+    // Testing "hidden properties" 2
+    function make_player()
+    {
+        var player = []
+        var x = 0
+        var y = 0
+
+        player.move = function (p_x, p_y)
+        {
+            x = x + p_x;
+            y = y + p_y;
+            return [x:x, y:y]
+        }
+        return player
+    }
+
+    var p1 = make_player()
+    var p2 = make_player()
+
+    assert(p1.move(1,1).x, 1, "Failed hidden properties test 4.")
+    assert(p1.move(0,2).y, 3, "Failed hidden properties test 5.")
+    assert(p2.move(0,2).y, 2, "Failed hidden properties test 6.")
+}
+return assert_counter.get_error_counter()

@@ -1,0 +1,27 @@
+var assert_counter = require("assert_counter.ltn")
+var assert = assert_counter.assert
+var assert_not = assert_counter.assert_not
+{
+    // Testing method calls
+
+    function make_player()
+    {
+        var player = []
+        player.position = [];
+        player.position["x"] = 0
+        player.position["y"] = 0
+
+        player.move = function (self, x, y)
+        {
+            self.position.x = self.position.x + x;
+            self.position.y = self.position.y + y;
+            return self.position
+        }
+        return player
+    }
+
+    var p1 = make_player();
+    assert(p1:move(1,0).x, 1, "Failed method call test 1.")
+    assert(p1:move(0,3).y, 3, "Failed method call test 2.")
+}
+return assert_counter.get_error_counter()

@@ -1,0 +1,29 @@
+var assert_counter = require("assert_counter.ltn")
+var assert = assert_counter.assert
+var assert_not = assert_counter.assert_not
+{
+    // Testing tuples
+    var tuple1 = tuple.new(1, "hello")
+    assert(tuple1:get_x(), 1, "Failed Tuples Test 1.")
+    assert(tuple1:get_y(), "hello", "Failed Tuples Test 2.")
+
+    tuple1:set_x("hello")
+    tuple1:set_y("world")
+    assert(tuple1:get_x(), "hello", "Failed Tuples Test 3.")
+    assert(tuple1:get_y(), "world", "Failed Tuples Test 4.")
+}
+{
+    // Testing nuples
+    var nuple1 = nuple.from_table([1, "hello"])
+    assert(nuple1:get(0), 1, "Failed Nuples Test 1.")
+    assert(nuple1:get(1), "hello", "Failed Nuples Test 2.")
+
+    nuple1:set(0, "hello")
+    nuple1:set(1, "world")
+    assert(nuple1:get(0), "hello", "Failed Nuples Test 3.")
+    assert(nuple1:get(1), "world", "Failed Nuples Test 4.")
+
+    var nuple2 = nuple.new(5)
+    assert(nuple2:size(), 5, "Failed Nuples Test 5")
+}
+return assert_counter.get_error_counter()

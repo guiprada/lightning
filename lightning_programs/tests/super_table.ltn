@@ -1,0 +1,24 @@
+var assert_counter = require("assert_counter.ltn")
+var assert = assert_counter.assert
+var assert_not = assert_counter.assert_not
+{
+    // Testing super table
+    var super_table = [ brazil:"Brasilia", eua:"Washington", australia:"Canberra",]
+    var common_table = []
+    table.set_super(common_table, super_table)
+    assert(common_table.brazil, "Brasilia", "Failed Super Table Test 1.")
+    common_table.brazil = "hello"
+    assert(common_table.brazil, "hello", "Failed Super Table Test 2.")
+    assert(super_table.brazil, "Brasilia", "Failed Super Table Test 3.")
+
+    super_table.a_function = function(self){
+        return self.brazil
+    }
+    assert(common_table:a_function(), "hello", "Failed Super Table Test 4.")
+    assert(super_table:a_function(), "Brasilia", "Failed Super Table Test 5.")
+
+    var Table = table.list_new(5)
+    table.set_super(Table, table)
+    assert(Table:count(), 5, "Failed Super Table Test 6.")
+}
+return assert_counter.get_error_counter()

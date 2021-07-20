@@ -1,0 +1,169 @@
+var assert_counter = require("assert_counter.ltn")
+var assert = assert_counter.assert
+var assert_not = assert_counter.assert_not
+{
+    // Table test
+    var this_list = []
+    this_list.a = "a"
+    this_list.b = "b"
+    var this_list_alias = this_list
+    assert(this_list_alias, this_list, "Failed Table test 1.")
+    assert_not([a:"a",b:"b"], this_list, "Failed Table test 2.")
+    assert_not([a:"b",b:"b"], this_list, "Failed Table test 3.")
+    assert_not([], this_list, "Failed Table test 4.")
+    assert(table.count(this_list), 2, "Failed Table test 5")
+    assert(table.map_count(this_list), 2, "Failed Table test 6")
+    assert(table.list_count(this_list), 0, "Failed Table test 7")
+
+    var this_array = this_list
+    this_array[0] = 100
+    this_array[1] = null
+    this_array[99] = 0
+    assert(this_array[0], 100, "Failed Array test 1.")
+    assert(this_array[1], null, "Failed Array test 2.")
+    assert(this_array[99], 0, "Failed Array test 3.")
+    assert(table.count(this_list), 5, "Failed Array test 4")
+    assert(table.list_count(this_array), 2, "Failed Array test 5.")
+    assert(table.map_count(this_list), 3, "Failed Array test 6.")
+
+    var table_negative = []
+    table_negative[-1] = 5
+    assert(table_negative[-1], 5, "Failed Table Negative Index Test 1.")
+}
+{
+    // Table literal test
+    var this_table = [null, null, null, null, null, 5:"hello"]
+    for(var i = 0; i<5; i++){
+        assert(this_table[i], null, "Failed Table Literal test " .. (i+1) .. ".")
+    }
+    assert(this_table[5], "hello", "Failed Table Literal test 6.")
+
+    var another_table = [ "brazil":"Brasilia", eua:"Washington", australia:"Canberra",]
+    assert(another_table.brazil, "Brasilia", "Failed Table Literal test 7.")
+    assert(another_table.australia, "Canberra", "Failed Super Table Test 3.")
+
+    // Testing Table negative
+    var table_teste = [5:0, -11, -1:2]
+    assert(table_teste[0], -11, "Failed Table Literal Negative Value Test 1.")
+    assert(table_teste[-1], 2, "Failde Table Literal Negatiev Index Test 1.")
+}
+{
+    // Some arrays, functions and recursion
+    var fibs = []
+    function populate_fibs(n)
+    {
+        var next;
+        var num = 1;
+        var ant = 0;
+        var i = 0;
+        while(i <= n)
+        {
+            fibs[i] = ant;
+            next = num + ant;
+            ant = num;
+            num = next;
+            i = i + 1;
+        }
+    }
+    populate_fibs(50)
+    assert(fibs[0], 0, "Failed Fibonacci test 1.")
+    assert(fibs[1], 1, "Failed Fibonacci test 2.")
+    assert(fibs[2], 1, "Failed Fibonacci test 3.")
+    assert(fibs[3], 2, "Failed Fibonacci test 4.")
+    assert(fibs[30], 832040, "Failed Fibonacci test 5.")
+    assert(fibs[40], 102334155, "Failed Fibonacci test 6.")
+
+    function rec_fib(n)
+    {
+        if (n < 2)
+        {
+            return n;
+        }
+        return rec_fib(n -1) + rec_fib(n -2);
+    }
+
+    assert(rec_fib(0), 0, "Failed Fibonacci test 7.")
+    assert(rec_fib(1), 1, "Failed Fibonacci test 8.")
+    assert(rec_fib(10), fibs[10], "Failed Fibonacci test 9.")
+}
+{
+    // Testing multi dimensional arrays
+    var matrix = []
+    var lines = 10
+    var columns = 3
+    for (var i = 0; i < 10; i++)
+    {
+        matrix[i] = []
+        for (var j = 0; j < columns; j++)
+        {
+            matrix[i][j] = i + j
+        }
+    }
+    assert(matrix[0][0], 0, "Failed multi dimensional array test 1.")
+    assert(matrix[9][2], 11, "Failed multi dimensional array test 2.")
+}
+{
+    // Testing List
+    var new_list = []
+    table.push(new_list, 3)
+    table.push(new_list, 2)
+    table.push(new_list, 1)
+    assert(new_list[0], 3, "Failed List test 1.")
+    assert(new_list[1], 2, "Failed List test 2.")
+    assert(new_list[2], 1, "Failed List test 3.")
+
+    var list_copy = table.list_copy(new_list)
+    assert_not(list_copy, new_list, "Failed List test 4.")
+    table.pop(new_list)
+    table.pop(new_list)
+    table.pop(new_list)
+    assert(table.list_count(new_list), 0, "Failed List test 5.")
+    assert(table.list_count(list_copy), 3, "Failed List test 6.")
+
+    list_copy.hey = "hey"
+    table.list_clear(list_copy)
+    assert(table.list_count(list_copy), 0, "Failed List test 7.")
+    assert(table.map_count(list_copy), 1, "Failed List test 8.")
+    table.push(list_copy, 1)
+    table.map_clear(list_copy)
+    assert(table.list_count(list_copy), 1, "Failed List test 9.")
+    assert(table.map_count(list_copy), 0, "Failed List test 10.")
+    list_copy.hey = "hey"
+    table.clear(list_copy)
+    assert(table.list_count(list_copy), 0, "Failed List test 9.")
+    assert(table.map_count(list_copy), 0, "Failed List test 10.")
+    assert(table.count(list_copy), 0, "Failed List test 11.")
+}
+{
+    // Testing Table Class
+    var testTable = table.new();
+    testTable[-1] = -1
+
+    assert(testTable:count(), 1, "Failed Table Class Test 1.")
+    assert(testTable:map_count(), 1, "Failed Table Class Test 2.")
+    assert(testTable:list_count(), 0, "Failed Table Class Test 3.")
+
+    var testTableClone = testTable:clone()
+    assert(testTableClone:count(), 1, "Failed Table Class Test 4.")
+    assert(testTableClone:map_count(), 1, "Failed Table Class Test 5.")
+    assert(testTableClone:list_count(), 0, "Failed Table Class Test 6.")
+}
+{
+    // Testing List sort
+    var this_list = [3, "string", 1, false, 2, 'a', null, 0, '0']
+    var ordered_list = [null, false, '0', 'a', 0, 1, 2, 3, "string"]
+    table.list_sort(this_list)
+
+    for(var i=0; i<(table.list_count(this_list)); i++){
+        assert(this_list[i], ordered_list[i], "Failed List Sort Test 1, iteration: " .. (i+1) ..".")
+    }
+
+    this_list = ["a", "ab", "b", "aaa", "aba", "aca", "bb", 2, 3, this_list]
+    ordered_list = [2, 3, "a", "aaa", "ab", "aba", "aca", "b", "bb", this_list]
+    table.list_sort(this_list)
+
+    for(var i=0; i<(table.list_count(this_list)); i++){
+        assert(this_list[i], ordered_list[i], "Failed List Sort Test 2 iteration: " .. (i+1) ..".")
+    }
+}
+return assert_counter.get_error_counter()

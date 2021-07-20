@@ -1,0 +1,28 @@
+var assert_counter = require("assert_counter.ltn")
+var assert = assert_counter.assert
+var assert_not = assert_counter.assert_not
+{
+    // Testing a lamba function
+    var lambda = function (a, b, c)
+    {
+	    return (a+b)/c;
+    }
+    assert(lambda(1,2,3), 1, "Failed Lambda test 1.")
+
+    lambda = \(a, b, c)
+    {
+	    return (a+b)/c;
+    }
+    assert(lambda(1,2,3), 1, "Failed Lambda test 2.")
+
+    lambda = \{
+        return 1
+    }
+    assert(lambda(), 1, "Failed Lambda test 3.")
+
+    lambda = function{
+        return 1
+    }
+    assert(lambda(), 1, "Failed Lambda test 4.")
+}
+return assert_counter.get_error_counter()

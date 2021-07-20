@@ -1,0 +1,22 @@
+var assert_counter = require("assert_counter.ltn")
+var assert = assert_counter.assert
+var assert_not = assert_counter.assert_not
+{
+    // Testing Anonymous Function Call
+    var teste = ('e' .. 'o'):char_at(0) .. "eo":char_at(1)
+    assert("eo", teste, "Failed Anonymous Function Call Test 1.")
+
+    teste = ('e' .. "eo":char_at(1)):char_at(0) .. "eo":char_at(1)
+    assert("eo", teste, "Failed Anonymous Function Call Test 2.")
+
+    var counter = 0
+    for(var i="":length(); i<"3__":length(); i++){
+        assert(i, counter, "Failed Anonymous Function Call Test 3, iteration: " .. i)
+        counter++
+    }
+
+    if(true)
+        counter = "6_____":length()
+    assert(counter, 6, "Failed Anonymous Function Call Test 4.")
+}
+return assert_counter.get_error_counter()

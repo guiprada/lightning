@@ -1,0 +1,20 @@
+var assert_counter = require("assert_counter.ltn")
+var assert = assert_counter.assert
+var assert_not = assert_counter.assert_not
+{
+    // Testing try
+    var array1
+    var a = 1
+    var success = try(\(array){
+        write_line(array[0])
+        a = 2
+    }, ["oi", "mundo"])
+    assert(a, 1, "Failed try() Test 1.")
+
+    success = try(\{
+        write_line(array1[0])
+        a = 2
+    }, ["oi", "mundo"])
+    assert(a, 1, "Failed try() Test 2.")
+}
+return assert_counter.get_error_counter()

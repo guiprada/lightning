@@ -1,0 +1,28 @@
+var assert_counter = require("assert_counter.ltn")
+var assert = assert_counter.assert
+var assert_not = assert_counter.assert_not
+{
+    // Testing ASSIGN_OP
+    var i = 0
+    i+=1
+    assert(i, 1, "Failed ASSIGN_OP Test 1.")
+    i*=10
+    assert(i, 10, "Failed ASSIGN_OP Test 2.")
+    i/=2
+    assert(i, 5, "Failed ASSIGN_OP Test 3.")
+    i-=10
+    assert(i, -5, "Failed ASSIGN_OP Test 4.")
+}
+{
+    // Testing increment and decrement
+    var j = 1
+    var j1 = --j
+    assert(j1, 0, "Failed Increment Test 1.")
+    j = 2
+    j1 = j+=1 // chained ASSIGN_VARIABLEment op works weird, this is equivalent to j1 = + = 1
+    assert(j1, 1, "Failed Increment Test 2.")
+    var j2 = 0
+    j2++
+    assert(j2, 1, "Failed Increment Test 2.")
+}
+return assert_counter.get_error_counter()

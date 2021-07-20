@@ -24,4 +24,16 @@ var assert_not = assert_counter.assert_not
     assert((1 .. 2  .. char_o .. 3 .. 5 .. " " .. char_a), "12o35 a", "Failed Append and Alphanumeric Addition Test 1.")
     assert((1 + 2  .. char_o .. 3 .. " " .. char_a), "3o3 a", "Failed Append and Alphanumeric Addition Test 2.")
 }
+{
+    // Testing String Contains
+    var hello_world_string = "hello world"
+    assert(hello_world_string:contains("hello"), true, "Failed String Contains Test 1.")
+    assert(hello_world_string:contains("world"), true, "Failed String Contains Test 2.")
+    assert(hello_world_string:contains("llo wo"), true, "Failed String Contains Test 3.")
+    assert(hello_world_string:contains("hey"), false, "Failed String Contains Test 4.")
+    assert(hello_world_string:contains("_wor"), false, "Failed String Contains Test 5.")
+    assert(hello_world_string:contains_char('e'), true, "Failed String Contains Test 6.")
+    assert(hello_world_string:contains_char('l'), true, "Failed String Contains Test 7.")
+    assert(hello_world_string:contains_char('g'), false, "Failed String Contains Test 8.")
+}
 return assert_counter.get_error_counter()
