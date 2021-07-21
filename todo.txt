@@ -1,4 +1,5 @@
 ﻿todo
+	improve Peek2()
 	list sort tests
 	table class
 	nuple type
