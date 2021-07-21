@@ -1,5 +1,5 @@
 ﻿todo
-	fix double upvalue test
+	replace ContainsKey and Contains with TryGetValue
 	improve Peek2()
 	list sort tests
 	table class
@@ -130,3 +130,4 @@ done
 	- try , protected call
 	- separate test suite in modules
 	- fixed bug in instantiate variables in literal tables
+	- fix double upvalue test
