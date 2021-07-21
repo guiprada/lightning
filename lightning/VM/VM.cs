@@ -49,7 +49,7 @@ namespace lightning
 
         Memory<UpValueUnit> upValues;
         Memory<UpValueUnit> upValuesRegistry;
-        SparseMatrix registeredUpvalues;
+        UpValueMatrix registeredUpValues;
 
         public List<IntrinsicUnit> Intrinsics { get; private set; }
         public Library Prelude { get; private set; }
@@ -85,7 +85,7 @@ namespace lightning
             variables = new Memory<Unit>();
             upValues = new Memory<UpValueUnit>();
             upValuesRegistry = new Memory<UpValueUnit>();
-            SparseMatrix registeredUpvalues = new SparseMatrix();
+            registeredUpValues = new UpValueMatrix();
 
             constants = p_chunk.GetConstants;
             Prelude = p_chunk.Prelude;
@@ -129,7 +129,7 @@ namespace lightning
             variables = new Memory<Unit>();
             upValues = new Memory<UpValueUnit>();
             upValuesRegistry = new Memory<UpValueUnit>();
-            SparseMatrix registeredUpvalues = new SparseMatrix();
+            registeredUpValues = new UpValueMatrix();
         }
 
         public void ResoursesTrim(){
@@ -160,7 +160,7 @@ namespace lightning
             variables.Clear();
             upValues.Clear();
             upValuesRegistry.Clear();
-            registeredUpvalues.Clear();
+            registeredUpValues.Clear();
         }
         public void RecycleVM(VM vm)
         {
@@ -315,10 +315,10 @@ namespace lightning
         }
 
         UpValueUnit GetUpValue(Operand p_address, Operand p_env){
-            UpValueUnit up_value = registeredUpvalues.Get(p_address, p_env);
+            UpValueUnit up_value = registeredUpValues.Get(p_address, p_env);
             if(up_value == null){
-                up_value = new UpValueUnit(p_address, CalculateEnvShiftUpVal(p_env));
-                registeredUpvalues.Set(up_value, p_address, p_env);
+                up_value = new UpValueUnit(p_address, p_env);
+                registeredUpValues.Set(up_value, p_address, p_env);
             }
             return up_value;
         }
@@ -343,8 +343,7 @@ namespace lightning
                 upValuesRegistry.Get(i).Capture();
             }
             upValuesRegistry.PopEnv();
-            if(registeredUpvalues == null) Console.WriteLine("-----------------");
-            registeredUpvalues.Clear();
+            registeredUpValues.Clear();
             variables.PopEnv();
         }
 

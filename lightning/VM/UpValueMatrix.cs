@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using Operand = System.UInt16;
 namespace lightning
 {
-	public class SparseMatrix{
+	public class UpValueMatrix{
 		Dictionary<Operand, Dictionary<Operand, UpValueUnit>> values;
-		public SparseMatrix(){
+		public UpValueMatrix(){
 			values = new Dictionary<Operand, Dictionary<Operand, UpValueUnit>>();
 		}
 
