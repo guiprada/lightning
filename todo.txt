@@ -1,4 +1,5 @@
 ﻿todo
+	fix double upvalue test
 	improve Peek2()
 	list sort tests
 	table class
