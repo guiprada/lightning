@@ -702,7 +702,7 @@ namespace lightning
                 is_negative = true;
 
             if(!Check(TokenType.RIGHT_BRACKET)){
-                if(Peek2() != null && Peek2().Type == TokenType.COLON){
+                if((Peek2() != null) && (Peek2().Type == TokenType.COLON)){
                     if (Match(TokenType.IDENTIFIER))
                     {
                         Node item = new LiteralNode((Previous() as TokenString).value, Previous().Line);
@@ -716,41 +716,34 @@ namespace lightning
                     else
                     {
                         Node item = Primary();
-                        if(Check(TokenType.COLON)){
-                            Consume(TokenType.COLON, "Expected ':' separating key:values in table constructor", true);
-                            if(((LiteralNode)item).ValueType == typeof(Float)){
-                                LiteralNode number_value = (LiteralNode)item;
-
-                                if(!is_negative){
-                                    if((Float)(number_value.Value) == elements.Count)
-                                        elements.Add(Primary());
-                                    else
-                                        table.Add(number_value, Primary());
-                                }else{
-                                    number_value.SetNegative();
+                        Consume(TokenType.COLON, "Expected ':' separating key:values in table constructor", true);
+                        if(((LiteralNode)item).ValueType == typeof(Float)){
+                            LiteralNode number_value = (LiteralNode)item;
+                            if(!is_negative){
+                                if((Float)(number_value.Value) == elements.Count)
+                                    elements.Add(Primary());
+                                else
                                     table.Add(number_value, Primary());
-                                }
-                            }else if(((LiteralNode)item).ValueType == typeof(Integer)){
-                                LiteralNode number_value = (LiteralNode)item;
-                                if(!is_negative){
-                                    if((Integer)(number_value.Value) == elements.Count)
-                                        elements.Add(Primary());
-                                    else
-                                        table.Add(number_value, Primary());
-                                }else{
-                                    number_value.SetNegative();
-                                    table.Add(number_value, Primary());
-                                }
-                            }else if(((LiteralNode)item).ValueType == typeof(string)){
-                                if(is_negative)
-                                    Error("Minus Sign should only be used by Numeric Types in List Declaration.");
-                                LiteralNode string_value = (LiteralNode)item;
-                                table.Add(string_value, Primary());
+                            }else{
+                                number_value.SetNegative();
+                                table.Add(number_value, Primary());
                             }
-                        }
-                        else
-                        {
-                            elements.Add(item);
+                        }else if(((LiteralNode)item).ValueType == typeof(Integer)){
+                            LiteralNode number_value = (LiteralNode)item;
+                            if(!is_negative){
+                                if((Integer)(number_value.Value) == elements.Count)
+                                    elements.Add(Primary());
+                                else
+                                    table.Add(number_value, Primary());
+                            }else{
+                                number_value.SetNegative();
+                                table.Add(number_value, Primary());
+                            }
+                        }else if(((LiteralNode)item).ValueType == typeof(string)){
+                            if(is_negative)
+                                Error("Minus Sign should only be used by Numeric Types in List Declaration.");
+                            LiteralNode string_value = (LiteralNode)item;
+                            table.Add(string_value, Primary());
                         }
                     }
                 }

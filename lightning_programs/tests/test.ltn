@@ -65,15 +65,11 @@ errors += require("tests/try.ltn")
         f1 = function {
             a = a+1
         }
-        f2 = function {
-            a++
-        }
         get_a = function {
             write_line(a)
         }
     }
     f1()
-    f2()
     lib_assert_counter.assert(get_a(), 2, "Failed Double UpValue Test 1.")
 }
 
