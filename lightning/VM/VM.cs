@@ -49,6 +49,7 @@ namespace lightning
 
         Memory<UpValueUnit> upValues;
         Memory<UpValueUnit> upValuesRegistry;
+        SparseMatrix registeredUpvalues;
 
         public List<IntrinsicUnit> Intrinsics { get; private set; }
         public Library Prelude { get; private set; }
@@ -84,6 +85,7 @@ namespace lightning
             variables = new Memory<Unit>();
             upValues = new Memory<UpValueUnit>();
             upValuesRegistry = new Memory<UpValueUnit>();
+            SparseMatrix registeredUpvalues = new SparseMatrix();
 
             constants = p_chunk.GetConstants;
             Prelude = p_chunk.Prelude;
@@ -127,6 +129,7 @@ namespace lightning
             variables = new Memory<Unit>();
             upValues = new Memory<UpValueUnit>();
             upValuesRegistry = new Memory<UpValueUnit>();
+            SparseMatrix registeredUpvalues = new SparseMatrix();
         }
 
         public void ResoursesTrim(){
@@ -157,6 +160,7 @@ namespace lightning
             variables.Clear();
             upValues.Clear();
             upValuesRegistry.Clear();
+            registeredUpvalues.Clear();
         }
         public void RecycleVM(VM vm)
         {
@@ -310,6 +314,14 @@ namespace lightning
             return (Operand)(variables.Env + 1 - env);
         }
 
+        UpValueUnit GetUpValue(Operand p_address, Operand p_env){
+            UpValueUnit up_value = registeredUpvalues.Get(p_address, p_env);
+            if(up_value == null){
+                up_value = new UpValueUnit(p_address, CalculateEnvShiftUpVal(p_env));
+                registeredUpvalues.Set(up_value, p_address, p_env);
+            }
+            return up_value;
+        }
         void RegisterUpValue(UpValueUnit u)
         {
             upValuesRegistry.Add(u);
@@ -331,6 +343,8 @@ namespace lightning
                 upValuesRegistry.Get(i).Capture();
             }
             upValuesRegistry.PopEnv();
+            if(registeredUpvalues == null) Console.WriteLine("-----------------");
+            registeredUpvalues.Clear();
             variables.PopEnv();
         }
 
@@ -452,7 +466,7 @@ namespace lightning
                                 foreach (UpValueUnit u in this_closure.UpValues)
                                 {
                                     // here we convert env from shift based to absolute based
-                                    UpValueUnit new_upvalue = new UpValueUnit(u.Address, CalculateEnvShiftUpVal(u.Env));
+                                    UpValueUnit new_upvalue = GetUpValue(u.Address, CalculateEnvShiftUpVal(u.Env));
                                     new_upValues.Add(new_upvalue);
                                 }
                                 ClosureUnit new_closure = new ClosureUnit(this_closure.Function, new_upValues);
