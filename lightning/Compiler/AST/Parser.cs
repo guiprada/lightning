@@ -696,46 +696,87 @@ namespace lightning
         {
             List<Node> elements = table_node.Elements;
             Dictionary<Node, Node> table = table_node.Table;
-            if (Match(TokenType.IDENTIFIER))
-            {
-                Node item = new LiteralNode((Previous() as TokenString).value, Previous().Line);
 
-                if(Match(TokenType.COLON)){
-                    Node value = Primary();
-                    table.Add(item, value);
-                }else
-                    elements.Add(item);
-            }
-            else if(!Check(TokenType.RIGHT_BRACKET))
-            {
-                Node item = Primary();
-                if(Check(TokenType.COLON)){
-                    Consume(TokenType.COLON, "Expected ':' separating key:values in table constructor", true);
-                    if(((LiteralNode)item).ValueType == typeof(Float)){
-                        LiteralNode number_value = (LiteralNode)item;
-                        if((Float)(number_value.Value) == elements.Count)
-                            elements.Add(Primary());
+            bool is_negative = false;
+            if(Match(TokenType.MINUS))
+                is_negative = true;
+
+            if(!Check(TokenType.RIGHT_BRACKET)){
+                if(Peek2().Type == TokenType.COLON){
+                    if (Match(TokenType.IDENTIFIER))
+                    {
+                        Node item = new LiteralNode((Previous() as TokenString).value, Previous().Line);
+
+                        if(Match(TokenType.COLON)){
+                            Node value = Primary();
+                            table.Add(item, value);
+                        }else
+                            elements.Add(item);
+                    }
+                    else
+                    {
+                        Node item = Primary();
+                        if(Check(TokenType.COLON)){
+                            Consume(TokenType.COLON, "Expected ':' separating key:values in table constructor", true);
+                            if(((LiteralNode)item).ValueType == typeof(Float)){
+                                LiteralNode number_value = (LiteralNode)item;
+
+                                if(!is_negative){
+                                    if((Float)(number_value.Value) == elements.Count)
+                                        elements.Add(Primary());
+                                    else
+                                        table.Add(number_value, Primary());
+                                }else{
+                                    number_value.SetNegative();
+                                    table.Add(number_value, Primary());
+                                }
+                            }else if(((LiteralNode)item).ValueType == typeof(Integer)){
+                                LiteralNode number_value = (LiteralNode)item;
+                                if(!is_negative){
+                                    if((Integer)(number_value.Value) == elements.Count)
+                                        elements.Add(Primary());
+                                    else
+                                        table.Add(number_value, Primary());
+                                }else{
+                                    number_value.SetNegative();
+                                    table.Add(number_value, Primary());
+                                }
+                            }else if(((LiteralNode)item).ValueType == typeof(string)){
+                                if(is_negative)
+                                    Error("Minus Sign should only be used by Numeric Types in List Declaration.");
+                                LiteralNode string_value = (LiteralNode)item;
+                                table.Add(string_value, Primary());
+                            }
+                        }
                         else
-                            table.Add(number_value, Primary());
-                    }else if(((LiteralNode)item).ValueType == typeof(Integer)){
-                        LiteralNode number_value = (LiteralNode)item;
-                        if((Integer)(number_value.Value) == elements.Count)
-                            elements.Add(Primary());
-                        else
-                            table.Add(number_value, Primary());
-                    }else if(((LiteralNode)item).ValueType == typeof(string)){
-                        LiteralNode string_value = (LiteralNode)item;
-                        table.Add(string_value, Primary());
+                        {
+                            elements.Add(item);
+                        }
                     }
                 }
                 else
                 {
+                    Node item = Primary();
+                    bool minus_error = false;
+                    if(is_negative){
+                        if(item.Type == NodeType.LITERAL){
+                            LiteralNode literal_node = (LiteralNode)item;
+                            if(literal_node.ValueType == typeof(Integer) || literal_node.ValueType == typeof(Float))
+                                ((LiteralNode)item).SetNegative();
+                            else
+                                minus_error = true;
+                        }else
+                            minus_error = true;
+                    }
+                    if(minus_error == true)
+                        Error("Minus Sign should only be used by Numeric Types in List Declaration.");
                     elements.Add(item);
                 }
             }
 
             return table_node;
         }
+
         Node Table()
         {
             int line = Previous().Line;
@@ -828,6 +869,14 @@ namespace lightning
         Token Peek()
         {
             return tokens[current];
+        }
+
+        Token Peek2()
+        {
+            if((current + 1) < (tokens.Count -1))
+                return tokens[current + 1];
+            else
+                return null;
         }
 
         bool Check(TokenType type)

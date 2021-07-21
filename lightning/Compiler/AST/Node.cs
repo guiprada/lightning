@@ -180,6 +180,13 @@ namespace lightning
             Value = null;
             ValueType = null;
         }
+
+        public void SetNegative(){
+            if(ValueType == typeof(Float))
+                Value = -(Float)Value;
+            else if(ValueType == typeof(Integer))
+                Value = -(Integer)Value;
+        }
     }
 
     public class GroupingNode : Node

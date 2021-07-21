@@ -1,5 +1,4 @@
 ﻿todo
-	fix bug in instantiate variables in literal tables
 	list sort tests
 	table class
 	nuple type
@@ -15,7 +14,6 @@
 	add check for arity before call
 	add type to List and Wrapper so they can be retrieved from lightining
 	add load externally compiled prelude extensions
-
 
 	tuple and nuple class
 	List Class
@@ -129,3 +127,4 @@ done
 	- Added chained function calls(fix open parentheses after call turns into compoundCall)
 	- try , protected call
 	- separate test suite in modules
+	- fixed bug in instantiate variables in literal tables
