@@ -702,7 +702,7 @@ namespace lightning
                 is_negative = true;
 
             if(!Check(TokenType.RIGHT_BRACKET)){
-                if(Peek2().Type == TokenType.COLON){
+                if(Peek2() != null && Peek2().Type == TokenType.COLON){
                     if (Match(TokenType.IDENTIFIER))
                     {
                         Node item = new LiteralNode((Previous() as TokenString).value, Previous().Line);

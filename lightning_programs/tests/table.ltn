@@ -8,7 +8,7 @@ var assert_not = assert_counter.assert_not
     this_list.b = "b"
     var this_list_alias = this_list
     assert(this_list_alias, this_list, "Failed Table test 1.")
-    assert_not([a:"a",b:"b"], this_list, "Failed Table test 2.")
+    assert_not([a:"a",b:"b",], this_list, "Failed Table test 2.")
     assert_not([a:"b",b:"b"], this_list, "Failed Table test 3.")
     assert_not([], this_list, "Failed Table test 4.")
     assert(table.count(this_list), 2, "Failed Table test 5")

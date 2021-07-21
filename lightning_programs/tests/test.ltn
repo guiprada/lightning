@@ -55,7 +55,27 @@ errors += require("tests/anonymous_call.ltn")
 errors += require("tests/try.ltn")
 
 //////////////////////////////// scratch
+{
+    var f1
+    var f2
+    var get_a
+    {
 
+        var a = 0
+        f1 = function {
+            a = a+1
+        }
+        f2 = function {
+            a++
+        }
+        get_a = function {
+            write_line(a)
+        }
+    }
+    f1()
+    f2()
+    lib_assert_counter.assert(get_a(), 2, "Failed Double UpValue Test 1.")
+}
 
 //////////////////////////////// end scratch
 machine.trim()
