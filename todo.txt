@@ -1,4 +1,5 @@
 ﻿todo
+	consolidate UpValueMatrix and UpValueRegistry
 	replace ContainsKey and Contains with TryGetValue
 	improve Peek2()
 	list sort tests
