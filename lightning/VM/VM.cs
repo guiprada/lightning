@@ -311,7 +311,7 @@ namespace lightning
         }
 
         Operand CalculateEnvShiftUpVal(Operand env){
-            return (Operand)(env);
+            return (Operand)(env - 1);// there are no global upvalues
         }
 
         void EnvPush()

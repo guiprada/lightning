@@ -9,8 +9,7 @@ namespace lightning
 
         public UpValueEnv(){
             env = new List<Dictionary<Operand, UpValueUnit>>();
-            env.Add(new Dictionary<Operand, UpValueUnit>());
-            top = 1;
+            top = 0;
         }
 
         public void PushEnv(){
@@ -31,7 +30,7 @@ namespace lightning
             if(env[p_env].TryGetValue(p_address, out this_upvalue))
                 return this_upvalue;
             else{
-                this_upvalue = new UpValueUnit(p_address, p_env);
+                this_upvalue = new UpValueUnit(p_address,(Operand)(p_env + 1));// We shift back to global env.
                 Set(this_upvalue, p_address, p_env);
                 return this_upvalue;
             }
@@ -42,7 +41,7 @@ namespace lightning
         }
 
         public void Clear(){
-            for(int i=1; i<(env.Count -1); i++)
+            for(int i=0; i<(env.Count -1); i++)
                 env[i].Clear();
         }
     }
