@@ -309,15 +309,6 @@ namespace lightning
             return (Operand)(env);
         }
 
-        UpValueUnit GetUpValue(Operand p_address, Operand p_env){
-            UpValueUnit this_upvalue = registeredUpValues.Get(p_address, p_env);
-            if(this_upvalue == null){
-                this_upvalue = new UpValueUnit(p_address, p_env);
-                registeredUpValues.Set(this_upvalue, p_address, p_env);
-            }
-            return this_upvalue;
-        }
-
         void EnvPush()
         {
             variables.PushEnv();
@@ -448,7 +439,7 @@ namespace lightning
                                 foreach (UpValueUnit u in this_closure.UpValues)
                                 {
                                     // here we convert env from shift based to absolute based
-                                    UpValueUnit new_upvalue = GetUpValue(u.Address, CalculateEnvShiftUpVal(u.Env));
+                                    UpValueUnit new_upvalue = registeredUpValues.Get(u.Address, CalculateEnvShiftUpVal(u.Env));
                                     new_upValues.Add(new_upvalue);
                                 }
                                 ClosureUnit new_closure = new ClosureUnit(this_closure.Function, new_upValues);
