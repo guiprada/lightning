@@ -219,12 +219,17 @@ namespace lightning
             throw new Exception("Trying to get a integer value of non numeric type." + VM.ErrorString(this));
         }
 
+        public Float GetFloat(int n){
+            Unit this_value = stack.Peek(n);
+            if(this_value.Type == UnitType.Float)
+                return (this_value.floatValue);
+            throw new Exception("Trying to get a integer value of non numeric type." + VM.ErrorString(this));
+        }
+
         public Integer GetInteger(int n){
             Unit this_value = stack.Peek(n);
             if(this_value.Type == UnitType.Integer)
                 return this_value.integerValue;
-            if(this_value.Type == UnitType.Float)
-                return (Integer)(this_value.floatValue);
             throw new Exception("Trying to get a integer value of non numeric type." + VM.ErrorString(this));
         }
 

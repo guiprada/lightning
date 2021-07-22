@@ -111,7 +111,7 @@ namespace lightning
                 //////////////////////////////////////////////////////
                 Unit ReleaseVMs(VM vm)
                 {
-                    vm.ReleaseVMs((int)vm.GetNumber(0));
+                    vm.ReleaseVMs((int)vm.GetInteger(0));
                     return new Unit(UnitType.Null);
                 }
                 machine.Set("release_vms", new IntrinsicUnit("release_vms", ReleaseVMs, 1));
@@ -220,14 +220,14 @@ namespace lightning
                 {
                     Unit[] this_nuple = vm.GetWrappedContent<Unit[]>(0);
 
-                    return this_nuple[(int)vm.GetNumber(1)];
+                    return this_nuple[(int)vm.GetInteger(1)];
                 }
                 nupleMethods.Set("get", new IntrinsicUnit("nuple_get", NupleGet, 2));
 
                 //////////////////////////////////////////////////////
                 Unit NupleSet(VM vm)
                 {
-                    vm.GetWrappedContent<Unit[]>(0)[(int)vm.GetNumber(1)] = vm.GetUnit(2);
+                    vm.GetWrappedContent<Unit[]>(0)[(int)vm.GetInteger(1)] = vm.GetUnit(2);
 
                     return new Unit(UnitType.Null);
                 }
@@ -252,7 +252,7 @@ namespace lightning
                 Unit CreateIntrinsic(VM vm)
                 {
                     string name = vm.GetString(0);
-                    Float arity = vm.GetNumber(1);
+                    Float arity = vm.GetInteger(1);
                     string body = vm.GetString(2);
 
                     var options = ScriptOptions.Default.AddReferences(
@@ -279,7 +279,7 @@ namespace lightning
 
                 Unit NextInt(VM vm)
                 {
-                    int max = (int)(vm.GetNumber(0));
+                    int max = (int)(vm.GetInteger(0));
                     return new Unit(rng.Next(max));
                 }
                 rand.Set("int", new IntrinsicUnit("int", NextInt, 1));
@@ -421,8 +421,8 @@ namespace lightning
                 Unit ListRemoveRange(VM vm)
                 {
                     TableUnit list = vm.GetTable(0);
-                    int range_init = (int)vm.GetNumber(1);
-                    int range_end = (int)vm.GetNumber(2);
+                    int range_init = (int)vm.GetInteger(1);
+                    int range_end = (int)vm.GetInteger(2);
                     list.Elements.RemoveRange(range_init, range_end - range_init + 1);
 
                     return new Unit(UnitType.Null);
@@ -448,7 +448,7 @@ namespace lightning
                 Unit ListSplit(VM vm)
                 {
                     TableUnit list = vm.GetTable(0);
-                    int range_init = (int)vm.GetNumber(1);
+                    int range_init = (int)vm.GetInteger(1);
                     List<Unit> new_list_elements = list.Elements.GetRange(range_init, list.Elements.Count - range_init);
                     list.Elements.RemoveRange(range_init, list.Elements.Count - range_init);
                     TableUnit new_list = new TableUnit(new_list_elements, null);
@@ -461,8 +461,8 @@ namespace lightning
                 Unit ListSlice(VM vm)
                 {
                     TableUnit list = vm.GetTable(0);
-                    int range_init = (int)vm.GetNumber(1);
-                    int range_end = (int)vm.GetNumber(2);
+                    int range_init = (int)vm.GetInteger(1);
+                    int range_end = (int)vm.GetInteger(2);
 
                     List<Unit> new_list_elements = list.Elements.GetRange(range_init, range_end - range_init + 1);
                     list.Elements.RemoveRange(range_init, range_end - range_init + 1);
