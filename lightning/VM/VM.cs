@@ -132,6 +132,7 @@ namespace lightning
         public void ResoursesTrim(){
             variables.Trim();
             upValues.Trim();
+            registeredUpValues.Trim();
         }
         public void ReleaseVMs(int count){
             for (int i = 0; i < count; i++)

@@ -11,6 +11,10 @@ namespace lightning
             env = new List<Dictionary<Operand, UpValueUnit>>();
             top = 0;
         }
+        public void Trim(){
+            for(int i=0; i<(env.Count -1); i++)
+                env[i].TrimExcess();
+        }
 
         public void PushEnv(){
             if(top > (env.Count - 1))
