@@ -208,6 +208,8 @@ namespace lightning
         }
 
         public string GetString(int n){
+            if(stack.Peek(n).Type != UnitType.String)
+                throw new Exception("Expected a String." + VM.ErrorString(this));
             return ((StringUnit)(stack.Peek(n).heapUnitValue)).content;
         }
 
@@ -217,44 +219,56 @@ namespace lightning
                 return this_value.integerValue;
             if(this_value.Type == UnitType.Float)
                 return (this_value.floatValue);
-            throw new Exception("Trying to get a integer value of non numeric type." + VM.ErrorString(this));
+            throw new Exception("Expected a Float or Integer." + VM.ErrorString(this));
         }
 
         public Float GetFloat(int n){
             Unit this_value = stack.Peek(n);
             if(this_value.Type == UnitType.Float)
                 return (this_value.floatValue);
-            throw new Exception("Trying to get a integer value of non numeric type." + VM.ErrorString(this));
+            throw new Exception("Expected a Float." + VM.ErrorString(this));
         }
 
         public Integer GetInteger(int n){
             Unit this_value = stack.Peek(n);
             if(this_value.Type == UnitType.Integer)
                 return this_value.integerValue;
-            throw new Exception("Trying to get a integer value of non numeric type." + VM.ErrorString(this));
+            throw new Exception("Expected a Integer." + VM.ErrorString(this));
         }
 
         public TableUnit GetTable(int n){
+            if(stack.Peek(n).Type != UnitType.Table)
+                throw new Exception("Expected a Table." + VM.ErrorString(this));
             return (TableUnit)(stack.Peek(n).heapUnitValue);
         }
 
         public T GetWrappedContent<T>(int n){
+            if(stack.Peek(n).Type != UnitType.Wrapper)
+                throw new Exception("Expected a Wrapper." + VM.ErrorString(this));
             return ((WrapperUnit<T>)(stack.Peek(n).heapUnitValue)).UnWrapp();
         }
 
         public WrapperUnit<T> GetWrapperUnit<T>(int n){
+            if(stack.Peek(n).Type != UnitType.Wrapper)
+                throw new Exception("Expected a Wrapper." + VM.ErrorString(this));
             return ((WrapperUnit<T>)(stack.Peek(n).heapUnitValue));
         }
 
         public StringUnit GetStringUnit(int n){
+            if(stack.Peek(n).Type != UnitType.String)
+                throw new Exception("Expected a String." + VM.ErrorString(this));
             return ((StringUnit)(stack.Peek(n).heapUnitValue));
         }
 
         public char GetChar(int n){
+            if(stack.Peek(n).Type != UnitType.Char)
+                throw new Exception("Expected a Char." + VM.ErrorString(this));
             return (stack.Peek(n).charValue);
         }
 
         public bool GetBool(int n){
+            if(stack.Peek(n).Type != UnitType.Boolean)
+                throw new Exception("Expected a Boolean." + VM.ErrorString(this));
             return stack.Peek(n).ToBool();
         }
 
