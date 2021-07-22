@@ -43,13 +43,13 @@ namespace lightning
         }
         public Unit(Float p_number):this()
         {
-            if(p_number%1 == 0){
-                integerValue = (Integer)p_number;
-                heapUnitValue = TypeUnit.Integer;
-            }else{
+            // if(p_number%1 == 0){
+            //     integerValue = (Integer)p_number;
+            //     heapUnitValue = TypeUnit.Integer;
+            // }else{
                 floatValue = p_number;
                 heapUnitValue = TypeUnit.Float;
-            }
+            // }
         }
 
         public Unit(Integer p_number):this()

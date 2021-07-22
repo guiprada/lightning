@@ -2,12 +2,15 @@
 	///////////////////////
 	interface as a compile time check
 	protected variables as a compile time check
+
 	rethink typing system
-	strong typed dynamic lamguage
+	strong typed dynamic language
+	add typing tests
+
 	string could have an add method to sum string to string
 	cast methods float() integer() string()
 	table coild have an add melhod
-	table and wrapper could have and add overridabel add method
+	table and wrapper could have and add overridable add method
 	floor() ceil() and round()
 	///////////////////////
 
