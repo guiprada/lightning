@@ -13,12 +13,12 @@ namespace lightning
 			env.Add(values);
 		}
 
-		public void Push(){
+		public void PushEnv(){
 			values = new Dictionary<Operand, Dictionary<Operand, UpValueUnit>>();
 			env.Add(values);
 		}
 
-		public void Pop(){
+		public void PopEnv(){
 			values = env[^1];
 			env.RemoveAt(env.Count -1);
 		}
@@ -52,9 +52,14 @@ namespace lightning
 		}
 
 		public void Clear(){
-			foreach(KeyValuePair<Operand, Dictionary<Operand, UpValueUnit>> line in values){
-				line.Value.Clear();
-			}
+			values.Clear();
+			env.Clear();
+			env.Add(values);
+
+			// env.Clear();
+			// foreach(KeyValuePair<Operand, Dictionary<Operand, UpValueUnit>> line in values){
+			// 	line.Value.Clear();
+			// }
 		}
 	}
 }

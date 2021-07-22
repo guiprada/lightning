@@ -961,7 +961,7 @@ namespace lightning
                         if (is_in_function && i < funStartEnv.Peek())// not global
                         {
                             List<Variable> this_upvalues = upvalueStack.Peek();
-                            Variable this_upvalue = GetOrSetInUpValue(name, this_env.IndexOf(name), top_index - i, this_upvalues);
+                            Variable this_upvalue = GetOrSetUpValue(name, this_env.IndexOf(name), top_index - i, this_upvalues);
                             return this_upvalue;
                         }
                         // local var
@@ -978,7 +978,7 @@ namespace lightning
             return null;
         }
 
-        private Variable GetOrSetInUpValue(string name, int adress, int env, List<Variable> list)
+        private Variable GetOrSetUpValue(string name, int adress, int env, List<Variable> list)
         {
             foreach (Variable v in list)
             {

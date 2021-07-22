@@ -331,6 +331,7 @@ namespace lightning
         {
             variables.PushEnv();
             upValuesRegistry.PushEnv();
+            registeredUpValues.PushEnv();
         }
 
         void EnvPop()
@@ -343,7 +344,7 @@ namespace lightning
                 upValuesRegistry.Get(i).Capture();
             }
             upValuesRegistry.PopEnv();
-            registeredUpValues.Clear();
+            registeredUpValues.PopEnv();
             variables.PopEnv();
         }
 

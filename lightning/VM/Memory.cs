@@ -83,5 +83,6 @@ namespace lightning
             values.RemoveRange(markers[last_index], values.Count - markers[last_index]);
             markers.RemoveAt(last_index);
         }
+
     }
 }
