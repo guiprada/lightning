@@ -1117,7 +1117,9 @@ namespace lightning
                             return result.value;
                         }
                     }catch(Exception e){
+#if DEBUG
                         Console.WriteLine(e);
+#endif
                         imported_vm.Error("VM Busted ...");
                     }
                 }
@@ -1175,11 +1177,12 @@ namespace lightning
                             if (result.status == VMResultType.OK)
                             {
                                 MakeModule(result.value, path, vm, imported_vm);
-                                //vm.GetChunk().Print();
                                 return result.value;
                             }
                         }catch(Exception e){
+#if DEBUG
                             Console.WriteLine(e);
+#endif
                             imported_vm.Error("VM Busted ...");
                         }
                     }
