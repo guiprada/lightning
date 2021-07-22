@@ -59,8 +59,9 @@ namespace lightning
         }
 
         public override Unit Get(Unit p_key){
-            if(table.ContainsKey(p_key))
-                return table[p_key];
+            Unit this_unit;
+            if(table.TryGetValue(p_key, out this_unit))
+                return this_unit;
             else if(superTable != null)
                 return superTable.Get(p_key);
             throw new Exception("String Table or Super Table does not contain index: " + p_key.ToString());

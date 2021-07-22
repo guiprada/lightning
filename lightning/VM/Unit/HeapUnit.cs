@@ -568,8 +568,9 @@ namespace lightning
         }
 
         public override Unit Get(Unit p_key){
-            if(Table.ContainsKey(p_key)){
-                return Table[p_key];
+            Unit this_unit;
+            if(Table.TryGetValue(p_key, out this_unit)){
+                return this_unit;
             }else{
                 throw new Exception("Module Table does not contain index:" + p_key.ToString());
             }
@@ -626,8 +627,9 @@ namespace lightning
         }
 
         public override Unit Get(Unit p_key){
-            if(table.ContainsKey(p_key))
-                return table[p_key];
+            Unit this_unit;
+            if(table.TryGetValue(p_key, out this_unit))
+                return this_unit;
             else if(superTable != null)
                 return superTable.Get(p_key);
             throw new Exception("Wrapper<" + typeof(T) +"> Super Table does not contain index: " + p_key.ToString());

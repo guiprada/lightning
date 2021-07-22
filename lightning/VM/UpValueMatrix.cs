@@ -10,16 +10,27 @@ namespace lightning
 		}
 
 		public UpValueUnit Get(Operand x, Operand y){
-			if(values.ContainsKey(x))
-				if(values[x].ContainsKey(y))
-					return values[x][y];
+			Dictionary<Operand, UpValueUnit> this_line;
+			if(values.TryGetValue(x, out this_line)){
+				UpValueUnit this_up_value;
+				if(values[x].TryGetValue(y, out this_up_value))
+					return this_up_value;
+			}
+
 			return null;
 		}
 
 		public void Set(UpValueUnit p_value, Operand x, Operand y){
-			if(!values.ContainsKey(x))
+			Dictionary<Operand, UpValueUnit> this_line;
+			if(!values.TryGetValue(x, out this_line)){
 				values[x] = new Dictionary<Operand, UpValueUnit>();
-			values[x].Add(y, p_value);
+				this_line = values[x];
+			}
+			this_line.Add(y, p_value);
+		}
+
+		public void Capture(){
+
 		}
 
 		public void Clear(){

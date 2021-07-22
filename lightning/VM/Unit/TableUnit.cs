@@ -108,8 +108,9 @@ namespace lightning
             }
         }
         Unit GetTable(Unit p_key){
-            if(Table.ContainsKey(p_key))
-                return Table[p_key];
+            Unit this_unit;
+            if(Table.TryGetValue(p_key, out this_unit))
+                return this_unit;
             else if(SuperTable != null)
                 return SuperTable.GetTable(p_key);
             throw new Exception("Table or Super Table does not contain index: " + p_key.ToString());
@@ -118,8 +119,9 @@ namespace lightning
         Unit GetElement(Unit p_key){
             if(p_key.integerValue < Elements.Count)
                 return Elements[(int)p_key.integerValue];
-            if(Table.ContainsKey(p_key))
-                    return Table[p_key];
+            Unit this_unit;
+            if(Table.TryGetValue(p_key, out this_unit))
+                    return this_unit;
             throw new Exception("List does not contain index: " + p_key.ToString());
         }
         void ElementSet(Unit p_key, Unit value)
@@ -130,15 +132,16 @@ namespace lightning
             else if (index > Elements.Count)
                 TableSet(p_key, value);
             else if (index == Elements.Count){
-                if (Table.ContainsKey(p_key))
-                    MoveToList(p_key);
+                Unit this_unit;
+                if (Table.TryGetValue(p_key, out this_unit))
+                    MoveToList(this_unit, p_key);
                 else
                     Elements.Add(value);
             }
         }
 
-        void MoveToList(Unit p_key){
-            Elements.Add(Table[p_key]);
+        void MoveToList(Unit value, Unit p_key){
+            Elements.Add(value);
             Table.Remove(p_key);
         }
 
