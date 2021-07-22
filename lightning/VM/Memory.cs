@@ -34,7 +34,6 @@ namespace lightning
         public Memory(){
             values = new List<T>();
             markers = new List<int>();
-            PushEnv();
         }
 
         public void Trim(){

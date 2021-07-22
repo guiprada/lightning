@@ -30,7 +30,7 @@ namespace lightning
             if(env[p_env].TryGetValue(p_address, out this_upvalue))
                 return this_upvalue;
             else{
-                this_upvalue = new UpValueUnit(p_address,(Operand)(p_env + 1));// We shift back to global env.
+                this_upvalue = new UpValueUnit(p_address,(Operand)(p_env));
                 Set(this_upvalue, p_address, p_env);
                 return this_upvalue;
             }
