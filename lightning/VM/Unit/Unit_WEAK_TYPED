@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Runtime.InteropServices;
 
 #if DOUBLE
@@ -210,14 +210,15 @@ namespace lightning
             UnitType opA_type = opA.Type;
             UnitType opB_type = opB.Type;
 
-            if(opA_type != opB_type)
-                throw new Exception("Trying to add different UnitType. " + VM.ErrorString(null));
-
             if(opA_type == UnitType.Float){
                 if(opB_type == UnitType.Float)
                     return new Unit(opA.floatValue + opB.floatValue);
+                if(opB_type == UnitType.Integer)
+                    return new Unit(opA.floatValue + opB.integerValue);
             }
             if(opA_type == UnitType.Integer){
+                if(opB_type == UnitType.Float)
+                    return new Unit(opA.integerValue + opB.floatValue);
                 if(opB_type == UnitType.Integer)
                     return new Unit(opA.integerValue + opB.integerValue);
             }
@@ -231,7 +232,7 @@ namespace lightning
                 return new Unit(opA.floatValue + opB);
             }
             if(opA_type == UnitType.Integer){
-                return new Unit(opA.integerValue + (Integer)opB);
+                return new Unit(opA.integerValue + opB);
             }
             throw new Exception("Trying to increment non numeric UnitType. " + VM.ErrorString(null));
         }
@@ -252,14 +253,15 @@ namespace lightning
             UnitType opA_type = opA.Type;
             UnitType opB_type = opB.Type;
 
-            if(opA_type != opB_type)
-                throw new Exception("Trying to subtract different UnitType. " + VM.ErrorString(null));
-
             if(opA_type == UnitType.Float){
                 if(opB_type == UnitType.Float)
                     return new Unit(opA.floatValue - opB.floatValue);
+                if(opB_type == UnitType.Integer)
+                    return new Unit(opA.floatValue - opB.integerValue);
             }
             if(opA_type == UnitType.Integer){
+                if(opB_type == UnitType.Float)
+                    return new Unit(opA.integerValue - opB.floatValue);
                 if(opB_type == UnitType.Integer)
                     return new Unit(opA.integerValue - opB.integerValue);
             }
@@ -273,7 +275,7 @@ namespace lightning
                 return new Unit(opA.floatValue - opB);
             }
             if(opA_type == UnitType.Integer){
-                return new Unit(opA.integerValue - (Integer)opB);
+                return new Unit(opA.integerValue - opB);
             }
             throw new Exception("Trying to decrement non numeric UnitType. " + VM.ErrorString(null));
         }
@@ -294,14 +296,15 @@ namespace lightning
             UnitType opA_type = opA.Type;
             UnitType opB_type = opB.Type;
 
-            if(opA_type != opB_type)
-                throw new Exception("Trying to multiply different UnitType. " + VM.ErrorString(null));
-
             if(opA_type == UnitType.Float){
                 if(opB_type == UnitType.Float)
                     return new Unit(opA.floatValue * opB.floatValue);
+                if(opB_type == UnitType.Integer)
+                    return new Unit(opA.floatValue * opB.integerValue);
             }
             if(opA_type == UnitType.Integer){
+                if(opB_type == UnitType.Float)
+                    return new Unit(opA.integerValue * opB.floatValue);
                 if(opB_type == UnitType.Integer)
                     return new Unit(opA.integerValue * opB.integerValue);
             }
@@ -312,14 +315,15 @@ namespace lightning
             UnitType opA_type = opA.Type;
             UnitType opB_type = opB.Type;
 
-            if(opA_type != opB_type)
-                throw new Exception("Trying to divide different UnitType. " + VM.ErrorString(null));
-
             if(opA_type == UnitType.Float){
                 if(opB_type == UnitType.Float)
                     return new Unit(opA.floatValue / opB.floatValue);
+                if(opB_type == UnitType.Integer)
+                    return new Unit(opA.floatValue / opB.integerValue);
             }
             if(opA_type == UnitType.Integer){
+                if(opB_type == UnitType.Float)
+                    return new Unit(opA.integerValue / opB.floatValue);
                 if(opB_type == UnitType.Integer)
                     return new Unit(opA.integerValue / opB.integerValue);
             }

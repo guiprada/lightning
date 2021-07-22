@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Runtime.InteropServices;
 
 #if DOUBLE
@@ -36,15 +36,20 @@ namespace lightning
             }
         }
 
-        public Unit(HeapUnit p_value):this()
+        public UnitAUTACASTING(HeapUnit p_value):this()
         {
             floatValue = 0;
             heapUnitValue = p_value;
         }
         public Unit(Float p_number):this()
         {
-            floatValue = p_number;
-            heapUnitValue = TypeUnit.Float;
+            // if(p_number%1 == 0){
+            //     integerValue = (Integer)p_number;
+            //     heapUnitValue = TypeUnit.Integer;
+            // }else{
+                floatValue = p_number;
+                heapUnitValue = TypeUnit.Float;
+            // }
         }
 
         public Unit(Integer p_number):this()
@@ -216,25 +221,29 @@ namespace lightning
             if(opA_type == UnitType.Float){
                 if(opB_type == UnitType.Float)
                     return new Unit(opA.floatValue + opB.floatValue);
+                // if(opB_type == UnitType.Integer)
+                //     return new Unit(opA.floatValue + opB.integerValue);
             }
             if(opA_type == UnitType.Integer){
+                // if(opB_type == UnitType.Float)
+                //     return new Unit(opA.integerValue + opB.floatValue);
                 if(opB_type == UnitType.Integer)
                     return new Unit(opA.integerValue + opB.integerValue);
             }
             throw new Exception("Trying to add non alphanumeric UnitType. " + VM.ErrorString(null));
         }
 
-        public static Unit operator +(Unit opA, Float opB){
-            UnitType opA_type = opA.Type;
+        // public static Unit operator +(Unit opA, Float opB){
+        //     UnitType opA_type = opA.Type;
 
-            if(opA_type == UnitType.Float){
-                return new Unit(opA.floatValue + opB);
-            }
-            if(opA_type == UnitType.Integer){
-                return new Unit(opA.integerValue + (Integer)opB);
-            }
-            throw new Exception("Trying to increment non numeric UnitType. " + VM.ErrorString(null));
-        }
+        //     if(opA_type == UnitType.Float){
+        //         return new Unit(opA.floatValue + opB);
+        //     }
+        //     if(opA_type == UnitType.Integer){
+        //         return new Unit(opA.integerValue + opB);
+        //     }
+        //     throw new Exception("Trying to increment non numeric UnitType. " + VM.ErrorString(null));
+        // }
 
         public static Unit operator +(Unit opA, Integer opB){
             UnitType opA_type = opA.Type;
@@ -258,25 +267,29 @@ namespace lightning
             if(opA_type == UnitType.Float){
                 if(opB_type == UnitType.Float)
                     return new Unit(opA.floatValue - opB.floatValue);
+                // if(opB_type == UnitType.Integer)
+                //     return new Unit(opA.floatValue - opB.integerValue);
             }
             if(opA_type == UnitType.Integer){
+                // if(opB_type == UnitType.Float)
+                //     return new Unit(opA.integerValue - opB.floatValue);
                 if(opB_type == UnitType.Integer)
                     return new Unit(opA.integerValue - opB.integerValue);
             }
             throw new Exception("Trying to subtract non numeric UnitType. " + VM.ErrorString(null));
         }
 
-        public static Unit operator -(Unit opA, Float opB){
-            UnitType opA_type = opA.Type;
+        // public static Unit operator -(Unit opA, Float opB){
+        //     UnitType opA_type = opA.Type;
 
-            if(opA_type == UnitType.Float){
-                return new Unit(opA.floatValue - opB);
-            }
-            if(opA_type == UnitType.Integer){
-                return new Unit(opA.integerValue - (Integer)opB);
-            }
-            throw new Exception("Trying to decrement non numeric UnitType. " + VM.ErrorString(null));
-        }
+        //     if(opA_type == UnitType.Float){
+        //         return new Unit(opA.floatValue - opB);
+        //     }
+        //     if(opA_type == UnitType.Integer){
+        //         return new Unit(opA.integerValue - opB);
+        //     }
+        //     throw new Exception("Trying to decrement non numeric UnitType. " + VM.ErrorString(null));
+        // }
 
         public static Unit operator -(Unit opA, Integer opB){
             UnitType opA_type = opA.Type;
@@ -300,8 +313,12 @@ namespace lightning
             if(opA_type == UnitType.Float){
                 if(opB_type == UnitType.Float)
                     return new Unit(opA.floatValue * opB.floatValue);
+                // if(opB_type == UnitType.Integer)
+                //     return new Unit(opA.floatValue * opB.integerValue);
             }
             if(opA_type == UnitType.Integer){
+                // if(opB_type == UnitType.Float)
+                //     return new Unit(opA.integerValue * opB.floatValue);
                 if(opB_type == UnitType.Integer)
                     return new Unit(opA.integerValue * opB.integerValue);
             }
@@ -318,8 +335,12 @@ namespace lightning
             if(opA_type == UnitType.Float){
                 if(opB_type == UnitType.Float)
                     return new Unit(opA.floatValue / opB.floatValue);
+                // if(opB_type == UnitType.Integer)
+                //     return new Unit(opA.floatValue / opB.integerValue);
             }
             if(opA_type == UnitType.Integer){
+                // if(opB_type == UnitType.Float)
+                //     return new Unit(opA.integerValue / opB.floatValue);
                 if(opB_type == UnitType.Integer)
                     return new Unit(opA.integerValue / opB.integerValue);
             }
