@@ -1286,20 +1286,28 @@ namespace lightning
             functions.Add(new IntrinsicUnit("type", Type, 1));
 
             //////////////////////////////////////////////////////
-            Unit Integer(VM vm)
+            Unit ToInteger(VM vm)
             {
                 Float this_float = vm.GetFloat(0);
                 return new Unit((Integer)this_float);
             }
-            functions.Add(new IntrinsicUnit("to_integer", Integer, 1));
+            functions.Add(new IntrinsicUnit("to_integer", ToInteger, 1));
 
             //////////////////////////////////////////////////////
-            Unit String(VM vm)
+            Unit ToFloat(VM vm)
+            {
+                Integer this_integer = vm.GetInteger(0);
+                return new Unit((Float)this_integer);
+            }
+            functions.Add(new IntrinsicUnit("to_float", ToFloat, 1));
+
+            //////////////////////////////////////////////////////
+            Unit ToString(VM vm)
             {
                 string this_string = vm.GetUnit(0).ToString();
                 return new Unit(this_string);
             }
-            functions.Add(new IntrinsicUnit("to_string", String, 1));
+            functions.Add(new IntrinsicUnit("to_string", ToString, 1));
 
             //////////////////////////////////////////////////////
             Unit IsNumber(VM vm)
