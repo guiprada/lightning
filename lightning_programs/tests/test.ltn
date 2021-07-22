@@ -58,23 +58,42 @@ errors += require("tests/try.ltn")
 {
     var f1
     var f2
+    var f3
     var get_a
     {
 
         var a = 0
         f1 = function {
-            {{{
             a = a + 1
-            }}}
-            // a = a + 1
         }
         get_a = function {
             return a
+        }
+
+        f2 = function {
+            {{{
+            a = a + 1
+            }}}
+        }
+
+        {
+            f3 = function {
+                a = a + 1
+            }
         }
     }
     f1()
     f1()
     lib_assert_counter.assert(get_a(), 2, "Failed Double UpValue Test 1.")
+
+
+    f2()
+    lib_assert_counter.assert(get_a(), 3, "Failed Nested UpValue Test 1.")
+
+    f3()
+    f3()
+    f3()
+    lib_assert_counter.assert(get_a(), 6, "Failed Nested UpValue Test 2.")
 }
 
 //////////////////////////////// end scratch
