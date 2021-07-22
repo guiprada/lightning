@@ -1,0 +1,44 @@
+var assert_counter = require("assert_counter.ltn")
+var assert = assert_counter.assert
+var assert_not = assert_counter.assert_not
+{
+    var f1
+    var f2
+    var f3
+    var get_a
+    {
+
+        var a = 0
+        f1 = function {
+            a = a + 1
+        }
+        get_a = function {
+            return a
+        }
+
+        f2 = function {
+            {{{
+            a = a + 1
+            }}}
+        }
+
+        {
+            f3 = function {
+                a = a + 1
+            }
+        }
+    }
+    f1()
+    f1()
+    assert(get_a(), 2, "Failed Double UpValue Test 1.")
+
+
+    f2()
+    assert(get_a(), 3, "Failed Nested UpValue Test 1.")
+
+    f3()
+    f3()
+    f3()
+    assert(get_a(), 6, "Failed Nested UpValue Test 2.")
+}
+return assert_counter.get_error_counter()

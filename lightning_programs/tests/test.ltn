@@ -33,6 +33,7 @@ errors += require("tests/map.ltn")
 errors += require("tests/reduce.ltn")
 errors += require("tests/table.ltn")
 errors += require("tests/scoping.ltn")
+errors += require("tests/up_value.ltn")
 errors += require("tests/closures.ltn")
 errors += require("tests/lambdas.ltn")
 errors += require("tests/boolean.ltn")
@@ -55,46 +56,7 @@ errors += require("tests/anonymous_call.ltn")
 errors += require("tests/try.ltn")
 
 //////////////////////////////// scratch
-{
-    var f1
-    var f2
-    var f3
-    var get_a
-    {
 
-        var a = 0
-        f1 = function {
-            a = a + 1
-        }
-        get_a = function {
-            return a
-        }
-
-        f2 = function {
-            {{{
-            a = a + 1
-            }}}
-        }
-
-        {
-            f3 = function {
-                a = a + 1
-            }
-        }
-    }
-    f1()
-    f1()
-    lib_assert_counter.assert(get_a(), 2, "Failed Double UpValue Test 1.")
-
-
-    f2()
-    lib_assert_counter.assert(get_a(), 3, "Failed Nested UpValue Test 1.")
-
-    f3()
-    f3()
-    f3()
-    lib_assert_counter.assert(get_a(), 6, "Failed Nested UpValue Test 2.")
-}
 
 //////////////////////////////// end scratch
 machine.trim()
