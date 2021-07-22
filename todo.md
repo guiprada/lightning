@@ -11,6 +11,8 @@ examine overflows in numeric operations
 
 To be Done
 ----------
+add a make_closure(a_function, a_table_with_values) method to set up "protected" table variables
+sync grammar with parser
 string could have an add method to sum string to string
 cast methods float() integer() string()
 table could have an add melhod
