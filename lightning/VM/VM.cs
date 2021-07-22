@@ -48,8 +48,7 @@ namespace lightning
         public Stack stack;
 
         Memory<UpValueUnit> upValues;
-        Memory<UpValueUnit> upValuesRegistry;
-        UpValueMatrix registeredUpValues;
+        UpValueEnv registeredUpValues;
 
         public List<IntrinsicUnit> Intrinsics { get; private set; }
         public Library Prelude { get; private set; }
@@ -84,8 +83,7 @@ namespace lightning
 
             variables = new Memory<Unit>();
             upValues = new Memory<UpValueUnit>();
-            upValuesRegistry = new Memory<UpValueUnit>();
-            registeredUpValues = new UpValueMatrix();
+            registeredUpValues = new UpValueEnv();
 
             constants = p_chunk.GetConstants;
             Prelude = p_chunk.Prelude;
@@ -128,12 +126,10 @@ namespace lightning
             stack = new Stack(functionDeepness);
             variables = new Memory<Unit>();
             upValues = new Memory<UpValueUnit>();
-            upValuesRegistry = new Memory<UpValueUnit>();
-            registeredUpValues = new UpValueMatrix();
+            registeredUpValues = new UpValueEnv();
         }
 
         public void ResoursesTrim(){
-            upValuesRegistry.Trim();
             variables.Trim();
             upValues.Trim();
         }
@@ -159,7 +155,6 @@ namespace lightning
             stack.Clear();
             variables.Clear();
             upValues.Clear();
-            upValuesRegistry.Clear();
             registeredUpValues.Clear();
         }
         public void RecycleVM(VM vm)
@@ -315,35 +310,22 @@ namespace lightning
         }
 
         UpValueUnit GetUpValue(Operand p_address, Operand p_env){
-            UpValueUnit up_value = registeredUpValues.Get(p_address, p_env);
-            if(up_value == null){
-                up_value = new UpValueUnit(p_address, p_env);
-                registeredUpValues.Set(up_value, p_address, p_env);
+            UpValueUnit this_upvalue = registeredUpValues.Get(p_address, p_env);
+            if(this_upvalue == null){
+                this_upvalue = new UpValueUnit(p_address, p_env);
+                registeredUpValues.Set(this_upvalue, p_address, p_env);
             }
-            return up_value;
-        }
-        void RegisterUpValue(UpValueUnit u)
-        {
-            upValuesRegistry.Add(u);
+            return this_upvalue;
         }
 
         void EnvPush()
         {
             variables.PushEnv();
-            upValuesRegistry.PushEnv();
             registeredUpValues.PushEnv();
         }
 
         void EnvPop()
         {
-            // capture closures
-            int upvalues_start = upValuesRegistry.Marker;
-            int upvalues_end = upValuesRegistry.Count;
-            for (int i = upvalues_start; i < upvalues_end; i++)
-            {
-                upValuesRegistry.Get(i).Capture();
-            }
-            upValuesRegistry.PopEnv();
             registeredUpValues.PopEnv();
             variables.PopEnv();
         }
@@ -472,10 +454,7 @@ namespace lightning
                                 ClosureUnit new_closure = new ClosureUnit(this_closure.Function, new_upValues);
 
                                 new_closure.Register(variables);
-                                foreach (UpValueUnit u in new_closure.UpValues)
-                                {
-                                    RegisterUpValue(u);
-                                }
+
                                 Unit new_closure_unit = new Unit(new_closure);
                                 if (lambda == 0)
                                     if (env == 0)// yes they exist!
