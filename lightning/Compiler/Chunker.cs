@@ -955,13 +955,12 @@ namespace lightning
                 {
                     bool is_in_function = upvalueStack.Count != 0;// if we are compiling a function this stack will not be empty
                     bool isGlobal = (i == 0);
-                    //Console.WriteLine("found var " + name + " " + isGlobal.ToString());
                     if (!isGlobal)
                     {
                         if (is_in_function && i < funStartEnv.Peek())// not global
                         {
                             List<Variable> this_upvalues = upvalueStack.Peek();
-                            Variable this_upvalue = GetOrSetUpValue(name, this_env.IndexOf(name), top_index - i, this_upvalues);
+                            Variable this_upvalue = GetOrSetUpValue(name, this_env.IndexOf(name), i, this_upvalues);
                             return this_upvalue;
                         }
                         // local var

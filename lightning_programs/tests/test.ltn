@@ -63,10 +63,10 @@ errors += require("tests/try.ltn")
 
         var a = 0
         f1 = function {
-            // {
-            // a = a + 1
-            // }
+            {{{
             a = a + 1
+            }}}
+            // a = a + 1
         }
         get_a = function {
             return a

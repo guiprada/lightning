@@ -311,7 +311,7 @@ namespace lightning
         }
 
         Operand CalculateEnvShiftUpVal(Operand env){
-            return (Operand)(variables.Env + 1 - env);
+            return (Operand)(env);
         }
 
         UpValueUnit GetUpValue(Operand p_address, Operand p_env){
