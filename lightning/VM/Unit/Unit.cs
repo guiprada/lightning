@@ -213,12 +213,12 @@ namespace lightning
             if(opA_type == UnitType.Float){
                 if(opB_type == UnitType.Float)
                     return new Unit(opA.floatValue + opB.floatValue);
-                throw new Exception("Trying to add different UnitType. " + VM.ErrorString(null));
+                throw new Exception("Trying to add different UnitTypes. " + VM.ErrorString(null));
             }
             if(opA_type == UnitType.Integer){
                 if(opB_type == UnitType.Integer)
                     return new Unit(opA.integerValue + opB.integerValue);
-                throw new Exception("Trying to add different UnitType. " + VM.ErrorString(null));
+                throw new Exception("Trying to add different UnitTypes. " + VM.ErrorString(null));
             }
             throw new Exception("Trying to add non alphanumeric UnitType. " + VM.ErrorString(null));
         }
@@ -254,12 +254,12 @@ namespace lightning
             if(opA_type == UnitType.Float){
                 if(opB_type == UnitType.Float)
                     return new Unit(opA.floatValue - opB.floatValue);
-                throw new Exception("Trying to subtract different UnitType. " + VM.ErrorString(null));
+                throw new Exception("Trying to subtract different UnitTypes. " + VM.ErrorString(null));
             }
             if(opA_type == UnitType.Integer){
                 if(opB_type == UnitType.Integer)
                     return new Unit(opA.integerValue - opB.integerValue);
-                throw new Exception("Trying to subtract different UnitType. " + VM.ErrorString(null));
+                throw new Exception("Trying to subtract different UnitTypes. " + VM.ErrorString(null));
             }
             throw new Exception("Trying to subtract non numeric UnitType. " + VM.ErrorString(null));
         }
@@ -295,12 +295,12 @@ namespace lightning
             if(opA_type == UnitType.Float){
                 if(opB_type == UnitType.Float)
                     return new Unit(opA.floatValue * opB.floatValue);
-                throw new Exception("Trying to multiply different UnitType. " + VM.ErrorString(null));
+                throw new Exception("Trying to multiply different UnitTypes. " + VM.ErrorString(null));
             }
             if(opA_type == UnitType.Integer){
                 if(opB_type == UnitType.Integer)
                     return new Unit(opA.integerValue * opB.integerValue);
-                throw new Exception("Trying to multiply different UnitType. " + VM.ErrorString(null));
+                throw new Exception("Trying to multiply different UnitTypes. " + VM.ErrorString(null));
             }
             throw new Exception("Trying to multiply non numeric UnitType. " + VM.ErrorString(null));
         }
@@ -312,12 +312,12 @@ namespace lightning
             if(opA_type == UnitType.Float){
                 if(opB_type == UnitType.Float)
                     return new Unit(opA.floatValue / opB.floatValue);
-                throw new Exception("Trying to divide different UnitType. " + VM.ErrorString(null));
+                throw new Exception("Trying to divide different UnitTypes. " + VM.ErrorString(null));
             }
             if(opA_type == UnitType.Integer){
                 if(opB_type == UnitType.Integer)
                     return new Unit(opA.integerValue / opB.integerValue);
-                throw new Exception("Trying to divide different UnitType. " + VM.ErrorString(null));
+                throw new Exception("Trying to divide different UnitTypes. " + VM.ErrorString(null));
             }
             throw new Exception("Trying to divide non numeric UnitType. " + VM.ErrorString(null));
         }
