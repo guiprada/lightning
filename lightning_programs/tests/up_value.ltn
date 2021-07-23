@@ -32,7 +32,6 @@ var assert_not = assert_counter.assert_not
     f1()
     assert(get_a(), 2, "Failed Double UpValue Test 1.")
 
-
     f2()
     assert(get_a(), 3, "Failed Nested UpValue Test 1.")
 

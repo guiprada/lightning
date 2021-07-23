@@ -37,7 +37,13 @@ namespace lightning
                 return Elements.Count + Table.Count;
             }
         }
-        public TableUnit(List<Unit> p_elements, Dictionary<Unit, Unit> p_table, TableUnit p_superTable = null)
+        public TableUnit(List<Unit> p_elements, Dictionary<Unit, Unit> p_table)
+        {
+            Elements = p_elements ??= new List<Unit>();
+            Table = p_table ??= new Dictionary<Unit, Unit>();
+            SuperTable = superTable;
+        }
+        public TableUnit(List<Unit> p_elements, Dictionary<Unit, Unit> p_table, TableUnit p_superTable)
         {
             Elements = p_elements ??= new List<Unit>();
             Table = p_table ??= new Dictionary<Unit, Unit>();
@@ -241,6 +247,464 @@ namespace lightning
                     return -1;
                 default:
                     throw new Exception("Trying to compare a TableUnit to unkown UnitType.");
+            }
+        }
+
+        ////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        ////////////////////////////////////////////////////////////////////////////////////////////////////// Table
+        private static TableUnit superTable = new TableUnit(null, null);
+        static TableUnit(){
+            initSuperTable();
+        }
+        private static void initSuperTable(){
+            {
+                Unit Clone(VM vm)
+                {
+                    TableUnit this_table = vm.GetTable(0);
+                    Dictionary<Unit, Unit> table_copy = new Dictionary<Unit, Unit>();
+                    foreach (KeyValuePair<Unit, Unit> entry in this_table.Table)
+                    {
+                        table_copy.Add(entry.Key, entry.Value);
+                    }
+
+                    List<Unit> new_list_elements = new List<Unit>();
+                    foreach (Unit v in this_table.Elements)
+                    {
+                        new_list_elements.Add(v);
+                    }
+                    TableUnit new_list = new TableUnit(new_list_elements, null);
+
+                    TableUnit copy = new TableUnit(new_list_elements, table_copy, this_table.SuperTable);
+
+                    return new Unit(copy);
+                }
+                superTable.Set("clone", new IntrinsicUnit("table_clone", Clone, 1));
+
+                //////////////////////////////////////////////////////
+                Unit ListInit(VM vm)
+                {
+                    TableUnit list = vm.GetTable(0);
+                    Integer new_end = vm.GetInteger(1);
+                    int size = list.Count;
+                    for(int i=size; i<(new_end); i++)
+                        list.Elements.Add(new Unit(UnitType.Null));
+
+                    return new Unit(UnitType.Null);
+                }
+                superTable.Set("list_init", new IntrinsicUnit("list_init", ListInit, 2));
+
+                //////////////////////////////////////////////////////
+                Unit ListPush(VM vm)
+                {
+                    TableUnit list = vm.GetTable(0);
+                    Unit value = vm.GetUnit(1);
+                    list.Elements.Add(value);
+
+                    return new Unit(UnitType.Null);
+                }
+                superTable.Set("push", new IntrinsicUnit("push", ListPush, 2));
+
+                //////////////////////////////////////////////////////
+                Unit ListPop(VM vm)
+                {
+                    TableUnit list = vm.GetTable(0);
+                    Float value = list.Elements[^1].floatValue;
+                    list.Elements.RemoveRange(list.Elements.Count - 1, 1);
+
+                    return new Unit(value);
+                }
+                superTable.Set("pop", new IntrinsicUnit("pop", ListPop, 1));
+
+                //////////////////////////////////////////////////////
+                Unit ListToString(VM vm)
+                {
+                    TableUnit this_table = vm.GetTable(0);
+                    bool first = true;
+                    string value = "";
+                    foreach (Unit v in this_table.Elements)
+                    {
+                        if (first)
+                        {
+                            value += System.Text.RegularExpressions.Regex.Unescape(v.ToString());
+                            first = false;
+                        }
+                        else
+                        {
+                            value += ", " + System.Text.RegularExpressions.Regex.Unescape(v.ToString());
+                        }
+                    }
+                    return new Unit(value);
+                }
+                superTable.Set("list_to_string", new IntrinsicUnit("list_to_string", ListToString, 1));
+
+                ////////////////////////////////////////////////////
+                Unit ListCount(VM vm)
+                {
+                    TableUnit this_table = vm.GetTable(0);
+                    int count = this_table.ECount;
+                    return new Unit(count);
+                }
+                superTable.Set("list_count", new IntrinsicUnit("list_count", ListCount, 1));
+
+                //////////////////////////////////////////////////////
+                Unit ListClear(VM vm)
+                {
+                    TableUnit list = vm.GetTable(0);
+                    list.Elements.Clear();
+                    return new Unit(UnitType.Null);
+                }
+                superTable.Set("list_clear", new IntrinsicUnit("list_clear", ListClear, 1));
+
+                //////////////////////////////////////////////////////
+                Unit ListRemoveRange(VM vm)
+                {
+                    TableUnit list = vm.GetTable(0);
+                    int range_init = (int)vm.GetInteger(1);
+                    int range_end = (int)vm.GetInteger(2);
+                    list.Elements.RemoveRange(range_init, range_end - range_init + 1);
+
+                    return new Unit(UnitType.Null);
+                }
+                superTable.Set("list_remove", new IntrinsicUnit("list_remove", ListRemoveRange, 3));
+
+                //////////////////////////////////////////////////////
+                Unit ListCopy(VM vm)
+                {
+                    TableUnit list = vm.GetTable(0);
+                    List<Unit> new_list_elements = new List<Unit>();
+                    foreach (Unit v in list.Elements)
+                    {
+                        new_list_elements.Add(v);
+                    }
+                    TableUnit new_list = new TableUnit(new_list_elements, null);
+
+                    return new Unit(new_list);
+                }
+                superTable.Set("list_copy", new IntrinsicUnit("list_copy", ListCopy, 1));
+
+                //////////////////////////////////////////////////////
+                Unit ListSplit(VM vm)
+                {
+                    TableUnit list = vm.GetTable(0);
+                    int range_init = (int)vm.GetInteger(1);
+                    List<Unit> new_list_elements = list.Elements.GetRange(range_init, list.Elements.Count - range_init);
+                    list.Elements.RemoveRange(range_init, list.Elements.Count - range_init);
+                    TableUnit new_list = new TableUnit(new_list_elements, null);
+
+                    return new Unit(new_list);
+                }
+                superTable.Set("list_split", new IntrinsicUnit("list_split", ListSplit, 2));
+
+                //////////////////////////////////////////////////////
+                Unit ListSlice(VM vm)
+                {
+                    TableUnit list = vm.GetTable(0);
+                    int range_init = (int)vm.GetInteger(1);
+                    int range_end = (int)vm.GetInteger(2);
+
+                    List<Unit> new_list_elements = list.Elements.GetRange(range_init, range_end - range_init + 1);
+                    list.Elements.RemoveRange(range_init, range_end - range_init + 1);
+                    TableUnit new_list = new TableUnit(new_list_elements, null);
+
+                    return new Unit(new_list);
+                }
+                superTable.Set("list_slice", new IntrinsicUnit("list_slice", ListSlice, 3));
+                //////////////////////////////////////////////////////
+                Unit ListReverse(VM vm)
+                {
+                    TableUnit list = vm.GetTable(0);
+                    list.Elements.Reverse();
+
+                    return new Unit(UnitType.Null);
+                }
+                superTable.Set("list_reverse", new IntrinsicUnit("list_reverse", ListReverse, 1));
+
+                //////////////////////////////////////////////////////
+                Unit ListSort(VM vm)
+                {
+                    TableUnit list = vm.GetTable(0);
+                    list.Elements.Sort();
+
+                    return new Unit(UnitType.Null);
+                }
+                superTable.Set("list_sort", new IntrinsicUnit("list_sort", ListSort, 1));
+
+                //////////////////////////////////////////////////////
+                var rng = new Random();
+                Unit ListShuffle(VM vm)
+                {
+                    TableUnit listUnit = vm.GetTable(0);
+                    List<Unit> list = listUnit.Elements;
+                    int n = list.Count;
+                    for(int i=0; i<list.Count; i++){
+                        int rand_position = rng.Next(n);
+                        Unit swap = list[rand_position];
+                        list[rand_position] = list[i];
+                        list[i] = swap;
+                    }
+
+                    return new Unit(UnitType.Null);
+                }
+                superTable.Set("list_shuffle", new IntrinsicUnit("list_shuffle", ListShuffle, 1));
+
+                //////////////////////////////////////////////////////
+
+                Unit ListMakeIndexesIterator(VM vm)
+                {
+                    TableUnit this_table = vm.GetTable(0);
+                    int i = -1;
+
+                    TableUnit iterator = new TableUnit(null, null);
+                    Unit next(VM vm)
+                    {
+                        if (i < (this_table.ECount - 1))
+                        {
+                            i++;
+                            iterator.Set("key", i);
+                            iterator.Set("value", this_table.Elements[i]);
+                            return new Unit(true);
+                        }
+                        return new Unit(false);
+                    };
+                    iterator.Set("next", new IntrinsicUnit("list_index_iterator_next", next, 0));
+                    return new Unit(iterator);
+                }
+                superTable.Set("list_index_iterator", new IntrinsicUnit("list_index_iterator", ListMakeIndexesIterator, 1));
+
+                //////////////////////////////////////////////////////
+
+                Unit ListMakeIterator(VM vm)
+                {
+                    TableUnit this_table = vm.GetTable(0);
+                    int i = -1;
+                    Unit value = new Unit(UnitType.Null);
+
+                    TableUnit iterator = new TableUnit(null, null);
+                    Unit next(VM vm)
+                    {
+                        if (i < (this_table.ECount - 1))
+                        {
+                            i++;
+                            iterator.Set("value", this_table.Elements[i]);
+                            return new Unit(true);
+                        }
+                        return new Unit(false);
+                    };
+                    iterator.Set("next", new IntrinsicUnit("list_iterator_next", next, 0));
+                    return new Unit(iterator);
+                }
+                superTable.Set("list_iterator", new IntrinsicUnit("list_iterator", ListMakeIterator, 1));
+
+                //////////////////////////////////////////////////////
+                Unit MapCount(VM vm)
+                {
+                    TableUnit this_table = vm.GetTable(0);
+                    int count = this_table.TCount;
+                    return new Unit(count);
+                }
+                superTable.Set("map_count", new IntrinsicUnit("map_count", MapCount, 1));
+
+                //////////////////////////////////////////////////////
+                Unit Count(VM vm)
+                {
+                    TableUnit this_table = vm.GetTable(0);
+                    int count = this_table.Count;
+                    return new Unit(count);
+                }
+                superTable.Set("count", new IntrinsicUnit("table_count", Count, 1));
+
+                //////////////////////////////////////////////////////
+                Unit MapIndexes(VM vm)
+                {
+                    TableUnit this_table = vm.GetTable(0);
+                    TableUnit indexes = new TableUnit(null, null);
+
+                    foreach (Unit v in this_table.Table.Keys)
+                    {
+                        indexes.Elements.Add(v);
+                    }
+
+                    return new Unit(indexes);
+                }
+                superTable.Set("map_indexes", new IntrinsicUnit("map_indexes", MapIndexes, 1));
+
+                //////////////////////////////////////////////////////
+                Unit MapNumericIndexes(VM vm)
+                {
+                    TableUnit this_table = vm.GetTable(0);
+                    TableUnit indexes = new TableUnit(null, null);
+
+                    foreach (Unit v in this_table.Table.Keys)
+                    {
+                        if(Unit.IsNumeric(v))
+                            indexes.Elements.Add(v);
+                    }
+
+                    return new Unit(indexes);
+                }
+                superTable.Set("map_numeric_indexes", new IntrinsicUnit("map_numeric_indexes", MapNumericIndexes, 1));
+
+                //////////////////////////////////////////////////////
+                Unit MapCopy(VM vm)
+                {
+                    TableUnit this_table = vm.GetTable(0);
+                    Dictionary<Unit, Unit> table_copy = new Dictionary<Unit, Unit>();
+                    foreach (KeyValuePair<Unit, Unit> entry in this_table.Table)
+                    {
+                        table_copy.Add(entry.Key, entry.Value);
+                    }
+
+                    TableUnit copy = new TableUnit(null, table_copy);
+
+                    return new Unit(copy);
+                }
+                superTable.Set("map_copy", new IntrinsicUnit("map_copy", MapCopy, 1));
+
+                //////////////////////////////////////////////////////
+                Unit MapClear(VM vm)
+                {
+                    TableUnit this_table = vm.GetTable(0);
+                    this_table.Table.Clear();
+                    return new Unit(UnitType.Null);
+                }
+                superTable.Set("map_clear", new IntrinsicUnit("map_clear", MapClear, 1));
+
+                //////////////////////////////////////////////////////
+                Unit Clear(VM vm)
+                {
+                    TableUnit this_table = vm.GetTable(0);
+                    this_table.Elements.Clear();
+                    this_table.Table.Clear();
+                    return new Unit(UnitType.Null);
+                }
+                superTable.Set("clear", new IntrinsicUnit("table_clear", Clear, 1));
+
+                //////////////////////////////////////////////////////
+                Unit MapMakeIterator(VM vm)
+                {
+                    TableUnit this_table = vm.GetTable(0);
+                    System.Collections.IDictionaryEnumerator enumerator = this_table.Table.GetEnumerator();
+
+                    TableUnit iterator = new TableUnit(null, null);
+                    iterator.Set("key", new Unit(UnitType.Null));
+                    iterator.Set("value", new Unit(UnitType.Null));
+
+                    Unit next(VM vm)
+                    {
+                        if (enumerator.MoveNext())
+                        {
+                            iterator.Set("key", (Unit)(enumerator.Key));
+                            iterator.Set("value", (Unit)(enumerator.Value));
+                            return new Unit(true);
+                        }
+                        return new Unit(false);
+                    };
+
+                    iterator.Set("next", new IntrinsicUnit("map_iterator_next", next, 0));
+                    return new Unit(iterator);
+                }
+                superTable.Set("map_iterator", new IntrinsicUnit("map_iterator", MapMakeIterator, 1));
+
+                //////////////////////////////////////////////////////
+                Unit MapMakeNumericIterator(VM vm)
+                {
+                    TableUnit this_table = vm.GetTable(0);
+                    System.Collections.IDictionaryEnumerator enumerator = this_table.Table.GetEnumerator();
+
+                    TableUnit iterator = new TableUnit(null, null);
+                    iterator.Set("key", new Unit(UnitType.Null));
+                    iterator.Set("value", new Unit(UnitType.Null));
+
+                    Unit next(VM vm)
+                    {
+                        while (true)
+                        {
+                            if(enumerator.MoveNext()){
+                                if(Unit.IsNumeric((Unit)enumerator.Key)){
+                                    iterator.Set("key", (Unit)(enumerator.Key));
+                                    iterator.Set("value", (Unit)(enumerator.Value));
+                                    return new Unit(true);
+                                }
+                            }else{
+                                return new Unit(false);
+                            }
+                        }
+                    };
+
+                    iterator.Set("next", new IntrinsicUnit("map_iterator_next", next, 0));
+                    return new Unit(iterator);
+                }
+                superTable.Set("map_numeric_iterator", new IntrinsicUnit("map_numeric_iterator", MapMakeNumericIterator, 1));
+
+                //////////////////////////////////////////////////////
+                Unit MapToString(VM vm)
+                {
+                    TableUnit this_table = vm.GetTable(0);
+                    string value = "";
+                    bool first = true;
+                    foreach (KeyValuePair<Unit, Unit> entry in this_table.Table)
+                    {
+                        if (first)
+                        {
+                            value +=
+                                System.Text.RegularExpressions.Regex.Unescape(entry.Key.ToString())
+                                + " : " + System.Text.RegularExpressions.Regex.Unescape(entry.Value.ToString());
+                            first = false;
+                        }
+                        else
+                        {
+                            value +=
+                                ", "
+                                + System.Text.RegularExpressions.Regex.Unescape(entry.Key.ToString())
+                                + " : " + System.Text.RegularExpressions.Regex.Unescape(entry.Value.ToString());
+                        }
+                    }
+                    return new Unit(value);
+                }
+                superTable.Set("map_to_string", new IntrinsicUnit("map_to_string", MapToString, 1));
+
+                //////////////////////////////////////////////////////
+                Unit SetSuperTable(VM vm)
+                {
+                    TableUnit this_table = vm.GetTable(0);
+                    TableUnit super_table = vm.GetTable(1);
+                    this_table.SuperTable = super_table;
+
+                    return new Unit(UnitType.Null);
+                }
+                superTable.Set("set_super_table", new IntrinsicUnit("set_super_table", SetSuperTable, 2));
+
+                //////////////////////////////////////////////////////
+                Unit PushSuperTable(VM vm)
+                {
+                    TableUnit this_table = vm.GetTable(0);
+                    TableUnit super_table = vm.GetTable(1);
+
+                    super_table.SuperTable = this_table.SuperTable;
+                    this_table.SuperTable = super_table;
+
+                    return new Unit(UnitType.Null);
+                }
+                superTable.Set("push_super_table", new IntrinsicUnit("push_super_table", PushSuperTable, 2));
+
+                //////////////////////////////////////////////////////
+                Unit UnsetSuperTable(VM vm)
+                {
+                    TableUnit this_table = vm.GetTable(0);
+                    this_table.SuperTable = null;
+
+                    return new Unit(UnitType.Null);
+                }
+                superTable.Set("unset_super_table", new IntrinsicUnit("unset_super_table", UnsetSuperTable, 1));
+
+                //////////////////////////////////////////////////////
+                Unit GetSuperTable(VM vm)
+                {
+                    TableUnit this_table = vm.GetTable(0);
+
+                    return new Unit(this_table.SuperTable);
+                }
+                superTable.Set("get_super_table", new IntrinsicUnit("get_super_table", GetSuperTable, 0));
             }
         }
     }

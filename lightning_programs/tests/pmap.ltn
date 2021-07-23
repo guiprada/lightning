@@ -4,7 +4,7 @@ var assert_not = assert_counter.assert_not
 {
     // Testing pmap
     var n = 100
-    var table1 = table.list_new(n)
+    var table1 = List(n)
 
     function init(index, collection)
     {
@@ -17,7 +17,7 @@ var assert_not = assert_counter.assert_not
         assert(table1[i].x, 1, "Failed pmap Test 1, iteration:" .. i .. ".")
     }
 
-    table1 = table.list_new(n)
+    table1 = List(n)
     function init_number(index, collection)
     {
         collection[index] = 1
@@ -28,7 +28,7 @@ var assert_not = assert_counter.assert_not
         assert(table1[i], 1, "Failed pmap Test 2, iteration: " .. i .. ".")
     }
 
-    table1 = table.list_new(n)
+    table1 = List(n)
     pmap(table1, function(index, collection)
     {
         collection[index] = 100 - index

@@ -5,7 +5,7 @@ var assert_not = assert_counter.assert_not
 {
     // Testing reduce
     var n = 100
-    var table1 = table.list_new(n)
+    var table1 = List(n)
 
     function many(index, collection, accumulator)
     {
