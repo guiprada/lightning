@@ -704,7 +704,7 @@ namespace lightning
 
                     return new Unit(this_table.SuperTable);
                 }
-                superTable.Set("get_super_table", new IntrinsicUnit("get_super_table", GetSuperTable, 0));
+                superTable.Set("get_super_table", new IntrinsicUnit("get_super_table", GetSuperTable, 1));
             }
         }
     }
