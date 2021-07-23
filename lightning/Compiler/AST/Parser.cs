@@ -615,7 +615,7 @@ namespace lightning
             {
                 List<List<Node>> calls = new List<List<Node>>();
                 List<VariableNode> indexed_access = new List<VariableNode>();
-                FunctionCallNode function_call_node = new FunctionCallNode(
+                Node function_call_node = new FunctionCallNode(
                     (maybe_func as VariableNode),
                     calls,
                     indexed_access,
@@ -632,26 +632,14 @@ namespace lightning
         Node AnonymousFunctionCall(Node node){
             if(Check(TokenType.COLON))
             {
-                string name;
-                if(node.Type == NodeType.GROUPING){
-                    name = "*(" + anonymousCounter + ")_grouping";
-                }else if(node.Type == NodeType.LITERAL) {
-                    name = "*(" + anonymousCounter + ")_" + ((LiteralNode)node).Value.ToString();
-                    anonymousCounter++;
-                }else if(node.Type == NodeType.FUNCTION_CALL) {
-                    name = "*(" + anonymousCounter + ")_function_call";
-                    anonymousCounter++;
-                }else{
-                    name = "*(" + anonymousCounter + ")";
-                    anonymousCounter++;
-                }
+                string name = string.Format(@"*_{0}.txt", Guid.NewGuid());
 
                 VarDeclarationNode declaration_node = new VarDeclarationNode(name, node, node.Line);
                 VariableNode variableNode = (VariableNode)IndexedAccess(name, node.Line);
 
                 List<List<Node>> calls = new List<List<Node>>();
                 List<VariableNode> indexed_access = new List<VariableNode>();
-                FunctionCallNode function_call_node = new FunctionCallNode(
+                Node function_call_node = new FunctionCallNode(
 
                     variableNode,
                     calls,
@@ -665,21 +653,24 @@ namespace lightning
             return node;
         }
 
-        FunctionCallNode FinishFunctionCall(FunctionCallNode function_call_node)
+        Node FinishFunctionCall(Node function_call_node)
         {
             bool go_on = true;
             while(Check(TokenType.LEFT_PAREN) && go_on)
             {
-                function_call_node.Calls.Add(Arguments());
+                FunctionCallNode this_function_call_node = (FunctionCallNode)function_call_node;
+                this_function_call_node.Calls.Add(Arguments());
 
-                if (Check(TokenType.DOT) || Check(TokenType.LEFT_BRACKET) || Check(TokenType.COLON))
-                    function_call_node.IndexedAccess.Add(IndexedAccess(function_call_node.Variable.Name, function_call_node.Line) as VariableNode);
+                if (Check(TokenType.DOT) || Check(TokenType.LEFT_BRACKET))
+                    this_function_call_node.IndexedAccess.Add(IndexedAccess(this_function_call_node.Variable.Name, this_function_call_node.Line) as VariableNode);
                 else{
-                    function_call_node.IndexedAccess.Add(null);
+                    this_function_call_node.IndexedAccess.Add(null);
                     if (!Match(TokenType.PIPE))
                         go_on = false;
                 }
             }
+            if(Check(TokenType.COLON))
+                function_call_node = AnonymousFunctionCall(function_call_node);
 
             return function_call_node;
         }

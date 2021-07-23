@@ -438,32 +438,37 @@ namespace lightning
             Print(p_node.Variable);
 
             int counter = 0;
-            foreach (List<Node> arguments in p_node.FunctionCall.Calls)
-            {
-                Console.Write("(");
-                bool is_first = true;
-                foreach (Node n in arguments)
+            if(p_node.FunctionCall.Type == NodeType.FUNCTION_CALL){
+                FunctionCallNode this_function_call_node = (FunctionCallNode)p_node.FunctionCall;
+                foreach (List<Node> arguments in this_function_call_node.Calls)
                 {
-                    if (is_first)
+                    Console.Write("(");
+                    bool is_first = true;
+                    foreach (Node n in arguments)
                     {
-                        Print(n);
-                        is_first = false;
+                        if (is_first)
+                        {
+                            Print(n);
+                            is_first = false;
+                        }
+                        else
+                        {
+                            Print(n);
+                            Console.Write(", ");
+                        }
                     }
-                    else
-                    {
-                        Print(n);
-                        Console.Write(", ");
-                    }
-                }
-                Console.Write(")");
-                if(p_node.FunctionCall.IndexedAccess[counter] != null)
-                {
-                    Console.Write(".indexedAccess(");
-                    foreach(Node n in p_node.FunctionCall.IndexedAccess[counter].Indexes)
-                        Print(n);
                     Console.Write(")");
+                    if(this_function_call_node.IndexedAccess[counter] != null)
+                    {
+                        Console.Write(".indexedAccess(");
+                        foreach(Node n in this_function_call_node.IndexedAccess[counter].Indexes)
+                            Print(n);
+                        Console.Write(")");
+                    }
+                    counter++;
                 }
-                counter++;
+            }else if(p_node.FunctionCall.Type == NodeType.FUNCTION_CALL){
+                Print(p_node.FunctionCall);
             }
             Console.Write("]");
         }

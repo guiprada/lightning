@@ -340,11 +340,11 @@ namespace lightning
     }
 
     public class AnonymousFunctionCallNode : Node{
-        public FunctionCallNode FunctionCall { get; private set; }
+        public Node FunctionCall { get; private set; }
         public VarDeclarationNode Declaration { get; private set; }
         public VariableNode Variable { get; private set; }
 
-        public AnonymousFunctionCallNode(FunctionCallNode p_functionCall, VarDeclarationNode p_declaration, VariableNode p_variable, int p_Line)
+        public AnonymousFunctionCallNode(Node p_functionCall, VarDeclarationNode p_declaration, VariableNode p_variable, int p_Line)
             : base (NodeType.ANONYMOUS_FUNCTION_CALL, p_Line)
         {
             FunctionCall = p_functionCall;

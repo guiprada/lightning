@@ -35,9 +35,6 @@ var assert_not = assert_counter.assert_not
     assert(this_table:another_function(), 100, "Failed Super Table Test 10.")
 
     assert(this_table:get_super_table(), another_table, "Failed Super Table Test 11.")
-    write_line(this_table:get_super_table():get_super_table())
-    // assert(, a_table, "Failed Super Table Test 12.")
-    // write_line(this_table:get_super_table())
-    // write_line(this_table:get_super_table():get_super_table())
+    assert(this_table:get_super_table():get_super_table(), a_table, "Failed Super Table Test 12.")
 }
 return assert_counter.get_error_counter()
