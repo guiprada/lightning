@@ -635,8 +635,14 @@ namespace lightning
                 string name;
                 if(node.Type == NodeType.GROUPING){
                     name = "*(" + anonymousCounter + ")_grouping";
-                }else{
+                }else if(node.Type == NodeType.LITERAL) {
                     name = "*(" + anonymousCounter + ")_" + ((LiteralNode)node).Value.ToString();
+                    anonymousCounter++;
+                }else if(node.Type == NodeType.FUNCTION_CALL) {
+                    name = "*(" + anonymousCounter + ")_function_call";
+                    anonymousCounter++;
+                }else{
+                    name = "*(" + anonymousCounter + ")";
                     anonymousCounter++;
                 }
 
@@ -666,7 +672,7 @@ namespace lightning
             {
                 function_call_node.Calls.Add(Arguments());
 
-                if (Check(TokenType.DOT) || Check(TokenType.LEFT_BRACKET))
+                if (Check(TokenType.DOT) || Check(TokenType.LEFT_BRACKET) || Check(TokenType.COLON))
                     function_call_node.IndexedAccess.Add(IndexedAccess(function_call_node.Variable.Name, function_call_node.Line) as VariableNode);
                 else{
                     function_call_node.IndexedAccess.Add(null);

@@ -29,9 +29,14 @@ var assert_not = assert_counter.assert_not
     another_table.another_function = \(self){return self.another_value}
     this_table.another_value = 100
     this_table:push_super_table(another_table)
-    write_line((this_table:get_super_table()):get_super_table())
+
     assert(this_table:count(), 7, "Failed Super Table Test 8.")
     assert(this_table:a_function(), 99, "Failed Super Table Test 9.")
     assert(this_table:another_function(), 100, "Failed Super Table Test 10.")
+    var test_table = this_table:get_super_table()
+    assert(test_table, another_table, "Failed Super Table Test 11.")
+
+    write_line(this_table:get_super_table())
+    write_line((this_table:get_super_table()):get_super_table())
 }
 return assert_counter.get_error_counter()
