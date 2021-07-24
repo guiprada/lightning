@@ -719,14 +719,7 @@ namespace lightning
                         List<Unit> args = new List<Unit>();
                         args.Add(new Unit(index));
                         args.Add(new Unit(table));
-                        try{
-                            map_vm.CallFunction(func, args);
-                        }catch(Exception e){
-#if DEBUG
-                            Console.WriteLine(e);
-#endif
-                            map_vm.Error("VM Busted ...");
-                        }
+                        map_vm.ProtectedCallFunction(func, args);
                     }
 
                     vm.RecycleVM(map_vm);
@@ -754,14 +747,7 @@ namespace lightning
                         List<Unit> args = new List<Unit>();
                         args.Add(new Unit(index));
                         args.Add(new Unit(table));
-                        try{
-                            vms[index].CallFunction(func, args);
-                        }catch(Exception e){
-#if DEBUG
-                            Console.WriteLine(e);
-#endif
-                            vms[index].Error("VM Busted ...");
-                        }
+                        vms[index].ProtectedCallFunction(func, args);
                     });
                     for (int i = init; i < end; i++)
                     {
@@ -798,18 +784,11 @@ namespace lightning
                         int range_end = range_start + step;
                         if (range_end > count) range_end = count;
 
-                        try{
-                            for(int i = range_start; i<range_end; i++){
-                                args.Clear();
-                                args.Add(new Unit((Integer)i));
-                                args.Add(new Unit(table));
-                                vms[index].CallFunction(func, args);
-                            }
-                        }catch(Exception e){
-#if DEBUG
-                            Console.WriteLine(e);
-#endif
-                            vms[index].Error("VM Busted ...");
+                        for(int i = range_start; i<range_end; i++){
+                            args.Clear();
+                            args.Add(new Unit((Integer)i));
+                            args.Add(new Unit(table));
+                            vms[index].ProtectedCallFunction(func, args);
                         }
                     });
                     for (int i = 0; i < end; i++)
@@ -836,14 +815,7 @@ namespace lightning
                         args.Add(new Unit(index));
                         args.Add(new Unit(table));
                         args.Add(accumulator);
-                        try{
-                            reduce_vm.CallFunction(func, args);
-                        }catch(Exception e){
-#if DEBUG
-                            Console.WriteLine(e);
-#endif
-                            reduce_vm.Error("VM Busted ...");
-                        }
+                        reduce_vm.ProtectedCallFunction(func, args);
                     }
 
                     vm.RecycleVM(reduce_vm);

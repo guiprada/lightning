@@ -273,6 +273,27 @@ namespace lightning
         }
 
 //////////////////////////// End Accessors
+        public Unit ProtectedCallFunction(Unit this_callable, List<Unit> args){
+            try{
+                return CallFunction(this_callable, args);
+            }
+#if DEBUG
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+                Error("VM Busted ...");
+                System.Environment.Exit(1);
+                return new Unit(UnitType.Null);
+            }
+#else
+            catch
+            {
+                Error("VM Busted ...");
+                System.Environment.Exit(1);
+                return new Unit(UnitType.Null);
+            }
+#endif
+        }
         public Unit CallFunction(Unit this_callable, List<Unit> args)
         {
             UnitType this_type = this_callable.Type;
@@ -366,6 +387,27 @@ namespace lightning
             " on line: " + vm.instructions.ExecutingFunction.LineCounter.GetLine(vm.IP);
         }
 
+        public VMResult ProtectedRun(){
+            try{
+                return Run();
+            }
+#if DEBUG
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+                Error("VM Busted ...");
+                System.Environment.Exit(1);
+                return new VMResult(VMResultType.ERROR, new Unit(UnitType.Null));
+            }
+#else
+            catch
+            {
+                Error("VM Busted ...");
+                System.Environment.Exit(1);
+                return new VMResult(VMResultType.ERROR, new Unit(UnitType.Null));
+            }
+#endif
+        }
         public VMResult Run()
         {
             Instruction instruction;

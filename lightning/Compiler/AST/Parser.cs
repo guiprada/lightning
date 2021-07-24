@@ -43,10 +43,21 @@ namespace lightning
                         if(Errors.Count == 0)
                             hasParsed = true;
                     }
+#if DEBUG
                     catch (Exception e)
                     {
-                        Console.WriteLine(e.ToString());
+
+                        Console.WriteLine(e);
+                        foreach(string error in Errors)
+                            Console.WriteLine(error);
                     }
+#else
+                    catch
+                    {
+                        foreach(string error in Errors)
+                            Console.WriteLine(error);
+                    }
+#endif
                 }
                 return ast;
             }

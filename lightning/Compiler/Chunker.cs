@@ -40,6 +40,17 @@ namespace lightning
         private Node ast;
         private Chunk chunk;
         private string moduleName;
+
+        public bool HasChunked { get; private set; }
+        private int instructionCounter;
+        private List<object> constants;
+        private List<List<string>> env;
+        private List<string> globals;
+        private Stack<List<Variable>> upvalueStack;
+        private Stack<int> funStartEnv;
+        int lambdaCounter;
+        public List<string> Errors { get; private set; }
+
         public Chunk Chunk
         {
             get
@@ -51,25 +62,24 @@ namespace lightning
                         ChunkIt(ast);
                         HasChunked = true;
                     }
-                    catch(Exception e)
+#if DEBUG
+                    catch (Exception e)
                     {
-                        Console.WriteLine(e.ToString());
+                        Console.WriteLine(e);
+                        foreach(string error in Errors)
+                        Console.WriteLine(error);
                     }
+#else
+                    catch
+                    {
+                        foreach(string error in Errors)
+                        Console.WriteLine(error);
+                    }
+#endif
                 }
                 return chunk;
             }
         }
-
-        public bool HasChunked { get; private set; }
-        private int instructionCounter;
-        private List<object> constants;
-        private List<List<string>> env;
-        private List<string> globals;
-        private Stack<List<Variable>> upvalueStack;
-        private Stack<int> funStartEnv;
-        int lambdaCounter;
-
-        public List<string> Errors { get; private set; }
 
         public Chunker(Node p_ast, string p_moduleName, Library prelude)
         {
