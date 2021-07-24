@@ -64,9 +64,9 @@ var assert_not = assert_counter.assert_not
     var p1 = make_player()
     var p2 = make_player()
 
-    assert(p1:move(1,1)|.x, 1, "Failed hidden properties test 1.")
-    assert(p1:move(0,2)|.y, 3, "Failed hidden properties test 2.")
-    assert(p2:move(0,2)|.y, 2, "Failed hidden properties test 3.")
+    assert(p1:move(1,1).x, 1, "Failed hidden properties test 1.")
+    assert(p1:move(0,2).y, 3, "Failed hidden properties test 2.")
+    assert(p2:move(0,2).y, 2, "Failed hidden properties test 3.")
 }
 {
     // Testing "hidden properties" 2
@@ -88,8 +88,8 @@ var assert_not = assert_counter.assert_not
     var p1 = make_player()
     var p2 = make_player()
 
-    assert(p1.move(1,1)|.x, 1, "Failed hidden properties test 4.")
-    assert(p1.move(0,2)|.y, 3, "Failed hidden properties test 5.")
-    assert(p2.move(0,2)|.y, 2, "Failed hidden properties test 6.")
+    assert(p1.move(1,1).x, 1, "Failed hidden properties test 4.")
+    assert(p1.move(0,2).y, 3, "Failed hidden properties test 5.")
+    assert(p2.move(0,2).y, 2, "Failed hidden properties test 6.")
 }
 return assert_counter.get_error_counter()
