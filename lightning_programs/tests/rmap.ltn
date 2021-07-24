@@ -4,36 +4,33 @@ var assert_not = assert_counter.assert_not
 {
     // Testing rmap
     var n = 100
-    var table1 = List(n)
-    function init_in_range (start, end, this_table)
+    var this_list = List(n)
+    function init_in_range (index, this_table)
     {
-        for (var i = start; i<end; i++)
-        {
-            this_table[i] = i
-        }
+        this_table[index] = index
     }
-    rmap(6, table1, init_in_range)
+    this_list:list_rmap(6, init_in_range)
     for (var i = 0; i<n; i++)
     {
-        assert(table1[i], i, "Failed rmap Test 1, iteration: " .. i .. ".")
+        assert(this_list[i], i, "Failed rmap Test 1, iteration: " .. i .. ".")
     }
 
-    rmap(1, table1, init_in_range)
+    this_list:list_rmap(1, init_in_range)
     for (var i = 0; i<n; i++)
     {
-        assert(table1[i], i, "Failed rmap Test 2, iteration: " .. i .. ".")
+        assert(this_list[i], i, "Failed rmap Test 2, iteration: " .. i .. ".")
     }
 
-    rmap(3, table1, init_in_range)
+    this_list:list_rmap(3, init_in_range)
     for (var i = 0; i<n; i++)
     {
-        assert(table1[i], i, "Failed rmap Test 3, iteration: " .. i .. ".")
+        assert(this_list[i], i, "Failed rmap Test 3, iteration: " .. i .. ".")
     }
 
-    rmap(200, table1, init_in_range)
+    this_list:list_rmap(200, init_in_range)
     for (var i = 0; i<n; i++)
     {
-        assert(table1[i], i, "Failed rmap Test 4, iteration: " .. i .. ".")
+        assert(this_list[i], i, "Failed rmap Test 4, iteration: " .. i .. ".")
     }
 }
 return assert_counter.get_error_counter()

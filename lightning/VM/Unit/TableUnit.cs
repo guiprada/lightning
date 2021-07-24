@@ -286,7 +286,8 @@ namespace lightning
                     TableUnit list = vm.GetTable(0);
                     Integer new_end = vm.GetInteger(1);
                     int size = list.Count;
-                    for(int i=size; i<(new_end); i++)
+
+                    for(int i=size; i<new_end; i++)
                         list.Elements.Add(new Unit(UnitType.Null));
 
                     return new Unit(UnitType.Null);
@@ -705,6 +706,152 @@ namespace lightning
                     return new Unit(this_table.SuperTable);
                 }
                 superTable.Set("get_super_table", new IntrinsicUnit("get_super_table", GetSuperTable, 1));
+
+                //////////////////////////////////////////////////////
+                Unit Map(VM vm)
+                {
+                    TableUnit table = vm.GetTable(0);
+                    Unit func = vm.GetUnit(1);
+
+                    VM map_vm = vm.GetParallelVM();
+
+                    for(int index=0; index<table.ECount; index++){
+                        List<Unit> args = new List<Unit>();
+                        args.Add(new Unit(index));
+                        args.Add(new Unit(table));
+                        try{
+                            map_vm.CallFunction(func, args);
+                        }catch(Exception e){
+#if DEBUG
+                            Console.WriteLine(e);
+#endif
+                            map_vm.Error("VM Busted ...");
+                        }
+                    }
+
+                    vm.RecycleVM(map_vm);
+
+                    return new Unit(UnitType.Null);
+                }
+
+                superTable.Set("list_map", new IntrinsicUnit("list_map", Map, 2));
+
+                //////////////////////////////////////////////////////
+                Unit ParallelMap(VM vm)
+                {
+                    TableUnit table = vm.GetTable(0);
+                    Unit func = vm.GetUnit(1);
+
+                    int init = 0;
+                    int end = table.ECount;
+                    VM[] vms = new VM[end];
+                    for (int i = init; i < end; i++)
+                    {
+                        vms[i] = vm.GetParallelVM();
+                    }
+                    System.Threading.Tasks.Parallel.For(init, end, (index) =>
+                    {
+                        List<Unit> args = new List<Unit>();
+                        args.Add(new Unit(index));
+                        args.Add(new Unit(table));
+                        try{
+                            vms[index].CallFunction(func, args);
+                        }catch(Exception e){
+#if DEBUG
+                            Console.WriteLine(e);
+#endif
+                            vms[index].Error("VM Busted ...");
+                        }
+                    });
+                    for (int i = init; i < end; i++)
+                    {
+                        vm.RecycleVM(vms[i]);
+                    }
+                    return new Unit(UnitType.Null);
+                }
+
+                superTable.Set("list_pmap", new IntrinsicUnit("list_pmap", ParallelMap, 2));
+
+                //////////////////////////////////////////////////////
+                Unit RangeMap(VM vm)
+                {
+                    TableUnit table = vm.GetTable(0);
+                    Integer n_tasks = vm.GetInteger(1);
+                    Unit func = vm.GetUnit(2);
+
+
+                    int init = 0;
+                    int end = (int)n_tasks;
+                    VM[] vms = new VM[end];
+                    for (int i = 0; i < end; i++)
+                    {
+                        vms[i] = vm.GetParallelVM();
+                    }
+
+                    int count = table.ECount;
+                    int step = (count / (int)n_tasks) + 1;
+
+                    System.Threading.Tasks.Parallel.For(init, end, (index) =>
+                    {
+                        List<Unit> args = new List<Unit>();
+                        int range_start = index * step;
+                        int range_end = range_start + step;
+                        if (range_end > count) range_end = count;
+
+                        try{
+                            for(int i = range_start; i<range_end; i++){
+                                args.Clear();
+                                args.Add(new Unit((Integer)i));
+                                args.Add(new Unit(table));
+                                vms[index].CallFunction(func, args);
+                            }
+                        }catch(Exception e){
+#if DEBUG
+                            Console.WriteLine(e);
+#endif
+                            vms[index].Error("VM Busted ...");
+                        }
+                    });
+                    for (int i = 0; i < end; i++)
+                    {
+                        vm.RecycleVM(vms[i]);
+                    }
+                    return new Unit(UnitType.Null);
+                }
+
+                superTable.Set("list_rmap", new IntrinsicUnit("list_rmap", RangeMap, 3));
+                //////////////////////////////////////////////////////
+                Unit Reduce(VM vm)
+                {
+                    TableUnit table = vm.GetTable(0);
+                    Unit func = vm.GetUnit(1);
+                    Unit accumulator = vm.GetUnit(2);
+
+                    VM reduce_vm = vm.GetParallelVM();
+
+                    // Unit accumulator = new Unit(new TableUnit(null, null, null));
+                    // accumulator.heapUnitValue.Set(new Unit("value"), new Unit((Integer)0));
+                    for(int index=0; index<table.ECount; index++){
+                        List<Unit> args = new List<Unit>();
+                        args.Add(new Unit(index));
+                        args.Add(new Unit(table));
+                        args.Add(accumulator);
+                        try{
+                            reduce_vm.CallFunction(func, args);
+                        }catch(Exception e){
+#if DEBUG
+                            Console.WriteLine(e);
+#endif
+                            reduce_vm.Error("VM Busted ...");
+                        }
+                    }
+
+                    vm.RecycleVM(reduce_vm);
+
+                    return accumulator;
+                }
+
+                superTable.Set("list_reduce", new IntrinsicUnit("list_reduce", Reduce, 2));
             }
         }
     }

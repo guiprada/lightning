@@ -872,130 +872,42 @@ namespace lightning
                     return second;
             }
             functions.Add(new IntrinsicUnit("maybe", Maybe, 2));
-            //////////////////////////////////////////////////////
-            Unit Map(VM vm)
-            {
-                TableUnit table = vm.GetTable(0);
-                Unit func = vm.GetUnit(1);
-
-                VM map_vm = vm.GetParallelVM();
-
-                for(int index=0; index<table.ECount; index++){
-                    List<Unit> args = new List<Unit>();
-                    args.Add(new Unit(index));
-                    args.Add(new Unit(table));
-                    map_vm.CallFunction(func, args);
-                }
-
-                vm.RecycleVM(map_vm);
-
-                return new Unit(UnitType.Null);
-            }
-
-            functions.Add(new IntrinsicUnit("map", Map, 2));
 
             //////////////////////////////////////////////////////
-            Unit ParallelMap(VM vm)
+            Unit Tasks(VM vm)
             {
-                TableUnit table = vm.GetTable(0);
-                Unit func = vm.GetUnit(1);
 
-                int init = 0;
-                int end = table.ECount;
-                VM[] vms = new VM[end];
-                for (int i = init; i < end; i++)
-                {
-                    vms[i] = vm.GetParallelVM();
-                }
-                System.Threading.Tasks.Parallel.For(init, end, (index) =>
-                {
-                    List<Unit> args = new List<Unit>();
-                    args.Add(new Unit(index));
-                    args.Add(new Unit(table));
-                    try{
-                        vms[index].CallFunction(func, args);
-                    }catch(Exception e){
-                        Console.WriteLine(e);
-                        vms[index].Error("VM Busted ...");
-                    }
-                });
-                for (int i = init; i < end; i++)
-                {
-                    vm.RecycleVM(vms[i]);
-                }
-                return new Unit(UnitType.Null);
-            }
-
-            functions.Add(new IntrinsicUnit("pmap", ParallelMap, 2));
-            //////////////////////////////////////////////////////
-
-            Unit RangeMap(VM vm)
-            {
                 Integer n_tasks = vm.GetInteger(0);
-                TableUnit table = vm.GetTable(1);
-                Unit func = vm.GetUnit(2);
+                Unit func = vm.GetUnit(1);
+                Unit arguments = vm.GetUnit(2);
 
-
-                int init = 0;
-                int end = (int)n_tasks;
-                VM[] vms = new VM[end];
-                for (int i = 0; i < end; i++)
+                VM[] vms = new VM[n_tasks];
+                for (int i = 0; i < (int)n_tasks; i++)
                 {
                     vms[i] = vm.GetParallelVM();
                 }
 
-                int count = table.ECount;
-                int step = (count / (int)n_tasks) + 1;
-
-                System.Threading.Tasks.Parallel.For(init, end, (index) =>
+                System.Threading.Tasks.Parallel.For(0, n_tasks, (index) =>
                 {
                     List<Unit> args = new List<Unit>();
-                    int range_start = index * step;
-                    args.Add(new Unit(range_start));
-                    int range_end = range_start + step;
-                    if (range_end > count) range_end = count;
-                    args.Add(new Unit(range_end));
-                    args.Add(new Unit(table));
+                    args.Add(arguments);
                     try{
                         vms[index].CallFunction(func, args);
                     }catch(Exception e){
+#if DEBUG
                         Console.WriteLine(e);
+#endif
                         vms[index].Error("VM Busted ...");
                     }
                 });
-                for (int i = 0; i < end; i++)
+                for (int i = 0; i<n_tasks; i++)
                 {
                     vm.RecycleVM(vms[i]);
                 }
                 return new Unit(UnitType.Null);
             }
 
-            functions.Add(new IntrinsicUnit("rmap", RangeMap, 3));
-            //////////////////////////////////////////////////////
-            Unit Reduce(VM vm)
-            {
-                TableUnit table = vm.GetTable(0);
-                Unit func = vm.GetUnit(1);
-                Unit accumulator = vm.GetUnit(2);
-
-                VM map_vm = vm.GetParallelVM();
-
-                // Unit accumulator = new Unit(new TableUnit(null, null, null));
-                // accumulator.heapUnitValue.Set(new Unit("value"), new Unit((Integer)0));
-                for(int index=0; index<table.ECount; index++){
-                    List<Unit> args = new List<Unit>();
-                    args.Add(new Unit(index));
-                    args.Add(new Unit(table));
-                    args.Add(accumulator);
-                    map_vm.CallFunction(func, args);
-                }
-
-                vm.RecycleVM(map_vm);
-
-                return accumulator;
-            }
-
-            functions.Add(new IntrinsicUnit("reduce", Reduce, 2));
+            functions.Add(new IntrinsicUnit("tasks", Tasks, 3));
 
             //////////////////////////////////////////////////////
             Unit GetOS(VM vm)

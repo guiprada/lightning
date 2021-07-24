@@ -12,7 +12,7 @@ var assert_not = assert_counter.assert_not
         this.x = 1
     }
 
-    map(table1, many)
+    table1:list_map(many)
     for (var i = 0; i<n; i++)
     {
         assert(table1[i].x, 1, "Failed map Test 1, iteration:" .. i .. ".")
@@ -23,14 +23,14 @@ var assert_not = assert_counter.assert_not
     {
         collection[index] = 1
     }
-    map(table1, many_number)
+    table1:list_map(many_number)
     for (var i = 0; i<n; i++)
     {
         assert(table1[i], 1, "Failed map Test 2, iteration: " .. i .. ".")
     }
 
     table1 = List(n)
-    map(table1, function(index, collection)
+    table1:list_map(function(index, collection)
     {
         collection[index] = 100 - index
     })
