@@ -18,7 +18,7 @@ var assert_not = assert_counter.assert_not
     var func1 = return_table_with_function ()
     assert(func1().another_function("viva"), "viva", "Failed compound calls test 1.")
 
-    assert(return_table_with_function().().another_function ("viva"), "viva", "Failed compound calls test 2.")
+    assert(return_table_with_function().().another_function("viva"), "viva", "Failed compound calls test 2.")
     var table1 = []
     {
         table1.inner_table = []

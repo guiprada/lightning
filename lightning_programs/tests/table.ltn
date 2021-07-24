@@ -175,19 +175,6 @@ var assert_not = assert_counter.assert_not
     var a_wrapper = time.now()
 
     this_list = [1, 1.5, null, true, "a_string", 'A', a_function, a_intrinsic, a_closure, a_table, a_module, a_wrapper]
-    // this_list = []
-    // table.push(this_list, 1)
-    // table.push(this_list, 1.5)
-    // table.push(this_list, null)
-    // table.push(this_list, true)
-    // table.push(this_list, "a_string")
-    // table.push(this_list, 'A')
-    // table.push(this_list, a_function)
-    // table.push(this_list, a_intrinsic)
-    // table.push(this_list, a_closure)
-    // table.push(this_list, a_table)
-    // table.push(this_list, a_module)
-    // table.push(this_list, a_wrapper)
 
     this_list:list_sort()
     var sorted_list  = this_list:clone()
@@ -199,13 +186,14 @@ var assert_not = assert_counter.assert_not
             assert(this_list[j], sorted_list[j], "Failed List Sort Test 3 iteration " .. i )
         }
     }
-
-
-    // this_list = ["a_string"]
-    // table.push(this_list, a_function)
-    // table.list_sort(this_list)
-    // write_line(this_list)
-    // this_list = [a_function:1]
-    // write_line(this_list)
+}
+{
+    // Test Nested Literal table
+    var a_table = [
+        nested_table: [value: 99],
+        value: 100,
+    ]
+    assert(a_table.nested_table.value, 99, "Failed Nested Literal Table Test 1.")
+    assert(a_table.value, 100, "Failed Nested Literal Table Test 2.")
 }
 return assert_counter.get_error_counter()
