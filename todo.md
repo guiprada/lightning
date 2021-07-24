@@ -11,18 +11,16 @@ examine overflows in numeric operations
 
 To be Done
 ----------
-sync grammar with parser
 add a make_closure(a_function, a_table_with_values) method to set up "protected" table variables
 
 string could have an add method to sum string to string
-cast methods float() integer() string()
 table could have an add melhod
+
 table and wrapper could have and add overridable add method
 floor() ceil() and round()
 
-improve Peek2()
-list sort tests
-table class
+better list sort tests
+
 tuple and nuple class
 
 add Type to Table and Wrapper so they can be retrieved from lightining and overrided
@@ -33,6 +31,8 @@ add Get and Set? to Unit :)
 convert StringUnit to use char[]
 
 add load externally compiled prelude extensions
+
+new VScode extension
 
 Improvements
 ============
@@ -49,7 +49,7 @@ Improvements
     - Memory Management
         - use unit value to count heapval references
         - out parameter
-        -
+
 Optimizations
 =============
     - tail call optimization
@@ -93,7 +93,8 @@ Done
     - bool ops otimizations
     - flatten upValue registry
     - convert value to structs and interfaces, tested and gone back
-    - when variables that store closures go out of scope we should clear their references, yes -- captured closures are stored in ther ValClosure and get collected with it
+    - when variables that store closures go out of scope we should clear their references
+        -- captured closures are stored in their ValClosure and get collected with it
     - pretty printer
     - can you return a declaration? No
     - intrinsics
@@ -152,3 +153,6 @@ Done
     - fix double upvalue test
     - replace ContainsKey and Contains with TryGetValue
     - consolidate UpValueMatrix and UpValueRegistry
+    - sync grammar with parser
+    - cast methods to_float() to_integer() to_string()
+    - table class
