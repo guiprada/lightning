@@ -13,6 +13,16 @@ namespace lightning
 {
     public class Parser
     {
+        struct FunctionStruct
+		{
+			public List<string> parameters;
+            public List<Node> statements;
+            public FunctionStruct(List<string> p_parameters, List<Node> p_statements){
+                parameters = p_parameters;
+                statements = p_statements;
+            }
+		}
+
         private List<Token> tokens;
         private bool hasParsed;
         public bool HasParsed { get { return hasParsed;} }
@@ -20,7 +30,6 @@ namespace lightning
         private int current;
         public List<string> Errors { get; private set; }
         public List<string> Warnings { get; private set; }
-        private int anonymousCounter;
 
         public Node ParsedTree
         {
@@ -50,7 +59,6 @@ namespace lightning
             Errors = new List<string>();
             Warnings = new List<string>();
             current = 0;
-            anonymousCounter = 0;
         }
 
         void Parse()
@@ -76,11 +84,11 @@ namespace lightning
         {
             if (Match(TokenType.VAR))
             {
-                return VarDeclaration();
+                return VarDecl();
             }
             else if(Match(TokenType.FUN))
             {
-                return FunctionDeclaration();
+                return FunctionDecl();
             }
             else
             {
@@ -125,7 +133,7 @@ namespace lightning
             return new VariableNode(name, indexes, VarAccessType.PLAIN, line);
         }
 
-        Node VarDeclaration()
+        Node VarDecl()
         {
             TokenString name = Consume(TokenType.IDENTIFIER, "Expected 'variable identifier' after 'var'.", true) as TokenString;
             Node initializer;
@@ -160,11 +168,7 @@ namespace lightning
             return parameters;
         }
 
-        Node FunExpr()
-        {
-            Token function_token = Consume(TokenType.FUN, "Expected 'function' to start 'function expression'.", true);
-            int line = function_token.Line;
-
+        FunctionStruct Function(){
             List<string> parameters = null;
             if(Match(TokenType.LEFT_PAREN)){
                 parameters = Parameters();
@@ -184,38 +188,27 @@ namespace lightning
 
             if (statements.Count == 0 || statements[^1].GetType() != typeof(ReturnNode))
             {
-                statements.Add(new ReturnNode(null, line));
+                statements.Add(new ReturnNode(null, Previous().Line));
             }
 
-            return new FunctionExpressionNode(parameters, statements, line);
+            return new FunctionStruct(parameters, statements);
+        }
+		Node FunctionExpr()
+        {
+            Token function_token = Consume(TokenType.FUN, "Expected 'function' or '\' to start 'function expression'.", true);
+
+            FunctionStruct this_function = Function();
+
+            return new FunctionExpressionNode(this_function.parameters, this_function.statements, function_token.Line);
         }
 
-        Node FunctionDeclaration()
+        Node FunctionDecl()
         {
             TokenString name = Consume(TokenType.IDENTIFIER, "Expected 'function identifier'.", true) as TokenString;
 
-            List<string> parameters = null;
-            if(Match(TokenType.LEFT_PAREN))
-                parameters = Parameters();
+            FunctionStruct this_function = Function();
 
-            Node body = Statement();
-            List<Node> statements;
-            if(body.Type == NodeType.BLOCK)
-            {
-                statements = (body as BlockNode).Statements;
-            }
-            else
-            {
-                statements = new List<Node>();
-                statements.Add(body);
-            }
-
-            if (statements.Count == 0 || statements[^1].GetType() != typeof(ReturnNode))
-            {
-                statements.Add(new ReturnNode(null, name.Line));
-            }
-
-            return new FunctionDeclarationNode(name.value, parameters, statements, name.Line);
+            return new FunctionDeclarationNode(name.value, this_function.parameters, this_function.statements, name.Line);
         }
 
         Node Statement()
@@ -231,7 +224,7 @@ namespace lightning
             else if (Match(TokenType.LEFT_BRACE))
                 return Block();
             else
-                return StmtExpr();
+                return ExprStmt();
         }
 
         Node Return()
@@ -254,11 +247,11 @@ namespace lightning
             }
             else if (Match(TokenType.VAR))
             {
-                initializer = VarDeclaration();
+                initializer = VarDecl();
             }
             else
             {
-                initializer = StmtExpr();
+                initializer = ExprStmt();
             }
 
             Node condition;
@@ -332,7 +325,7 @@ namespace lightning
             return new BlockNode(statements, line);
         }
 
-        Node StmtExpr()
+        Node ExprStmt()
         {
             Node expr = Expression();
 
@@ -817,7 +810,7 @@ namespace lightning
                 Consume(TokenType.RIGHT_PAREN, "Expected ')' after grouping'", true);
                 return new GroupingNode(expr, expr.Line);
             }else if (Check(TokenType.FUN))
-                return FunExpr();
+                return FunctionExpr();
             else if (Check(TokenType.IDENTIFIER))
                 return CompoundVar();
             else if (Match(TokenType.MINUS)){
