@@ -50,7 +50,7 @@ unary           <- ( "!" | "-" ) unary | call;
 call            <- primary (callTail | anonymousCall);
 callTail        <- "(" arguments* ")" pipedAccess* sequentialCall* anonymousCall?;
 anonymousCall   <- methodAccess callTail;
-sequentialCall  <- ("." "(" arguments* ")")*;
+sequentialCall  <- ("." "(" arguments* ")");
 arguments       <- expression ( "," expression )*;
 
 (* ACCESS *)

@@ -677,17 +677,6 @@ namespace lightning
                     this_function_call_node.IndexedAccess.Add(null);
                     go_on = false;
                 }
-
-                // if  (Check(TokenType.PIPE) &&
-                //     ((Peek2().Type == TokenType.LEFT_BRACKET) || (Peek2().Type == TokenType.DOT))){
-                //     Consume(TokenType.PIPE, "Expected '|' for chained index access", true);
-                //     this_function_call_node.IndexedAccess.Add(IndexedAccess(this_function_call_node.Variable.Name, this_function_call_node.Line) as VariableNode);
-                // }
-                // else{
-                //     this_function_call_node.IndexedAccess.Add(null);
-                //     if (!Match(TokenType.PIPE))
-                //         go_on = false;
-                // }
             }
             if(Check(TokenType.COLON))
                 function_call_node = AnonymousCall(function_call_node);
