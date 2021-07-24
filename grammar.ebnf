@@ -47,9 +47,9 @@ multiplication  <- unary ( ( "/" | "*" | "++" | "--" ) unary )*;
 unary           <- ( "!" | "-" ) unary | call;
 
 (* CALL *)
-call            <- primary (callTail | AnonymousCall);
-callTail        <- "(" arguments* ")" indexedAccess sequentialCall AnonymousCall?;
-AnonymousCall   <- methodAccess callTail;
+call            <- primary (callTail | anonymousCall);
+callTail        <- "(" arguments* ")" indexedAccess sequentialCall anonymousCall?;
+anonymousCall   <- methodAccess callTail;
 sequentialCall  <- ("|" "(" arguments* ")")*;
 arguments       <- expression ( "," expression )*;
 
