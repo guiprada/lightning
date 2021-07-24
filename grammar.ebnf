@@ -1,4 +1,14 @@
 ﻿program         ?? declaration* EOF ;
+primary         ?? NUMBER
+                | STRING
+                | "false"
+                | "true"
+                | "null"
+                | "(" expression ")"
+                | compoundVar
+                | list
+                | funExpr
+                | table;
 
 (* STATEMENTS *)
 declaration     ?? functionDecl
@@ -34,19 +44,21 @@ equality        ?? comparison ( ( "!=" | "==" ) comparison )*;
 comparison      ?? addition ( ( ">" | ">=" | "<" | "<=" ) addition )*;
 addition        ?? multiplication ( ( "-" | "+" | "..") multiplication )*;
 multiplication  ?? unary ( ( "/" | "*" | "++" | "--" ) unary )*;
-unary           ?? ( "!" | "-" ) unary | chainedCall;
+unary           ?? ( "!" | "-" ) unary | call;
 
-indexedAccess   ?? ( ( "[" expression "]" )
-                | ( "." IDENTIFIER ) )*;
-compoundVar     ?? IDENTIFIER indexedAccess;
-chainedCall     ?? compoundCall ( "|" "(" arguments? ")" )*;
-compoundCall    ?? functionCall
-                | methodCall;
-functionCall    ?? IDENTIFIER "(" arguments? ")";
-methodCall      ?? primary : IDENTIFIER "(" arguments? ")";
+(* CALL *)
+call            ?? primary (callTail | AnonymousCall);
+callTail        ?? "(" arguments* ")" indexedAccess sequentialCall AnonymousCall?;
+AnonymousCall   ?? methodAccess callTail;
+sequentialCall  ?? ("|" "(" arguments* ")")*;
 arguments       ?? expression ( "," expression )*;
 
+(* ACCESS *)
+indexedAccess   ?? ( ( "[" expression "]" ) | ( "." IDENTIFIER ) )*;
+methodAccess    ??  ( ":" IDENTIFIER ) )?;
+compoundVar     ?? IDENTIFIER indexedAccess methodCall;
+
+(* TABLE *)
 table           ?? [ tableEntry (, tableEntry )* ];
 tableEntry      ?? ( (-)? primary)
                 | ( (-)? IDENTIFIER : primary );
-primary         ??   NUMBER | STRING | "false" | "true" | "null" | "(" expression ")" | compoundVar | list | funExpr | table;

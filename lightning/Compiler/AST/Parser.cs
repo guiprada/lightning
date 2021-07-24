@@ -103,12 +103,16 @@ namespace lightning
             string name = last_token.value;
             int line = last_token.Line;
 
-            return IndexedAccess(name, line);
+            Node indexed_access = IndexedAccess(name, line);
+
+            Node method_call = MethodAccess(indexed_access);
+
+            return method_call;
         }
 
         Node IndexedAccess(string name, int line) {
             List<Node> indexes = new List<Node>();
-            while (Check(TokenType.LEFT_BRACKET) || Check(TokenType.DOT) || Check(TokenType.COLON))
+            while (Check(TokenType.LEFT_BRACKET) || Check(TokenType.DOT))
             {
                 if (Match(TokenType.LEFT_BRACKET))
                 {
@@ -120,13 +124,6 @@ namespace lightning
                     Match(TokenType.IDENTIFIER);
                     string this_name = (Previous() as TokenString).value;
                     VariableNode index = new VariableNode(this_name, new List<Node>(), VarAccessType.DOTTED, Previous().Line);
-                    indexes.Add(index);
-                }
-                else if (Match(TokenType.COLON))
-                {// Method Call
-                    Match(TokenType.IDENTIFIER);
-                    string this_name = (Previous() as TokenString).value;
-                    VariableNode index = new VariableNode(this_name, new List<Node>(), VarAccessType.METHOD, Previous().Line);
                     indexes.Add(index);
                 }
             }
@@ -597,10 +594,10 @@ namespace lightning
                 return new UnaryNode(this_op, right, op.Line);
             }
 
-            return FunctionCall();
+            return Call();
         }
 
-        Node FunctionCall()
+        Node Call()
         {
             Node maybe_func = Primary();
 
@@ -613,22 +610,34 @@ namespace lightning
                     calls,
                     indexed_access,
                     maybe_func.Line);
-                function_call_node = FinishFunctionCall(function_call_node);
+                function_call_node = CallTail(function_call_node);
                 return function_call_node;
             }
             if(Check(TokenType.COLON)){
-                return AnonymousFunctionCall(maybe_func);
+                return AnonymousCall(maybe_func);
             }
             return maybe_func;
         }
 
-        Node AnonymousFunctionCall(Node node){
+        Node MethodAccess(Node node){
+            if (Match(TokenType.COLON))
+            {// Method Call
+                Match(TokenType.IDENTIFIER);
+                string this_name = (Previous() as TokenString).value;
+                VariableNode index = new VariableNode(this_name, new List<Node>(), VarAccessType.METHOD, Previous().Line);
+                (node as VariableNode).Indexes.Add(index);
+            }
+            return node;
+        }
+
+        Node AnonymousCall(Node node){
             if(Check(TokenType.COLON))
             {
                 string name = string.Format(@"*_{0}.txt", Guid.NewGuid());
 
                 VarDeclarationNode declaration_node = new VarDeclarationNode(name, node, node.Line);
-                VariableNode variableNode = (VariableNode)IndexedAccess(name, node.Line);
+                VariableNode variableNode = new VariableNode(name, new List<Node>(), VarAccessType.PLAIN, node.Line);
+                variableNode = (VariableNode)MethodAccess(variableNode);
 
                 List<List<Node>> calls = new List<List<Node>>();
                 List<VariableNode> indexed_access = new List<VariableNode>();
@@ -639,14 +648,14 @@ namespace lightning
                     indexed_access,
                     node.Line);
 
-                function_call_node = FinishFunctionCall(function_call_node);
+                function_call_node = CallTail(function_call_node);
                 return new AnonymousFunctionCallNode(function_call_node, declaration_node, variableNode, node.Line);
             }
             Error("Expected ':' after anonymous function call.");
             return node;
         }
 
-        Node FinishFunctionCall(Node function_call_node)
+        Node CallTail(Node function_call_node)
         {
             bool go_on = true;
             while(Check(TokenType.LEFT_PAREN) && go_on)
@@ -663,7 +672,7 @@ namespace lightning
                 }
             }
             if(Check(TokenType.COLON))
-                function_call_node = AnonymousFunctionCall(function_call_node);
+                function_call_node = AnonymousCall(function_call_node);
 
             return function_call_node;
         }
