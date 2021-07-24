@@ -663,18 +663,31 @@ namespace lightning
                 FunctionCallNode this_function_call_node = (FunctionCallNode)function_call_node;
                 this_function_call_node.Calls.Add(Arguments());
 
-
-                if (Check(TokenType.DOT)){
-                    if(Peek2().Type == TokenType.LEFT_BRACKET){
+                if(Check(TokenType.DOT)){
+                    if(Check2(TokenType.LEFT_PAREN)){
                         Match(TokenType.DOT);
+                        this_function_call_node.IndexedAccess.Add(null);
+                    }else{
+                        if(Check2(TokenType.LEFT_BRACKET)){
+                            Match(TokenType.DOT);
+                        }
+                        this_function_call_node.IndexedAccess.Add(IndexedAccess(this_function_call_node.Variable.Name, this_function_call_node.Line) as VariableNode);
                     }
-                    this_function_call_node.IndexedAccess.Add(IndexedAccess(this_function_call_node.Variable.Name, this_function_call_node.Line) as VariableNode);
-                }
-                else{
+                }else{
                     this_function_call_node.IndexedAccess.Add(null);
-                    if (!Match(TokenType.PIPE))
-                        go_on = false;
+                    go_on = false;
                 }
+
+                // if  (Check(TokenType.PIPE) &&
+                //     ((Peek2().Type == TokenType.LEFT_BRACKET) || (Peek2().Type == TokenType.DOT))){
+                //     Consume(TokenType.PIPE, "Expected '|' for chained index access", true);
+                //     this_function_call_node.IndexedAccess.Add(IndexedAccess(this_function_call_node.Variable.Name, this_function_call_node.Line) as VariableNode);
+                // }
+                // else{
+                //     this_function_call_node.IndexedAccess.Add(null);
+                //     if (!Match(TokenType.PIPE))
+                //         go_on = false;
+                // }
             }
             if(Check(TokenType.COLON))
                 function_call_node = AnonymousCall(function_call_node);
@@ -880,6 +893,12 @@ namespace lightning
         {
             if (IsAtEnd()) return false;
             else return Peek().Type == type;
+        }
+
+        bool Check2(TokenType type)
+        {
+            if (IsAtEnd()) return false;
+            else return Peek2().Type == type;
         }
 
         bool Match(TokenType type)
