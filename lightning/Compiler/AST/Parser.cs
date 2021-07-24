@@ -663,12 +663,19 @@ namespace lightning
                 FunctionCallNode this_function_call_node = (FunctionCallNode)function_call_node;
                 this_function_call_node.Calls.Add(Arguments());
 
-                if (Check(TokenType.DOT) || Check(TokenType.LEFT_BRACKET))
-                    this_function_call_node.IndexedAccess.Add(IndexedAccess(this_function_call_node.Variable.Name, this_function_call_node.Line) as VariableNode);
-                else{
-                    this_function_call_node.IndexedAccess.Add(null);
-                    if (!Match(TokenType.PIPE))
-                        go_on = false;
+                if(Match(TokenType.PIPE)){
+                    if(Check(TokenType.LEFT_BRACKET) || Check(TokenType.DOT)){
+                        this_function_call_node.IndexedAccess.Add(IndexedAccess(this_function_call_node.Variable.Name, this_function_call_node.Line) as VariableNode);
+                    }else{
+                        this_function_call_node.IndexedAccess.Add(null);
+                    }
+                }else{
+                    if(Check(TokenType.DOT)){
+                        this_function_call_node.IndexedAccess.Add(IndexedAccess(this_function_call_node.Variable.Name, this_function_call_node.Line) as VariableNode);
+                    }else{
+                        this_function_call_node.IndexedAccess.Add(null);
+                    }
+                    go_on = false;
                 }
             }
             if(Check(TokenType.COLON))

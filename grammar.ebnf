@@ -48,15 +48,16 @@ unary           <- ( "!" | "-" ) unary | call;
 
 (* CALL *)
 call            <- primary (callTail | anonymousCall);
-callTail        <- "(" arguments* ")" indexedAccess sequentialCall anonymousCall?;
+callTail        <- "(" arguments* ")" pipedAccess* sequentialCall* anonymousCall?;
 anonymousCall   <- methodAccess callTail;
 sequentialCall  <- ("|" "(" arguments* ")")*;
 arguments       <- expression ( "," expression )*;
 
 (* ACCESS *)
-indexedAccess   <- ( ( "[" expression "]" ) | ( "." IDENTIFIER ) )*;
+pipedAccess     <- "|" indexedAccess;
+indexedAccess   <- ( "[" expression "]" ) | ( "." IDENTIFIER );
 methodAccess    <-  ( ":" IDENTIFIER )?;
-compoundVar     <- IDENTIFIER indexedAccess methodCall;
+compoundVar     <- IDENTIFIER indexedAccess* methodAccess;
 
 (* TABLE *)
 table           <- [ tableEntry (, tableEntry )* ];
