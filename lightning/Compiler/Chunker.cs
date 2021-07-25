@@ -285,22 +285,19 @@ namespace lightning
             int n_elements = 0;
             if (p_node.Elements != null)
             {
-                p_node.Elements.Reverse();
-                foreach (Node n in p_node.Elements)
-                {
-                    ChunkIt(n);
-                    n_elements++;
-                }
+                n_elements = p_node.Elements.Count;
+                for(int i=p_node.Elements.Count-1; i>=0; i--)
+                    ChunkIt(p_node.Elements[i]);
             }
 
             int n_table = 0;
             if (p_node.Table != null)
             {
+                n_table = p_node.Table.Count;
                 foreach (KeyValuePair<Node, Node> entry in p_node.Table)
                 {
                     ChunkIt(entry.Key);
                     ChunkIt(entry.Value);
-                    n_table++;
                 }
             }
             Add(OpCode.NEW_TABLE, (Operand)n_elements, (Operand)n_table, p_node.Line);
@@ -606,9 +603,8 @@ namespace lightning
         private void ChunkFunctionCall(FunctionCallNode p_node)
         {
             //push parameters on stack
-            p_node.Calls[0].Reverse();
-            foreach (Node n in p_node.Calls[0])
-                ChunkIt(n);
+            for(int i=p_node.Calls[0].Count-1; i>=0; i--)
+                ChunkIt(p_node.Calls[0][i]);
 
             // the first call, we need to decode the function name
             Nullable<Variable> maybe_call = GetVar(p_node.Variable.Name);
@@ -651,11 +647,8 @@ namespace lightning
                 {
                     Add(OpCode.PUSH_STASH, p_node.Line);
 
-                    p_node.Calls[i].Reverse();
-                    foreach (Node n in p_node.Calls[i])
-                    {
-                        ChunkIt(n);
-                    }
+                    for(int j=p_node.Calls[i].Count-1; j>=0; j--)
+                        ChunkIt(p_node.Calls[i][j]);
 
                     Add(OpCode.POP_STASH, p_node.Line);
                     Add(OpCode.CALL, p_node.Line);
