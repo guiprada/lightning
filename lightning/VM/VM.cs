@@ -209,7 +209,7 @@ namespace lightning
 
         public string GetString(int n){
             if(stack.Peek(n).Type != UnitType.String)
-                throw new Exception("Expected a String." + VM.ErrorString(this));
+                throw new Exception("Expected a String.");
             return ((StringUnit)(stack.Peek(n).heapUnitValue)).content;
         }
 
@@ -219,56 +219,56 @@ namespace lightning
                 return this_value.integerValue;
             if(this_value.Type == UnitType.Float)
                 return (this_value.floatValue);
-            throw new Exception("Expected a Float or Integer." + VM.ErrorString(this));
+            throw new Exception("Expected a Float or Integer.");
         }
 
         public Float GetFloat(int n){
             Unit this_value = stack.Peek(n);
             if(this_value.Type == UnitType.Float)
                 return (this_value.floatValue);
-            throw new Exception("Expected a Float." + VM.ErrorString(this));
+            throw new Exception("Expected a Float.");
         }
 
         public Integer GetInteger(int n){
             Unit this_value = stack.Peek(n);
             if(this_value.Type == UnitType.Integer)
                 return this_value.integerValue;
-            throw new Exception("Expected a Integer." + VM.ErrorString(this));
+            throw new Exception("Expected a Integer.");
         }
 
         public TableUnit GetTable(int n){
             if(stack.Peek(n).Type != UnitType.Table)
-                throw new Exception("Expected a Table." + VM.ErrorString(this));
+                throw new Exception("Expected a Table.");
             return (TableUnit)(stack.Peek(n).heapUnitValue);
         }
 
         public T GetWrappedContent<T>(int n){
             if(stack.Peek(n).Type != UnitType.Wrapper)
-                throw new Exception("Expected a Wrapper." + VM.ErrorString(this));
+                throw new Exception("Expected a Wrapper.");
             return ((WrapperUnit<T>)(stack.Peek(n).heapUnitValue)).UnWrapp();
         }
 
         public WrapperUnit<T> GetWrapperUnit<T>(int n){
             if(stack.Peek(n).Type != UnitType.Wrapper)
-                throw new Exception("Expected a Wrapper." + VM.ErrorString(this));
+                throw new Exception("Expected a Wrapper.");
             return ((WrapperUnit<T>)(stack.Peek(n).heapUnitValue));
         }
 
         public StringUnit GetStringUnit(int n){
             if(stack.Peek(n).Type != UnitType.String)
-                throw new Exception("Expected a String." + VM.ErrorString(this));
+                throw new Exception("Expected a String.");
             return ((StringUnit)(stack.Peek(n).heapUnitValue));
         }
 
         public char GetChar(int n){
             if(stack.Peek(n).Type != UnitType.Char)
-                throw new Exception("Expected a Char." + VM.ErrorString(this));
+                throw new Exception("Expected a Char.");
             return (stack.Peek(n).charValue);
         }
 
         public bool GetBool(int n){
             if(stack.Peek(n).Type != UnitType.Boolean)
-                throw new Exception("Expected a Boolean." + VM.ErrorString(this));
+                throw new Exception("Expected a Boolean.");
             return stack.Peek(n).ToBool();
         }
 
@@ -281,14 +281,14 @@ namespace lightning
             catch (Exception e)
             {
                 Console.WriteLine(e);
-                Error("VM Busted ...");
+                Console.WriteLine("VM Busted ... " + ErrorLocation());
                 System.Environment.Exit(1);
                 return new Unit(UnitType.Null);
             }
 #else
             catch
             {
-                Error("VM Busted ...");
+                Console.WriteLine("VM Busted ... " + ErrorLocation());
                 System.Environment.Exit(1);
                 return new Unit(UnitType.Null);
             }
@@ -370,21 +370,16 @@ namespace lightning
             }
         }
 
-        public void Error(string msg)
+        public void Error(string p_msg)
         {
-            Console.Write("Error: " + msg);
-            Console.Write(" on function: " + instructions.ExecutingFunction.Name);
-            Console.Write(" from module: " + instructions.ExecutingFunction.Module);
-            Console.WriteLine(" on line: " + instructions.ExecutingFunction.LineCounter.GetLine(IP));
+            throw new Exception(p_msg);
         }
 
-        public static string ErrorString(VM vm)
+        public string ErrorLocation()
         {
-            if (vm == null)
-                return null;
-            return "Function: " + vm.instructions.ExecutingFunction.Name +
-            " from module: " + vm.instructions.ExecutingFunction.Module +
-            " on line: " + vm.instructions.ExecutingFunction.LineCounter.GetLine(vm.IP);
+            return "Function: " + instructions.ExecutingFunction.Name +
+            " from module: " + instructions.ExecutingFunction.Module +
+            " on line: " + instructions.ExecutingFunction.LineCounter.GetLine(IP);
         }
 
         public VMResult ProtectedRun(){
@@ -395,14 +390,14 @@ namespace lightning
             catch (Exception e)
             {
                 Console.WriteLine(e);
-                Error("VM Busted ...");
+                Console.WriteLine("VM Busted ... " + ErrorLocation());
                 System.Environment.Exit(1);
                 return new VMResult(VMResultType.ERROR, new Unit(UnitType.Null));
             }
 #else
             catch
             {
-                Error("VM Busted ...");
+                Console.WriteLine("VM Busted ... " + ErrorLocation());
                 System.Environment.Exit(1);
                 return new VMResult(VMResultType.ERROR, new Unit(UnitType.Null));
             }
@@ -547,7 +542,7 @@ namespace lightning
                                         result = old_value / new_value;
                                         break;
                                     default:
-                                        throw new Exception("Unknown operator" + VM.ErrorString(this));
+                                        throw new Exception("Unknown operator");
                                 }
 
                                 variables.SetAt(result, address, CalculateEnvShift(n_shift));
@@ -589,7 +584,7 @@ namespace lightning
                                         }
                                         break;
                                     default:
-                                        throw new Exception("Unknown operator" + VM.ErrorString(this));
+                                        throw new Exception("Unknown operator");
                                 }
                             }else{
                                 Unit result;
@@ -607,7 +602,7 @@ namespace lightning
                                         result = globals.Get(address) / new_value;
                                         break;
                                     default:
-                                        throw new Exception("Unknown operator" + VM.ErrorString(this));
+                                        throw new Exception("Unknown operator");
                                 }
                                 globals.Set(result, address);
                             }
@@ -648,7 +643,7 @@ namespace lightning
                                         }
                                         break;
                                     default:
-                                        throw new Exception("Unknown operator" + VM.ErrorString(this));
+                                        throw new Exception("Unknown operator");
                                 }
                             }else{
                                 Unit result;
@@ -666,7 +661,7 @@ namespace lightning
                                         result = modules[instruction.opB].GetGlobal(instruction.opA) / new_value;
                                         break;
                                     default:
-                                        throw new Exception("Unknown operator" + VM.ErrorString(this));
+                                        throw new Exception("Unknown operator");
                                 }
                                 modules[instruction.opB].SetGlobal(result, instruction.opA);
                             }
@@ -704,7 +699,7 @@ namespace lightning
                                         }
                                         break;
                                     default:
-                                        throw new Exception("Unknown operator" + VM.ErrorString(this));
+                                        throw new Exception("Unknown operator");
                                 }
                             }else{
                                 switch(op){
@@ -721,7 +716,7 @@ namespace lightning
                                         this_upValue.UpValue = this_upValue.UpValue / new_value;
                                         break;
                                     default:
-                                        throw new Exception("Unknown operator" + VM.ErrorString(this));
+                                        throw new Exception("Unknown operator");
                                 }
                             }
                             break;
@@ -802,7 +797,7 @@ namespace lightning
                                         }
                                         break;
                                     default:
-                                        throw new Exception("Unknown operator" + VM.ErrorString(this));
+                                        throw new Exception("Unknown operator");
 
                                 }
                             }
@@ -824,7 +819,7 @@ namespace lightning
                                         result = old_value / new_value;
                                         break;
                                     default:
-                                        throw new Exception("Unknown operator" + VM.ErrorString(this));
+                                        throw new Exception("Unknown operator");
 
                                 }
                                 (this_table.heapUnitValue).Set(index, result);
