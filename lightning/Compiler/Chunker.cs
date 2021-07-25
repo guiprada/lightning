@@ -81,9 +81,9 @@ namespace lightning
             }
         }
 
-        public Chunker(Node p_ast, string p_moduleName, Library prelude)
+        public Chunker(Node p_ast, string p_moduleName, Library p_prelude)
         {
-            chunk = new Chunk(p_moduleName, prelude);
+            chunk = new Chunk(p_moduleName, p_prelude);
             moduleName = p_moduleName;
             ast = p_ast;
             instructionCounter = 0;
@@ -98,13 +98,13 @@ namespace lightning
             lambdaCounter = 0;
 
             // place prelude functions on constans
-            foreach (IntrinsicUnit v in prelude.intrinsics)
+            foreach (IntrinsicUnit v in p_prelude.intrinsics)
             {
                 SetGlobalVar(v.Name);
             }
 
             // load prelude tables
-            foreach (KeyValuePair<string, TableUnit> entry in prelude.tables)
+            foreach (KeyValuePair<string, TableUnit> entry in p_prelude.tables)
             {
                 SetGlobalVar(entry.Key);
 
@@ -400,11 +400,11 @@ namespace lightning
             int go_back_address = instructionCounter;
             Add(OpCode.JUMP_BACK, 0, p_node.Line);
 
-            int exit_adress = instructionCounter;
+            int exit_address = instructionCounter;
             Add(OpCode.CLOSE_ENV, p_node.Line);
             env.RemoveAt(env.Count - 1);
 
-            chunk.FixInstruction(start_address, null, (Operand)(exit_adress - start_address), null, null);
+            chunk.FixInstruction(start_address, null, (Operand)(exit_address - start_address), null, null);
             chunk.FixInstruction(go_back_address, null, (Operand)(go_back_address - condition_address), null, null);
 
         }
@@ -857,19 +857,19 @@ namespace lightning
             }
         }
 
-        private void CompileFunction(string name, int line, FunctionExpressionNode p_node, bool isGlobal)
+        private void CompileFunction(string p_name, int p_line, FunctionExpressionNode p_node, bool p_isGlobal)
         {
 
-            FunctionUnit new_function = new FunctionUnit(name, moduleName);
+            FunctionUnit new_function = new FunctionUnit(p_name, moduleName);
             Operand this_address = (Operand)AddConstant(new_function);
 
             if (p_node.GetType() == typeof(FunctionExpressionNode))
             {
-                Add(OpCode.DECLARE_FUNCTION, 0, 1, this_address, line);
+                Add(OpCode.DECLARE_FUNCTION, 0, 1, this_address, p_line);
             }
             else
             {
-                if (isGlobal)
+                if (p_isGlobal)
                 {
                     Add(OpCode.DECLARE_FUNCTION, 0, 0, this_address, p_node.Line);// zero for gloabal
                 }
@@ -885,19 +885,19 @@ namespace lightning
 
             // env
             env.Add(new List<string>());
-            Add(OpCode.OPEN_ENV, line);
+            Add(OpCode.OPEN_ENV, p_line);
             //Add funStartEnv
             funStartEnv.Push(env.Count - 1);
 
             int exit_instruction_address = instructionCounter;
-            Add(OpCode.RETURN_SET, 0, line);
+            Add(OpCode.RETURN_SET, 0, p_line);
 
             Operand arity = 0;
             if(p_node.Parameters != null)
                 foreach (string p in p_node.Parameters)
                 {
                     SetVar(p);// it is always local
-                    Add(OpCode.DECLARE_VARIABLE, line);
+                    Add(OpCode.DECLARE_VARIABLE, p_line);
                     arity++;
                 }
 
@@ -927,9 +927,9 @@ namespace lightning
             chunk.FixInstruction(exit_instruction_address, null, (Operand)(instructionCounter - exit_instruction_address), null, null);
 
             if (is_closure == true)
-                Add(OpCode.CLOSE_CLOSURE, line);
+                Add(OpCode.CLOSE_CLOSURE, p_line);
             else
-                Add(OpCode.CLOSE_FUNCTION, line);
+                Add(OpCode.CLOSE_FUNCTION, p_line);
 
             new_function.Set(
                 arity,
@@ -947,13 +947,13 @@ namespace lightning
 
         //////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-        private Nullable<Variable> GetVar(string name)
+        private Nullable<Variable> GetVar(string p_name)
         {
             int top_index = env.Count - 1;
             for (int i = top_index; i >= 0; i--)
             {
                 var this_env = env[i];
-                if (this_env.Contains(name))
+                if (this_env.Contains(p_name))
                 {
                     bool is_in_function = upvalueStack.Count != 0;// if we are compiling a function this stack will not be empty
                     bool isGlobal = (i == 0);
@@ -962,15 +962,15 @@ namespace lightning
                         if (is_in_function && i < funStartEnv.Peek())// not global
                         {
                             List<Variable> this_upvalues = upvalueStack.Peek();
-                            Variable this_upvalue = GetOrSetUpValue(name, this_env.IndexOf(name), i, this_upvalues);
+                            Variable this_upvalue = GetOrSetUpValue(p_name, this_env.IndexOf(p_name), i, this_upvalues);
                             return this_upvalue;
                         }
                         // local var
-                        return new Variable(name, this_env.IndexOf(name), top_index - i, ValueType.Local);
+                        return new Variable(p_name, this_env.IndexOf(p_name), top_index - i, ValueType.Local);
                     }
-                    if (isGlobal && globals.Contains(name))// Sanity check
+                    if (isGlobal && globals.Contains(p_name))// Sanity check
                     {
-                        return new Variable(name, this_env.IndexOf(name), 0, ValueType.Global);
+                        return new Variable(p_name, this_env.IndexOf(p_name), 0, ValueType.Global);
                     }
                     Console.WriteLine("Var finding gone mad!");
                     return null;
@@ -979,55 +979,53 @@ namespace lightning
             return null;
         }
 
-        private Variable GetOrSetUpValue(string name, int adress, int env, List<Variable> list)
+        private Variable GetOrSetUpValue(string p_name, int p_address, int p_env, List<Variable> p_list)
         {
-            foreach (Variable v in list)
+            foreach (Variable v in p_list)
             {
-                if (name == v.name) return v;
+                if (p_name == v.name) return v;
             }
-            Variable this_upvalue = new Variable(name, adress, env, ValueType.UpValue);
-            list.Add(this_upvalue);
+            Variable this_upvalue = new Variable(p_name, p_address, p_env, ValueType.UpValue);
+            p_list.Add(this_upvalue);
             return this_upvalue;
         }
 
-        private bool IsLocalVar(string name)
+        private bool IsLocalVar(string p_name)
         {
             int top_index = env.Count - 1;
             var this_env = env[top_index];
 
-            if (this_env.Contains(name))
+            if (this_env.Contains(p_name))
                 return true;
             else
                 return false;
         }
 
-        private Nullable<Variable> SetVar(string name)
+        private Nullable<Variable> SetVar(string p_name)
         {
             if (env.Count == 1)// we are in global scope
             {
-                return SetGlobalVar(name);
+                return SetGlobalVar(p_name);
             }
             else
             {
-                if (!IsLocalVar(name))
+                if (!IsLocalVar(p_name))
                 {
-                    //Console.WriteLine("added local var " + name);
                     int top_index = env.Count - 1;
                     var this_env = env[top_index];
-                    this_env.Add(name);
-                    return new Variable(name, this_env.IndexOf(name), 0, ValueType.Local);
+                    this_env.Add(p_name);
+                    return new Variable(p_name, this_env.IndexOf(p_name), 0, ValueType.Local);
                 }
             }
             return null;
         }
 
-        private Nullable<Variable> SetGlobalVar(string name)
+        private Nullable<Variable> SetGlobalVar(string p_name)
         {
-            if (!globals.Contains(name))
+            if (!globals.Contains(p_name))
             {
-                //Console.WriteLine("added global " + name);
-                globals.Add(name);
-                return new Variable(name, globals.IndexOf(name), 0, ValueType.Global);
+                globals.Add(p_name);
+                return new Variable(p_name, globals.IndexOf(p_name), 0, ValueType.Global);
             }
 
             return null;
@@ -1091,10 +1089,10 @@ namespace lightning
             }
         }
 
-        private int AddConstant(FunctionUnit new_function)
+        private int AddConstant(FunctionUnit p_function)
         {
-            constants.Add(new_function);
-            chunk.AddConstant(new Unit(new_function));
+            constants.Add(p_function);
+            chunk.AddConstant(new Unit(p_function));
             return constants.Count - 1;
         }
 

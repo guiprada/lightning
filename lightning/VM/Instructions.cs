@@ -6,8 +6,8 @@ namespace lightning{
     {
         int currentInstructionsIndex;
         FunctionUnit[] functions;
-        int returnAdressTop;
-        Operand[] returnAdress;
+        int returnAddressTop;
+        Operand[] returnAddress;
         int[] funCallEnv;
 
         public int TargetEnv{
@@ -34,51 +34,51 @@ namespace lightning{
             }
         }
 
-        public Instructions(int p_function_deepness, FunctionUnit p_main, out List<Instruction> p_instructions_cache){
-            functions = new FunctionUnit[p_function_deepness];
-            returnAdress = new Operand[2 * p_function_deepness];
-            funCallEnv = new int[p_function_deepness];
+        public Instructions(int p_functionDeepness, FunctionUnit p_main, out List<Instruction> p_instructionsCache){
+            functions = new FunctionUnit[p_functionDeepness];
+            returnAddress = new Operand[2 * p_functionDeepness];
+            funCallEnv = new int[p_functionDeepness];
 
-            returnAdressTop = 0;
+            returnAddressTop = 0;
             currentInstructionsIndex = 0;
 
             PushRET((Operand)(p_main.Body.Count - 1));
             functions[currentInstructionsIndex] = p_main;
 
-            p_instructions_cache = ExecutingInstructions;
+            p_instructionsCache = ExecutingInstructions;
         }
 
         public void Reset(){
-            returnAdressTop = 1;
+            returnAddressTop = 1;
             currentInstructionsIndex = 0;
         }
 
-        public Operand PopFunction(out List<Instruction> p_instructions_cache){
-            returnAdressTop--;
+        public Operand PopFunction(out List<Instruction> p_instructionsCache){
+            returnAddressTop--;
             currentInstructionsIndex--;
 
-            p_instructions_cache = ExecutingInstructions;
+            p_instructionsCache = ExecutingInstructions;
 
-            return returnAdress[returnAdressTop];
+            return returnAddress[returnAddressTop];
         }
 
-        public void PushFunction(FunctionUnit p_function, int p_env, out List<Instruction> p_instructions_cache){
+        public void PushFunction(FunctionUnit p_function, int p_env, out List<Instruction> p_instructionsCache){
             currentInstructionsIndex++;
 
             funCallEnv[currentInstructionsIndex] = p_env;
             functions[currentInstructionsIndex] = p_function;
 
-            p_instructions_cache = ExecutingInstructions;
+            p_instructionsCache = ExecutingInstructions;
         }
 
         public Operand PopRET(){
-            returnAdressTop--;
-            return returnAdress[returnAdressTop];
+            returnAddressTop--;
+            return returnAddress[returnAddressTop];
         }
 
         public void PushRET(Operand p_address){
-            returnAdress[returnAdressTop] = p_address;
-            returnAdressTop ++;
+            returnAddress[returnAddressTop] = p_address;
+            returnAddressTop ++;
         }
     }
 }

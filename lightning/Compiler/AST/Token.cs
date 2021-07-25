@@ -78,10 +78,10 @@ namespace lightning
         public TokenType Type { get; private set; }
 
         public int Line { get; private set; }
-        public Token(TokenType p_type, int p_Line)
+        public Token(TokenType p_Type, int p_Line)
         {
             //Console.WriteLine(p_type.ToString() + " " + p_Line);
-            Type = p_type;
+            Type = p_Type;
             Line = p_Line;
         }
 

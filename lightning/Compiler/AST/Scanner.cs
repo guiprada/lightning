@@ -59,9 +59,9 @@ namespace lightning
                 return tokens;
             }}
 
-        public Scanner(string input)
+        public Scanner(string p_input)
         {
-            source = input.ToCharArray();
+            source = p_input.ToCharArray();
             hasScanned = false;
             errors = new List<string>();
             line = 1;
@@ -207,10 +207,10 @@ namespace lightning
             return source[current - 1];
         }
 
-        private bool Match(char expected)
+        private bool Match(char p_expected)
         {
             if (IsAtEnd()) return false;
-            if (source[current] != expected) return false;
+            if (source[current] != p_expected) return false;
 
             current++;
             return true;
@@ -234,21 +234,21 @@ namespace lightning
             return is_end;
         }
 
-        private bool IsDigit(char c)
+        private bool IsDigit(char p_c)
         {
-            return (c >= '0' && c <= '9');
+            return (p_c >= '0' && p_c <= '9');
         }
 
-        private bool IsAlpha(char c)
+        private bool IsAlpha(char p_c)
         {
-            return (c >= 'a' && c <= 'z') ||
-                    (c >= 'A' && c <= 'Z') ||
-                    c == '_';
+            return (p_c >= 'a' && p_c <= 'z') ||
+                    (p_c >= 'A' && p_c <= 'Z') ||
+                    p_c == '_';
         }
 
-        private bool IsAlphaNumeric(char c)
+        private bool IsAlphaNumeric(char p_c)
         {
-            return IsAlpha(c) || IsDigit(c);
+            return IsAlpha(p_c) || IsDigit(p_c);
         }
 
         private String ReadNumber()
@@ -295,12 +295,12 @@ namespace lightning
         }
 
 
-        private string ReadString(char terminator)
+        private string ReadString(char p_terminator)
         {
-            while (Peek() != terminator && !IsAtEnd())
+            while (Peek() != p_terminator && !IsAtEnd())
             {
                 if (Peek() == '\n') line++;
-                else if (Peek() == '\\' && PeekNext() == terminator) // scaping terminator
+                else if (Peek() == '\\' && PeekNext() == p_terminator) // scaping terminator
                 {
                     Advance();
                 }
@@ -324,9 +324,9 @@ namespace lightning
         }
 
 
-        private void Error(string msg)
+        private void Error(string p_msg)
         {
-            errors.Add(msg + " on line: " + line);
+            errors.Add(p_msg + " on line: " + line);
         }
 
     }

@@ -121,7 +121,7 @@ namespace lightning
             return method_call;
         }
 
-        Node IndexedAccess(string name, int line) {
+        Node IndexedAccess(string p_name, int p_line) {
             List<Node> indexes = new List<Node>();
             while (Check(TokenType.LEFT_BRACKET) || Check(TokenType.DOT))
             {
@@ -142,7 +142,7 @@ namespace lightning
                     indexes.Add(index);
                 }
             }
-            return new VariableNode(name, indexes, VarAccessType.PLAIN, line);
+            return new VariableNode(p_name, indexes, VarAccessType.PLAIN, p_line);
         }
 
         Node VarDecl()
@@ -634,35 +634,35 @@ namespace lightning
             return maybe_func;
         }
 
-        Node MethodAccess(Node node){
+        Node MethodAccess(Node p_node){
             if (Match(TokenType.COLON))
             {// Method Call
                 if(Match(TokenType.IDENTIFIER)){
                     string this_name = (Previous() as TokenString).value;
                     VariableNode index = new VariableNode(this_name, new List<Node>(), VarAccessType.METHOD, Previous().Line);
-                    (node as VariableNode).Indexes.Add(index);
+                    (p_node as VariableNode).Indexes.Add(index);
                 }else if(Match(TokenType.STRING)){
                     string this_name = (Previous() as TokenString).value;
                     VariableNode index = new VariableNode(this_name, new List<Node>(), VarAccessType.METHOD, Previous().Line);
-                    (node as VariableNode).Indexes.Add(index);
+                    (p_node as VariableNode).Indexes.Add(index);
                 }else if (Match(TokenType.LEFT_BRACKET)) {
                     List<Node> expression_var = new List<Node>();
                     expression_var.Add(Expression());
                     VariableNode index = new VariableNode("_expression_as_index", expression_var, VarAccessType.METHOD, Previous().Line);
-                    (node as VariableNode).Indexes.Add(index);
+                    (p_node as VariableNode).Indexes.Add(index);
                     Consume(TokenType.RIGHT_BRACKET, "Expected ']' after 'Method Access'", true);
                 }
             }
-            return node;
+            return p_node;
         }
 
-        Node AnonymousCall(Node node){
+        Node AnonymousCall(Node p_node){
             if(Check(TokenType.COLON))
             {
                 string name = string.Format(@"*_{0}.txt", Guid.NewGuid());
 
-                VarDeclarationNode declaration_node = new VarDeclarationNode(name, node, node.Line);
-                VariableNode variableNode = new VariableNode(name, new List<Node>(), VarAccessType.PLAIN, node.Line);
+                VarDeclarationNode declaration_node = new VarDeclarationNode(name, p_node, p_node.Line);
+                VariableNode variableNode = new VariableNode(name, new List<Node>(), VarAccessType.PLAIN, p_node.Line);
                 variableNode = (VariableNode)MethodAccess(variableNode);
 
                 List<List<Node>> calls = new List<List<Node>>();
@@ -672,21 +672,21 @@ namespace lightning
                     variableNode,
                     calls,
                     indexed_access,
-                    node.Line);
+                    p_node.Line);
 
                 function_call_node = CallTail(function_call_node);
-                return new AnonymousFunctionCallNode(function_call_node, declaration_node, variableNode, node.Line);
+                return new AnonymousFunctionCallNode(function_call_node, declaration_node, variableNode, p_node.Line);
             }
             Error("Expected ':' after anonymous function call.");
-            return node;
+            return p_node;
         }
 
-        Node CallTail(Node function_call_node)
+        Node CallTail(Node p_functionCallNode)
         {
             bool go_on = true;
             while(Check(TokenType.LEFT_PAREN) && go_on)
             {
-                FunctionCallNode this_function_call_node = (FunctionCallNode)function_call_node;
+                FunctionCallNode this_function_call_node = (FunctionCallNode)p_functionCallNode;
                 this_function_call_node.Calls.Add(Arguments());
 
                 if(Check(TokenType.DOT)){
@@ -705,9 +705,9 @@ namespace lightning
                 }
             }
             if(Check(TokenType.COLON))
-                function_call_node = AnonymousCall(function_call_node);
+                p_functionCallNode = AnonymousCall(p_functionCallNode);
 
-            return function_call_node;
+            return p_functionCallNode;
         }
 
         List<Node> Arguments(){
@@ -724,10 +724,10 @@ namespace lightning
             return arguments;
         }
 
-        TableNode TableEntry(TableNode table_node)
+        TableNode TableEntry(TableNode p_tableNode)
         {
-            List<Node> elements = table_node.Elements;
-            Dictionary<Node, Node> table = table_node.Table;
+            List<Node> elements = p_tableNode.Elements;
+            Dictionary<Node, Node> table = p_tableNode.Table;
 
             bool is_negative = false;
             if(Match(TokenType.MINUS))
@@ -799,7 +799,7 @@ namespace lightning
                 }
             }
 
-            return table_node;
+            return p_tableNode;
         }
 
         Node Table()
@@ -904,21 +904,21 @@ namespace lightning
                 return null;
         }
 
-        bool Check(TokenType type)
+        bool Check(TokenType p_type)
         {
             if (IsAtEnd()) return false;
-            else return Peek().Type == type;
+            else return Peek().Type == p_type;
         }
 
-        bool Check2(TokenType type)
+        bool Check2(TokenType p_type)
         {
             if (IsAtEnd()) return false;
-            else return Peek2().Type == type;
+            else return Peek2().Type == p_type;
         }
 
-        bool Match(TokenType type)
+        bool Match(TokenType p_type)
         {
-            if (Check(type))
+            if (Check(p_type))
             {
                 Advance();
                 return true;
@@ -926,9 +926,9 @@ namespace lightning
             return false;
         }
 
-        bool Match(TokenType type1, TokenType type2)
+        bool Match(TokenType p_type1, TokenType p_type2)
         {
-            if (Check(type1) || Check(type2))
+            if (Check(p_type1) || Check(p_type2))
             {
                 Advance();
                 return true;
@@ -936,9 +936,9 @@ namespace lightning
             return false;
         }
 
-        bool Match(TokenType type1, TokenType type2, TokenType type3)
+        bool Match(TokenType p_type1, TokenType p_type2, TokenType p_type3)
         {
-            if (Check(type1) || Check(type2) || Check(type3))
+            if (Check(p_type1) || Check(p_type2) || Check(p_type3))
             {
                 Advance();
                 return true;
@@ -946,9 +946,9 @@ namespace lightning
             return false;
         }
 
-        bool Match(TokenType type1, TokenType type2, TokenType type3, TokenType type4)
+        bool Match(TokenType p_type1, TokenType p_type2, TokenType p_type3, TokenType p_type4)
         {
-            if (Check(type1) || Check(type2) || Check(type3) || Check(type4))
+            if (Check(p_type1) || Check(p_type2) || Check(p_type3) || Check(p_type4))
             {
                 Advance();
                 return true;
@@ -956,38 +956,38 @@ namespace lightning
             return false;
         }
 
-        Token Consume(TokenType type, string msg, bool error)
+        Token Consume(TokenType p_type, string p_msg, bool p_error)
         {
-            if (Check(type)) return Advance();
+            if (Check(p_type)) return Advance();
             else
             {
-                if(error == true)
+                if(p_error == true)
                     Error(Peek().ToString() +
                     " on line: " + Peek().Line +
-                    ", " + msg);
+                    ", " + p_msg);
                 else
                     Warning(Peek().ToString() +
                     " on line: " + Peek().Line +
-                    ", " + msg);
+                    ", " + p_msg);
                 return null;
             }
 
         }
 
-        Token Elide(TokenType type)
+        Token Elide(TokenType p_type)
         {
-            if (Check(type)) return Advance();
+            if (Check(p_type)) return Advance();
             return null;
         }
 
-        void Error(string msg)
+        void Error(string p_msg)
         {
-            Errors.Add(msg);
+            Errors.Add(p_msg);
         }
 
-        void Warning(string msg)
+        void Warning(string p_msg)
         {
-            Warnings.Add(msg);
+            Warnings.Add(p_msg);
         }
 
     }
