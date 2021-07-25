@@ -425,37 +425,47 @@ namespace lightning
             chunk.FixInstruction(go_back_address, null, (Operand)(go_back_address - condition_address), null, null);
         }
 
+        private void LoadVariable(Variable p_variable, int line){
+            switch (p_variable.type)
+            {
+                case ValueType.Local:
+                    Add(OpCode.LOAD_VARIABLE, (Operand)p_variable.address, (Operand)p_variable.envIndex, line);
+                    break;
+                case ValueType.Global:
+                    Add(OpCode.LOAD_GLOBAL, (Operand)p_variable.address, line);
+                    break;
+                case ValueType.UpValue:
+                    int this_index = upvalueStack.Peek().IndexOf(p_variable);
+                    Add(OpCode.LOAD_UPVALUE, (Operand)this_index, line);
+                    break;
+            }
+        }
+        private void LoadIndex(VariableNode p_node){
+            if(p_node.Name == "_expression_as_index")
+                ChunkIt(p_node.Indexes[^1]);
+            else{
+                Operand string_address = (Operand)AddConstant(p_node.Name);
+                Add(OpCode.LOAD_CONSTANT, string_address, p_node.Line);
+            }
+        }
+        private void LoadIndexes(VariableNode p_node){
+            foreach (Node n in p_node.Indexes)
+            {
+                LoadIndex((VariableNode)n);
+            }
+        }
+
         private void ChunkVariable(VariableNode p_node)
         {
             Nullable<Variable> maybe_var = GetVar(p_node.Name);
             if (maybe_var.HasValue)
             {
                 Variable this_var = maybe_var.Value;
-                switch (this_var.type)
-                {
-                    case ValueType.Local:
-                        Add(OpCode.LOAD_VARIABLE, (Operand)this_var.address, (Operand)this_var.envIndex, p_node.Line);
-                        break;
-                    case ValueType.Global:
-                        Add(OpCode.LOAD_GLOBAL, (Operand)this_var.address, p_node.Line);
-                        break;
-                    case ValueType.UpValue:
-                        int this_index = upvalueStack.Peek().IndexOf(this_var);
-                        Add(OpCode.LOAD_UPVALUE, (Operand)this_index, p_node.Line);
-                        break;
-                }
-                if (p_node.Indexes.Count != 0)
-                {// it is a compoundVar
-                    foreach (Node n in p_node.Indexes)
-                    {
-                        if((n as VariableNode).Name == "_expression_as_index")
-                            ChunkIt((n as VariableNode).Indexes[^1]);
-                        else{
-                            Operand string_address = (Operand)AddConstant((n as VariableNode).Name);
-                            Add(OpCode.LOAD_CONSTANT, string_address, p_node.Line);
-                        }
-                    }
+                LoadVariable(this_var, p_node.Line);
 
+                if (p_node.Indexes.Count > 0)
+                {// it is a compoundVar
+                    LoadIndexes(p_node);
                     Add(OpCode.TABLE_GET, (Operand)p_node.Indexes.Count, p_node.Line);
                 }
             }
@@ -517,30 +527,8 @@ namespace lightning
                 }
                 else//  it is a compoundVar
                 {
-                    switch (this_var.type)
-                    {
-                        case ValueType.Local:
-                            Add(OpCode.LOAD_VARIABLE, (Operand)this_var.address, (Operand)this_var.envIndex, p_node.Line);
-                            break;
-                        case ValueType.Global:
-                            Add(OpCode.LOAD_GLOBAL, (Operand)this_var.address, p_node.Line);
-                            break;
-                        case ValueType.UpValue:
-                            int this_index = upvalueStack.Peek().IndexOf(this_var);
-                            Add(OpCode.LOAD_UPVALUE, (Operand)this_index, p_node.Line);
-                            break;
-                    }
-
-                    foreach (Node n in p_node.Assigned.Indexes)
-                    {
-                        if((n as VariableNode).Name == "_expression_as_index")
-                            ChunkIt((n as VariableNode).Indexes[^1]);
-                        else{
-                            Operand string_address = (Operand)AddConstant((n as VariableNode).Name);
-                            Add(OpCode.LOAD_CONSTANT, string_address, p_node.Line);
-                        }
-                    }
-
+                    LoadVariable(this_var, p_node.Line);
+                    LoadIndexes(p_node.Assigned);
                     Add(OpCode.TABLE_SET, (Operand)p_node.Assigned.Indexes.Count, op, p_node.Line);
                 }
             }
@@ -579,30 +567,8 @@ namespace lightning
                 }
                 else//  it is a compoundVar
                 {
-                    switch (this_var.type)
-                    {
-                        case ValueType.Local:
-                            Add(OpCode.LOAD_VARIABLE, (Operand)this_var.address, (Operand)this_var.envIndex, p_node.Line);
-                            break;
-                        case ValueType.Global:
-                            Add(OpCode.LOAD_GLOBAL, (Operand)this_var.address, p_node.Line);
-                            break;
-                        case ValueType.UpValue:
-                            int this_index = upvalueStack.Peek().IndexOf(this_var);
-                            Add(OpCode.LOAD_UPVALUE, (Operand)this_index, p_node.Line);
-                            break;
-                    }
-
-                    foreach (Node n in p_node.Assigned.Indexes)
-                    {
-                        if((n as VariableNode).Name == "_expression_as_index")
-                            ChunkIt((n as VariableNode).Indexes[^1]);
-                        else{
-                            Operand string_address = (Operand)AddConstant((n as VariableNode).Name);
-                            Add(OpCode.LOAD_CONSTANT, string_address, p_node.Line);
-                        }
-                    }
-
+                    LoadVariable(this_var, p_node.Line);
+                    LoadIndexes(p_node.Assigned);
                     Add(OpCode.TABLE_SET, (Operand)p_node.Assigned.Indexes.Count, op, p_node.Line);
                 }
             }
@@ -679,79 +645,23 @@ namespace lightning
                 Variable this_call = maybe_call.Value;
 
                 if (p_node.Variable.Indexes.Count == 0)
-                {
-                    switch (this_call.type)
-                    {
-                        case ValueType.Local:
-                            Add(OpCode.LOAD_VARIABLE, (Operand)this_call.address, (Operand)this_call.envIndex, p_node.Line);
-                            break;
-                        case ValueType.Global:
-                            Add(OpCode.LOAD_GLOBAL, (Operand)this_call.address, p_node.Line);
-                            break;
-                        case ValueType.UpValue:
-                            int this_index = upvalueStack.Peek().IndexOf(this_call);
-                            Add(OpCode.LOAD_UPVALUE, (Operand)this_index, p_node.Line);
-                            break;
-                    }
-                }
-                else
-                {// it is a compoundCall/method/IndexedAccess
+                    LoadVariable(this_call, p_node.Line);
+                else{// it is a compoundCall/method/IndexedAccess
                     // is it a method?
                     if ((p_node.Variable.Indexes[p_node.Variable.Indexes.Count - 1] as VariableNode).AccessType == VarAccessType.METHOD)
                     {// it is a method so we push the table again, to be used as parameter
-                        switch (this_call.type)
-                        {
-                            case ValueType.Local:
-                                Add(OpCode.LOAD_VARIABLE, (Operand)this_call.address, (Operand)this_call.envIndex, p_node.Line);
-                                break;
-                            case ValueType.Global:
-                                Add(OpCode.LOAD_GLOBAL, (Operand)this_call.address, p_node.Line);
-                                break;
-                            case ValueType.UpValue:
-                                int this_index = upvalueStack.Peek().IndexOf(this_call);
-                                Add(OpCode.LOAD_UPVALUE, (Operand)this_index, p_node.Line);
-                                break;
-                        }
+                        LoadVariable(this_call, p_node.Line);
 
                         for (int i = 0; i < p_node.Variable.Indexes.Count - 1; i++)
                         {
-                            Node n = p_node.Variable.Indexes[i];
-
-                            if((n as VariableNode).Name == "_expression_as_index")
-                                ChunkIt((n as VariableNode).Indexes[^1]);
-                            else{
-                                Operand string_address = (Operand)AddConstant((n as VariableNode).Name);
-                                Add(OpCode.LOAD_CONSTANT, string_address, p_node.Line);
-                            }
+                            LoadIndex((VariableNode)p_node.Variable.Indexes[i]);
                         }
 
                         Add(OpCode.TABLE_GET, (Operand)(p_node.Variable.Indexes.Count - 1), p_node.Line);
                     }
 
-                    switch (this_call.type)
-                    {
-                        case ValueType.Local:
-                            Add(OpCode.LOAD_VARIABLE, (Operand)this_call.address, (Operand)this_call.envIndex, p_node.Line);
-                            break;
-                        case ValueType.Global:
-                            Add(OpCode.LOAD_GLOBAL, (Operand)this_call.address, p_node.Line);
-                            break;
-                        case ValueType.UpValue:
-                            int this_index = upvalueStack.Peek().IndexOf(this_call);
-                            Add(OpCode.LOAD_UPVALUE, (Operand)this_index, p_node.Line);
-                            break;
-                    }
-
-                    foreach (Node n in p_node.Variable.Indexes)
-                    {
-                        if((n as VariableNode).Name == "_expression_as_index")
-                            ChunkIt((n as VariableNode).Indexes[^1]);
-                        else{
-                            Operand string_address = (Operand)AddConstant((n as VariableNode).Name);
-                            Add(OpCode.LOAD_CONSTANT, string_address, p_node.Line);
-                        }
-
-                    }
+                    LoadVariable(this_call, p_node.Line);
+                    LoadIndexes(p_node.Variable);
                     Add(OpCode.TABLE_GET, (Operand)p_node.Variable.Indexes.Count, p_node.Line);
                 }
 
@@ -760,15 +670,7 @@ namespace lightning
                 // Does it have IndexedAccess?
                 if (p_node.IndexedAccess[0] != null)
                 {
-                    foreach (Node n in p_node.IndexedAccess[0].Indexes)
-                    {
-                        if((n as VariableNode).Name == "_expression_as_index")
-                            ChunkIt((n as VariableNode).Indexes[^1]);
-                        else{
-                            Operand string_address = (Operand)AddConstant((n as VariableNode).Name);
-                            Add(OpCode.LOAD_CONSTANT, string_address, p_node.Line);
-                        }
-                    }
+                    LoadIndexes(p_node.IndexedAccess[0]);
                     Add(OpCode.TABLE_GET, (Operand)p_node.IndexedAccess[0].Indexes.Count, p_node.Line);
                 }
 
@@ -788,15 +690,7 @@ namespace lightning
 
                     if (p_node.IndexedAccess[i] != null)
                     {
-                        foreach (Node n in p_node.IndexedAccess[i].Indexes)
-                        {
-                            if((n as VariableNode).Name == "_expression_as_index")
-                                ChunkIt((n as VariableNode).Indexes[^1]);
-                            else{
-                                Operand string_address = (Operand)AddConstant((n as VariableNode).Name);
-                                Add(OpCode.LOAD_CONSTANT, string_address, p_node.Line);
-                            }
-                        }
+                        LoadIndexes(p_node.IndexedAccess[i]);
                         Add(OpCode.TABLE_GET, (Operand)p_node.IndexedAccess[i].Indexes.Count, p_node.Line);
                     }
                 }
