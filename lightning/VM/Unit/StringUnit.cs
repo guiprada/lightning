@@ -14,16 +14,16 @@ namespace lightning
 	public class StringUnit : HeapUnit
     {
         public string content;
-        private Dictionary<Unit, Unit> table;
+        public Dictionary<Unit, Unit> Table{get; private set;}
         public override UnitType Type{
             get{
                 return UnitType.String;
             }
         }
-        public StringUnit(string value)
+        public StringUnit(string p_value)
         {
-            content = value;
-            table = new Dictionary<Unit, Unit>();
+            content = p_value;
+            Table = new Dictionary<Unit, Unit>();
         }
         public override string ToString()
         {
@@ -32,21 +32,21 @@ namespace lightning
 
         public override bool ToBool()
         {
-            throw new Exception("Can not convert String to Bool." + VM.ErrorString(null));
+            throw new Exception("Can not convert String to Bool.");
         }
 
-        public override bool Equals(object other)
+        public override bool Equals(object p_other)
         {
-            Type other_type = other.GetType();
+            Type other_type = p_other.GetType();
             if (other_type == typeof(Unit))
             {
-                if(((Unit)other).Type == UnitType.String)
-                    if(content == ((StringUnit)((Unit)(other)).heapUnitValue).content)
+                if(((Unit)p_other).Type == UnitType.String)
+                    if(content == ((StringUnit)((Unit)(p_other)).heapUnitValue).content)
                         return true;
             }
             if(other_type == typeof(StringUnit))
             {
-                if (((StringUnit)other).content == content)
+                if (((StringUnit)p_other).content == content)
                     return true;
             }
 
@@ -55,12 +55,12 @@ namespace lightning
 
         public override void Set(Unit index, Unit value)
         {
-            table[index] = value;
+            Table[index] = value;
         }
 
         public override Unit Get(Unit p_key){
             Unit this_unit;
-            if(table.TryGetValue(p_key, out this_unit))
+            if(Table.TryGetValue(p_key, out this_unit))
                 return this_unit;
             else if(superTable != null)
                 return superTable.Get(p_key);
@@ -72,10 +72,10 @@ namespace lightning
             return content.GetHashCode();
         }
 
-        public override int CompareTo(object compareTo){
-            if(compareTo.GetType() != typeof(Unit))
+        public override int CompareTo(object p_compareTo){
+            if(p_compareTo.GetType() != typeof(Unit))
                 throw new Exception("Trying to compare StringUnit to non Unit type");
-            Unit other = (Unit)compareTo;
+            Unit other = (Unit)p_compareTo;
             UnitType other_type = other.Type;
             switch(other_type){
                 case UnitType.String:
