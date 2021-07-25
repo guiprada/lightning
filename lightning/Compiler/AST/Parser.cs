@@ -127,7 +127,11 @@ namespace lightning
             {
                 if (Match(TokenType.LEFT_BRACKET))
                 {
-                    indexes.Add(Expression());
+                    List<Node> expression_var = new List<Node>();
+                    expression_var.Add(Expression());
+                    VariableNode index = new VariableNode("_expression_as_index", expression_var, VarAccessType.PLAIN, Previous().Line);
+                    indexes.Add(index);
+
                     Consume(TokenType.RIGHT_BRACKET, "Expected ']' after 'compoundVar identifier'", true);
                 }
                 else if (Match(TokenType.DOT))
@@ -633,10 +637,21 @@ namespace lightning
         Node MethodAccess(Node node){
             if (Match(TokenType.COLON))
             {// Method Call
-                Match(TokenType.IDENTIFIER);
-                string this_name = (Previous() as TokenString).value;
-                VariableNode index = new VariableNode(this_name, new List<Node>(), VarAccessType.METHOD, Previous().Line);
-                (node as VariableNode).Indexes.Add(index);
+                if(Match(TokenType.IDENTIFIER)){
+                    string this_name = (Previous() as TokenString).value;
+                    VariableNode index = new VariableNode(this_name, new List<Node>(), VarAccessType.METHOD, Previous().Line);
+                    (node as VariableNode).Indexes.Add(index);
+                }else if(Match(TokenType.STRING)){
+                    string this_name = (Previous() as TokenString).value;
+                    VariableNode index = new VariableNode(this_name, new List<Node>(), VarAccessType.METHOD, Previous().Line);
+                    (node as VariableNode).Indexes.Add(index);
+                }else if (Match(TokenType.LEFT_BRACKET)) {
+                    List<Node> expression_var = new List<Node>();
+                    expression_var.Add(Expression());
+                    VariableNode index = new VariableNode("_expression_as_index", expression_var, VarAccessType.METHOD, Previous().Line);
+                    (node as VariableNode).Indexes.Add(index);
+                    Consume(TokenType.RIGHT_BRACKET, "Expected ']' after 'Method Access'", true);
+                }
             }
             return node;
         }

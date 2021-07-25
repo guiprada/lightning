@@ -196,4 +196,11 @@ var assert_not = assert_counter.assert_not
     assert(a_table.nested_table.value, 99, "Failed Nested Literal Table Test 1.")
     assert(a_table.value, 100, "Failed Nested Literal Table Test 2.")
 }
+{
+    // Test Table Map Access by literal string
+    var a_table = [
+        value: 100,
+    ]
+    assert(a_table["value"], 100, "Failed Table Map Access By Literal String 1.")
+}
 return assert_counter.get_error_counter()

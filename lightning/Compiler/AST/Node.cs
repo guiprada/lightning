@@ -261,7 +261,7 @@ namespace lightning
         public string Name { get; private set; }
         public List<Node> Indexes { get; private set; }
 
-        public VarAccessType AccessType { get; private set; }
+        public VarAccessType AccessType { get; set;}
 
         public VariableNode(string p_Name, List<Node> p_Indexes, VarAccessType p_AccessType, int p_Line)
             : base(NodeType.VARIABLE, p_Line)

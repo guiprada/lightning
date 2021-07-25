@@ -449,10 +449,9 @@ namespace lightning
                 {// it is a compoundVar
                     foreach (Node n in p_node.Indexes)
                     {
-                        if (n.GetType() != typeof(VariableNode) || (n as VariableNode).AccessType == VarAccessType.PLAIN)
-                            ChunkIt(n);
-                        else
-                        {
+                        if((n as VariableNode).Name == "_expression_as_index")
+                            ChunkIt((n as VariableNode).Indexes[^1]);
+                        else{
                             Operand string_address = (Operand)AddConstant((n as VariableNode).Name);
                             Add(OpCode.LOAD_CONSTANT, string_address, p_node.Line);
                         }
@@ -535,10 +534,9 @@ namespace lightning
 
                     foreach (Node n in p_node.Assigned.Indexes)
                     {
-                        if (n.GetType() != typeof(VariableNode) || (n as VariableNode).AccessType == VarAccessType.PLAIN)
-                            ChunkIt(n);
-                        else
-                        {
+                        if((n as VariableNode).Name == "_expression_as_index")
+                            ChunkIt((n as VariableNode).Indexes[^1]);
+                        else{
                             Operand string_address = (Operand)AddConstant((n as VariableNode).Name);
                             Add(OpCode.LOAD_CONSTANT, string_address, p_node.Line);
                         }
@@ -598,10 +596,9 @@ namespace lightning
 
                     foreach (Node n in p_node.Assigned.Indexes)
                     {
-                        if (n.GetType() != typeof(VariableNode) || (n as VariableNode).AccessType == VarAccessType.PLAIN)
-                            ChunkIt(n);
-                        else
-                        {
+                        if((n as VariableNode).Name == "_expression_as_index")
+                            ChunkIt((n as VariableNode).Indexes[^1]);
+                        else{
                             Operand string_address = (Operand)AddConstant((n as VariableNode).Name);
                             Add(OpCode.LOAD_CONSTANT, string_address, p_node.Line);
                         }
@@ -676,44 +673,43 @@ namespace lightning
                 ChunkIt(n);
             }
             // the first call, we need to decode the function name
-            Nullable<Variable> maybe_func = GetVar(p_node.Variable.Name);
+            Nullable<Variable> maybe_call = GetVar(p_node.Variable.Name);
 
-            if (maybe_func.HasValue)
+            if (maybe_call.HasValue)
             {
-                Variable this_func = maybe_func.Value;
+                Variable this_call = maybe_call.Value;
 
                 if (p_node.Variable.Indexes.Count == 0)
                 {
-                    switch (this_func.type)
+                    switch (this_call.type)
                     {
                         case ValueType.Local:
-                            Add(OpCode.LOAD_VARIABLE, (Operand)this_func.address, (Operand)this_func.envIndex, p_node.Line);
+                            Add(OpCode.LOAD_VARIABLE, (Operand)this_call.address, (Operand)this_call.envIndex, p_node.Line);
                             break;
                         case ValueType.Global:
-                            Add(OpCode.LOAD_GLOBAL, (Operand)this_func.address, p_node.Line);
+                            Add(OpCode.LOAD_GLOBAL, (Operand)this_call.address, p_node.Line);
                             break;
                         case ValueType.UpValue:
-                            int this_index = upvalueStack.Peek().IndexOf(this_func);
+                            int this_index = upvalueStack.Peek().IndexOf(this_call);
                             Add(OpCode.LOAD_UPVALUE, (Operand)this_index, p_node.Line);
                             break;
                     }
                 }
                 else
                 {// it is a compoundCall/method/IndexedAccess
-
                     // is it a method?
                     if ((p_node.Variable.Indexes[p_node.Variable.Indexes.Count - 1] as VariableNode).AccessType == VarAccessType.METHOD)
                     {// it is a method so we push the table again, to be used as parameter
-                        switch (this_func.type)
+                        switch (this_call.type)
                         {
                             case ValueType.Local:
-                                Add(OpCode.LOAD_VARIABLE, (Operand)this_func.address, (Operand)this_func.envIndex, p_node.Line);
+                                Add(OpCode.LOAD_VARIABLE, (Operand)this_call.address, (Operand)this_call.envIndex, p_node.Line);
                                 break;
                             case ValueType.Global:
-                                Add(OpCode.LOAD_GLOBAL, (Operand)this_func.address, p_node.Line);
+                                Add(OpCode.LOAD_GLOBAL, (Operand)this_call.address, p_node.Line);
                                 break;
                             case ValueType.UpValue:
-                                int this_index = upvalueStack.Peek().IndexOf(this_func);
+                                int this_index = upvalueStack.Peek().IndexOf(this_call);
                                 Add(OpCode.LOAD_UPVALUE, (Operand)this_index, p_node.Line);
                                 break;
                         }
@@ -721,39 +717,37 @@ namespace lightning
                         for (int i = 0; i < p_node.Variable.Indexes.Count - 1; i++)
                         {
                             Node n = p_node.Variable.Indexes[i];
-                            if (n.GetType() != typeof(VariableNode) || (n as VariableNode).AccessType == VarAccessType.PLAIN)
-                                ChunkIt(n);
-                            else
-                            {
+
+                            if((n as VariableNode).Name == "_expression_as_index")
+                                ChunkIt((n as VariableNode).Indexes[^1]);
+                            else{
                                 Operand string_address = (Operand)AddConstant((n as VariableNode).Name);
                                 Add(OpCode.LOAD_CONSTANT, string_address, p_node.Line);
                             }
-
                         }
 
                         Add(OpCode.TABLE_GET, (Operand)(p_node.Variable.Indexes.Count - 1), p_node.Line);
                     }
 
-                    switch (this_func.type)
+                    switch (this_call.type)
                     {
                         case ValueType.Local:
-                            Add(OpCode.LOAD_VARIABLE, (Operand)this_func.address, (Operand)this_func.envIndex, p_node.Line);
+                            Add(OpCode.LOAD_VARIABLE, (Operand)this_call.address, (Operand)this_call.envIndex, p_node.Line);
                             break;
                         case ValueType.Global:
-                            Add(OpCode.LOAD_GLOBAL, (Operand)this_func.address, p_node.Line);
+                            Add(OpCode.LOAD_GLOBAL, (Operand)this_call.address, p_node.Line);
                             break;
                         case ValueType.UpValue:
-                            int this_index = upvalueStack.Peek().IndexOf(this_func);
+                            int this_index = upvalueStack.Peek().IndexOf(this_call);
                             Add(OpCode.LOAD_UPVALUE, (Operand)this_index, p_node.Line);
                             break;
                     }
 
                     foreach (Node n in p_node.Variable.Indexes)
                     {
-                        if (n.GetType() != typeof(VariableNode) || (n as VariableNode).AccessType == VarAccessType.PLAIN)
-                            ChunkIt(n);
-                        else
-                        {
+                        if((n as VariableNode).Name == "_expression_as_index")
+                            ChunkIt((n as VariableNode).Indexes[^1]);
+                        else{
                             Operand string_address = (Operand)AddConstant((n as VariableNode).Name);
                             Add(OpCode.LOAD_CONSTANT, string_address, p_node.Line);
                         }
@@ -769,10 +763,9 @@ namespace lightning
                 {
                     foreach (Node n in p_node.IndexedAccess[0].Indexes)
                     {
-                        if (n.GetType() != typeof(VariableNode) || (n as VariableNode).AccessType == VarAccessType.PLAIN)
-                            ChunkIt(n);
-                        else
-                        {
+                        if((n as VariableNode).Name == "_expression_as_index")
+                            ChunkIt((n as VariableNode).Indexes[^1]);
+                        else{
                             Operand string_address = (Operand)AddConstant((n as VariableNode).Name);
                             Add(OpCode.LOAD_CONSTANT, string_address, p_node.Line);
                         }
@@ -798,10 +791,9 @@ namespace lightning
                     {
                         foreach (Node n in p_node.IndexedAccess[i].Indexes)
                         {
-                            if (n.GetType() != typeof(VariableNode) || (n as VariableNode).AccessType == VarAccessType.PLAIN)
-                                ChunkIt(n);
-                            else
-                            {
+                            if((n as VariableNode).Name == "_expression_as_index")
+                                ChunkIt((n as VariableNode).Indexes[^1]);
+                            else{
                                 Operand string_address = (Operand)AddConstant((n as VariableNode).Name);
                                 Add(OpCode.LOAD_CONSTANT, string_address, p_node.Line);
                             }

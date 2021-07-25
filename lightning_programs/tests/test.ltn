@@ -18,10 +18,12 @@ var start_time = time.now()
 
 // Let's use some modules
 var _assert = require("assert.ltn")
-var lib_assert_counter = require("assert_counter.ltn")
+var assert_counter = require("assert_counter.ltn")
 
-var count_errors = lib_assert_counter.get_error_counter
-var clear_errors = lib_assert_counter.reset_error_counter
+var assert = assert_counter.assert
+var assert_not = assert_counter.assert_not
+var count_errors = assert_counter.get_error_counter
+var clear_errors = assert_counter.reset_error_counter
 
 var errors = 0
 errors += require("tests/assert.ltn")
@@ -56,8 +58,51 @@ errors += require("tests/anonymous_call.ltn")
 errors += require("tests/try.ltn")
 
 //////////////////////////////// scratch
+{
+    var a_table = [
+        value: 100,
+        a_function: \{return 99}
+    ]
+    assert(a_table.a_function(), 99, "Failed Table Map Access By Literal String 2." )
+    var name = "a_function"
+    assert(a_table[name](), 99, "Failed Table Map Access By Literal String 3." )
+    assert(a_table["a_function"](), 99, "Failed Table Map Access By Literal String 4." )
+    assert(a_table["a" .. "_function"](), 99, "Failed Table Map Access By Literal String 4." )
+}
+{
+    // Testing method calls
 
+    function make_player()
+    {
+        var player = []
+        player.position = [];
+        player.position["x"] = 0
+        player.position["y"] = 0
 
+        player.move = function (self, x, y)
+        {
+            self.position.x = self.position.x + x;
+            self.position.y = self.position.y + y;
+            return self.position
+        }
+        player[2] = player.move
+
+        return player
+    }
+
+    var p1 = make_player();
+    assert(p1:move(1,0).x, 1, "Failed method call test 1.")
+    assert(p1:move(0,3).y, 3, "Failed method call test 2.")
+    var name = "move"
+    assert(p1[name](p1,0,3).y, 6, "Failed method call test 3.")
+    assert(p1:[name](0,0).y, 6, "Failed method call test 4.")
+    assert(p1:"move"(0,0).y, 6, "Failed method call test 5.")
+    assert(p1["move"](p1,0,0).y, 6, "Failed method call test 6.")
+    assert(p1:["move"](0,0).y, 6, "Failed method call test 7.")
+    assert(p1:[1 + 1](0,0).y, 6, "Failed method call test 7.")
+    assert(p1:["mo".."ve"](0,0).y, 6, "Failed method call test 7.")
+
+}
 //////////////////////////////// end scratch
 machine.trim()
 
