@@ -39,7 +39,7 @@ var assert_not = assert_counter.assert_not
         assert(it.value, table1[it.key], "Failed iterator value Test 1, iteration: " .. counter)
         counter++
     }
-    assert((table1:map_indexes()):list_to_string(), "australia, eua, brazil", "Failed iterator Test 2")
+    assert(table1:map_indexes():list_to_string(), "australia, eua, brazil", "Failed iterator Test 2")
     assert(table1:map_to_string(), "australia : Canberra, eua : Washington, brazil : Brasilia", "Failed iterator Test 3")
 
     ///////////////////////////////

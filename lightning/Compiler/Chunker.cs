@@ -161,8 +161,8 @@ namespace lightning
                 case NodeType.FUNCTION_CALL:
                     ChunkFunctionCall(p_node as FunctionCallNode);
                     break;
-                case NodeType.ANONYMOUS_FUNCTION_CALL:
-                    ChunkAnonymousFunctionCall(p_node as AnonymousFunctionCallNode);
+                case NodeType.ANONYMOUS_METHOD_CALL:
+                    ChunkAnonymousMethodCall(p_node as AnonymousMethodCallNode);
                     break;
                 case NodeType.RETURN:
                     ChunkReturn(p_node as ReturnNode);
@@ -597,7 +597,7 @@ namespace lightning
             Add(OpCode.CLOSE_ENV, p_node.Line);
         }
 
-        private void ChunkAnonymousFunctionCall(AnonymousFunctionCallNode p_node)
+        private void ChunkAnonymousMethodCall(AnonymousMethodCallNode p_node)
         {
             ChunkIt(p_node.Declaration);
             ChunkIt(p_node.FunctionCall);

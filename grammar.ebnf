@@ -47,11 +47,11 @@ multiplication  <- unary ( ( "/" | "*" | "++" | "--" ) unary )*;
 unary           <- ( "!" | "-" ) unary | call;
 
 (* CALL *)
-call            <- primary (callTail | anonymousCall);
-callTail        <- "(" arguments* ")" pipedAccess* sequentialCall* anonymousCall?;
-anonymousCall   <- methodAccess callTail;
-sequentialCall  <- ("." "(" arguments* ")");
-arguments       <- expression ( "," expression )*;
+call                <- primary (callTail | anonymousMethodCall);
+callTail            <- "(" arguments* ")" pipedAccess* sequentialCall* anonymousMethodCall?;
+anonymousMethodCall <- methodAccess callTail;
+sequentialCall      <- ("." "(" arguments* ")");
+arguments           <- expression ( "," expression )*;
 
 (* ACCESS *)
 compoundVar     <- IDENTIFIER indexedAccess* methodAccess;

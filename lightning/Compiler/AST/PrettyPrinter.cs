@@ -16,9 +16,7 @@ namespace lightning
         public void Print(Node p_node)
         {
             NodeType this_type = p_node.Type;
-            //Console.WriteLine(this_type.ToString());
-            switch (this_type)
-            {
+            switch (this_type){
                 case NodeType.PROGRAM:
                     PrintProgram(p_node as ProgramNode);
                     break;
@@ -64,8 +62,8 @@ namespace lightning
                 case NodeType.FUNCTION_CALL:
                     PrintFunctionCall(p_node as FunctionCallNode);
                     break;
-                case NodeType.ANONYMOUS_FUNCTION_CALL:
-                    PrintAnonymousFunctionCall(p_node as AnonymousFunctionCallNode);
+                case NodeType.ANONYMOUS_METHOD_CALL:
+                    PrintAnonymousMethodCall(p_node as AnonymousMethodCallNode);
                     break;
                 case NodeType.RETURN:
                     PrintReturn(p_node as ReturnNode);
@@ -91,17 +89,12 @@ namespace lightning
         private void PrintProgram(ProgramNode p_node)
         {
             Console.WriteLine("[PROGRAM");
-            if (p_node.Statements != null)
-            {
+            if (p_node.Statements != null){
                 IdentPlus();
                 foreach (Node n in p_node.Statements)
-                {
                     Print(n);
-                }
                 IdentMinus();
-            }
-            else
-            {
+            }else{
                 Error("Program does not contain any statements!", p_node.Line);
             }
             Console.WriteLine("]");
@@ -146,50 +139,35 @@ namespace lightning
         {
             Console.Write("[LITERAL ");
             if (p_node.Value == null)
-            {
                 Console.Write("\"" + ("Null") + "\"");
-            }
             else if (p_node.ValueType == typeof(string))
-            {
                 Console.Write("\"" + (p_node.Value) + "\"");
-            }
             else
-            {
                 Console.Write(p_node.Value.ToString());
-            }
             Console.Write("]");
         }
 
         private void PrintTable(TableNode p_node)
         {
             Console.Write("[LIST ");
-            if (p_node.Elements != null)
-            {
+            if (p_node.Elements != null){
                 bool first = true;
-                foreach(Node n in p_node.Elements)
-                {
-                    if (first)
-                    {
+                foreach(Node n in p_node.Elements){
+                    if (first){
                         Print(n);
                         first = false;
-                    }
-                    else
-                    {
+                    }else{
                         Console.Write(", ");
                         Print(n);
                     }
                 }
-                foreach(KeyValuePair<Node,Node> entry in p_node.Table)
-                {
-                    if (first)
-                    {
+                foreach(KeyValuePair<Node,Node> entry in p_node.Table){
+                    if (first){
                         Print(entry.Key);
                         Console.Write(" : ");
                         Print(entry.Value);
                         first = false;
-                    }
-                    else
-                    {
+                    }else{
                         Console.Write(", ");
                         Print(entry.Key);
                         Console.Write(" : ");
@@ -220,8 +198,7 @@ namespace lightning
             Console.WriteLine();
             IdentPlus();
             Print(p_node.ThenBranch);
-            if (p_node.ElseBranch != null)
-            {
+            if (p_node.ElseBranch != null){
                 IdentMinus();
                 Console.WriteLine(identString + "ELSE ");
                 IdentPlus();
@@ -236,8 +213,7 @@ namespace lightning
         private void PrintFor(ForNode p_node)
         {
             Console.WriteLine(identString + "[FOR ");
-            if (p_node.Initializer != null)
-            {
+            if (p_node.Initializer != null){
                 IdentPlus();
                 Console.WriteLine(identString + "[INITIALIZER");
                 IdentPlus();
@@ -246,24 +222,21 @@ namespace lightning
                 Console.WriteLine(identString + "]");
                 IdentMinus();
             }
-            if (p_node.Condition != null)
-            {
+            if (p_node.Condition != null){
                 IdentPlus();
                 Console.Write(identString + "[CONDITION ");
                 Print(p_node.Condition);
                 Console.WriteLine("]");
                 IdentMinus();
             }
-            if (p_node.Finalizer != null)
-            {
+            if (p_node.Finalizer != null){
                 IdentPlus();
                 Console.Write(identString + "[FINALIZER ");
                 Print(p_node.Finalizer);
                 Console.WriteLine("]");
                 IdentMinus();
             }
-            if (p_node.Body != null)
-            {
+            if (p_node.Body != null){
                 IdentPlus();
                 Console.WriteLine(identString + "[BODY");
                 IdentPlus();
@@ -282,8 +255,7 @@ namespace lightning
                 Print(p_node.Condition);
             Console.WriteLine();
 
-            if (p_node.Body != null)
-            {
+            if (p_node.Body != null){
                 IdentPlus();
                 Print(p_node.Body);
                 IdentMinus();
@@ -303,19 +275,14 @@ namespace lightning
                 Console.Write("[VARIABLE " + p_node.Name);
 
             for (int i = 0; i < p_node.Indexes.Count; i++) {
-                if ((p_node.Indexes[i].GetType() != typeof(VariableNode)) || (p_node.Indexes[i]as VariableNode).AccessType == VarAccessType.PLAIN)
-                {
+                if ((p_node.Indexes[i].GetType() != typeof(VariableNode)) || (p_node.Indexes[i]as VariableNode).AccessType == VarAccessType.PLAIN){
                     Console.Write("[");
                     Print(p_node.Indexes[i]);
                     Console.Write("]");
-                }
-                else if ((p_node.Indexes[i] as VariableNode).AccessType == VarAccessType.METHOD)
-                {
+                }else if ((p_node.Indexes[i] as VariableNode).AccessType == VarAccessType.METHOD){
                     Console.Write(":");
                     Print(p_node.Indexes[i]);
-                }
-                else
-                {
+                }else{
                     Console.Write(".");
                     Print(p_node.Indexes[i]);
                 }
@@ -326,8 +293,7 @@ namespace lightning
         private void PrintVarDeclaration(VarDeclarationNode p_node)
         {
             Console.Write(identString + "[VARIABLE DECLARATION " + p_node.Name);
-            if (p_node.Initializer != null)
-            {
+            if (p_node.Initializer != null){
                 Console.Write(" = ");
                 Print(p_node.Initializer);
             }
@@ -345,7 +311,7 @@ namespace lightning
         {
             Console.Write("[ASSIGMENT_OP " + p_node.Assigned.Name);
             string op;
-            switch (p_node.Op) {
+            switch (p_node.Op){
                 case AssignmentOperatorType.ADDITION_ASSIGN:
                     op = " += ";
                     break;
@@ -388,8 +354,7 @@ namespace lightning
         {
             Console.WriteLine(identString + "[BLOCK");
             IdentPlus();
-            foreach (Node n in p_node.Statements)
-            {
+            foreach (Node n in p_node.Statements){
                 Print(n);
             }
             IdentMinus();
@@ -402,26 +367,20 @@ namespace lightning
             Print(p_node.Variable);
 
             int counter = 0;
-            foreach (List<Node> arguments in p_node.Calls)
-            {
+            foreach (List<Node> arguments in p_node.Calls){
                 Console.Write("(");
                 bool is_first = true;
-                foreach (Node n in arguments)
-                {
-                    if (is_first)
-                    {
+                foreach (Node n in arguments){
+                    if (is_first){
                         Print(n);
                         is_first = false;
-                    }
-                    else
-                    {
+                    }else{
                         Print(n);
                         Console.Write(", ");
                     }
                 }
                 Console.Write(")");
-                if(p_node.IndexedAccess[counter] != null)
-                {
+                if(p_node.IndexedAccess[counter] != null){
                     Console.Write(".indexedAccess(");
                     foreach(Node n in p_node.IndexedAccess[counter].Indexes)
                         Print(n);
@@ -432,34 +391,28 @@ namespace lightning
             Console.Write("]");
         }
 
-        private void PrintAnonymousFunctionCall(AnonymousFunctionCallNode p_node)
+        private void PrintAnonymousMethodCall(AnonymousMethodCallNode p_node)
         {
-            Console.Write("[ANONYMOUS FUNCTION CALL ");
+            Console.Write("[ANONYMOUS METHOD CALL ");
             Print(p_node.Variable);
 
             int counter = 0;
             if(p_node.FunctionCall.Type == NodeType.FUNCTION_CALL){
                 FunctionCallNode this_function_call_node = (FunctionCallNode)p_node.FunctionCall;
-                foreach (List<Node> arguments in this_function_call_node.Calls)
-                {
+                foreach (List<Node> arguments in this_function_call_node.Calls){
                     Console.Write("(");
                     bool is_first = true;
-                    foreach (Node n in arguments)
-                    {
-                        if (is_first)
-                        {
+                    foreach (Node n in arguments){
+                        if (is_first){
                             Print(n);
                             is_first = false;
-                        }
-                        else
-                        {
+                        }else{
                             Print(n);
                             Console.Write(", ");
                         }
                     }
                     Console.Write(")");
-                    if(this_function_call_node.IndexedAccess[counter] != null)
-                    {
+                    if(this_function_call_node.IndexedAccess[counter] != null){
                         Console.Write(".indexedAccess(");
                         foreach(Node n in this_function_call_node.IndexedAccess[counter].Indexes)
                             Print(n);
@@ -476,8 +429,7 @@ namespace lightning
         private void PrintReturn(ReturnNode p_node)
         {
             Console.Write(identString + "[RETURN");
-            if (p_node.Expr != null)
-            {
+            if (p_node.Expr != null){
                 Console.Write(" ");
                 Print(p_node.Expr);
             }
@@ -490,22 +442,17 @@ namespace lightning
             Console.Write("\n" + identString + "[FUNCTION EXPRESSION (");
             bool is_first = true;
             if(p_node.Parameters != null)
-                foreach (string n in p_node.Parameters)
-                {
-                    if (is_first)
-                    {
+                foreach (string n in p_node.Parameters){
+                    if (is_first){
                         Console.Write(n);
                         is_first = false;
-                    }
-                    else
-                    {
+                    }else{
                         Console.Write(", " + n);
                     }
                 }
             Console.WriteLine(")");
             IdentPlus();
-            foreach (Node n in p_node.Body)
-            {
+            foreach (Node n in p_node.Body){
                 Print(n);
             }
             IdentMinus();
@@ -519,22 +466,17 @@ namespace lightning
             bool is_first = true;
 
             if(p_node.Parameters != null)
-                foreach (string n in p_node.Parameters)
-                {
-                    if (is_first)
-                    {
+                foreach (string n in p_node.Parameters){
+                    if (is_first){
                         Console.Write(n);
                         is_first = false;
-                    }
-                    else
-                    {
+                    }else{
                         Console.Write(", " + n);
                     }
                 }
             Console.WriteLine(")");
             IdentPlus();
-            foreach (Node n in p_node.Body)
-            {
+            foreach (Node n in p_node.Body){
                 Print(n);
             }
             IdentMinus();
@@ -544,8 +486,7 @@ namespace lightning
         string GenIdentString()
         {
             string identString = "";
-            for (int i = 0; i < identLevel; i++)
-            {
+            for (int i = 0; i < identLevel; i++){
                 identString += "    ";
             }
             return identString;
