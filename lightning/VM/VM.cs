@@ -134,8 +134,8 @@ namespace lightning
             upValues.Trim();
             registeredUpValues.Trim();
         }
-        public void ReleaseVMs(int count){
-            for (int i = 0; i < count; i++)
+        public void ReleaseVMs(int p_count){
+            for (int i = 0; i < p_count; i++)
                 if (vmPool.Count > 0)
                     vmPool.Pop();
                 vmPool.TrimExcess();
@@ -158,10 +158,10 @@ namespace lightning
             upValues.Clear();
             registeredUpValues.Clear();
         }
-        public void RecycleVM(VM vm)
+        public void RecycleVM(VM p_vm)
         {
-            vm.Reset();
-            vmPool.Push(vm);
+            p_vm.Reset();
+            vmPool.Push(p_vm);
         }
 
         public VM GetVM(){
@@ -190,31 +190,31 @@ namespace lightning
             parallelVM = p_parallelVM;
         }
 
-        public Operand AddModule(ModuleUnit this_module)
+        public Operand AddModule(ModuleUnit p_module)
         {
-            LoadedModules.Add(this_module.Name, LoadedModules.Count);
-            modules.Add(this_module);
+            LoadedModules.Add(p_module.Name, LoadedModules.Count);
+            modules.Add(p_module);
             return (Operand)(LoadedModules.Count - 1);
         }
 
-        public Unit GetGlobal(Operand address)
+        public Unit GetGlobal(Operand p_address)
         {
-            return globals.Get(address);
+            return globals.Get(p_address);
         }
 
 //////////////////////////// Accessors
-        public Unit GetUnit(int n){
-            return stack.Peek(n);
+        public Unit GetUnit(int p_n){
+            return stack.Peek(p_n);
         }
 
-        public string GetString(int n){
-            if(stack.Peek(n).Type != UnitType.String)
+        public string GetString(int p_n){
+            if(stack.Peek(p_n).Type != UnitType.String)
                 throw new Exception("Expected a String.");
-            return ((StringUnit)(stack.Peek(n).heapUnitValue)).content;
+            return ((StringUnit)(stack.Peek(p_n).heapUnitValue)).content;
         }
 
-        public Float GetNumber(int n){
-            Unit this_value = stack.Peek(n);
+        public Float GetNumber(int p_n){
+            Unit this_value = stack.Peek(p_n);
             if(this_value.Type == UnitType.Integer)
                 return this_value.integerValue;
             if(this_value.Type == UnitType.Float)
@@ -222,60 +222,60 @@ namespace lightning
             throw new Exception("Expected a Float or Integer.");
         }
 
-        public Float GetFloat(int n){
-            Unit this_value = stack.Peek(n);
+        public Float GetFloat(int p_n){
+            Unit this_value = stack.Peek(p_n);
             if(this_value.Type == UnitType.Float)
                 return (this_value.floatValue);
             throw new Exception("Expected a Float.");
         }
 
-        public Integer GetInteger(int n){
-            Unit this_value = stack.Peek(n);
+        public Integer GetInteger(int p_n){
+            Unit this_value = stack.Peek(p_n);
             if(this_value.Type == UnitType.Integer)
                 return this_value.integerValue;
             throw new Exception("Expected a Integer.");
         }
 
-        public TableUnit GetTable(int n){
-            if(stack.Peek(n).Type != UnitType.Table)
+        public TableUnit GetTable(int p_n){
+            if(stack.Peek(p_n).Type != UnitType.Table)
                 throw new Exception("Expected a Table.");
-            return (TableUnit)(stack.Peek(n).heapUnitValue);
+            return (TableUnit)(stack.Peek(p_n).heapUnitValue);
         }
 
-        public T GetWrappedContent<T>(int n){
-            if(stack.Peek(n).Type != UnitType.Wrapper)
+        public T GetWrappedContent<T>(int p_n){
+            if(stack.Peek(p_n).Type != UnitType.Wrapper)
                 throw new Exception("Expected a Wrapper.");
-            return ((WrapperUnit<T>)(stack.Peek(n).heapUnitValue)).UnWrapp();
+            return ((WrapperUnit<T>)(stack.Peek(p_n).heapUnitValue)).UnWrapp();
         }
 
-        public WrapperUnit<T> GetWrapperUnit<T>(int n){
-            if(stack.Peek(n).Type != UnitType.Wrapper)
+        public WrapperUnit<T> GetWrapperUnit<T>(int p_n){
+            if(stack.Peek(p_n).Type != UnitType.Wrapper)
                 throw new Exception("Expected a Wrapper.");
-            return ((WrapperUnit<T>)(stack.Peek(n).heapUnitValue));
+            return ((WrapperUnit<T>)(stack.Peek(p_n).heapUnitValue));
         }
 
-        public StringUnit GetStringUnit(int n){
-            if(stack.Peek(n).Type != UnitType.String)
+        public StringUnit GetStringUnit(int p_n){
+            if(stack.Peek(p_n).Type != UnitType.String)
                 throw new Exception("Expected a String.");
-            return ((StringUnit)(stack.Peek(n).heapUnitValue));
+            return ((StringUnit)(stack.Peek(p_n).heapUnitValue));
         }
 
-        public char GetChar(int n){
-            if(stack.Peek(n).Type != UnitType.Char)
+        public char GetChar(int p_n){
+            if(stack.Peek(p_n).Type != UnitType.Char)
                 throw new Exception("Expected a Char.");
-            return (stack.Peek(n).charValue);
+            return (stack.Peek(p_n).charValue);
         }
 
-        public bool GetBool(int n){
-            if(stack.Peek(n).Type != UnitType.Boolean)
+        public bool GetBool(int p_n){
+            if(stack.Peek(p_n).Type != UnitType.Boolean)
                 throw new Exception("Expected a Boolean.");
-            return stack.Peek(n).ToBool();
+            return stack.Peek(p_n).ToBool();
         }
 
 //////////////////////////// End Accessors
-        public Unit ProtectedCallFunction(Unit this_callable, List<Unit> args){
+        public Unit ProtectedCallFunction(Unit p_callable, List<Unit> p_args){
             try{
-                return CallFunction(this_callable, args);
+                return CallFunction(p_callable, p_args);
             }
 #if DEBUG
             catch (Exception e)
@@ -294,17 +294,19 @@ namespace lightning
             }
 #endif
         }
-        public Unit CallFunction(Unit this_callable, List<Unit> args)
+        public Unit CallFunction(Unit p_callable, List<Unit> p_args)
         {
-            UnitType this_type = this_callable.Type;
-            if (args != null)
-                for (int i = args.Count - 1; i >= 0; i--)
-                    stack.Push(args[i]);
+            UnitType this_type = p_callable.Type;
+            if (p_args != null)
+                for (int i = p_args.Count - 1; i >= 0; i--)
+                    stack.Push(p_args[i]);
+
+            Operand before_call_IP = IP;
 
             if (this_type == UnitType.Function)
             {
                 instructions.PushRET((Operand)(main.Body.Count - 1));
-                FunctionUnit this_func = (FunctionUnit)(this_callable.heapUnitValue);
+                FunctionUnit this_func = (FunctionUnit)(p_callable.heapUnitValue);
                 instructions.PushFunction(this_func, Env, out instructionsCache);
 
                 IP = 0;
@@ -312,7 +314,7 @@ namespace lightning
             else if (this_type == UnitType.Closure)
             {
                 instructions.PushRET((Operand)(main.Body.Count - 1));
-                ClosureUnit this_closure = (ClosureUnit)(this_callable.heapUnitValue);
+                ClosureUnit this_closure = (ClosureUnit)(p_callable.heapUnitValue);
 
                 upValues.PushEnv();
 
@@ -326,28 +328,29 @@ namespace lightning
             }
             else if (this_type == UnitType.Intrinsic)
             {
-                IntrinsicUnit this_intrinsic = (IntrinsicUnit)(this_callable.heapUnitValue);
+                IntrinsicUnit this_intrinsic = (IntrinsicUnit)(p_callable.heapUnitValue);
                 Unit intrinsic_result = this_intrinsic.Function(this);
                 stack.top -= this_intrinsic.Arity;
                 stack.Push(intrinsic_result);
             }
             VMResult result = Run();
+            IP = before_call_IP;
             if (result.status == VMResultType.OK)
                 return result.value;
             return new Unit(UnitType.Null);
         }
 //////////////////////////////////////////////////// End Public
 
-        ModuleUnit GetModule(string p_module_name){
-            return modules[LoadedModules[p_module_name]];
+        ModuleUnit GetModule(string p_moduleName){
+            return modules[LoadedModules[p_moduleName]];
         }
 
-        Operand CalculateEnvShift(Operand n_shift){
-            return (Operand)(variables.Env - n_shift);
+        Operand CalculateEnvShift(Operand p_nShift){
+            return (Operand)(variables.Env - p_nShift);
         }
 
-        Operand CalculateEnvShiftUpVal(Operand env){
-            return (Operand)(env - 1);// there are no global upvalues
+        Operand CalculateEnvShiftUpVal(Operand p_env){
+            return (Operand)(p_env - 1);// there are no global upvalues
         }
 
         void EnvPush()
@@ -362,9 +365,9 @@ namespace lightning
             variables.PopEnv();
         }
 
-        void EnvSet(int target_env)
+        void EnvSet(int p_target_env)
         {
-            while ((variables.Env) > target_env)
+            while ((variables.Env) > p_target_env)
             {
                 EnvPop();
             }

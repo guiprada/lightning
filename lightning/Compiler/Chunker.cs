@@ -114,7 +114,6 @@ namespace lightning
         private void ChunkIt(Node p_node)
         {
             NodeType this_type = p_node.Type;
-            //Console.WriteLine(this_type.ToString());
             switch (this_type)
             {
                 case NodeType.PROGRAM:
