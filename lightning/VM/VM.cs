@@ -83,7 +83,7 @@ namespace lightning
 
             variables = new Memory<Unit>();
             upValues = new Memory<UpValueUnit>();
-            registeredUpValues = new UpValueEnv();
+            registeredUpValues = new UpValueEnv(variables);
 
             constants = p_chunk.GetConstants;
             Prelude = p_chunk.Prelude;
@@ -126,7 +126,7 @@ namespace lightning
             stack = new Stack(functionDeepness);
             variables = new Memory<Unit>();
             upValues = new Memory<UpValueUnit>();
-            registeredUpValues = new UpValueEnv();
+            registeredUpValues = new UpValueEnv(variables);
         }
 
         public void ResoursesTrim(){
@@ -505,8 +505,6 @@ namespace lightning
                                     new_upValues.Add(new_upvalue);
                                 }
                                 ClosureUnit new_closure = new ClosureUnit(this_closure.Function, new_upValues);
-
-                                new_closure.Register(variables);
 
                                 Unit new_closure_unit = new Unit(new_closure);
                                 if (lambda == 0)

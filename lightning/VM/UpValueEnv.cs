@@ -6,10 +6,12 @@ namespace lightning
     public class UpValueEnv{
         List<Dictionary<Operand, UpValueUnit>> env;
         int top;
+        Memory<Unit> variables;
 
-        public UpValueEnv(){
+        public UpValueEnv(Memory<Unit> p_variables){
             env = new List<Dictionary<Operand, UpValueUnit>>();
             top = 0;
+            variables = p_variables;
         }
         public void Trim(){
             for(int i=0; i<(env.Count -1); i++)
@@ -35,6 +37,7 @@ namespace lightning
                 return this_upvalue;
             else{
                 this_upvalue = new UpValueUnit(p_address,(Operand)(p_env));
+                this_upvalue.Attach(variables);
                 Set(this_upvalue, p_address, p_env);
                 return this_upvalue;
             }

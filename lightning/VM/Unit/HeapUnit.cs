@@ -306,12 +306,6 @@ namespace lightning
             UpValues = p_UpValues;
         }
 
-        public void Register(Memory<Unit> p_variables)
-        {
-            foreach (UpValueUnit u in UpValues)
-                u.Attach(p_variables);
-        }
-
         public override string ToString()
         {
             return new string("Closure of " + Function.ToString());
