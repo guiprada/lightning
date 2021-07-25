@@ -127,9 +127,7 @@ namespace lightning
             {
                 if (Match(TokenType.LEFT_BRACKET))
                 {
-                    List<Node> expression_var = new List<Node>();
-                    expression_var.Add(Expression());
-                    VariableNode index = new VariableNode("_expression_as_index", expression_var, VarAccessType.PLAIN, Previous().Line);
+                    VariableNode index = new VariableNode(Expression(), VarAccessType.PLAIN, Previous().Line);
                     indexes.Add(index);
 
                     Consume(TokenType.RIGHT_BRACKET, "Expected ']' after 'compoundVar identifier'", true);
@@ -646,9 +644,7 @@ namespace lightning
                     VariableNode index = new VariableNode(this_name, new List<Node>(), VarAccessType.METHOD, Previous().Line);
                     (p_node as VariableNode).Indexes.Add(index);
                 }else if (Match(TokenType.LEFT_BRACKET)) {
-                    List<Node> expression_var = new List<Node>();
-                    expression_var.Add(Expression());
-                    VariableNode index = new VariableNode("_expression_as_index", expression_var, VarAccessType.METHOD, Previous().Line);
+                    VariableNode index = new VariableNode(Expression(), VarAccessType.METHOD, Previous().Line);
                     (p_node as VariableNode).Indexes.Add(index);
                     Consume(TokenType.RIGHT_BRACKET, "Expected ']' after 'Method Access'", true);
                 }

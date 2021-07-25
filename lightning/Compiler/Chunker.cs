@@ -441,8 +441,8 @@ namespace lightning
             }
         }
         private void LoadIndex(VariableNode p_node){
-            if(p_node.Name == "_expression_as_index")
-                ChunkIt(p_node.Indexes[^1]);
+            if(p_node.IsExpression)
+                ChunkIt(p_node.Expression);
             else{
                 Operand string_address = (Operand)AddConstant(p_node.Name);
                 Add(OpCode.LOAD_CONSTANT, string_address, p_node.Line);

@@ -260,8 +260,9 @@ namespace lightning
     {
         public string Name { get; private set; }
         public List<Node> Indexes { get; private set; }
-
-        public VarAccessType AccessType { get; set;}
+        public Node Expression { get; private set; }
+        public VarAccessType AccessType { get; private set;}
+        public bool IsExpression { get; private set;}
 
         public VariableNode(string p_Name, List<Node> p_Indexes, VarAccessType p_AccessType, int p_Line)
             : base(NodeType.VARIABLE, p_Line)
@@ -269,6 +270,14 @@ namespace lightning
             Name = p_Name;
             Indexes = p_Indexes;
             AccessType = p_AccessType;
+            IsExpression = false;
+        }
+        public VariableNode(Node p_Expression, VarAccessType p_AccessType, int p_Line)
+            : base(NodeType.VARIABLE, p_Line)
+        {
+            Expression = p_Expression;
+            AccessType = p_AccessType;
+            IsExpression = true;
         }
     }
 
