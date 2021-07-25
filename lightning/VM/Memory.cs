@@ -46,30 +46,30 @@ namespace lightning
             markers.Clear();
         }
 
-        public T Get(int index){
-            return values[index];
+        public T Get(int p_index){
+            return values[p_index];
         }
 
-        public T GetAt(int index, int env){
-            int this_base = markers[env];
-            return values[this_base + index];
+        public T GetAt(int p_index, int p_env){
+            int this_base = markers[p_env];
+            return values[this_base + p_index];
         }
 
-        public T GetAt(int index){
-            return values[Marker + index];
+        public T GetAt(int p_index){
+            return values[Marker + p_index];
         }
 
-        public void SetAt(T new_value, int index, int env){
-            int this_base = markers[env];
-            values[this_base + index] = new_value;
+        public void SetAt(T p_new_value, int p_index, int p_env){
+            int this_base = markers[p_env];
+            values[this_base + p_index] = p_new_value;
         }
 
-        public void Set(T new_value, int index){
-            values[index] = new_value;
+        public void Set(T p_new_value, int p_index){
+            values[p_index] = p_new_value;
         }
 
-        public int Add(T new_value){
-            values.Add(new_value);
+        public int Add(T p_new_value){
+            values.Add(p_new_value);
             return values.Count - 1;
         }
 

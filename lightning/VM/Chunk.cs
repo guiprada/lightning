@@ -11,19 +11,19 @@ namespace lightning
         public LineCounter(List<uint> p_lines){
             lines = p_lines;
         }
-        public void AddLine(uint line)
+        public void AddLine(uint p_line)
         {
-            lines.Add(line);
+            lines.Add(p_line);
         }
-        public uint GetLine(int instruction_address)
+        public uint GetLine(int p_instructionAddress)
         {
-            return lines[instruction_address];
+            return lines[p_instructionAddress];
         }
-        public LineCounter Slice(int start, int end)
+        public LineCounter Slice(int p_start, int p_end)
         {
-            int range = end - start;
-            List<uint> linesSlice = lines.GetRange(start, range);
-            lines.RemoveRange(start, range);
+            int range = p_end - p_start;
+            List<uint> linesSlice = lines.GetRange(p_start, range);
+            lines.RemoveRange(p_start, range);
 
             return new LineCounter(linesSlice);
         }
@@ -241,52 +241,52 @@ namespace lightning
             PrintInstruction(program[^1]);
         }
 
-        static public void PrintInstruction(Instruction instruction)
+        static public void PrintInstruction(Instruction p_instruction)
         {
-            Console.Write(instruction.ToString());
+            Console.Write(p_instruction.ToString());
         }
 
-        public ushort AddConstant(Unit value)
+        public ushort AddConstant(Unit p_value)
         {
-            constants.Add(value);
+            constants.Add(p_value);
             return (ushort)(constants.Count -1);
         }
 
-        public void WriteInstruction(OpCode opCode, Operand opA, Operand opB, Operand opC, uint line)
+        public void WriteInstruction(OpCode p_opCode, Operand p_opA, Operand p_opB, Operand p_opC, uint p_line)
         {
-            Instruction this_instruction = new Instruction(opCode, opA, opB, opC);
+            Instruction this_instruction = new Instruction(p_opCode, p_opA, p_opB, p_opC);
             program.Add(this_instruction);
-            lineCounter.AddLine(line);
+            lineCounter.AddLine(p_line);
         }
 
-        public void WriteInstruction(Instruction instruction)
+        public void WriteInstruction(Instruction p_instruction)
         {
-            program.Add(instruction);
+            program.Add(p_instruction);
         }
 
-        public Instruction ReadInstruction(Operand address)
+        public Instruction ReadInstruction(Operand p_address)
         {
-           return program[address];
+           return program[p_address];
         }
 
-        public Unit GetConstant(Operand address)
+        public Unit GetConstant(Operand p_address)
         {
-            return constants[address];
+            return constants[p_address];
         }
 
-        public HeapUnit GetFunction(string name)
+        public HeapUnit GetFunction(string p_name)
         {
             foreach(Unit v in constants)
             {
                 if(v.Type == UnitType.Function)
-                    if( ((FunctionUnit)(v.heapUnitValue)).Name == name)
+                    if( ((FunctionUnit)(v.heapUnitValue)).Name == p_name)
                     {
                         return (FunctionUnit)(v.heapUnitValue);
                     }
             }
             foreach (IntrinsicUnit v in Prelude.intrinsics)
             {
-                if (v.Name == name)
+                if (v.Name == p_name)
                 {
                     return v;
                 }
@@ -295,28 +295,28 @@ namespace lightning
             return null;
         }
 
-        public List<Instruction> Slice(int start, int end)
+        public List<Instruction> Slice(int p_start, int p_end)
         {
-            int range = end - start;
-            List<Instruction> programSlice = program.GetRange(start, range);
-            program.RemoveRange(start, range);
+            int range = p_end - p_start;
+            List<Instruction> programSlice = program.GetRange(p_start, range);
+            program.RemoveRange(p_start, range);
 
             return programSlice;
         }
 
-        public void FixInstruction(int address, OpCode? opCode, Operand? opA, Operand? opB, Operand? opC)
+        public void FixInstruction(int p_address, OpCode? p_opCode, Operand? p_opA, Operand? p_opB, Operand? p_opC)
         {
-            Instruction old_instruction = program[address];
-            program[address] = new Instruction(
-                opCode ??= old_instruction.opCode,
-                opA ??= old_instruction.opA,
-                opB ??= old_instruction.opB,
-                opC ??= old_instruction.opC);
+            Instruction old_instruction = program[p_address];
+            program[p_address] = new Instruction(
+                p_opCode ??= old_instruction.opCode,
+                p_opA ??= old_instruction.opA,
+                p_opB ??= old_instruction.opB,
+                p_opC ??= old_instruction.opC);
         }
 
-        public void SwapConstant(int address, Unit new_value)
+        public void SwapConstant(int p_address, Unit p_new_value)
         {
-            constants[address] = new_value;
+            constants[p_address] = p_new_value;
         }
     }
 }

@@ -7,11 +7,11 @@ namespace lightning{
         Unit[] stash;
         int stashTop;
 
-        public Stack(int p_function_deepness)
+        public Stack(int p_functionDeepness)
         {
-            values = new Unit[3 * p_function_deepness];
+            values = new Unit[3 * p_functionDeepness];
             top = 0;
-            stash = new Unit[p_function_deepness];
+            stash = new Unit[p_functionDeepness];
             stashTop = 0;
         }
 
@@ -38,12 +38,12 @@ namespace lightning{
             return values[top - 1];
         }
 
-        public Unit Peek(int n)
+        public Unit Peek(int p_n)
         {
-            if (n < 0 || n > (top - 1)){
-                throw new Exception("Atempt to read empty stack. " + VM.ErrorString(null));
+            if ((p_n < 0) || (p_n > (top - 1))){
+                throw new Exception("Atempt to read empty stack.");
             }
-            return values[top - n - 1];
+            return values[top - p_n - 1];
         }
 
         public void PushStash(){

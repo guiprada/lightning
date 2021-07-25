@@ -79,9 +79,9 @@ namespace lightning
             throw new Exception("Trying to get a boolean value of TypeUnit.");
         }
 
-        public override bool Equals(object other){
-            if(other.GetType() == typeof(TypeUnit))
-                return this.type == ((TypeUnit)other).type;
+        public override bool Equals(object p_other){
+            if(p_other.GetType() == typeof(TypeUnit))
+                return this.type == ((TypeUnit)p_other).type;
             return false;
         }
         public override int GetHashCode(){
@@ -96,7 +96,7 @@ namespace lightning
             throw new Exception("Trying to Set a Table value of TypeUnit.");
         }
 
-        public override int CompareTo(object compareTo){
+        public override int CompareTo(object p_compareTo){
             throw new Exception("Trying to compare a TypeUnit.");
         }
     }
@@ -116,17 +116,17 @@ namespace lightning
             }
         }
 
-        public FunctionUnit(string p_name, string p_module)
+        public FunctionUnit(string p_Name, string p_Module)
         {
-            Name = p_name;
-            Module = p_module;
+            Name = p_Name;
+            Module = p_Module;
         }
 
-        public void Set(Operand p_arity, List<Instruction> p_body, LineCounter p_lineCounter, Operand p_originalPosition){
-            Arity = p_arity;
-            Body = p_body;
-            LineCounter = p_lineCounter;
-            OriginalPosition = p_originalPosition;
+        public void Set(Operand p_Arity, List<Instruction> p_Body, LineCounter p_LineCounter, Operand p_OriginalPosition){
+            Arity = p_Arity;
+            Body = p_Body;
+            LineCounter = p_LineCounter;
+            OriginalPosition = p_OriginalPosition;
         }
         public override string ToString()
         {
@@ -143,20 +143,20 @@ namespace lightning
             throw new Exception("Can not convert Function to Bool.");
         }
 
-        public override bool Equals(object other)
+        public override bool Equals(object p_other)
         {
-            Type other_type = other.GetType();
+            Type other_type = p_other.GetType();
             if (other_type == typeof(Unit))
             {
-                if(((Unit)other).Type == UnitType.Function)
+                if(((Unit)p_other).Type == UnitType.Function)
                 {
-                    FunctionUnit other_val_func = (FunctionUnit)((Unit)(other)).heapUnitValue;
+                    FunctionUnit other_val_func = (FunctionUnit)((Unit)(p_other)).heapUnitValue;
                     if (other_val_func.Name == this.Name && other_val_func.Module == this.Module) return true;
                 }
             }
             if (other_type == typeof(FunctionUnit))
             {
-                FunctionUnit other_val_func = other as FunctionUnit;
+                FunctionUnit other_val_func = p_other as FunctionUnit;
                 if (other_val_func.Name == this.Name && other_val_func.Module == this.Module) return true;
             }
             return false;
@@ -175,10 +175,10 @@ namespace lightning
             throw new Exception("Trying to Set a Table value of FunctionUnit.");
         }
 
-        public override int CompareTo(object compareTo){
-            if(compareTo.GetType() != typeof(Unit))
+        public override int CompareTo(object p_compareTo){
+            if(p_compareTo.GetType() != typeof(Unit))
                 throw new Exception("Trying to compare a FunctionUnit to non Unit type");
-            Unit other = (Unit)compareTo;
+            Unit other = (Unit)p_compareTo;
             UnitType other_type = other.Type;
             switch(other_type){
                 case UnitType.Function:
@@ -215,11 +215,11 @@ namespace lightning
             }
         }
 
-        public IntrinsicUnit(string p_name, Func<VM, Unit> p_function, int p_arity)
+        public IntrinsicUnit(string p_Name, Func<VM, Unit> p_Function, int p_Arity)
         {
-            Name = p_name;
-            Function = p_function;
-            Arity = p_arity;
+            Name = p_Name;
+            Function = p_Function;
+            Arity = p_Arity;
         }
 
         public override string ToString()
@@ -232,19 +232,19 @@ namespace lightning
             throw new Exception("Can not convert Intrinsic to Bool.");
         }
 
-        public override bool Equals(object other)
+        public override bool Equals(object p_other)
         {
-            Type other_type = other.GetType();
+            Type other_type = p_other.GetType();
             if (other_type == typeof(Unit))
             {
-                if(((Unit)other).Type == UnitType.Intrinsic)
+                if(((Unit)p_other).Type == UnitType.Intrinsic)
                 {
-                    if (Function == (((Unit)other).heapUnitValue as IntrinsicUnit).Function) return true;
+                    if (Function == (((Unit)p_other).heapUnitValue as IntrinsicUnit).Function) return true;
                 }
             }
             if (other_type == typeof(IntrinsicUnit))
             {
-                if (Function == (other as IntrinsicUnit).Function) return true;
+                if (Function == (p_other as IntrinsicUnit).Function) return true;
             }
             return false;
         }
@@ -262,10 +262,10 @@ namespace lightning
             throw new Exception("Trying to Set a Table value of IntrinsicUnit.");
         }
 
-        public override int CompareTo(object compareTo){
-            if(compareTo.GetType() != typeof(Unit))
+        public override int CompareTo(object p_compareTo){
+            if(p_compareTo.GetType() != typeof(Unit))
                 throw new Exception("Trying to compare an IntrinsicUnit to non Unit type");
-            Unit other = (Unit)compareTo;
+            Unit other = (Unit)p_compareTo;
             UnitType other_type = other.Type;
             switch(other_type){
                 case UnitType.Intrinsic:
@@ -300,10 +300,10 @@ namespace lightning
             }
         }
 
-        public ClosureUnit(FunctionUnit p_function, List<UpValueUnit> p_upValues)
+        public ClosureUnit(FunctionUnit p_Function, List<UpValueUnit> p_UpValues)
         {
-            Function = p_function;
-            UpValues = p_upValues;
+            Function = p_Function;
+            UpValues = p_UpValues;
         }
 
         public void Register(Memory<Unit> p_variables)
@@ -322,19 +322,19 @@ namespace lightning
             throw new Exception("Can not convert Clojure to Bool.");
         }
 
-        public override bool Equals(object other)
+        public override bool Equals(object p_other)
         {
-            Type other_type = other.GetType();
+            Type other_type = p_other.GetType();
             if (other_type == typeof(Unit))
             {
-                if(((Unit)other).Type == UnitType.Closure)
+                if(((Unit)p_other).Type == UnitType.Closure)
                 {
-                    if (this == ((Unit)other).heapUnitValue as ClosureUnit) return true;
+                    if (this == ((Unit)p_other).heapUnitValue as ClosureUnit) return true;
                 }
             }
             if (other_type == typeof(ClosureUnit))
             {
-                if (other == this) return true;
+                if (p_other == this) return true;
             }
             return false;
         }
@@ -352,10 +352,10 @@ namespace lightning
             throw new Exception("Trying to Set a Table value of ClosureUnit.");
         }
 
-        public override int CompareTo(object compareTo){
-            if(compareTo.GetType() != typeof(Unit))
+        public override int CompareTo(object p_compareTo){
+            if(p_compareTo.GetType() != typeof(Unit))
                 throw new Exception("Trying to compare a ClosureUnit to non Unit type");
-            Unit other = (Unit)compareTo;
+            Unit other = (Unit)p_compareTo;
             UnitType other_type = other.Type;
             switch(other_type){
                 case UnitType.Closure:
@@ -410,10 +410,10 @@ namespace lightning
             }
         }
 
-        public UpValueUnit(Operand p_address, Operand p_env)
+        public UpValueUnit(Operand p_Address, Operand p_Env)
         {
-            Address = p_address;
-            Env = p_env;
+            Address = p_Address;
+            Env = p_Env;
             isCaptured = false;
             variables = null;
             value = new Unit(UnitType.Null);
@@ -442,19 +442,19 @@ namespace lightning
             return UpValue.ToBool();
         }
 
-        public override bool Equals(object other)
+        public override bool Equals(object p_other)
         {
-            Type other_type = other.GetType();
+            Type other_type = p_other.GetType();
             if (other_type == typeof(Unit))
             {
-                if(((Unit)other).Type == UnitType.UpValue)
+                if(((Unit)p_other).Type == UnitType.UpValue)
                 {
-                    if (UpValue.Equals(((Unit)other).heapUnitValue)) return true;
+                    if (UpValue.Equals(((Unit)p_other).heapUnitValue)) return true;
                 }
             }
             if (other_type == typeof(UpValueUnit))
             {
-                if (UpValue.Equals(other)) return true;
+                if (UpValue.Equals(p_other)) return true;
             }
             return false;
         }
@@ -472,10 +472,10 @@ namespace lightning
             throw new Exception("Trying to Set a Table value of UpValueUnit.");
         }
 
-        public override int CompareTo(object compareTo){
-            if(compareTo.GetType() != typeof(Unit))
+        public override int CompareTo(object p_compareTo){
+            if(p_compareTo.GetType() != typeof(Unit))
                 throw new Exception("Trying to compare a UpValueUnit to non Unit type");
-            Unit other = (Unit)compareTo;
+            Unit other = (Unit)p_compareTo;
             UnitType other_type = other.Type;
             switch(other_type){
                 case UnitType.UpValue:
@@ -512,12 +512,12 @@ namespace lightning
                 return UnitType.Module;
             }
         }
-        public ModuleUnit(string p_name, Dictionary<Unit, Unit> p_table, List<Unit> p_globals, List<Unit> p_constants)
+        public ModuleUnit(string p_Name, Dictionary<Unit, Unit> p_Table, List<Unit> p_Globals, List<Unit> p_Constants)
         {
-            Name = p_name;
-            Table = p_table ?? new Dictionary<Unit, Unit>();
-            Globals = p_globals ??= new List<Unit>();
-            Constants = p_constants ??= new List<Unit>();
+            Name = p_Name;
+            Table = p_Table ?? new Dictionary<Unit, Unit>();
+            Globals = p_Globals ??= new List<Unit>();
+            Constants = p_Constants ??= new List<Unit>();
             ImportIndex = 0;
         }
 
@@ -538,16 +538,16 @@ namespace lightning
             throw new Exception("Can not convert Module to Bool.");
         }
 
-        public override bool Equals(object other)
+        public override bool Equals(object p_other)
         {
-            Type other_type = other.GetType();
+            Type other_type = p_other.GetType();
             if (other_type == typeof(Unit))
             {
-                if (this.Name == (((Unit)other).heapUnitValue as ModuleUnit).Name) return true;
+                if (this.Name == (((Unit)p_other).heapUnitValue as ModuleUnit).Name) return true;
             }
             if (other_type == typeof(ModuleUnit))
             {
-                if ((other as ModuleUnit).Name == this.Name) return true;
+                if ((p_other as ModuleUnit).Name == this.Name) return true;
             }
 
             return false;
@@ -576,10 +576,10 @@ namespace lightning
             }
         }
 
-        public override int CompareTo(object compareTo){
-            if(compareTo.GetType() != typeof(Unit))
+        public override int CompareTo(object p_compareTo){
+            if(p_compareTo.GetType() != typeof(Unit))
                 throw new Exception("Trying to compare a ModuleUnit to non Unit type");
-            Unit other = (Unit)compareTo;
+            Unit other = (Unit)p_compareTo;
             UnitType other_type = other.Type;
             switch(other_type){
                 case UnitType.Module:
@@ -607,31 +607,31 @@ namespace lightning
     public class WrapperUnit<T> : HeapUnit
     {
         public object content;
-        private Dictionary<Unit, Unit> table;
-        private TableUnit superTable;
+        public Dictionary<Unit, Unit> Table{get; private set;}
+        public TableUnit SuperTable{get; private set;}
         public override UnitType Type{
             get{
                 return UnitType.Wrapper;
             }
         }
-        public WrapperUnit(object p_content, TableUnit p_superTable = null)
+        public WrapperUnit(object p_content, TableUnit p_SuperTable = null)
         {
             content = p_content;
-            table = new Dictionary<Unit, Unit>();
-            superTable = p_superTable;
+            Table = new Dictionary<Unit, Unit>();
+            SuperTable = p_SuperTable;
         }
 
         public override void Set(Unit index, Unit value)
         {
-            table[index] = value;
+            Table[index] = value;
         }
 
         public override Unit Get(Unit p_key){
             Unit this_unit;
-            if(table.TryGetValue(p_key, out this_unit))
+            if(Table.TryGetValue(p_key, out this_unit))
                 return this_unit;
-            else if(superTable != null)
-                return superTable.Get(p_key);
+            else if(SuperTable != null)
+                return SuperTable.Get(p_key);
             throw new Exception("Wrapper<" + typeof(T) +"> Super Table does not contain index: " + p_key.ToString());
         }
 
@@ -640,19 +640,19 @@ namespace lightning
             return content.ToString();
         }
 
-        public override bool Equals(object other)
+        public override bool Equals(object p_other)
         {
-            Type other_type = other.GetType();
+            Type other_type = p_other.GetType();
             if (other_type == typeof(Unit))
             {
-                if(((Unit)other).Type == UnitType.Wrapper)
+                if(((Unit)p_other).Type == UnitType.Wrapper)
                 {
-                    if (this.content == (((Unit)other).heapUnitValue as WrapperUnit<T>).content) return true;
+                    if (this.content == (((Unit)p_other).heapUnitValue as WrapperUnit<T>).content) return true;
                 }
             }
             if(other_type == typeof(WrapperUnit<T>))
             {
-                if(((WrapperUnit<T>)other).content == this.content)
+                if(((WrapperUnit<T>)p_other).content == this.content)
                 {
                     return true;
                 }
@@ -682,10 +682,10 @@ namespace lightning
             }
         }
 
-        public override int CompareTo(object compareTo){
-            if(compareTo.GetType() != typeof(Unit))
+        public override int CompareTo(object p_compareTo){
+            if(p_compareTo.GetType() != typeof(Unit))
                 throw new Exception("Trying to compare a WrapperUnit to non Unit type");
-            Unit other = (Unit)compareTo;
+            Unit other = (Unit)p_compareTo;
             UnitType other_type = other.Type;
             switch(other_type){
                 case UnitType.Wrapper:

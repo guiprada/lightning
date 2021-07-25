@@ -15,7 +15,7 @@ namespace lightning
     {
         public List<Unit> Elements{get; private set;}
         public Dictionary<Unit, Unit> Table{get; private set;}
-        public TableUnit SuperTable{get; set;}
+        public TableUnit SuperTable{get; private set;}
 
         public override UnitType Type{
             get{
