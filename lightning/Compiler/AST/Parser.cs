@@ -658,20 +658,20 @@ namespace lightning
                 string name = string.Format(@"*_{0}.txt", Guid.NewGuid());
 
                 VarDeclarationNode declaration_node = new VarDeclarationNode(name, p_node, p_node.Line);
-                VariableNode variableNode = new VariableNode(name, new List<Node>(), VarAccessType.PLAIN, p_node.Line);
-                variableNode = (VariableNode)MethodAccess(variableNode);
+                VariableNode variable_node = new VariableNode(name, new List<Node>(), VarAccessType.PLAIN, p_node.Line);
+                variable_node = (VariableNode)MethodAccess(variable_node);
 
                 List<List<Node>> calls = new List<List<Node>>();
                 List<VariableNode> indexed_access = new List<VariableNode>();
                 Node function_call_node = new FunctionCallNode(
 
-                    variableNode,
+                    variable_node,
                     calls,
                     indexed_access,
                     p_node.Line);
 
                 function_call_node = CallTail(function_call_node);
-                return new AnonymousMethodCallNode(function_call_node, declaration_node, variableNode, p_node.Line);
+                return new AnonymousMethodCallNode(function_call_node, declaration_node, variable_node, p_node.Line);
             }
             Error("Expected ':' after anonymous function call.");
             return p_node;
