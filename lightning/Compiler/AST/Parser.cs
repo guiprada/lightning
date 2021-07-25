@@ -664,7 +664,6 @@ namespace lightning
                 List<List<Node>> calls = new List<List<Node>>();
                 List<VariableNode> indexed_access = new List<VariableNode>();
                 Node function_call_node = new FunctionCallNode(
-
                     variable_node,
                     calls,
                     indexed_access,
