@@ -106,5 +106,4 @@
     [EXPR_STMT [FUNCTION CALL [VARIABLE write_line]([LITERAL "-- Finished tests! --"])]]
     [EXPR_STMT [FUNCTION CALL [VARIABLE write_line]([BINARY [BINARY [LITERAL "Elapsed time: "] .. [FUNCTION CALL [VARIABLE start_time:[METHOD elapsed]]()]] .. [LITERAL " ms"]])]]
     [EXPR_STMT [FUNCTION CALL [VARIABLE write_line]([BINARY [LITERAL "Loaded modules: "] .. [FUNCTION CALL [VARIABLE machine.[IDENTIFIER modules]]()]])]]
-    [EXPR_STMT [FUNCTION CALL [VARIABLE write_line]([FUNCTION CALL [VARIABLE machine.[IDENTIFIER memory_use]]()])]]
 ]

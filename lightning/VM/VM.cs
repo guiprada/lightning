@@ -274,7 +274,7 @@ namespace lightning
         }
 
 //////////////////////////// End Accessors
-        public Unit ProtectedCallFunction(Unit p_callable, List<Unit> p_args){
+        public Unit ProtectedCallFunction(Unit p_callable, List<Unit> p_args = null){
             try{
                 return CallFunction(p_callable, p_args);
             }
@@ -293,7 +293,7 @@ namespace lightning
                 return new Unit(UnitType.Null);
             }
         }
-        public Unit CallFunction(Unit p_callable, List<Unit> p_args)
+        public Unit CallFunction(Unit p_callable, List<Unit> p_args = null)
         {
             UnitType this_type = p_callable.Type;
             if (p_args != null)
@@ -402,7 +402,7 @@ namespace lightning
                 return new VMResult(VMResultType.ERROR, new Unit(UnitType.Null));
             }
         }
-        public VMResult Run()
+        private VMResult Run()
         {
             Instruction instruction;
 

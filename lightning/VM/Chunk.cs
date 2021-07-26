@@ -278,25 +278,38 @@ namespace lightning
             return constants[p_address];
         }
 
-        public HeapUnit GetFunction(string p_name)
+        public Unit GetFunction(string p_name)
         {
             foreach(Unit v in constants)
             {
                 if(v.Type == UnitType.Function)
                     if( ((FunctionUnit)(v.heapUnitValue)).Name == p_name)
                     {
-                        return (FunctionUnit)(v.heapUnitValue);
+                        return new Unit(v.heapUnitValue);
                     }
             }
             foreach (IntrinsicUnit v in Prelude.intrinsics)
             {
                 if (v.Name == p_name)
                 {
-                    return v;
+                    return new Unit(v);
                 }
 
             }
-            return null;
+            return new Unit(UnitType.Null);
+        }
+
+        public Unit GetUnitFromTable(string p_table, string p_name)
+        {
+            foreach (KeyValuePair<string, TableUnit> item in Prelude.tables)
+            {
+                if (item.Key == p_table)
+                {
+                    return item.Value.Get(new Unit(p_name));
+                }
+
+            }
+            return new Unit(UnitType.Null);
         }
 
         public List<Instruction> Slice(int p_start, int p_end)

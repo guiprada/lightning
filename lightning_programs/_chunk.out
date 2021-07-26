@@ -160,7 +160,6 @@ Constant: 81 "elapsed"
 Constant: 82 " ms"
 Constant: 83 "Loaded modules: "
 Constant: 84 "modules"
-Constant: 85 "memory_use"
 
 ------------------- CHUNK:
 0: LOAD_CONSTANT 0 on line:  1
@@ -669,12 +668,5 @@ Constant: 85 "memory_use"
 503: LOAD_GLOBAL 3 on line:  118
 504: CALL on line:  118
 505: POP on line:  118
-506: LOAD_GLOBAL 21 on line:  119
-507: LOAD_CONSTANT 85 on line:  119
-508: TABLE_GET 1 on line:  119
-509: CALL on line:  119
-510: LOAD_GLOBAL 3 on line:  119
-511: CALL on line:  119
-512: POP on line:  119
-513: EXIT on line:  119
+506: EXIT on line:  118
 

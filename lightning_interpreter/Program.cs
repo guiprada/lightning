@@ -119,6 +119,11 @@ namespace interpreter
                     Console.WriteLine("Program returned ERROR");
                 else if (result.value.Type != UnitType.Null)
                     Console.WriteLine("Program returned: " + result.value);
+
+                // Print memory_use
+                Unit my_func = chunk.GetUnitFromTable("machine", "memory_use");
+                Unit call_result = vm.ProtectedCallFunction(my_func, null);
+                Console.WriteLine(call_result);
             }
             else
             {
@@ -128,15 +133,6 @@ namespace interpreter
                     return 0;
                 }
             }
-
-            //ValFunction my_func = chunk.GetFunction("append");
-            //List<HeapUnit> stack = new List<HeapUnit>();
-            //stack.Add(new ValString("hello"));
-            //stack.Add(new ValString("hello!"));
-            //stack.Add(new ValString("Failed--------------------------------"));
-            //HeapUnit call_result = vm.CallFunction(my_func, stack);
-            //Console.WriteLine(call_result);
-
             return 0;
         }
     }

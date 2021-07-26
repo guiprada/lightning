@@ -700,12 +700,4 @@ IDENTIFIER string: modules line: 118
 LEFT_PAREN line: 118
 RIGHT_PAREN line: 118
 RIGHT_PAREN line: 118
-IDENTIFIER string: write_line line: 119
-LEFT_PAREN line: 119
-IDENTIFIER string: machine line: 119
-DOT line: 119
-IDENTIFIER string: memory_use line: 119
-LEFT_PAREN line: 119
-RIGHT_PAREN line: 119
-RIGHT_PAREN line: 119
 EOF line: 119
