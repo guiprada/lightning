@@ -43,6 +43,7 @@ namespace interpreter
 
         static int Run(string input)
         {
+//////////////////////////////////////////////////////// TOKENS
             Scanner scanner = new Scanner(input);
             Parser parser = new Parser(scanner.Tokens);
             if (scanner.Errors.Count > 0)
@@ -54,28 +55,20 @@ namespace interpreter
                 }
                 return 0;
             }
-            bool skip_line = false;
-#if TOKENS
-            Console.WriteLine("---------------------------------- Tokens:");
-
-            foreach (Token token in scanner.Tokens)
             {
-               Console.WriteLine(token.ToString());
-            }
-            Console.WriteLine("-------------------------------end Tokens:");
-            skip_line = true;
-#endif
-
-            Node program = parser.ParsedTree;
-            if (parser.Errors.Count > 0)
-            {
-                Console.WriteLine("Parsing had errors:");
-                foreach (string error in parser.Errors)
+                string output = "";
+                foreach (Token token in scanner.Tokens)
                 {
-                    Console.WriteLine(error);
+                    output += token.ToString() + Environment.NewLine;
                 }
-                return 0;
+                using (System.IO.StreamWriter file = new System.IO.StreamWriter(@"_tokens.out", false))
+                {
+                    file.Write(output);
+                }
             }
+
+//////////////////////////////////////////////////////// AST
+            Node program = parser.ParsedTree;
             if (parser.Warnings.Count > 0)
             {
                 Console.WriteLine("Parsing had Warnings:");
@@ -87,15 +80,16 @@ namespace interpreter
             if(parser.HasParsed == false)
                 return  0;
 
-#if AST
-            Console.WriteLine("\n---------------------------------- AST:");
-
             PrettyPrinter astPrinter = new PrettyPrinter();
-            astPrinter.Print(program);
+            using (System.IO.StreamWriter file = new System.IO.StreamWriter(@"_ast.out", false)){
+                Console.SetOut(file);
+                astPrinter.Print(program);
+                var standardOutput = new StreamWriter(Console.OpenStandardOutput());
+                standardOutput.AutoFlush = true;
+                Console.SetOut(standardOutput);
+            }
 
-            Console.WriteLine("\n-------------------------------end AST:");
-            skip_line = true;
-#endif
+//////////////////////////////////////////////////////// CHUNK
 
             Chunker code_generator = new Chunker(program, "main", Prelude.GetPrelude());
             Chunk chunk = code_generator.Chunk;
@@ -110,21 +104,14 @@ namespace interpreter
             }
             if (code_generator.HasChunked == true)
             {
-#if CHUNK
-                Console.WriteLine("\n---------------------------------- Generated Chunk:");
-                Console.WriteLine();
-                chunk.Print();
-#endif
-#if CONSTANTS
-                foreach(Unit v in chunk.GetConstants)
-                {
-                   Console.WriteLine(v);
+
+                using (System.IO.StreamWriter file = new System.IO.StreamWriter(@"_chunk.out", false)){
+                    Console.SetOut(file);
+                    chunk.Print();
+                    var standardOutput = new StreamWriter(Console.OpenStandardOutput());
+                    standardOutput.AutoFlush = true;
+                    Console.SetOut(standardOutput);
                 }
-                Console.WriteLine("\n-------------------------------end Generated Chunk:");
-                skip_line = true;
-#endif
-                if(skip_line)
-                    Console.WriteLine();
 
                 VM vm = new VM(chunk);
                 VMResult result = vm.ProtectedRun();

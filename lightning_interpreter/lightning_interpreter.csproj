@@ -6,7 +6,6 @@
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-    <!-- TRACE;DOUBLE;DEBUG;TOKENS;AST;CHUNK;CONSTANTS -->
     <DefineConstants>TRACE;DOUBLE;DEBUG;</DefineConstants>
   </PropertyGroup>
 

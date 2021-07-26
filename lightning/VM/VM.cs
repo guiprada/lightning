@@ -65,10 +65,12 @@ namespace lightning
 
         Stack<VM> vmPool;
         static int functionDeepness;
+        static bool DEBUG;
 
 //////////////////////////////////////////////////// Public
         static VM(){
-            functionDeepness = 30;
+            VM.functionDeepness = 30;
+            VM.DEBUG = false;
         }
         public VM(Chunk p_chunk)
         {
@@ -147,6 +149,10 @@ namespace lightning
 
         public int CountVMs(){
             return vmPool.Count;
+        }
+
+        public void SetDebug(bool p_value){
+            VM.DEBUG = p_value;
         }
 
         void Reset(){
@@ -277,22 +283,14 @@ namespace lightning
             try{
                 return CallFunction(p_callable, p_args);
             }
-#if DEBUG
             catch (Exception e)
             {
-                Console.WriteLine(e);
+                if(VM.DEBUG)
+                    Console.WriteLine(e);
                 Console.WriteLine("VM Busted ... " + ErrorLocation());
                 System.Environment.Exit(1);
                 return new Unit(UnitType.Null);
             }
-#else
-            catch
-            {
-                Console.WriteLine("VM Busted ... " + ErrorLocation());
-                System.Environment.Exit(1);
-                return new Unit(UnitType.Null);
-            }
-#endif
         }
         public Unit CallFunction(Unit p_callable, List<Unit> p_args)
         {
@@ -389,22 +387,14 @@ namespace lightning
             try{
                 return Run();
             }
-#if DEBUG
             catch (Exception e)
             {
-                Console.WriteLine(e);
+                if(VM.DEBUG)
+                    Console.WriteLine(e);
                 Console.WriteLine("VM Busted ... " + ErrorLocation());
                 System.Environment.Exit(1);
                 return new VMResult(VMResultType.ERROR, new Unit(UnitType.Null));
             }
-#else
-            catch
-            {
-                Console.WriteLine("VM Busted ... " + ErrorLocation());
-                System.Environment.Exit(1);
-                return new VMResult(VMResultType.ERROR, new Unit(UnitType.Null));
-            }
-#endif
         }
         public VMResult Run()
         {

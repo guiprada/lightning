@@ -220,6 +220,7 @@ namespace lightning
         {
 
             int constant_counter = 0;
+            Console.WriteLine("------------------- CONSTANTS:");
             foreach (Unit v in constants)
             {
                 if(v.Type == UnitType.String)
@@ -229,6 +230,7 @@ namespace lightning
                 constant_counter++;
             }
 
+            Console.WriteLine(Environment.NewLine + "------------------- CHUNK:");
             for(int i = 0; i< program.Count; i++)
             {
                 Console.Write(i + ": ");

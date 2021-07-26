@@ -123,6 +123,14 @@ namespace lightning
                 }
                 machine.Set("count_vms", new IntrinsicUnit("count_vms", CountVMs, 0));
 
+                //////////////////////////////////////////////////////
+                Unit SetDebug(VM p_vm)
+                {
+                    p_vm.SetDebug(p_vm.GetBool(0));
+                    return new Unit(UnitType.Null);
+                }
+                machine.Set("set_debug", new IntrinsicUnit("set_debug", SetDebug, 1));
+
                 tables.Add("machine", machine);
             }
             ////////////////////////////////////////////////////////////////////////////////////////////////////////////

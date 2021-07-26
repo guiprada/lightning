@@ -1,0 +1,717 @@
+IDENTIFIER string: machine line: 1
+DOT line: 1
+IDENTIFIER string: set_debug line: 1
+LEFT_PAREN line: 1
+TRUE line: 1
+RIGHT_PAREN line: 1
+IDENTIFIER string: write_line line: 2
+LEFT_PAREN line: 2
+STRING string: *** Welcome to lightning test suite Zzz :) *** line: 2
+RIGHT_PAREN line: 2
+VAR line: 4
+IDENTIFIER string: os_string line: 4
+EQUAL line: 4
+IDENTIFIER string: get_os line: 4
+LEFT_PAREN line: 4
+RIGHT_PAREN line: 4
+VAR line: 5
+IDENTIFIER string: os line: 5
+EQUAL line: 5
+STRING string: Unknown line: 5
+IF line: 6
+LEFT_PAREN line: 6
+IDENTIFIER string: os_string line: 6
+COLON line: 6
+IDENTIFIER string: contains line: 6
+LEFT_PAREN line: 6
+STRING string: Windows line: 6
+RIGHT_PAREN line: 6
+RIGHT_PAREN line: 6
+IDENTIFIER string: os line: 7
+EQUAL line: 7
+STRING string: Windows line: 7
+ELSE line: 8
+IF line: 8
+LEFT_PAREN line: 8
+IDENTIFIER string: os_string line: 8
+COLON line: 8
+IDENTIFIER string: contains line: 8
+LEFT_PAREN line: 8
+STRING string: Unix line: 8
+RIGHT_PAREN line: 8
+RIGHT_PAREN line: 8
+IDENTIFIER string: os line: 9
+EQUAL line: 9
+STRING string: Unix line: 9
+IDENTIFIER string: write_line line: 11
+LEFT_PAREN line: 11
+IDENTIFIER string: get_os line: 11
+LEFT_PAREN line: 11
+RIGHT_PAREN line: 11
+RIGHT_PAREN line: 11
+IF line: 13
+LEFT_PAREN line: 13
+IDENTIFIER string: intrinsic line: 13
+DOT line: 13
+IDENTIFIER string: create line: 13
+EQUAL_EQUAL line: 13
+NIL line: 13
+RIGHT_PAREN line: 13
+LEFT_BRACE line: 13
+IDENTIFIER string: write_line line: 14
+LEFT_PAREN line: 14
+STRING string: No inline intrinsic support! line: 14
+RIGHT_PAREN line: 14
+RIGHT_BRACE line: 15
+IDENTIFIER string: write_line line: 17
+LEFT_PAREN line: 17
+STRING string: -- Starting tests -- line: 17
+RIGHT_PAREN line: 17
+VAR line: 18
+IDENTIFIER string: start_time line: 18
+EQUAL line: 18
+IDENTIFIER string: time line: 18
+DOT line: 18
+IDENTIFIER string: now line: 18
+LEFT_PAREN line: 18
+RIGHT_PAREN line: 18
+VAR line: 21
+IDENTIFIER string: _assert line: 21
+EQUAL line: 21
+IDENTIFIER string: require line: 21
+LEFT_PAREN line: 21
+STRING string: assert.ltn line: 21
+RIGHT_PAREN line: 21
+VAR line: 22
+IDENTIFIER string: assert_counter line: 22
+EQUAL line: 22
+IDENTIFIER string: require line: 22
+LEFT_PAREN line: 22
+STRING string: assert_counter.ltn line: 22
+RIGHT_PAREN line: 22
+VAR line: 24
+IDENTIFIER string: assert line: 24
+EQUAL line: 24
+IDENTIFIER string: assert_counter line: 24
+DOT line: 24
+IDENTIFIER string: assert line: 24
+VAR line: 25
+IDENTIFIER string: assert_not line: 25
+EQUAL line: 25
+IDENTIFIER string: assert_counter line: 25
+DOT line: 25
+IDENTIFIER string: assert_not line: 25
+VAR line: 26
+IDENTIFIER string: count_errors line: 26
+EQUAL line: 26
+IDENTIFIER string: assert_counter line: 26
+DOT line: 26
+IDENTIFIER string: get_error_counter line: 26
+VAR line: 27
+IDENTIFIER string: clear_errors line: 27
+EQUAL line: 27
+IDENTIFIER string: assert_counter line: 27
+DOT line: 27
+IDENTIFIER string: reset_error_counter line: 27
+VAR line: 29
+IDENTIFIER string: errors line: 29
+EQUAL line: 29
+NUMBER Integer: 0 line: 29
+IDENTIFIER string: errors line: 30
+PLUS_EQUAL line: 30
+IDENTIFIER string: require line: 30
+LEFT_PAREN line: 30
+STRING string: tests/assert.ltn line: 30
+RIGHT_PAREN line: 30
+IDENTIFIER string: errors line: 31
+PLUS_EQUAL line: 31
+IDENTIFIER string: require line: 31
+LEFT_PAREN line: 31
+STRING string: tests/numbers.ltn line: 31
+RIGHT_PAREN line: 31
+IDENTIFIER string: errors line: 32
+PLUS_EQUAL line: 32
+IDENTIFIER string: require line: 32
+LEFT_PAREN line: 32
+STRING string: tests/strings.ltn line: 32
+RIGHT_PAREN line: 32
+IDENTIFIER string: errors line: 33
+PLUS_EQUAL line: 33
+IDENTIFIER string: require line: 33
+LEFT_PAREN line: 33
+STRING string: tests/pmap.ltn line: 33
+RIGHT_PAREN line: 33
+IDENTIFIER string: errors line: 34
+PLUS_EQUAL line: 34
+IDENTIFIER string: require line: 34
+LEFT_PAREN line: 34
+STRING string: tests/rmap.ltn line: 34
+RIGHT_PAREN line: 34
+IDENTIFIER string: errors line: 35
+PLUS_EQUAL line: 35
+IDENTIFIER string: require line: 35
+LEFT_PAREN line: 35
+STRING string: tests/map.ltn line: 35
+RIGHT_PAREN line: 35
+IDENTIFIER string: errors line: 36
+PLUS_EQUAL line: 36
+IDENTIFIER string: require line: 36
+LEFT_PAREN line: 36
+STRING string: tests/reduce.ltn line: 36
+RIGHT_PAREN line: 36
+IDENTIFIER string: errors line: 37
+PLUS_EQUAL line: 37
+IDENTIFIER string: require line: 37
+LEFT_PAREN line: 37
+STRING string: tests/table.ltn line: 37
+RIGHT_PAREN line: 37
+IDENTIFIER string: errors line: 38
+PLUS_EQUAL line: 38
+IDENTIFIER string: require line: 38
+LEFT_PAREN line: 38
+STRING string: tests/scoping.ltn line: 38
+RIGHT_PAREN line: 38
+IDENTIFIER string: errors line: 39
+PLUS_EQUAL line: 39
+IDENTIFIER string: require line: 39
+LEFT_PAREN line: 39
+STRING string: tests/up_value.ltn line: 39
+RIGHT_PAREN line: 39
+IDENTIFIER string: errors line: 40
+PLUS_EQUAL line: 40
+IDENTIFIER string: require line: 40
+LEFT_PAREN line: 40
+STRING string: tests/closures.ltn line: 40
+RIGHT_PAREN line: 40
+IDENTIFIER string: errors line: 41
+PLUS_EQUAL line: 41
+IDENTIFIER string: require line: 41
+LEFT_PAREN line: 41
+STRING string: tests/lambdas.ltn line: 41
+RIGHT_PAREN line: 41
+IDENTIFIER string: errors line: 42
+PLUS_EQUAL line: 42
+IDENTIFIER string: require line: 42
+LEFT_PAREN line: 42
+STRING string: tests/boolean.ltn line: 42
+RIGHT_PAREN line: 42
+IDENTIFIER string: errors line: 43
+PLUS_EQUAL line: 43
+IDENTIFIER string: require line: 43
+LEFT_PAREN line: 43
+STRING string: tests/iterators.ltn line: 43
+RIGHT_PAREN line: 43
+IDENTIFIER string: errors line: 44
+PLUS_EQUAL line: 44
+IDENTIFIER string: require line: 44
+LEFT_PAREN line: 44
+STRING string: tests/methods.ltn line: 44
+RIGHT_PAREN line: 44
+IDENTIFIER string: errors line: 45
+PLUS_EQUAL line: 45
+IDENTIFIER string: require line: 45
+LEFT_PAREN line: 45
+STRING string: tests/compound_calls.ltn line: 45
+RIGHT_PAREN line: 45
+IDENTIFIER string: errors line: 46
+PLUS_EQUAL line: 46
+IDENTIFIER string: require line: 46
+LEFT_PAREN line: 46
+STRING string: tests/transient.ltn line: 46
+RIGHT_PAREN line: 46
+IDENTIFIER string: errors line: 47
+PLUS_EQUAL line: 47
+IDENTIFIER string: require line: 47
+LEFT_PAREN line: 47
+STRING string: tests/math.ltn line: 47
+RIGHT_PAREN line: 47
+IDENTIFIER string: errors line: 48
+PLUS_EQUAL line: 48
+IDENTIFIER string: require line: 48
+LEFT_PAREN line: 48
+STRING string: tests/eval.ltn line: 48
+RIGHT_PAREN line: 48
+IDENTIFIER string: errors line: 49
+PLUS_EQUAL line: 49
+IDENTIFIER string: require line: 49
+LEFT_PAREN line: 49
+STRING string: tests/maybe.ltn line: 49
+RIGHT_PAREN line: 49
+IDENTIFIER string: errors line: 50
+PLUS_EQUAL line: 50
+IDENTIFIER string: require line: 50
+LEFT_PAREN line: 50
+STRING string: tests/assign_op.ltn line: 50
+RIGHT_PAREN line: 50
+IDENTIFIER string: errors line: 51
+PLUS_EQUAL line: 51
+IDENTIFIER string: require line: 51
+LEFT_PAREN line: 51
+STRING string: tests/lock.ltn line: 51
+RIGHT_PAREN line: 51
+IDENTIFIER string: errors line: 52
+PLUS_EQUAL line: 52
+IDENTIFIER string: require line: 52
+LEFT_PAREN line: 52
+STRING string: tests/vm_management.ltn line: 52
+RIGHT_PAREN line: 52
+IDENTIFIER string: errors line: 53
+PLUS_EQUAL line: 53
+IDENTIFIER string: require line: 53
+LEFT_PAREN line: 53
+STRING string: tests/inline_intrinsics.ltn line: 53
+RIGHT_PAREN line: 53
+IDENTIFIER string: errors line: 54
+PLUS_EQUAL line: 54
+IDENTIFIER string: require line: 54
+LEFT_PAREN line: 54
+STRING string: tests/nuples.ltn line: 54
+RIGHT_PAREN line: 54
+IDENTIFIER string: errors line: 55
+PLUS_EQUAL line: 55
+IDENTIFIER string: require line: 55
+LEFT_PAREN line: 55
+STRING string: tests/super_table.ltn line: 55
+RIGHT_PAREN line: 55
+IDENTIFIER string: errors line: 56
+PLUS_EQUAL line: 56
+IDENTIFIER string: require line: 56
+LEFT_PAREN line: 56
+STRING string: tests/char.ltn line: 56
+RIGHT_PAREN line: 56
+IDENTIFIER string: errors line: 57
+PLUS_EQUAL line: 57
+IDENTIFIER string: require line: 57
+LEFT_PAREN line: 57
+STRING string: tests/integers.ltn line: 57
+RIGHT_PAREN line: 57
+IDENTIFIER string: errors line: 58
+PLUS_EQUAL line: 58
+IDENTIFIER string: require line: 58
+LEFT_PAREN line: 58
+STRING string: tests/anonymous_call.ltn line: 58
+RIGHT_PAREN line: 58
+IDENTIFIER string: errors line: 59
+PLUS_EQUAL line: 59
+IDENTIFIER string: require line: 59
+LEFT_PAREN line: 59
+STRING string: tests/try.ltn line: 59
+RIGHT_PAREN line: 59
+LEFT_BRACE line: 62
+VAR line: 63
+IDENTIFIER string: a_table line: 63
+EQUAL line: 63
+LEFT_BRACKET line: 63
+IDENTIFIER string: value line: 64
+COLON line: 64
+NUMBER Integer: 100 line: 64
+COMMA line: 64
+IDENTIFIER string: a_function line: 65
+COLON line: 65
+FUN line: 65
+LEFT_BRACE line: 65
+RETURN line: 65
+NUMBER Integer: 99 line: 65
+RIGHT_BRACE line: 65
+RIGHT_BRACKET line: 66
+IDENTIFIER string: assert line: 67
+LEFT_PAREN line: 67
+IDENTIFIER string: a_table line: 67
+DOT line: 67
+IDENTIFIER string: a_function line: 67
+LEFT_PAREN line: 67
+RIGHT_PAREN line: 67
+COMMA line: 67
+NUMBER Integer: 99 line: 67
+COMMA line: 67
+STRING string: Failed Table Map Access By Literal String 2. line: 67
+RIGHT_PAREN line: 67
+VAR line: 68
+IDENTIFIER string: name line: 68
+EQUAL line: 68
+STRING string: a_function line: 68
+IDENTIFIER string: assert line: 69
+LEFT_PAREN line: 69
+IDENTIFIER string: a_table line: 69
+LEFT_BRACKET line: 69
+IDENTIFIER string: name line: 69
+RIGHT_BRACKET line: 69
+LEFT_PAREN line: 69
+RIGHT_PAREN line: 69
+COMMA line: 69
+NUMBER Integer: 99 line: 69
+COMMA line: 69
+STRING string: Failed Table Map Access By Literal String 3. line: 69
+RIGHT_PAREN line: 69
+IDENTIFIER string: assert line: 70
+LEFT_PAREN line: 70
+IDENTIFIER string: a_table line: 70
+LEFT_BRACKET line: 70
+STRING string: a_function line: 70
+RIGHT_BRACKET line: 70
+LEFT_PAREN line: 70
+RIGHT_PAREN line: 70
+COMMA line: 70
+NUMBER Integer: 99 line: 70
+COMMA line: 70
+STRING string: Failed Table Map Access By Literal String 4. line: 70
+RIGHT_PAREN line: 70
+IDENTIFIER string: assert line: 71
+LEFT_PAREN line: 71
+IDENTIFIER string: a_table line: 71
+LEFT_BRACKET line: 71
+STRING string: a line: 71
+APPEND line: 71
+STRING string: _function line: 71
+RIGHT_BRACKET line: 71
+LEFT_PAREN line: 71
+RIGHT_PAREN line: 71
+COMMA line: 71
+NUMBER Integer: 99 line: 71
+COMMA line: 71
+STRING string: Failed Table Map Access By Literal String 4. line: 71
+RIGHT_PAREN line: 71
+RIGHT_BRACE line: 72
+LEFT_BRACE line: 73
+FUN line: 76
+IDENTIFIER string: make_player line: 76
+LEFT_PAREN line: 76
+RIGHT_PAREN line: 76
+LEFT_BRACE line: 77
+VAR line: 78
+IDENTIFIER string: player line: 78
+EQUAL line: 78
+LEFT_BRACKET line: 78
+RIGHT_BRACKET line: 78
+IDENTIFIER string: player line: 79
+DOT line: 79
+IDENTIFIER string: position line: 79
+EQUAL line: 79
+LEFT_BRACKET line: 79
+RIGHT_BRACKET line: 79
+SEMICOLON line: 79
+IDENTIFIER string: player line: 80
+DOT line: 80
+IDENTIFIER string: position line: 80
+LEFT_BRACKET line: 80
+STRING string: x line: 80
+RIGHT_BRACKET line: 80
+EQUAL line: 80
+NUMBER Integer: 0 line: 80
+IDENTIFIER string: player line: 81
+DOT line: 81
+IDENTIFIER string: position line: 81
+LEFT_BRACKET line: 81
+STRING string: y line: 81
+RIGHT_BRACKET line: 81
+EQUAL line: 81
+NUMBER Integer: 0 line: 81
+IDENTIFIER string: player line: 83
+DOT line: 83
+IDENTIFIER string: move line: 83
+EQUAL line: 83
+FUN line: 83
+LEFT_PAREN line: 83
+IDENTIFIER string: self line: 83
+COMMA line: 83
+IDENTIFIER string: x line: 83
+COMMA line: 83
+IDENTIFIER string: y line: 83
+RIGHT_PAREN line: 83
+LEFT_BRACE line: 84
+IDENTIFIER string: self line: 85
+DOT line: 85
+IDENTIFIER string: position line: 85
+DOT line: 85
+IDENTIFIER string: x line: 85
+EQUAL line: 85
+IDENTIFIER string: self line: 85
+DOT line: 85
+IDENTIFIER string: position line: 85
+DOT line: 85
+IDENTIFIER string: x line: 85
+PLUS line: 85
+IDENTIFIER string: x line: 85
+SEMICOLON line: 85
+IDENTIFIER string: self line: 86
+DOT line: 86
+IDENTIFIER string: position line: 86
+DOT line: 86
+IDENTIFIER string: y line: 86
+EQUAL line: 86
+IDENTIFIER string: self line: 86
+DOT line: 86
+IDENTIFIER string: position line: 86
+DOT line: 86
+IDENTIFIER string: y line: 86
+PLUS line: 86
+IDENTIFIER string: y line: 86
+SEMICOLON line: 86
+RETURN line: 87
+IDENTIFIER string: self line: 87
+DOT line: 87
+IDENTIFIER string: position line: 87
+RIGHT_BRACE line: 88
+IDENTIFIER string: player line: 89
+LEFT_BRACKET line: 89
+NUMBER Integer: 2 line: 89
+RIGHT_BRACKET line: 89
+EQUAL line: 89
+IDENTIFIER string: player line: 89
+DOT line: 89
+IDENTIFIER string: move line: 89
+RETURN line: 91
+IDENTIFIER string: player line: 91
+RIGHT_BRACE line: 92
+VAR line: 94
+IDENTIFIER string: p1 line: 94
+EQUAL line: 94
+IDENTIFIER string: make_player line: 94
+LEFT_PAREN line: 94
+RIGHT_PAREN line: 94
+SEMICOLON line: 94
+IDENTIFIER string: assert line: 95
+LEFT_PAREN line: 95
+IDENTIFIER string: p1 line: 95
+COLON line: 95
+IDENTIFIER string: move line: 95
+LEFT_PAREN line: 95
+NUMBER Integer: 1 line: 95
+COMMA line: 95
+NUMBER Integer: 0 line: 95
+RIGHT_PAREN line: 95
+DOT line: 95
+IDENTIFIER string: x line: 95
+COMMA line: 95
+NUMBER Integer: 1 line: 95
+COMMA line: 95
+STRING string: Failed method call test 1. line: 95
+RIGHT_PAREN line: 95
+IDENTIFIER string: assert line: 96
+LEFT_PAREN line: 96
+IDENTIFIER string: p1 line: 96
+COLON line: 96
+IDENTIFIER string: move line: 96
+LEFT_PAREN line: 96
+NUMBER Integer: 0 line: 96
+COMMA line: 96
+NUMBER Integer: 3 line: 96
+RIGHT_PAREN line: 96
+DOT line: 96
+IDENTIFIER string: y line: 96
+COMMA line: 96
+NUMBER Integer: 3 line: 96
+COMMA line: 96
+STRING string: Failed method call test 2. line: 96
+RIGHT_PAREN line: 96
+VAR line: 97
+IDENTIFIER string: name line: 97
+EQUAL line: 97
+STRING string: move line: 97
+IDENTIFIER string: assert line: 98
+LEFT_PAREN line: 98
+IDENTIFIER string: p1 line: 98
+LEFT_BRACKET line: 98
+IDENTIFIER string: name line: 98
+RIGHT_BRACKET line: 98
+LEFT_PAREN line: 98
+IDENTIFIER string: p1 line: 98
+COMMA line: 98
+NUMBER Integer: 0 line: 98
+COMMA line: 98
+NUMBER Integer: 3 line: 98
+RIGHT_PAREN line: 98
+DOT line: 98
+IDENTIFIER string: y line: 98
+COMMA line: 98
+NUMBER Integer: 6 line: 98
+COMMA line: 98
+STRING string: Failed method call test 3. line: 98
+RIGHT_PAREN line: 98
+IDENTIFIER string: assert line: 99
+LEFT_PAREN line: 99
+IDENTIFIER string: p1 line: 99
+COLON line: 99
+LEFT_BRACKET line: 99
+IDENTIFIER string: name line: 99
+RIGHT_BRACKET line: 99
+LEFT_PAREN line: 99
+NUMBER Integer: 0 line: 99
+COMMA line: 99
+NUMBER Integer: 0 line: 99
+RIGHT_PAREN line: 99
+DOT line: 99
+IDENTIFIER string: y line: 99
+COMMA line: 99
+NUMBER Integer: 6 line: 99
+COMMA line: 99
+STRING string: Failed method call test 4. line: 99
+RIGHT_PAREN line: 99
+IDENTIFIER string: assert line: 100
+LEFT_PAREN line: 100
+IDENTIFIER string: p1 line: 100
+COLON line: 100
+STRING string: move line: 100
+LEFT_PAREN line: 100
+NUMBER Integer: 0 line: 100
+COMMA line: 100
+NUMBER Integer: 0 line: 100
+RIGHT_PAREN line: 100
+DOT line: 100
+IDENTIFIER string: y line: 100
+COMMA line: 100
+NUMBER Integer: 6 line: 100
+COMMA line: 100
+STRING string: Failed method call test 5. line: 100
+RIGHT_PAREN line: 100
+IDENTIFIER string: assert line: 101
+LEFT_PAREN line: 101
+IDENTIFIER string: p1 line: 101
+LEFT_BRACKET line: 101
+STRING string: move line: 101
+RIGHT_BRACKET line: 101
+LEFT_PAREN line: 101
+IDENTIFIER string: p1 line: 101
+COMMA line: 101
+NUMBER Integer: 0 line: 101
+COMMA line: 101
+NUMBER Integer: 0 line: 101
+RIGHT_PAREN line: 101
+DOT line: 101
+IDENTIFIER string: y line: 101
+COMMA line: 101
+NUMBER Integer: 6 line: 101
+COMMA line: 101
+STRING string: Failed method call test 6. line: 101
+RIGHT_PAREN line: 101
+IDENTIFIER string: assert line: 102
+LEFT_PAREN line: 102
+IDENTIFIER string: p1 line: 102
+COLON line: 102
+LEFT_BRACKET line: 102
+STRING string: move line: 102
+RIGHT_BRACKET line: 102
+LEFT_PAREN line: 102
+NUMBER Integer: 0 line: 102
+COMMA line: 102
+NUMBER Integer: 0 line: 102
+RIGHT_PAREN line: 102
+DOT line: 102
+IDENTIFIER string: y line: 102
+COMMA line: 102
+NUMBER Integer: 6 line: 102
+COMMA line: 102
+STRING string: Failed method call test 7. line: 102
+RIGHT_PAREN line: 102
+IDENTIFIER string: assert line: 103
+LEFT_PAREN line: 103
+IDENTIFIER string: p1 line: 103
+COLON line: 103
+LEFT_BRACKET line: 103
+NUMBER Integer: 1 line: 103
+PLUS line: 103
+NUMBER Integer: 1 line: 103
+RIGHT_BRACKET line: 103
+LEFT_PAREN line: 103
+NUMBER Integer: 0 line: 103
+COMMA line: 103
+NUMBER Integer: 0 line: 103
+RIGHT_PAREN line: 103
+DOT line: 103
+IDENTIFIER string: y line: 103
+COMMA line: 103
+NUMBER Integer: 6 line: 103
+COMMA line: 103
+STRING string: Failed method call test 7. line: 103
+RIGHT_PAREN line: 103
+IDENTIFIER string: assert line: 104
+LEFT_PAREN line: 104
+IDENTIFIER string: p1 line: 104
+COLON line: 104
+LEFT_BRACKET line: 104
+STRING string: mo line: 104
+APPEND line: 104
+STRING string: ve line: 104
+RIGHT_BRACKET line: 104
+LEFT_PAREN line: 104
+NUMBER Integer: 0 line: 104
+COMMA line: 104
+NUMBER Integer: 0 line: 104
+RIGHT_PAREN line: 104
+DOT line: 104
+IDENTIFIER string: y line: 104
+COMMA line: 104
+NUMBER Integer: 6 line: 104
+COMMA line: 104
+STRING string: Failed method call test 7. line: 104
+RIGHT_PAREN line: 104
+RIGHT_BRACE line: 106
+IDENTIFIER string: machine line: 108
+DOT line: 108
+IDENTIFIER string: trim line: 108
+LEFT_PAREN line: 108
+RIGHT_PAREN line: 108
+IF line: 110
+LEFT_PAREN line: 110
+IDENTIFIER string: errors line: 110
+EQUAL_EQUAL line: 110
+NUMBER Integer: 0 line: 110
+RIGHT_PAREN line: 110
+LEFT_BRACE line: 110
+IDENTIFIER string: write_line line: 111
+LEFT_PAREN line: 111
+STRING string: No errors found! :) line: 111
+RIGHT_PAREN line: 111
+RIGHT_BRACE line: 112
+ELSE line: 113
+LEFT_BRACE line: 113
+IDENTIFIER string: write line: 114
+LEFT_PAREN line: 114
+IDENTIFIER string: new_line line: 114
+LEFT_PAREN line: 114
+RIGHT_PAREN line: 114
+RIGHT_PAREN line: 114
+IDENTIFIER string: write_line line: 115
+LEFT_PAREN line: 115
+STRING string: :(  line: 115
+APPEND line: 115
+IDENTIFIER string: errors line: 115
+APPEND line: 115
+STRING string:  errors found! line: 115
+RIGHT_PAREN line: 115
+RIGHT_BRACE line: 116
+IDENTIFIER string: write_line line: 117
+LEFT_PAREN line: 117
+STRING string: -- Finished tests! -- line: 117
+RIGHT_PAREN line: 117
+IDENTIFIER string: write_line line: 118
+LEFT_PAREN line: 118
+STRING string: Elapsed time:  line: 118
+APPEND line: 118
+IDENTIFIER string: start_time line: 118
+COLON line: 118
+IDENTIFIER string: elapsed line: 118
+LEFT_PAREN line: 118
+RIGHT_PAREN line: 118
+APPEND line: 118
+STRING string:  ms line: 118
+RIGHT_PAREN line: 118
+IDENTIFIER string: write_line line: 119
+LEFT_PAREN line: 119
+STRING string: Loaded modules:  line: 119
+APPEND line: 119
+IDENTIFIER string: machine line: 119
+DOT line: 119
+IDENTIFIER string: modules line: 119
+LEFT_PAREN line: 119
+RIGHT_PAREN line: 119
+RIGHT_PAREN line: 119
+IDENTIFIER string: write_line line: 120
+LEFT_PAREN line: 120
+IDENTIFIER string: machine line: 120
+DOT line: 120
+IDENTIFIER string: memory_use line: 120
+LEFT_PAREN line: 120
+RIGHT_PAREN line: 120
+RIGHT_PAREN line: 120
+EOF line: 120

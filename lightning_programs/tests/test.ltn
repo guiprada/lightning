@@ -1,4 +1,5 @@
-﻿write_line("*** Welcome to lightning test suite Zzz :) ***")
+﻿machine.set_debug(true)
+write_line("*** Welcome to lightning test suite Zzz :) ***")
 
 var os_string = get_os()
 var os = "Unknown"
