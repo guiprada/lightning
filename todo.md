@@ -12,6 +12,8 @@ examine overflows in numeric operations
 To be Done
 ----------
 remove DUP and STASH
+require should genenate .out
+eval should generate .out
 separate List and Map
 
 add a make_closure(a_function, a_table_with_values) method to set up "protected" table variables
