@@ -1,5 +1,4 @@
 [PROGRAM
-    [EXPR_STMT [FUNCTION CALL [VARIABLE machine.[IDENTIFIER set_debug]]([LITERAL True])]]
     [EXPR_STMT [FUNCTION CALL [VARIABLE write_line]([LITERAL "*** Welcome to lightning test suite Zzz :) ***"])]]
     [VARIABLE DECLARATION os_string = [FUNCTION CALL [VARIABLE get_os]()]]
     [VARIABLE DECLARATION os = [LITERAL "Unknown"]]

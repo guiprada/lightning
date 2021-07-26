@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 
 using Operand = System.UInt16;
 
@@ -65,12 +66,10 @@ namespace lightning
 
         Stack<VM> vmPool;
         static int functionDeepness;
-        static bool DEBUG;
 
 //////////////////////////////////////////////////// Public
         static VM(){
             VM.functionDeepness = 30;
-            VM.DEBUG = false;
         }
         public VM(Chunk p_chunk)
         {
@@ -149,10 +148,6 @@ namespace lightning
 
         public int CountVMs(){
             return vmPool.Count;
-        }
-
-        public void SetDebug(bool p_value){
-            VM.DEBUG = p_value;
         }
 
         void Reset(){
@@ -285,8 +280,14 @@ namespace lightning
             }
             catch (Exception e)
             {
-                if(VM.DEBUG)
+                using (System.IO.StreamWriter file = new System.IO.StreamWriter(@"_vm.log", false)){
+                    Console.SetOut(file);
                     Console.WriteLine(e);
+                    var standardOutput = new StreamWriter(Console.OpenStandardOutput());
+                    standardOutput.AutoFlush = true;
+                    Console.SetOut(standardOutput);
+                }
+
                 Console.WriteLine("VM Busted ... " + ErrorLocation());
                 System.Environment.Exit(1);
                 return new Unit(UnitType.Null);
@@ -389,8 +390,13 @@ namespace lightning
             }
             catch (Exception e)
             {
-                if(VM.DEBUG)
+                using (System.IO.StreamWriter file = new System.IO.StreamWriter(@"_vm.log", false)){
+                    Console.SetOut(file);
                     Console.WriteLine(e);
+                    var standardOutput = new StreamWriter(Console.OpenStandardOutput());
+                    standardOutput.AutoFlush = true;
+                    Console.SetOut(standardOutput);
+                }
                 Console.WriteLine("VM Busted ... " + ErrorLocation());
                 System.Environment.Exit(1);
                 return new VMResult(VMResultType.ERROR, new Unit(UnitType.Null));
