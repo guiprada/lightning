@@ -7,6 +7,7 @@ rethink typing system
 strong typed dynamic language
 add typing tests
 examine overflows in numeric operations
+method and member function declaration
 
 
 To be Done

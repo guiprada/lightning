@@ -292,412 +292,77 @@ LEFT_PAREN line: 58
 STRING string: tests/try.ltn line: 58
 RIGHT_PAREN line: 58
 LEFT_BRACE line: 61
-VAR line: 62
-IDENTIFIER string: a_table line: 62
-EQUAL line: 62
-LEFT_BRACKET line: 62
-IDENTIFIER string: value line: 63
-COLON line: 63
-NUMBER Integer: 100 line: 63
-COMMA line: 63
-IDENTIFIER string: a_function line: 64
-COLON line: 64
-FUN line: 64
-LEFT_BRACE line: 64
-RETURN line: 64
-NUMBER Integer: 99 line: 64
-RIGHT_BRACE line: 64
-RIGHT_BRACKET line: 65
-IDENTIFIER string: assert line: 66
-LEFT_PAREN line: 66
-IDENTIFIER string: a_table line: 66
-DOT line: 66
-IDENTIFIER string: a_function line: 66
-LEFT_PAREN line: 66
-RIGHT_PAREN line: 66
-COMMA line: 66
-NUMBER Integer: 99 line: 66
-COMMA line: 66
-STRING string: Failed Table Map Access By Literal String 2. line: 66
-RIGHT_PAREN line: 66
 VAR line: 67
-IDENTIFIER string: name line: 67
+IDENTIFIER string: a line: 67
 EQUAL line: 67
-STRING string: a_function line: 67
-IDENTIFIER string: assert line: 68
+FUN line: 67
+RETURN line: 67
+NUMBER Integer: 99 line: 67
+IDENTIFIER string: write_line line: 68
 LEFT_PAREN line: 68
-IDENTIFIER string: a_table line: 68
-LEFT_BRACKET line: 68
-IDENTIFIER string: name line: 68
-RIGHT_BRACKET line: 68
+IDENTIFIER string: a line: 68
 LEFT_PAREN line: 68
 RIGHT_PAREN line: 68
-COMMA line: 68
-NUMBER Integer: 99 line: 68
-COMMA line: 68
-STRING string: Failed Table Map Access By Literal String 3. line: 68
 RIGHT_PAREN line: 68
-IDENTIFIER string: assert line: 69
-LEFT_PAREN line: 69
-IDENTIFIER string: a_table line: 69
-LEFT_BRACKET line: 69
-STRING string: a_function line: 69
-RIGHT_BRACKET line: 69
-LEFT_PAREN line: 69
-RIGHT_PAREN line: 69
-COMMA line: 69
-NUMBER Integer: 99 line: 69
-COMMA line: 69
-STRING string: Failed Table Map Access By Literal String 4. line: 69
-RIGHT_PAREN line: 69
-IDENTIFIER string: assert line: 70
-LEFT_PAREN line: 70
-IDENTIFIER string: a_table line: 70
-LEFT_BRACKET line: 70
-STRING string: a line: 70
-APPEND line: 70
-STRING string: _function line: 70
-RIGHT_BRACKET line: 70
-LEFT_PAREN line: 70
-RIGHT_PAREN line: 70
-COMMA line: 70
-NUMBER Integer: 99 line: 70
-COMMA line: 70
-STRING string: Failed Table Map Access By Literal String 4. line: 70
-RIGHT_PAREN line: 70
-RIGHT_BRACE line: 71
-LEFT_BRACE line: 72
-FUN line: 75
-IDENTIFIER string: make_player line: 75
-LEFT_PAREN line: 75
-RIGHT_PAREN line: 75
+RIGHT_BRACE line: 69
+IDENTIFIER string: machine line: 71
+DOT line: 71
+IDENTIFIER string: trim line: 71
+LEFT_PAREN line: 71
+RIGHT_PAREN line: 71
+IF line: 73
+LEFT_PAREN line: 73
+IDENTIFIER string: errors line: 73
+EQUAL_EQUAL line: 73
+NUMBER Integer: 0 line: 73
+RIGHT_PAREN line: 73
+LEFT_BRACE line: 73
+IDENTIFIER string: write_line line: 74
+LEFT_PAREN line: 74
+STRING string: No errors found! :) line: 74
+RIGHT_PAREN line: 74
+RIGHT_BRACE line: 75
+ELSE line: 76
 LEFT_BRACE line: 76
-VAR line: 77
-IDENTIFIER string: player line: 77
-EQUAL line: 77
-LEFT_BRACKET line: 77
-RIGHT_BRACKET line: 77
-IDENTIFIER string: player line: 78
-DOT line: 78
-IDENTIFIER string: position line: 78
-EQUAL line: 78
-LEFT_BRACKET line: 78
-RIGHT_BRACKET line: 78
-SEMICOLON line: 78
-IDENTIFIER string: player line: 79
-DOT line: 79
-IDENTIFIER string: position line: 79
-LEFT_BRACKET line: 79
-STRING string: x line: 79
-RIGHT_BRACKET line: 79
-EQUAL line: 79
-NUMBER Integer: 0 line: 79
-IDENTIFIER string: player line: 80
-DOT line: 80
-IDENTIFIER string: position line: 80
-LEFT_BRACKET line: 80
-STRING string: y line: 80
-RIGHT_BRACKET line: 80
-EQUAL line: 80
-NUMBER Integer: 0 line: 80
-IDENTIFIER string: player line: 82
-DOT line: 82
-IDENTIFIER string: move line: 82
-EQUAL line: 82
-FUN line: 82
+IDENTIFIER string: write line: 77
+LEFT_PAREN line: 77
+IDENTIFIER string: new_line line: 77
+LEFT_PAREN line: 77
+RIGHT_PAREN line: 77
+RIGHT_PAREN line: 77
+IDENTIFIER string: write_line line: 78
+LEFT_PAREN line: 78
+STRING string: :(  line: 78
+APPEND line: 78
+IDENTIFIER string: errors line: 78
+APPEND line: 78
+STRING string:  errors found! line: 78
+RIGHT_PAREN line: 78
+RIGHT_BRACE line: 79
+IDENTIFIER string: write_line line: 80
+LEFT_PAREN line: 80
+STRING string: -- Finished tests! -- line: 80
+RIGHT_PAREN line: 80
+IDENTIFIER string: write_line line: 81
+LEFT_PAREN line: 81
+STRING string: Elapsed time:  line: 81
+APPEND line: 81
+IDENTIFIER string: start_time line: 81
+COLON line: 81
+IDENTIFIER string: elapsed line: 81
+LEFT_PAREN line: 81
+RIGHT_PAREN line: 81
+APPEND line: 81
+STRING string:  ms line: 81
+RIGHT_PAREN line: 81
+IDENTIFIER string: write_line line: 82
 LEFT_PAREN line: 82
-IDENTIFIER string: self line: 82
-COMMA line: 82
-IDENTIFIER string: x line: 82
-COMMA line: 82
-IDENTIFIER string: y line: 82
+STRING string: Loaded modules:  line: 82
+APPEND line: 82
+IDENTIFIER string: machine line: 82
+DOT line: 82
+IDENTIFIER string: modules line: 82
+LEFT_PAREN line: 82
 RIGHT_PAREN line: 82
-LEFT_BRACE line: 83
-IDENTIFIER string: self line: 84
-DOT line: 84
-IDENTIFIER string: position line: 84
-DOT line: 84
-IDENTIFIER string: x line: 84
-EQUAL line: 84
-IDENTIFIER string: self line: 84
-DOT line: 84
-IDENTIFIER string: position line: 84
-DOT line: 84
-IDENTIFIER string: x line: 84
-PLUS line: 84
-IDENTIFIER string: x line: 84
-SEMICOLON line: 84
-IDENTIFIER string: self line: 85
-DOT line: 85
-IDENTIFIER string: position line: 85
-DOT line: 85
-IDENTIFIER string: y line: 85
-EQUAL line: 85
-IDENTIFIER string: self line: 85
-DOT line: 85
-IDENTIFIER string: position line: 85
-DOT line: 85
-IDENTIFIER string: y line: 85
-PLUS line: 85
-IDENTIFIER string: y line: 85
-SEMICOLON line: 85
-RETURN line: 86
-IDENTIFIER string: self line: 86
-DOT line: 86
-IDENTIFIER string: position line: 86
-RIGHT_BRACE line: 87
-IDENTIFIER string: player line: 88
-LEFT_BRACKET line: 88
-NUMBER Integer: 2 line: 88
-RIGHT_BRACKET line: 88
-EQUAL line: 88
-IDENTIFIER string: player line: 88
-DOT line: 88
-IDENTIFIER string: move line: 88
-RETURN line: 90
-IDENTIFIER string: player line: 90
-RIGHT_BRACE line: 91
-VAR line: 93
-IDENTIFIER string: p1 line: 93
-EQUAL line: 93
-IDENTIFIER string: make_player line: 93
-LEFT_PAREN line: 93
-RIGHT_PAREN line: 93
-SEMICOLON line: 93
-IDENTIFIER string: assert line: 94
-LEFT_PAREN line: 94
-IDENTIFIER string: p1 line: 94
-COLON line: 94
-IDENTIFIER string: move line: 94
-LEFT_PAREN line: 94
-NUMBER Integer: 1 line: 94
-COMMA line: 94
-NUMBER Integer: 0 line: 94
-RIGHT_PAREN line: 94
-DOT line: 94
-IDENTIFIER string: x line: 94
-COMMA line: 94
-NUMBER Integer: 1 line: 94
-COMMA line: 94
-STRING string: Failed method call test 1. line: 94
-RIGHT_PAREN line: 94
-IDENTIFIER string: assert line: 95
-LEFT_PAREN line: 95
-IDENTIFIER string: p1 line: 95
-COLON line: 95
-IDENTIFIER string: move line: 95
-LEFT_PAREN line: 95
-NUMBER Integer: 0 line: 95
-COMMA line: 95
-NUMBER Integer: 3 line: 95
-RIGHT_PAREN line: 95
-DOT line: 95
-IDENTIFIER string: y line: 95
-COMMA line: 95
-NUMBER Integer: 3 line: 95
-COMMA line: 95
-STRING string: Failed method call test 2. line: 95
-RIGHT_PAREN line: 95
-VAR line: 96
-IDENTIFIER string: name line: 96
-EQUAL line: 96
-STRING string: move line: 96
-IDENTIFIER string: assert line: 97
-LEFT_PAREN line: 97
-IDENTIFIER string: p1 line: 97
-LEFT_BRACKET line: 97
-IDENTIFIER string: name line: 97
-RIGHT_BRACKET line: 97
-LEFT_PAREN line: 97
-IDENTIFIER string: p1 line: 97
-COMMA line: 97
-NUMBER Integer: 0 line: 97
-COMMA line: 97
-NUMBER Integer: 3 line: 97
-RIGHT_PAREN line: 97
-DOT line: 97
-IDENTIFIER string: y line: 97
-COMMA line: 97
-NUMBER Integer: 6 line: 97
-COMMA line: 97
-STRING string: Failed method call test 3. line: 97
-RIGHT_PAREN line: 97
-IDENTIFIER string: assert line: 98
-LEFT_PAREN line: 98
-IDENTIFIER string: p1 line: 98
-COLON line: 98
-LEFT_BRACKET line: 98
-IDENTIFIER string: name line: 98
-RIGHT_BRACKET line: 98
-LEFT_PAREN line: 98
-NUMBER Integer: 0 line: 98
-COMMA line: 98
-NUMBER Integer: 0 line: 98
-RIGHT_PAREN line: 98
-DOT line: 98
-IDENTIFIER string: y line: 98
-COMMA line: 98
-NUMBER Integer: 6 line: 98
-COMMA line: 98
-STRING string: Failed method call test 4. line: 98
-RIGHT_PAREN line: 98
-IDENTIFIER string: assert line: 99
-LEFT_PAREN line: 99
-IDENTIFIER string: p1 line: 99
-COLON line: 99
-STRING string: move line: 99
-LEFT_PAREN line: 99
-NUMBER Integer: 0 line: 99
-COMMA line: 99
-NUMBER Integer: 0 line: 99
-RIGHT_PAREN line: 99
-DOT line: 99
-IDENTIFIER string: y line: 99
-COMMA line: 99
-NUMBER Integer: 6 line: 99
-COMMA line: 99
-STRING string: Failed method call test 5. line: 99
-RIGHT_PAREN line: 99
-IDENTIFIER string: assert line: 100
-LEFT_PAREN line: 100
-IDENTIFIER string: p1 line: 100
-LEFT_BRACKET line: 100
-STRING string: move line: 100
-RIGHT_BRACKET line: 100
-LEFT_PAREN line: 100
-IDENTIFIER string: p1 line: 100
-COMMA line: 100
-NUMBER Integer: 0 line: 100
-COMMA line: 100
-NUMBER Integer: 0 line: 100
-RIGHT_PAREN line: 100
-DOT line: 100
-IDENTIFIER string: y line: 100
-COMMA line: 100
-NUMBER Integer: 6 line: 100
-COMMA line: 100
-STRING string: Failed method call test 6. line: 100
-RIGHT_PAREN line: 100
-IDENTIFIER string: assert line: 101
-LEFT_PAREN line: 101
-IDENTIFIER string: p1 line: 101
-COLON line: 101
-LEFT_BRACKET line: 101
-STRING string: move line: 101
-RIGHT_BRACKET line: 101
-LEFT_PAREN line: 101
-NUMBER Integer: 0 line: 101
-COMMA line: 101
-NUMBER Integer: 0 line: 101
-RIGHT_PAREN line: 101
-DOT line: 101
-IDENTIFIER string: y line: 101
-COMMA line: 101
-NUMBER Integer: 6 line: 101
-COMMA line: 101
-STRING string: Failed method call test 7. line: 101
-RIGHT_PAREN line: 101
-IDENTIFIER string: assert line: 102
-LEFT_PAREN line: 102
-IDENTIFIER string: p1 line: 102
-COLON line: 102
-LEFT_BRACKET line: 102
-NUMBER Integer: 1 line: 102
-PLUS line: 102
-NUMBER Integer: 1 line: 102
-RIGHT_BRACKET line: 102
-LEFT_PAREN line: 102
-NUMBER Integer: 0 line: 102
-COMMA line: 102
-NUMBER Integer: 0 line: 102
-RIGHT_PAREN line: 102
-DOT line: 102
-IDENTIFIER string: y line: 102
-COMMA line: 102
-NUMBER Integer: 6 line: 102
-COMMA line: 102
-STRING string: Failed method call test 7. line: 102
-RIGHT_PAREN line: 102
-IDENTIFIER string: assert line: 103
-LEFT_PAREN line: 103
-IDENTIFIER string: p1 line: 103
-COLON line: 103
-LEFT_BRACKET line: 103
-STRING string: mo line: 103
-APPEND line: 103
-STRING string: ve line: 103
-RIGHT_BRACKET line: 103
-LEFT_PAREN line: 103
-NUMBER Integer: 0 line: 103
-COMMA line: 103
-NUMBER Integer: 0 line: 103
-RIGHT_PAREN line: 103
-DOT line: 103
-IDENTIFIER string: y line: 103
-COMMA line: 103
-NUMBER Integer: 6 line: 103
-COMMA line: 103
-STRING string: Failed method call test 7. line: 103
-RIGHT_PAREN line: 103
-RIGHT_BRACE line: 105
-IDENTIFIER string: machine line: 107
-DOT line: 107
-IDENTIFIER string: trim line: 107
-LEFT_PAREN line: 107
-RIGHT_PAREN line: 107
-IF line: 109
-LEFT_PAREN line: 109
-IDENTIFIER string: errors line: 109
-EQUAL_EQUAL line: 109
-NUMBER Integer: 0 line: 109
-RIGHT_PAREN line: 109
-LEFT_BRACE line: 109
-IDENTIFIER string: write_line line: 110
-LEFT_PAREN line: 110
-STRING string: No errors found! :) line: 110
-RIGHT_PAREN line: 110
-RIGHT_BRACE line: 111
-ELSE line: 112
-LEFT_BRACE line: 112
-IDENTIFIER string: write line: 113
-LEFT_PAREN line: 113
-IDENTIFIER string: new_line line: 113
-LEFT_PAREN line: 113
-RIGHT_PAREN line: 113
-RIGHT_PAREN line: 113
-IDENTIFIER string: write_line line: 114
-LEFT_PAREN line: 114
-STRING string: :(  line: 114
-APPEND line: 114
-IDENTIFIER string: errors line: 114
-APPEND line: 114
-STRING string:  errors found! line: 114
-RIGHT_PAREN line: 114
-RIGHT_BRACE line: 115
-IDENTIFIER string: write_line line: 116
-LEFT_PAREN line: 116
-STRING string: -- Finished tests! -- line: 116
-RIGHT_PAREN line: 116
-IDENTIFIER string: write_line line: 117
-LEFT_PAREN line: 117
-STRING string: Elapsed time:  line: 117
-APPEND line: 117
-IDENTIFIER string: start_time line: 117
-COLON line: 117
-IDENTIFIER string: elapsed line: 117
-LEFT_PAREN line: 117
-RIGHT_PAREN line: 117
-APPEND line: 117
-STRING string:  ms line: 117
-RIGHT_PAREN line: 117
-IDENTIFIER string: write_line line: 118
-LEFT_PAREN line: 118
-STRING string: Loaded modules:  line: 118
-APPEND line: 118
-IDENTIFIER string: machine line: 118
-DOT line: 118
-IDENTIFIER string: modules line: 118
-LEFT_PAREN line: 118
-RIGHT_PAREN line: 118
-RIGHT_PAREN line: 118
-EOF line: 119
+RIGHT_PAREN line: 82
+EOF line: 83

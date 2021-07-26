@@ -200,7 +200,13 @@ var assert_not = assert_counter.assert_not
     // Test Table Map Access by literal string
     var a_table = [
         value: 100,
+        a_function: \{return 99}
     ]
-    assert(a_table["value"], 100, "Failed Table Map Access By Literal String 1.")
+    assert(a_table.a_function(), 99, "Failed Table Map Access By Literal String 2." )
+    var name = "a_function"
+    assert(a_table[name](), 99, "Failed Table Map Access By Literal String 3." )
+    assert(a_table["a_function"](), 99, "Failed Table Map Access By Literal String 4." )
+    assert(a_table["a" .. "_function"](), 99, "Failed Table Map Access By Literal String 5." )
+    assert(a_table["value"], 100, "Failed Table Map Access By Literal String 6.")
 }
 return assert_counter.get_error_counter()

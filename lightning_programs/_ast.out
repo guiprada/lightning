@@ -55,42 +55,11 @@
     [EXPR_STMT [ASSIGMENT_OP errors += [FUNCTION CALL [VARIABLE require]([LITERAL "tests/anonymous_call.ltn"])]]]
     [EXPR_STMT [ASSIGMENT_OP errors += [FUNCTION CALL [VARIABLE require]([LITERAL "tests/try.ltn"])]]]
     [BLOCK
-        [VARIABLE DECLARATION a_table = [LIST [LITERAL "value"] : [LITERAL 100], [LITERAL "a_function"] : 
+        [VARIABLE DECLARATION a = 
             [FUNCTION EXPRESSION ()
                 [RETURN [LITERAL 99]]
             ]]
-        [EXPR_STMT [FUNCTION CALL [VARIABLE assert]([FUNCTION CALL [VARIABLE a_table.[IDENTIFIER a_function]]()][LITERAL 99], [LITERAL "Failed Table Map Access By Literal String 2."], )]]
-        [VARIABLE DECLARATION name = [LITERAL "a_function"]]
-        [EXPR_STMT [FUNCTION CALL [VARIABLE assert]([FUNCTION CALL [VARIABLE a_table[[VAR_EXPRESSION ]]]()][LITERAL 99], [LITERAL "Failed Table Map Access By Literal String 3."], )]]
-        [EXPR_STMT [FUNCTION CALL [VARIABLE assert]([FUNCTION CALL [VARIABLE a_table[[VAR_EXPRESSION ]]]()][LITERAL 99], [LITERAL "Failed Table Map Access By Literal String 4."], )]]
-        [EXPR_STMT [FUNCTION CALL [VARIABLE assert]([FUNCTION CALL [VARIABLE a_table[[VAR_EXPRESSION ]]]()][LITERAL 99], [LITERAL "Failed Table Map Access By Literal String 4."], )]]
-    ]
-    [BLOCK
-        [FUNCTION DECLARATION make_player ()
-            [VARIABLE DECLARATION player = [LIST ]
-            [EXPR_STMT [ASSIGMENT player = [LIST ]]
-            [EXPR_STMT [ASSIGMENT player = [LITERAL 0]]]
-            [EXPR_STMT [ASSIGMENT player = [LITERAL 0]]]
-            [EXPR_STMT [ASSIGMENT player = 
-                [FUNCTION EXPRESSION (self, x, y)
-                    [EXPR_STMT [ASSIGMENT self = [BINARY [VARIABLE self.[IDENTIFIER position].[IDENTIFIER x]] + [VARIABLE x]]]]
-                    [EXPR_STMT [ASSIGMENT self = [BINARY [VARIABLE self.[IDENTIFIER position].[IDENTIFIER y]] + [VARIABLE y]]]]
-                    [RETURN [VARIABLE self.[IDENTIFIER position]]]
-                ]]]
-            [EXPR_STMT [ASSIGMENT player = [VARIABLE player.[IDENTIFIER move]]]]
-            [RETURN [VARIABLE player]]
-        ]
-        [VARIABLE DECLARATION p1 = [FUNCTION CALL [VARIABLE make_player]()]]
-        [EXPR_STMT [FUNCTION CALL [VARIABLE assert]([FUNCTION CALL [VARIABLE p1:[METHOD move]]([LITERAL 1][LITERAL 0], ).indexedAccess([IDENTIFIER x])][LITERAL 1], [LITERAL "Failed method call test 1."], )]]
-        [EXPR_STMT [FUNCTION CALL [VARIABLE assert]([FUNCTION CALL [VARIABLE p1:[METHOD move]]([LITERAL 0][LITERAL 3], ).indexedAccess([IDENTIFIER y])][LITERAL 3], [LITERAL "Failed method call test 2."], )]]
-        [VARIABLE DECLARATION name = [LITERAL "move"]]
-        [EXPR_STMT [FUNCTION CALL [VARIABLE assert]([FUNCTION CALL [VARIABLE p1[[VAR_EXPRESSION ]]]([VARIABLE p1][LITERAL 0], [LITERAL 3], ).indexedAccess([IDENTIFIER y])][LITERAL 6], [LITERAL "Failed method call test 3."], )]]
-        [EXPR_STMT [FUNCTION CALL [VARIABLE assert]([FUNCTION CALL [VARIABLE p1:[METHOD ]]([LITERAL 0][LITERAL 0], ).indexedAccess([IDENTIFIER y])][LITERAL 6], [LITERAL "Failed method call test 4."], )]]
-        [EXPR_STMT [FUNCTION CALL [VARIABLE assert]([FUNCTION CALL [VARIABLE p1:[METHOD move]]([LITERAL 0][LITERAL 0], ).indexedAccess([IDENTIFIER y])][LITERAL 6], [LITERAL "Failed method call test 5."], )]]
-        [EXPR_STMT [FUNCTION CALL [VARIABLE assert]([FUNCTION CALL [VARIABLE p1[[VAR_EXPRESSION ]]]([VARIABLE p1][LITERAL 0], [LITERAL 0], ).indexedAccess([IDENTIFIER y])][LITERAL 6], [LITERAL "Failed method call test 6."], )]]
-        [EXPR_STMT [FUNCTION CALL [VARIABLE assert]([FUNCTION CALL [VARIABLE p1:[METHOD ]]([LITERAL 0][LITERAL 0], ).indexedAccess([IDENTIFIER y])][LITERAL 6], [LITERAL "Failed method call test 7."], )]]
-        [EXPR_STMT [FUNCTION CALL [VARIABLE assert]([FUNCTION CALL [VARIABLE p1:[METHOD ]]([LITERAL 0][LITERAL 0], ).indexedAccess([IDENTIFIER y])][LITERAL 6], [LITERAL "Failed method call test 7."], )]]
-        [EXPR_STMT [FUNCTION CALL [VARIABLE assert]([FUNCTION CALL [VARIABLE p1:[METHOD ]]([LITERAL 0][LITERAL 0], ).indexedAccess([IDENTIFIER y])][LITERAL 6], [LITERAL "Failed method call test 7."], )]]
+        [EXPR_STMT [FUNCTION CALL [VARIABLE write_line]([FUNCTION CALL [VARIABLE a]()])]]
     ]
     [EXPR_STMT [FUNCTION CALL [VARIABLE machine.[IDENTIFIER trim]]()]]
     [IF [BINARY [VARIABLE errors] == [LITERAL 0]]

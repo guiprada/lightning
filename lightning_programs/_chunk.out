@@ -45,121 +45,24 @@ Constant: 42 "tests/char.ltn"
 Constant: 43 "tests/integers.ltn"
 Constant: 44 "tests/anonymous_call.ltn"
 Constant: 45 "tests/try.ltn"
-Constant: 46 "value"
-Constant: 47 100
-Constant: 48 "a_function"
-Constant: 49 fun lambda0:main  (0)
+Constant: 46 fun lambda0:main  (0)
 OPEN_ENV
 RETURN_SET 3
-LOAD_CONSTANT 50
+LOAD_CONSTANT 47
 RETURN
 CLOSE_FUNCTION
 
-Constant: 50 99
-Constant: 51 "Failed Table Map Access By Literal String 2."
-Constant: 52 "Failed Table Map Access By Literal String 3."
-Constant: 53 "Failed Table Map Access By Literal String 4."
-Constant: 54 "a"
-Constant: 55 "_function"
-Constant: 56 fun make_player:main  (0)
-OPEN_ENV
-RETURN_SET 34
-NEW_TABLE 0 0
-DECLARE_VARIABLE
-NEW_TABLE 0 0
-LOAD_VARIABLE 0 0
-LOAD_CONSTANT 57
-TABLE_SET 1 0
-POP
-LOAD_CONSTANT 15
-LOAD_VARIABLE 0 0
-LOAD_CONSTANT 57
-LOAD_CONSTANT 58
-TABLE_SET 2 0
-POP
-LOAD_CONSTANT 15
-LOAD_VARIABLE 0 0
-LOAD_CONSTANT 57
-LOAD_CONSTANT 59
-TABLE_SET 2 0
-POP
-DECLARE_FUNCTION 0 1 60
-LOAD_VARIABLE 0 0
-LOAD_CONSTANT 61
-TABLE_SET 1 0
-POP
-LOAD_VARIABLE 0 0
-LOAD_CONSTANT 61
-TABLE_GET 1
-LOAD_VARIABLE 0 0
-LOAD_CONSTANT 62
-TABLE_SET 1 0
-POP
-LOAD_VARIABLE 0 0
-RETURN
-CLOSE_FUNCTION
-
-Constant: 57 "position"
-Constant: 58 "x"
-Constant: 59 "y"
-Constant: 60 fun lambda1:main  (3)
-OPEN_ENV
-RETURN_SET 30
-DECLARE_VARIABLE
-DECLARE_VARIABLE
-DECLARE_VARIABLE
-LOAD_VARIABLE 0 0
-LOAD_CONSTANT 57
-LOAD_CONSTANT 58
-TABLE_GET 2
-LOAD_VARIABLE 1 0
-ADD
-LOAD_VARIABLE 0 0
-LOAD_CONSTANT 57
-LOAD_CONSTANT 58
-TABLE_SET 2 0
-POP
-LOAD_VARIABLE 0 0
-LOAD_CONSTANT 57
-LOAD_CONSTANT 59
-TABLE_GET 2
-LOAD_VARIABLE 2 0
-ADD
-LOAD_VARIABLE 0 0
-LOAD_CONSTANT 57
-LOAD_CONSTANT 59
-TABLE_SET 2 0
-POP
-LOAD_VARIABLE 0 0
-LOAD_CONSTANT 57
-TABLE_GET 1
-RETURN
-CLOSE_FUNCTION
-
-Constant: 61 "move"
-Constant: 62 2
-Constant: 63 "Failed method call test 1."
-Constant: 64 1
-Constant: 65 "Failed method call test 2."
-Constant: 66 3
-Constant: 67 "Failed method call test 3."
-Constant: 68 6
-Constant: 69 "Failed method call test 4."
-Constant: 70 "Failed method call test 5."
-Constant: 71 "Failed method call test 6."
-Constant: 72 "Failed method call test 7."
-Constant: 73 "mo"
-Constant: 74 "ve"
-Constant: 75 "trim"
-Constant: 76 "No errors found! :)"
-Constant: 77 ":( "
-Constant: 78 " errors found!"
-Constant: 79 "-- Finished tests! --"
-Constant: 80 "Elapsed time: "
-Constant: 81 "elapsed"
-Constant: 82 " ms"
-Constant: 83 "Loaded modules: "
-Constant: 84 "modules"
+Constant: 47 99
+Constant: 48 "trim"
+Constant: 49 "No errors found! :)"
+Constant: 50 ":( "
+Constant: 51 " errors found!"
+Constant: 52 "-- Finished tests! --"
+Constant: 53 "Elapsed time: "
+Constant: 54 "elapsed"
+Constant: 55 " ms"
+Constant: 56 "Loaded modules: "
+Constant: 57 "modules"
 
 ------------------- CHUNK:
 0: LOAD_CONSTANT 0 on line:  1
@@ -403,270 +306,72 @@ Constant: 84 "modules"
 238: ASSIGN_GLOBAL 39 1 on line:  58
 239: POP on line:  58
 240: OPEN_ENV on line:  61
-241: LOAD_CONSTANT 46 on line:  63
-242: LOAD_CONSTANT 47 on line:  63
-243: LOAD_CONSTANT 48 on line:  64
-244: DECLARE_FUNCTION 0 1 49 on line:  64
-245: NEW_TABLE 0 2 on line:  62
-246: DECLARE_VARIABLE on line:  62
-247: LOAD_CONSTANT 51 on line:  66
-248: LOAD_CONSTANT 50 on line:  66
-249: LOAD_VARIABLE 0 0 on line:  66
-250: LOAD_CONSTANT 48 on line:  66
-251: TABLE_GET 1 on line:  66
-252: CALL on line:  66
-253: LOAD_GLOBAL 35 on line:  66
-254: CALL on line:  66
-255: POP on line:  66
-256: LOAD_CONSTANT 48 on line:  67
-257: DECLARE_VARIABLE on line:  67
-258: LOAD_CONSTANT 52 on line:  68
-259: LOAD_CONSTANT 50 on line:  68
-260: LOAD_VARIABLE 0 0 on line:  68
-261: LOAD_VARIABLE 1 0 on line:  68
-262: TABLE_GET 1 on line:  68
-263: CALL on line:  68
-264: LOAD_GLOBAL 35 on line:  68
-265: CALL on line:  68
-266: POP on line:  68
-267: LOAD_CONSTANT 53 on line:  69
-268: LOAD_CONSTANT 50 on line:  69
-269: LOAD_VARIABLE 0 0 on line:  69
-270: LOAD_CONSTANT 48 on line:  69
-271: TABLE_GET 1 on line:  69
-272: CALL on line:  69
-273: LOAD_GLOBAL 35 on line:  69
-274: CALL on line:  69
-275: POP on line:  69
-276: LOAD_CONSTANT 53 on line:  70
-277: LOAD_CONSTANT 50 on line:  70
-278: LOAD_VARIABLE 0 0 on line:  70
-279: LOAD_CONSTANT 54 on line:  70
-280: LOAD_CONSTANT 55 on line:  70
-281: APPEND on line:  70
-282: TABLE_GET 1 on line:  70
-283: CALL on line:  70
-284: LOAD_GLOBAL 35 on line:  70
-285: CALL on line:  70
-286: POP on line:  70
-287: CLOSE_ENV on line:  61
-288: OPEN_ENV on line:  72
-289: DECLARE_FUNCTION 1 0 56 on line:  75
-290: LOAD_VARIABLE 0 0 on line:  93
-291: CALL on line:  93
-292: DECLARE_VARIABLE on line:  93
-293: LOAD_CONSTANT 63 on line:  94
-294: LOAD_CONSTANT 64 on line:  94
-295: LOAD_CONSTANT 15 on line:  94
-296: LOAD_CONSTANT 64 on line:  94
-297: LOAD_VARIABLE 1 0 on line:  94
-298: DUP on line:  94
-299: PUSH_STASH on line:  94
-300: TABLE_GET 0 on line:  94
-301: POP_STASH on line:  94
-302: LOAD_CONSTANT 61 on line:  94
-303: TABLE_GET 1 on line:  94
-304: CALL on line:  94
-305: LOAD_CONSTANT 58 on line:  94
-306: TABLE_GET 1 on line:  94
-307: LOAD_GLOBAL 35 on line:  94
-308: CALL on line:  94
-309: POP on line:  94
-310: LOAD_CONSTANT 65 on line:  95
-311: LOAD_CONSTANT 66 on line:  95
-312: LOAD_CONSTANT 66 on line:  95
-313: LOAD_CONSTANT 15 on line:  95
-314: LOAD_VARIABLE 1 0 on line:  95
-315: DUP on line:  95
-316: PUSH_STASH on line:  95
-317: TABLE_GET 0 on line:  95
-318: POP_STASH on line:  95
-319: LOAD_CONSTANT 61 on line:  95
-320: TABLE_GET 1 on line:  95
-321: CALL on line:  95
-322: LOAD_CONSTANT 59 on line:  95
-323: TABLE_GET 1 on line:  95
-324: LOAD_GLOBAL 35 on line:  95
-325: CALL on line:  95
-326: POP on line:  95
-327: LOAD_CONSTANT 61 on line:  96
-328: DECLARE_VARIABLE on line:  96
-329: LOAD_CONSTANT 67 on line:  97
-330: LOAD_CONSTANT 68 on line:  97
-331: LOAD_CONSTANT 66 on line:  97
-332: LOAD_CONSTANT 15 on line:  97
-333: LOAD_VARIABLE 1 0 on line:  97
-334: LOAD_VARIABLE 1 0 on line:  97
-335: LOAD_VARIABLE 2 0 on line:  97
-336: TABLE_GET 1 on line:  97
-337: CALL on line:  97
-338: LOAD_CONSTANT 59 on line:  97
-339: TABLE_GET 1 on line:  97
-340: LOAD_GLOBAL 35 on line:  97
-341: CALL on line:  97
-342: POP on line:  97
-343: LOAD_CONSTANT 69 on line:  98
-344: LOAD_CONSTANT 68 on line:  98
-345: LOAD_CONSTANT 15 on line:  98
-346: LOAD_CONSTANT 15 on line:  98
-347: LOAD_VARIABLE 1 0 on line:  98
-348: DUP on line:  98
-349: PUSH_STASH on line:  98
-350: TABLE_GET 0 on line:  98
-351: POP_STASH on line:  98
-352: LOAD_VARIABLE 2 0 on line:  98
-353: TABLE_GET 1 on line:  98
-354: CALL on line:  98
-355: LOAD_CONSTANT 59 on line:  98
-356: TABLE_GET 1 on line:  98
-357: LOAD_GLOBAL 35 on line:  98
-358: CALL on line:  98
-359: POP on line:  98
-360: LOAD_CONSTANT 70 on line:  99
-361: LOAD_CONSTANT 68 on line:  99
-362: LOAD_CONSTANT 15 on line:  99
-363: LOAD_CONSTANT 15 on line:  99
-364: LOAD_VARIABLE 1 0 on line:  99
-365: DUP on line:  99
-366: PUSH_STASH on line:  99
-367: TABLE_GET 0 on line:  99
-368: POP_STASH on line:  99
-369: LOAD_CONSTANT 61 on line:  99
-370: TABLE_GET 1 on line:  99
-371: CALL on line:  99
-372: LOAD_CONSTANT 59 on line:  99
-373: TABLE_GET 1 on line:  99
-374: LOAD_GLOBAL 35 on line:  99
-375: CALL on line:  99
-376: POP on line:  99
-377: LOAD_CONSTANT 71 on line:  100
-378: LOAD_CONSTANT 68 on line:  100
-379: LOAD_CONSTANT 15 on line:  100
-380: LOAD_CONSTANT 15 on line:  100
-381: LOAD_VARIABLE 1 0 on line:  100
-382: LOAD_VARIABLE 1 0 on line:  100
-383: LOAD_CONSTANT 61 on line:  100
-384: TABLE_GET 1 on line:  100
-385: CALL on line:  100
-386: LOAD_CONSTANT 59 on line:  100
-387: TABLE_GET 1 on line:  100
-388: LOAD_GLOBAL 35 on line:  100
-389: CALL on line:  100
-390: POP on line:  100
-391: LOAD_CONSTANT 72 on line:  101
-392: LOAD_CONSTANT 68 on line:  101
-393: LOAD_CONSTANT 15 on line:  101
-394: LOAD_CONSTANT 15 on line:  101
-395: LOAD_VARIABLE 1 0 on line:  101
-396: DUP on line:  101
-397: PUSH_STASH on line:  101
-398: TABLE_GET 0 on line:  101
-399: POP_STASH on line:  101
-400: LOAD_CONSTANT 61 on line:  101
-401: TABLE_GET 1 on line:  101
-402: CALL on line:  101
-403: LOAD_CONSTANT 59 on line:  101
-404: TABLE_GET 1 on line:  101
-405: LOAD_GLOBAL 35 on line:  101
-406: CALL on line:  101
-407: POP on line:  101
-408: LOAD_CONSTANT 72 on line:  102
-409: LOAD_CONSTANT 68 on line:  102
-410: LOAD_CONSTANT 15 on line:  102
-411: LOAD_CONSTANT 15 on line:  102
-412: LOAD_VARIABLE 1 0 on line:  102
-413: DUP on line:  102
-414: PUSH_STASH on line:  102
-415: TABLE_GET 0 on line:  102
-416: POP_STASH on line:  102
-417: LOAD_CONSTANT 64 on line:  102
-418: LOAD_CONSTANT 64 on line:  102
-419: ADD on line:  102
-420: TABLE_GET 1 on line:  102
-421: CALL on line:  102
-422: LOAD_CONSTANT 59 on line:  102
-423: TABLE_GET 1 on line:  102
-424: LOAD_GLOBAL 35 on line:  102
-425: CALL on line:  102
-426: POP on line:  102
-427: LOAD_CONSTANT 72 on line:  103
-428: LOAD_CONSTANT 68 on line:  103
-429: LOAD_CONSTANT 15 on line:  103
-430: LOAD_CONSTANT 15 on line:  103
-431: LOAD_VARIABLE 1 0 on line:  103
-432: DUP on line:  103
-433: PUSH_STASH on line:  103
-434: TABLE_GET 0 on line:  103
-435: POP_STASH on line:  103
-436: LOAD_CONSTANT 73 on line:  103
-437: LOAD_CONSTANT 74 on line:  103
-438: APPEND on line:  103
-439: TABLE_GET 1 on line:  103
-440: CALL on line:  103
-441: LOAD_CONSTANT 59 on line:  103
-442: TABLE_GET 1 on line:  103
-443: LOAD_GLOBAL 35 on line:  103
-444: CALL on line:  103
-445: POP on line:  103
-446: CLOSE_ENV on line:  72
-447: LOAD_GLOBAL 21 on line:  107
-448: LOAD_CONSTANT 75 on line:  107
-449: TABLE_GET 1 on line:  107
-450: CALL on line:  107
-451: POP on line:  107
-452: LOAD_GLOBAL 39 on line:  109
-453: LOAD_CONSTANT 15 on line:  109
-454: EQUALS on line:  109
-455: JUMP_IF_NOT_TRUE 8 on line:  109
-456: OPEN_ENV on line:  109
-457: LOAD_CONSTANT 76 on line:  110
-458: LOAD_GLOBAL 3 on line:  110
-459: CALL on line:  110
-460: POP on line:  110
-461: CLOSE_ENV on line:  109
-462: JUMP 16 on line:  109
-463: OPEN_ENV on line:  112
-464: LOAD_GLOBAL 20 on line:  113
-465: CALL on line:  113
-466: LOAD_GLOBAL 4 on line:  113
-467: CALL on line:  113
-468: POP on line:  113
-469: LOAD_CONSTANT 77 on line:  114
-470: LOAD_GLOBAL 39 on line:  114
-471: APPEND on line:  114
-472: LOAD_CONSTANT 78 on line:  114
-473: APPEND on line:  114
-474: LOAD_GLOBAL 3 on line:  114
-475: CALL on line:  114
-476: POP on line:  114
-477: CLOSE_ENV on line:  112
-478: LOAD_CONSTANT 79 on line:  116
-479: LOAD_GLOBAL 3 on line:  116
-480: CALL on line:  116
-481: POP on line:  116
-482: LOAD_CONSTANT 80 on line:  117
-483: LOAD_GLOBAL 32 on line:  117
-484: DUP on line:  117
-485: PUSH_STASH on line:  117
-486: TABLE_GET 0 on line:  117
-487: POP_STASH on line:  117
-488: LOAD_CONSTANT 81 on line:  117
-489: TABLE_GET 1 on line:  117
-490: CALL on line:  117
-491: APPEND on line:  117
-492: LOAD_CONSTANT 82 on line:  117
-493: APPEND on line:  117
-494: LOAD_GLOBAL 3 on line:  117
-495: CALL on line:  117
-496: POP on line:  117
-497: LOAD_CONSTANT 83 on line:  118
-498: LOAD_GLOBAL 21 on line:  118
-499: LOAD_CONSTANT 84 on line:  118
-500: TABLE_GET 1 on line:  118
-501: CALL on line:  118
-502: APPEND on line:  118
-503: LOAD_GLOBAL 3 on line:  118
-504: CALL on line:  118
-505: POP on line:  118
-506: EXIT on line:  118
+241: DECLARE_FUNCTION 0 1 46 on line:  67
+242: DECLARE_VARIABLE on line:  67
+243: LOAD_VARIABLE 0 0 on line:  68
+244: CALL on line:  68
+245: LOAD_GLOBAL 3 on line:  68
+246: CALL on line:  68
+247: POP on line:  68
+248: CLOSE_ENV on line:  61
+249: LOAD_GLOBAL 21 on line:  71
+250: LOAD_CONSTANT 48 on line:  71
+251: TABLE_GET 1 on line:  71
+252: CALL on line:  71
+253: POP on line:  71
+254: LOAD_GLOBAL 39 on line:  73
+255: LOAD_CONSTANT 15 on line:  73
+256: EQUALS on line:  73
+257: JUMP_IF_NOT_TRUE 8 on line:  73
+258: OPEN_ENV on line:  73
+259: LOAD_CONSTANT 49 on line:  74
+260: LOAD_GLOBAL 3 on line:  74
+261: CALL on line:  74
+262: POP on line:  74
+263: CLOSE_ENV on line:  73
+264: JUMP 16 on line:  73
+265: OPEN_ENV on line:  76
+266: LOAD_GLOBAL 20 on line:  77
+267: CALL on line:  77
+268: LOAD_GLOBAL 4 on line:  77
+269: CALL on line:  77
+270: POP on line:  77
+271: LOAD_CONSTANT 50 on line:  78
+272: LOAD_GLOBAL 39 on line:  78
+273: APPEND on line:  78
+274: LOAD_CONSTANT 51 on line:  78
+275: APPEND on line:  78
+276: LOAD_GLOBAL 3 on line:  78
+277: CALL on line:  78
+278: POP on line:  78
+279: CLOSE_ENV on line:  76
+280: LOAD_CONSTANT 52 on line:  80
+281: LOAD_GLOBAL 3 on line:  80
+282: CALL on line:  80
+283: POP on line:  80
+284: LOAD_CONSTANT 53 on line:  81
+285: LOAD_GLOBAL 32 on line:  81
+286: DUP on line:  81
+287: PUSH_STASH on line:  81
+288: TABLE_GET 0 on line:  81
+289: POP_STASH on line:  81
+290: LOAD_CONSTANT 54 on line:  81
+291: TABLE_GET 1 on line:  81
+292: CALL on line:  81
+293: APPEND on line:  81
+294: LOAD_CONSTANT 55 on line:  81
+295: APPEND on line:  81
+296: LOAD_GLOBAL 3 on line:  81
+297: CALL on line:  81
+298: POP on line:  81
+299: LOAD_CONSTANT 56 on line:  82
+300: LOAD_GLOBAL 21 on line:  82
+301: LOAD_CONSTANT 57 on line:  82
+302: TABLE_GET 1 on line:  82
+303: CALL on line:  82
+304: APPEND on line:  82
+305: LOAD_GLOBAL 3 on line:  82
+306: CALL on line:  82
+307: POP on line:  82
+308: EXIT on line:  82
 
