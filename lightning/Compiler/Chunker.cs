@@ -450,7 +450,7 @@ namespace lightning
             }
         }
         private void LoadIndex(VariableNode p_node){
-            if(p_node.IsExpression)
+            if(p_node.IsAnonymous)
                 ChunkIt(p_node.Expression);
             else{
                 Operand string_address = (Operand)AddConstant(p_node.Name);
@@ -611,7 +611,7 @@ namespace lightning
 
             // the first call, we need to decode the function name, or object
             Variable this_call;
-            if(p_node.Variable.IsExpression)
+            if(p_node.Variable.IsAnonymous)
                 this_call = new Variable(p_node.Variable.Expression);
             else{
                 Nullable<Variable> maybe_call = GetVar(p_node.Variable.Name, p_node.Line);

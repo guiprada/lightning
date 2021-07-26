@@ -268,7 +268,7 @@ namespace lightning
                 Console.Write("[METHOD " + p_node.Name);
             else if (p_node.AccessType == VarAccessType.DOTTED)
                 Console.Write("[IDENTIFIER " + p_node.Name);
-            else if (p_node.IsExpression)
+            else if (p_node.IsAnonymous)
                 Console.Write("[VAR_EXPRESSION " + p_node.Name);
             else
                 Console.Write("[VARIABLE " + p_node.Name);
