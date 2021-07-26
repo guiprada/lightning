@@ -631,11 +631,12 @@ namespace lightning
 
             if (p_node.Variable.Indexes.Count == 0)
                 LoadVariable(this_call, p_node.Line);
-            else{// it is a compoundCall/method/IndexedAccess
-                // is it a method?
+            else{// it is a compoundCall/method/IndexedAccess!
                 if ((p_node.Variable.Indexes[p_node.Variable.Indexes.Count - 1] as VariableNode).AccessType == VarAccessType.METHOD)
-                {// it is a method so we push the table again, to be used as parameter
+                {// is it a method!
                     LoadVariable(this_call, p_node.Line);
+                    Add(OpCode.DUP, p_node.Line);// it is a method so we push the table again, to be used as parameter!
+                    Add(OpCode.PUSH_STASH, p_node.Line);
 
                     for (int i = 0; i < p_node.Variable.Indexes.Count - 1; i++)
                     {
@@ -643,9 +644,11 @@ namespace lightning
                     }
 
                     Add(OpCode.TABLE_GET, (Operand)(p_node.Variable.Indexes.Count - 1), p_node.Line);
+                    Add(OpCode.POP_STASH, p_node.Line);
+                }else{
+                    LoadVariable(this_call, p_node.Line);
                 }
 
-                LoadVariable(this_call, p_node.Line);
                 LoadIndexes(p_node.Variable);
                 Add(OpCode.TABLE_GET, (Operand)p_node.Variable.Indexes.Count, p_node.Line);
             }

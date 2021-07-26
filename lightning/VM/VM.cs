@@ -420,6 +420,10 @@ namespace lightning
                         IP++;
                         stack.Pop();
                         break;
+                    case OpCode.DUP:
+                        IP++;
+                        stack.Push(stack.Peek());
+                        break;
                     case OpCode.LOAD_CONSTANT:
                         IP++;
                         stack.Push(constants[instruction.opA]);

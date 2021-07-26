@@ -77,6 +77,7 @@ namespace lightning
                 case OpCode.EXIT:
                 case OpCode.LOAD_NIL:
                 case OpCode.POP:
+                case OpCode.DUP:
                 case OpCode.PUSH_STASH:
                 case OpCode.POP_STASH:
                 case OpCode.CALL:
@@ -140,6 +141,7 @@ namespace lightning
         TABLE_SET,
 
         POP,
+        DUP,
         PUSH_STASH,
         POP_STASH,
 
