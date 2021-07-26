@@ -62,9 +62,6 @@ namespace lightning
                 case NodeType.FUNCTION_CALL:
                     PrintFunctionCall(p_node as FunctionCallNode);
                     break;
-                case NodeType.ANONYMOUS_METHOD_CALL:
-                    PrintAnonymousMethodCall(p_node as AnonymousMethodCallNode);
-                    break;
                 case NodeType.RETURN:
                     PrintReturn(p_node as ReturnNode);
                     break;
@@ -271,6 +268,8 @@ namespace lightning
                 Console.Write("[METHOD " + p_node.Name);
             else if (p_node.AccessType == VarAccessType.DOTTED)
                 Console.Write("[IDENTIFIER " + p_node.Name);
+            else if (p_node.IsExpression)
+                Console.Write("[VAR_EXPRESSION " + p_node.Name);
             else
                 Console.Write("[VARIABLE " + p_node.Name);
 
@@ -387,41 +386,6 @@ namespace lightning
                     Console.Write(")");
                 }
                 counter++;
-            }
-            Console.Write("]");
-        }
-
-        private void PrintAnonymousMethodCall(AnonymousMethodCallNode p_node)
-        {
-            Console.Write("[ANONYMOUS METHOD CALL ");
-            Print(p_node.Variable);
-
-            int counter = 0;
-            if(p_node.FunctionCall.Type == NodeType.FUNCTION_CALL){
-                FunctionCallNode this_function_call_node = (FunctionCallNode)p_node.FunctionCall;
-                foreach (List<Node> arguments in this_function_call_node.Calls){
-                    Console.Write("(");
-                    bool is_first = true;
-                    foreach (Node n in arguments){
-                        if (is_first){
-                            Print(n);
-                            is_first = false;
-                        }else{
-                            Print(n);
-                            Console.Write(", ");
-                        }
-                    }
-                    Console.Write(")");
-                    if(this_function_call_node.IndexedAccess[counter] != null){
-                        Console.Write(".indexedAccess(");
-                        foreach(Node n in this_function_call_node.IndexedAccess[counter].Indexes)
-                            Print(n);
-                        Console.Write(")");
-                    }
-                    counter++;
-                }
-            }else if(p_node.FunctionCall.Type == NodeType.FUNCTION_CALL){
-                Print(p_node.FunctionCall);
             }
             Console.Write("]");
         }

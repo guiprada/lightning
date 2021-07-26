@@ -34,7 +34,6 @@ namespace lightning
 
         BLOCK,
         FUNCTION_CALL,
-        ANONYMOUS_METHOD_CALL,
         FUNCTION_DECLARATION,
         FUNCTION_EXPRESSION,
 
@@ -346,18 +345,6 @@ namespace lightning
             : base(NodeType.BLOCK, p_Line)
         {
             Statements = p_Statements;
-        }
-    }
-
-    public class AnonymousMethodCallNode : Node{
-        public Node FunctionCall { get; private set; }
-        public VariableNode Variable { get; private set; }
-
-        public AnonymousMethodCallNode(Node p_FunctionCall, VariableNode p_Variable, int p_Line)
-            : base (NodeType.ANONYMOUS_METHOD_CALL, p_Line)
-        {
-            FunctionCall = p_FunctionCall;
-            Variable = p_Variable;
         }
     }
 

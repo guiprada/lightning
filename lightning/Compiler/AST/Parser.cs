@@ -667,7 +667,7 @@ namespace lightning
                     p_node.Line);
 
                 function_call_node = CallTail(function_call_node);
-                return new AnonymousMethodCallNode(function_call_node, variable_node, p_node.Line);
+                return function_call_node;
             }
             Error("Expected ':' after anonymous function call.");
             return p_node;
