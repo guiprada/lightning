@@ -19,7 +19,8 @@ namespace lightning
         {
             UpValue,
             Global,
-            Local
+            Local,
+            Expression,
         }
 
         struct Variable
@@ -27,13 +28,24 @@ namespace lightning
             public string name;
             public int address;
             public int envIndex;
+            public Node expression;
             public ValueType type;
             public Variable(string p_name, int p_address, int p_envIndex, ValueType p_type)
             {
                 name = p_name;
                 address = p_address;
                 envIndex = p_envIndex;
+                expression = null;
                 type = p_type;
+            }
+
+            public Variable(Node p_expression)
+            {
+                name = null;
+                address = -1;
+                envIndex = -1;
+                expression = p_expression;
+                type = ValueType.Expression;
             }
         }
 
@@ -434,6 +446,9 @@ namespace lightning
                 case ValueType.UpValue:
                     int this_index = upvalueStack.Peek().IndexOf(p_variable);
                     Add(OpCode.LOAD_UPVALUE, (Operand)this_index, line);
+                    break;
+                case ValueType.Expression:
+                    ChunkIt(p_variable.expression);
                     break;
             }
         }
