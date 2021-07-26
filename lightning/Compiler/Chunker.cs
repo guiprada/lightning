@@ -453,7 +453,7 @@ namespace lightning
 
         private void ChunkVariable(VariableNode p_node)
         {
-            Nullable<Variable> maybe_var = GetVar(p_node.Name);
+            Nullable<Variable> maybe_var = GetVar(p_node.Name, p_node.Line);
             if (maybe_var.HasValue){
                 Variable this_var = maybe_var.Value;
                 LoadVariable(this_var, p_node.Line);
@@ -462,10 +462,7 @@ namespace lightning
                     LoadIndexes(p_node);
                     Add(OpCode.TABLE_GET, (Operand)p_node.Indexes.Count, p_node.Line);
                 }
-            }else{
-                Error("Variable " + p_node.Name + " not found!", p_node.Line);
             }
-
         }
 
         private void ChunkVarDeclaration(VarDeclarationNode p_node)
@@ -489,7 +486,7 @@ namespace lightning
         private void Chunkassignment(AssignmentNode p_node)
         {
             ChunkIt(p_node.Value);
-            Nullable<Variable> maybe_var = GetVar(p_node.Assigned.Name);
+            Nullable<Variable> maybe_var = GetVar(p_node.Assigned.Name, p_node.Line);
             Operand op = (Operand)AssignmentOperatorType.ASSIGN;
             if (maybe_var.HasValue){
                 Variable this_var = maybe_var.Value;
@@ -520,7 +517,7 @@ namespace lightning
         private void ChunkassignmentOp(AssignmentOpNode p_node)
         {
             ChunkIt(p_node.Value);
-            Nullable<Variable> maybe_var = GetVar(p_node.Assigned.Name);
+            Nullable<Variable> maybe_var = GetVar(p_node.Assigned.Name, p_node.Line);
 
             Operand op = (Operand) p_node.Op;
 
@@ -607,7 +604,7 @@ namespace lightning
                 ChunkIt(p_node.Calls[0][i]);
 
             // the first call, we need to decode the function name
-            Nullable<Variable> maybe_call = GetVar(p_node.Variable.Name);
+            Nullable<Variable> maybe_call = GetVar(p_node.Variable.Name, p_node.Line);
 
             if (maybe_call.HasValue){
                 Variable this_call = maybe_call.Value;
@@ -776,7 +773,7 @@ namespace lightning
 
         //////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-        private Nullable<Variable> GetVar(string p_name)
+        private Nullable<Variable> GetVar(string p_name, int line)
         {
             int top_index = env.Count - 1;
             for (int i = top_index; i >= 0; i--){
@@ -796,10 +793,11 @@ namespace lightning
                     if (isGlobal && globals.Contains(p_name)){// Sanity check
                         return new Variable(p_name, this_env.IndexOf(p_name), 0, ValueType.Global);
                     }
-                    Console.WriteLine("Var finding gone mad!");
+                    Error("Var finding gone mad! Variable: " + p_name + " not found!", line);
                     return null;
                 }
             }
+            Error("Variable: " + p_name + " not found!", line);
             return null;
         }
 
