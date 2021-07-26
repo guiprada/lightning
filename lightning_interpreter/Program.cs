@@ -55,16 +55,16 @@ namespace interpreter
                 }
                 return 0;
             }
-            {
-                string output = "";
+
+            using (System.IO.StreamWriter file = new System.IO.StreamWriter(@"_tokens.out", false)){
+                Console.SetOut(file);
                 foreach (Token token in scanner.Tokens)
                 {
-                    output += token.ToString() + Environment.NewLine;
+                    Console.WriteLine(token.ToString());
                 }
-                using (System.IO.StreamWriter file = new System.IO.StreamWriter(@"_tokens.out", false))
-                {
-                    file.Write(output);
-                }
+                var standardOutput = new StreamWriter(Console.OpenStandardOutput());
+                standardOutput.AutoFlush = true;
+                Console.SetOut(standardOutput);
             }
 
 //////////////////////////////////////////////////////// AST
@@ -77,9 +77,10 @@ namespace interpreter
                     Console.WriteLine(error);
                 }
             }
-            if(parser.HasParsed == false)
+            if(parser.HasParsed == false){
+                Console.WriteLine("Parsing had Errors, check _parser.log!");
                 return  0;
-
+            }
             PrettyPrinter astPrinter = new PrettyPrinter();
             using (System.IO.StreamWriter file = new System.IO.StreamWriter(@"_ast.out", false)){
                 Console.SetOut(file);
@@ -104,7 +105,6 @@ namespace interpreter
             }
             if (code_generator.HasChunked == true)
             {
-
                 using (System.IO.StreamWriter file = new System.IO.StreamWriter(@"_chunk.out", false)){
                     Console.SetOut(file);
                     chunk.Print();
@@ -124,12 +124,11 @@ namespace interpreter
             {
                 if (code_generator.Errors.Count > 0)
                 {
-                    Console.WriteLine("Code generation had errors:");
-                    foreach (string error in code_generator.Errors)
-                        Console.WriteLine(error);
+                    Console.WriteLine("Code generation had errors, check _chunker.log");
                     return 0;
                 }
             }
+
             //ValFunction my_func = chunk.GetFunction("append");
             //List<HeapUnit> stack = new List<HeapUnit>();
             //stack.Add(new ValString("hello"));

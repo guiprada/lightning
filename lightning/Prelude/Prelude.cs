@@ -701,6 +701,15 @@ namespace lightning
             functions.Add(new IntrinsicUnit("require", Require, 1));
 
             //////////////////////////////////////////////////////
+            // start a new _try.log file
+            using (System.IO.StreamWriter file = new System.IO.StreamWriter(@"_try.log", false)){
+                Console.SetOut(file);
+                Console.WriteLine("------------------- try log:");
+                var standardOutput = new StreamWriter(Console.OpenStandardOutput());
+                standardOutput.AutoFlush = true;
+                Console.SetOut(standardOutput);
+            }
+
             Unit Try(VM p_vm)
             {
                 Unit this_callable = p_vm.GetUnit(0);
@@ -710,8 +719,14 @@ namespace lightning
                     try_vm.CallFunction(this_callable, this_arguments.Elements);
                     p_vm.RecycleVM(try_vm);
                     return new Unit(true);
-                }catch{//(Exception e){
-                    // return new Unit(e.ToString());
+                }catch(Exception e){
+                    using (System.IO.StreamWriter file = new System.IO.StreamWriter(@"_try.log", true)){
+                        Console.SetOut(file);
+                        Console.WriteLine(e);
+                        var standardOutput = new StreamWriter(Console.OpenStandardOutput());
+                        standardOutput.AutoFlush = true;
+                        Console.SetOut(standardOutput);
+                    }
                     p_vm.RecycleVM(try_vm);
                     return new Unit(false);
                 }
