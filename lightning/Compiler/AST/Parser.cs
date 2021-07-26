@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 
 #if DOUBLE
     using Float = System.Double;
@@ -43,21 +44,18 @@ namespace lightning
                         if(Errors.Count == 0)
                             hasParsed = true;
                     }
-#if DEBUG
                     catch (Exception e)
                     {
-
-                        Console.WriteLine(e);
+                        using (System.IO.StreamWriter file = new System.IO.StreamWriter(@"_parser.log", false)){
+                            Console.SetOut(file);
+                            Console.WriteLine(e);
+                            var standardOutput = new StreamWriter(Console.OpenStandardOutput());
+                            standardOutput.AutoFlush = true;
+                            Console.SetOut(standardOutput);
+                        }
                         foreach(string error in Errors)
                             Console.WriteLine(error);
                     }
-#else
-                    catch
-                    {
-                        foreach(string error in Errors)
-                            Console.WriteLine(error);
-                    }
-#endif
                 }
                 return ast;
             }

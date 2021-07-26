@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 
 using Operand = System.UInt16;
 
@@ -74,20 +75,18 @@ namespace lightning
                         ChunkIt(ast);
                         HasChunked = true;
                     }
-#if DEBUG
                     catch (Exception e)
                     {
-                        Console.WriteLine(e);
+                        using (System.IO.StreamWriter file = new System.IO.StreamWriter(@"_chunker.log", false)){
+                            Console.SetOut(file);
+                            Console.WriteLine(e);
+                            var standardOutput = new StreamWriter(Console.OpenStandardOutput());
+                            standardOutput.AutoFlush = true;
+                            Console.SetOut(standardOutput);
+                        }
                         foreach(string error in Errors)
                         Console.WriteLine(error);
                     }
-#else
-                    catch
-                    {
-                        foreach(string error in Errors)
-                        Console.WriteLine(error);
-                    }
-#endif
                 }
                 return chunk;
             }
