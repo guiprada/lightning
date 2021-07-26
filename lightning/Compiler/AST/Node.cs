@@ -272,10 +272,11 @@ namespace lightning
             AccessType = p_AccessType;
             IsExpression = false;
         }
-        public VariableNode(Node p_Expression, VarAccessType p_AccessType, int p_Line)
+        public VariableNode(Node p_Expression, List<Node> p_Indexes, VarAccessType p_AccessType, int p_Line)
             : base(NodeType.VARIABLE, p_Line)
         {
             Expression = p_Expression;
+            Indexes = p_Indexes;
             AccessType = p_AccessType;
             IsExpression = true;
         }
@@ -350,14 +351,12 @@ namespace lightning
 
     public class AnonymousMethodCallNode : Node{
         public Node FunctionCall { get; private set; }
-        public VarDeclarationNode Declaration { get; private set; }
         public VariableNode Variable { get; private set; }
 
-        public AnonymousMethodCallNode(Node p_FunctionCall, VarDeclarationNode p_Declaration, VariableNode p_Variable, int p_Line)
+        public AnonymousMethodCallNode(Node p_FunctionCall, VariableNode p_Variable, int p_Line)
             : base (NodeType.ANONYMOUS_METHOD_CALL, p_Line)
         {
             FunctionCall = p_FunctionCall;
-            Declaration = p_Declaration;
             Variable = p_Variable;
         }
     }

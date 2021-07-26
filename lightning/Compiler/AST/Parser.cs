@@ -127,7 +127,7 @@ namespace lightning
             {
                 if (Match(TokenType.LEFT_BRACKET))
                 {
-                    VariableNode index = new VariableNode(Expression(), VarAccessType.PLAIN, Previous().Line);
+                    VariableNode index = new VariableNode(Expression(), new List<Node>(), VarAccessType.PLAIN, Previous().Line);
                     indexes.Add(index);
 
                     Consume(TokenType.RIGHT_BRACKET, "Expected ']' after 'compoundVar identifier'", true);
@@ -644,7 +644,7 @@ namespace lightning
                     VariableNode index = new VariableNode(this_name, new List<Node>(), VarAccessType.METHOD, Previous().Line);
                     (p_node as VariableNode).Indexes.Add(index);
                 }else if (Match(TokenType.LEFT_BRACKET)) {
-                    VariableNode index = new VariableNode(Expression(), VarAccessType.METHOD, Previous().Line);
+                    VariableNode index = new VariableNode(Expression(), new List<Node>(), VarAccessType.METHOD, Previous().Line);
                     (p_node as VariableNode).Indexes.Add(index);
                     Consume(TokenType.RIGHT_BRACKET, "Expected ']' after 'Method Access'", true);
                 }
@@ -655,10 +655,7 @@ namespace lightning
         Node AnonymousCall(Node p_node){
             if(Check(TokenType.COLON))
             {
-                string name = string.Format(@"*_{0}.txt", Guid.NewGuid());
-
-                VarDeclarationNode declaration_node = new VarDeclarationNode(name, p_node, p_node.Line);
-                VariableNode variable_node = new VariableNode(name, new List<Node>(), VarAccessType.PLAIN, p_node.Line);
+                VariableNode variable_node = new VariableNode(p_node, new List<Node>(), VarAccessType.PLAIN, p_node.Line);
                 variable_node = (VariableNode)MethodAccess(variable_node);
 
                 List<List<Node>> calls = new List<List<Node>>();
@@ -670,7 +667,7 @@ namespace lightning
                     p_node.Line);
 
                 function_call_node = CallTail(function_call_node);
-                return new AnonymousMethodCallNode(function_call_node, declaration_node, variable_node, p_node.Line);
+                return new AnonymousMethodCallNode(function_call_node, variable_node, p_node.Line);
             }
             Error("Expected ':' after anonymous function call.");
             return p_node;

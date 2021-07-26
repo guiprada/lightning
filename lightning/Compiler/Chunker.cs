@@ -608,7 +608,6 @@ namespace lightning
 
         private void ChunkAnonymousMethodCall(AnonymousMethodCallNode p_node)
         {
-            ChunkIt(p_node.Declaration);
             ChunkIt(p_node.FunctionCall);
         }
 
@@ -618,61 +617,65 @@ namespace lightning
             for(int i=p_node.Calls[0].Count-1; i>=0; i--)
                 ChunkIt(p_node.Calls[0][i]);
 
-            // the first call, we need to decode the function name
-            Nullable<Variable> maybe_call = GetVar(p_node.Variable.Name, p_node.Line);
+            // the first call, we need to decode the function name, or object
+            Variable this_call;
+            if(p_node.Variable.IsExpression)
+                this_call = new Variable(p_node.Variable.Expression);
+            else{
+                Nullable<Variable> maybe_call = GetVar(p_node.Variable.Name, p_node.Line);
+                if (maybe_call.HasValue)
+                    this_call = maybe_call.Value;
+                else
+                    return;
+            }
 
-            if (maybe_call.HasValue){
-                Variable this_call = maybe_call.Value;
-
-                if (p_node.Variable.Indexes.Count == 0)
+            if (p_node.Variable.Indexes.Count == 0)
+                LoadVariable(this_call, p_node.Line);
+            else{// it is a compoundCall/method/IndexedAccess
+                // is it a method?
+                if ((p_node.Variable.Indexes[p_node.Variable.Indexes.Count - 1] as VariableNode).AccessType == VarAccessType.METHOD)
+                {// it is a method so we push the table again, to be used as parameter
                     LoadVariable(this_call, p_node.Line);
-                else{// it is a compoundCall/method/IndexedAccess
-                    // is it a method?
-                    if ((p_node.Variable.Indexes[p_node.Variable.Indexes.Count - 1] as VariableNode).AccessType == VarAccessType.METHOD)
-                    {// it is a method so we push the table again, to be used as parameter
-                        LoadVariable(this_call, p_node.Line);
 
-                        for (int i = 0; i < p_node.Variable.Indexes.Count - 1; i++)
-                        {
-                            LoadIndex((VariableNode)p_node.Variable.Indexes[i]);
-                        }
-
-                        Add(OpCode.TABLE_GET, (Operand)(p_node.Variable.Indexes.Count - 1), p_node.Line);
-                    }
-
-                    LoadVariable(this_call, p_node.Line);
-                    LoadIndexes(p_node.Variable);
-                    Add(OpCode.TABLE_GET, (Operand)p_node.Variable.Indexes.Count, p_node.Line);
-                }
-
-                // Call
-                Add(OpCode.CALL, p_node.Line);
-                // Does it have IndexedAccess?
-                if (p_node.IndexedAccess[0] != null)
-                {
-                    LoadIndexes(p_node.IndexedAccess[0]);
-                    Add(OpCode.TABLE_GET, (Operand)p_node.IndexedAccess[0].Indexes.Count, p_node.Line);
-                }
-
-                // Is it a compound call?
-                for (int i = 1; i < p_node.Calls.Count; i++)
-                {
-                    Add(OpCode.PUSH_STASH, p_node.Line);
-
-                    for(int j=p_node.Calls[i].Count-1; j>=0; j--)
-                        ChunkIt(p_node.Calls[i][j]);
-
-                    Add(OpCode.POP_STASH, p_node.Line);
-                    Add(OpCode.CALL, p_node.Line);
-
-                    if (p_node.IndexedAccess[i] != null)
+                    for (int i = 0; i < p_node.Variable.Indexes.Count - 1; i++)
                     {
-                        LoadIndexes(p_node.IndexedAccess[i]);
-                        Add(OpCode.TABLE_GET, (Operand)p_node.IndexedAccess[i].Indexes.Count, p_node.Line);
+                        LoadIndex((VariableNode)p_node.Variable.Indexes[i]);
                     }
+
+                    Add(OpCode.TABLE_GET, (Operand)(p_node.Variable.Indexes.Count - 1), p_node.Line);
                 }
-            }else
-                Error("Tried to call unkown function!", p_node.Line);
+
+                LoadVariable(this_call, p_node.Line);
+                LoadIndexes(p_node.Variable);
+                Add(OpCode.TABLE_GET, (Operand)p_node.Variable.Indexes.Count, p_node.Line);
+            }
+
+            // Call
+            Add(OpCode.CALL, p_node.Line);
+            // Does it have IndexedAccess?
+            if (p_node.IndexedAccess[0] != null)
+            {
+                LoadIndexes(p_node.IndexedAccess[0]);
+                Add(OpCode.TABLE_GET, (Operand)p_node.IndexedAccess[0].Indexes.Count, p_node.Line);
+            }
+
+            // Is it a compound call?
+            for (int i = 1; i < p_node.Calls.Count; i++)
+            {
+                Add(OpCode.PUSH_STASH, p_node.Line);
+
+                for(int j=p_node.Calls[i].Count-1; j>=0; j--)
+                    ChunkIt(p_node.Calls[i][j]);
+
+                Add(OpCode.POP_STASH, p_node.Line);
+                Add(OpCode.CALL, p_node.Line);
+
+                if (p_node.IndexedAccess[i] != null)
+                {
+                    LoadIndexes(p_node.IndexedAccess[i]);
+                    Add(OpCode.TABLE_GET, (Operand)p_node.IndexedAccess[i].Indexes.Count, p_node.Line);
+                }
+            }
         }
 
         private void ChunkReturn(ReturnNode p_node)
