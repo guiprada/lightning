@@ -73,19 +73,32 @@ namespace lightning
                     try
                     {
                         ChunkIt(ast);
-                        HasChunked = true;
+                        PrintErrors();
+                        if (Errors.Count > 0){
+                            return null;
+                        }else{
+                            HasChunked = true;
+                            using (System.IO.StreamWriter file = new System.IO.StreamWriter(moduleName + ".chunk", false)){
+                                Console.SetOut(file);
+                                chunk.Print();
+                                var standardOutput = new StreamWriter(Console.OpenStandardOutput());
+                                standardOutput.AutoFlush = true;
+                                Console.SetOut(standardOutput);
+                            }
+                        }
                     }
                     catch (Exception e)
                     {
-                        using (System.IO.StreamWriter file = new System.IO.StreamWriter(@"_chunker.log", false)){
+                        using (System.IO.StreamWriter file = new System.IO.StreamWriter(moduleName + "_chunker.log", false)){
+                            Console.WriteLine("Chunking broke the runtime, check " + moduleName + "_chunker.log!");
                             Console.SetOut(file);
                             Console.WriteLine(e);
                             var standardOutput = new StreamWriter(Console.OpenStandardOutput());
                             standardOutput.AutoFlush = true;
                             Console.SetOut(standardOutput);
                         }
-                        foreach(string error in Errors)
-                        Console.WriteLine(error);
+                        PrintErrors();
+                        return null;
                     }
                 }
                 return chunk;
@@ -120,6 +133,12 @@ namespace lightning
                 SetGlobalVar(entry.Key);
 
             }
+        }
+
+        private void PrintErrors(){
+            if(Errors.Count > 0)
+                foreach(string error in Errors)
+                    Console.WriteLine(error);
         }
 
         private void ChunkIt(Node p_node)

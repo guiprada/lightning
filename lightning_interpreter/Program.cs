@@ -56,25 +56,8 @@ namespace interpreter
 
             Chunker chunker = new Chunker(program, name, Prelude.GetPrelude());
             Chunk chunk = chunker.Chunk;
-            if(chunker.Errors.Count > 0)
-            {
-                Console.WriteLine("\nCompiling had errors!");
-                foreach(string e in chunker.Errors)
-                {
-                    Console.WriteLine(e);
-                }
-                return 0;
-            }
             if (chunker.HasChunked == true)
             {
-                using (System.IO.StreamWriter file = new System.IO.StreamWriter(@"_chunk.out", false)){
-                    Console.SetOut(file);
-                    chunk.Print();
-                    var standardOutput = new StreamWriter(Console.OpenStandardOutput());
-                    standardOutput.AutoFlush = true;
-                    Console.SetOut(standardOutput);
-                }
-
                 VM vm = new VM(chunk);
                 VMResult result = vm.ProtectedRun();
                 if (result.status != VMResultType.OK)
