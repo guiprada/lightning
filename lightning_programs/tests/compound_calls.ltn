@@ -45,7 +45,7 @@ var assert_not = assert_counter.assert_not
     var null_func = function(){}
     var result = 0
     null_func()
-    (result++)
+    result++
     assert(result, 1, "Failed Grouping after function call Test.")
 }
 return assert_counter.get_error_counter()

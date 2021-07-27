@@ -25,6 +25,7 @@ namespace lightning
 		}
 
         private List<Token> tokens;
+        private string moduleName;
         private bool hasParsed;
         public bool HasParsed { get { return hasParsed;} }
         private Node ast;
@@ -41,38 +42,68 @@ namespace lightning
                     try
                     {
                         Parse();
-                        if(Errors.Count == 0)
+                        PrintWarnings();
+                        PrintErrors();
+                        if(Errors.Count > 0)
+                            return null;
+                        else{
                             hasParsed = true;
-                    }
-                    catch (Exception e)
-                    {
-                        using (System.IO.StreamWriter file = new System.IO.StreamWriter(@"_parser.log", false)){
+                            PrettyPrinter astPrinter = new PrettyPrinter();
+                            using (System.IO.StreamWriter file = new System.IO.StreamWriter(moduleName + ".ast", false)){
+                                Console.SetOut(file);
+                                astPrinter.Print(ParsedTree);
+                                var standardOutput = new StreamWriter(Console.OpenStandardOutput());
+                                standardOutput.AutoFlush = true;
+                                Console.SetOut(standardOutput);
+                            }
+                        }
+                    }catch (Exception e){
+                        using (System.IO.StreamWriter file = new System.IO.StreamWriter(moduleName + "_parser.log", false)){
+                            Console.WriteLine("Parsing broke the runtime, check _parser.log!");
                             Console.SetOut(file);
                             Console.WriteLine(e);
                             var standardOutput = new StreamWriter(Console.OpenStandardOutput());
                             standardOutput.AutoFlush = true;
                             Console.SetOut(standardOutput);
                         }
-                        foreach(string error in Errors)
-                            Console.WriteLine(error);
+                        PrintWarnings();
+                        PrintErrors();
+                        return null;
                     }
                 }
                 return ast;
             }
         }
 
-        public Parser(List<Token> p_tokens)
+        public Parser(List<Token> p_tokens, string p_moduleName)
         {
             tokens = p_tokens;
+            moduleName = p_moduleName;
             hasParsed = false;
             Errors = new List<string>();
             Warnings = new List<string>();
             current = 0;
         }
 
-        void Parse()
+        private void Parse()
         {
             ast = Program();
+        }
+
+        private void PrintWarnings(){
+            if (Warnings.Count > 0){
+                Console.WriteLine("Parsing had Warnings:");
+                foreach (string warning in Warnings)
+                    Console.WriteLine(warning);
+            }
+        }
+
+        private void PrintErrors(){
+            if (Errors.Count > 0){
+                Console.WriteLine("Parsing had Errors:");
+                foreach (string error in Errors)
+                    Console.WriteLine(error);
+            }
         }
 
         //////////////////////////////////////////////////////////////////////

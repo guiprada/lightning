@@ -42,6 +42,7 @@ namespace lightning
         private int current;
         private List<Token> tokens;
         private bool hasScanned;
+        public bool HasScanned { get{ return hasScanned; } }
         private List<string> errors;
         public List<string> Errors { get{ return errors; } }
         public List<Token> Tokens{
@@ -49,33 +50,33 @@ namespace lightning
             {
                 if (hasScanned == false)
                 {
-                    ScanTokens();
-                    if (errors.Count > 0)
-                    {
-                        Console.WriteLine("Scanning had errors on module: " + moduleName);
-                        foreach(string error in errors)
-                            Console.WriteLine(error);
-
+                    try{
+                        ScanTokens();
+                        PrintErrors();
+                        if (errors.Count > 0){
+                            return null;
+                        }else{
+                            hasScanned = true;
+                            using (System.IO.StreamWriter file = new System.IO.StreamWriter(moduleName + ".tokens", false)){
+                                Console.SetOut(file);
+                                foreach (Token token in tokens)
+                                    Console.WriteLine(token.ToString());
+                                var standardOutput = new StreamWriter(Console.OpenStandardOutput());
+                                standardOutput.AutoFlush = true;
+                                Console.SetOut(standardOutput);
+                            }
+                        }
+                    }catch (Exception e){
                         using (System.IO.StreamWriter file = new System.IO.StreamWriter(moduleName + "_scanner.log", false)){
+                            Console.WriteLine("Scanning broke the runtime, check _scanner.log!");
                             Console.SetOut(file);
-                            foreach(string error in errors)
-                                Console.WriteLine(error);
-
+                            Console.WriteLine(e);
                             var standardOutput = new StreamWriter(Console.OpenStandardOutput());
                             standardOutput.AutoFlush = true;
                             Console.SetOut(standardOutput);
                         }
+                        PrintErrors();
                         return null;
-                    }else{
-                        using (System.IO.StreamWriter file = new System.IO.StreamWriter(moduleName + ".tokens", false)){
-                            Console.SetOut(file);
-                            foreach (Token token in tokens)
-                                Console.WriteLine(token.ToString());
-                            var standardOutput = new StreamWriter(Console.OpenStandardOutput());
-                            standardOutput.AutoFlush = true;
-                            Console.SetOut(standardOutput);
-                        }
-                        hasScanned = true;
                     }
                 }
                 return tokens;
@@ -90,6 +91,12 @@ namespace lightning
             line = 1;
             start = 0;
             current = 0;
+        }
+
+        private void PrintErrors(){
+            Console.WriteLine("Scanning had errors on module: " + moduleName);
+                foreach(string error in errors)
+                    Console.WriteLine(error);
         }
 
         private List<Token> ScanTokens()
@@ -120,11 +127,11 @@ namespace lightning
                     // Ignore whitespace.
                     break;
                 case '\n':
+                    line++;
                     while (IsWhiteSpace(Peek()) )
                         Advance();
                     if(Peek() == '(')
                         Error("Parentheses can not be used in the beggining of a line!");
-                    line++;
                     break;
                 case '(': tokens.Add(new Token(TokenType.LEFT_PAREN, line)); break;
                 case ')': tokens.Add(new Token(TokenType.RIGHT_PAREN, line)); break;

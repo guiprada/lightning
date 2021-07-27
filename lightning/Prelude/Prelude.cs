@@ -606,30 +606,24 @@ namespace lightning
                 string eval_name = eval_code.GetHashCode().ToString();
 
                 Scanner scanner = new Scanner(eval_code, eval_name);
+                List<Token> tokens = scanner.Tokens;
+                if(scanner.HasScanned == false){ new Unit(UnitType.Null); }
 
-                Parser parser = new Parser(scanner.Tokens);
-                if (parser.Errors.Count > 0)
-                {
-                    Console.WriteLine("Parsing had errors:");
-                    foreach (string error in parser.Errors)
-                    {
-                        Console.WriteLine(error);
-                    }
-                    return new Unit(UnitType.Null);
-                }
+                Parser parser = new Parser(tokens, eval_name);
 
                 Node program = parser.ParsedTree;
+                if(parser.HasParsed == false){ new Unit(UnitType.Null); }
 
-                Chunker code_generator = new Chunker(program, eval_name, p_vm.Prelude);
-                Chunk chunk = code_generator.Chunk;
-                if (code_generator.Errors.Count > 0)
+                Chunker chunker = new Chunker(program, eval_name, p_vm.Prelude);
+                Chunk chunk = chunker.Chunk;
+                if (chunker.Errors.Count > 0)
                 {
                     Console.WriteLine("Code generation had errors:");
-                    foreach (string error in code_generator.Errors)
+                    foreach (string error in chunker.Errors)
                         Console.WriteLine(error);
                     return new Unit(UnitType.Null);
                 }
-                if (code_generator.HasChunked == true)
+                if (chunker.HasChunked == true)
                 {
                     VM imported_vm = new VM(chunk);
                     VMResult result = imported_vm.ProtectedRun();
@@ -663,31 +657,24 @@ namespace lightning
                 {
 
                     Scanner scanner = new Scanner(module_code, name);
+                    List<Token> tokens = scanner.Tokens;
+                    if(scanner.HasScanned == false){ return new Unit(UnitType.Null); }
 
-                    Parser parser = new Parser(scanner.Tokens);
-                    if (parser.Errors.Count > 0)
-                    {
-                        Console.WriteLine("Parsing had errors:");
-                        foreach (string error in parser.Errors)
-                        {
-                            Console.WriteLine(error);
-                        }
-                        return new Unit(UnitType.Null);
-                    }
-
+                    Parser parser = new Parser(tokens, name);
                     Node program = parser.ParsedTree;
+                    if(parser.HasParsed == false){ return new Unit(UnitType.Null); }
 
-                    Chunker code_generator = new Chunker(program, name, p_vm.Prelude);
-                    Chunk chunk = code_generator.Chunk;
-                    if (code_generator.Errors.Count > 0)
+                    Chunker chunker = new Chunker(program, name, p_vm.Prelude);
+                    Chunk chunk = chunker.Chunk;
+                    if (chunker.Errors.Count > 0)
                     {
                         Console.WriteLine("Code generation had errors:");
-                        foreach (string error in code_generator.Errors)
+                        foreach (string error in chunker.Errors)
                             Console.WriteLine(error);
                         return new Unit(UnitType.Null);
                     }
 
-                    if (code_generator.HasChunked == true)
+                    if (chunker.HasChunked == true)
                     {
                         VM imported_vm = new VM(chunk);
                         VMResult result = imported_vm.ProtectedRun();

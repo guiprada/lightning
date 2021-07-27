@@ -44,47 +44,28 @@ namespace interpreter
 
         static int Run(string input, string name)
         {
-//////////////////////////////////////////////////////// TOKENS
             Scanner scanner = new Scanner(input, name);
-            Parser parser = new Parser(scanner.Tokens);
+            List<Token> tokens = scanner.Tokens;
+            if(scanner.HasScanned == false){ return 0; }
 
-//////////////////////////////////////////////////////// AST
+            Parser parser = new Parser(tokens, name);
             Node program = parser.ParsedTree;
-            if (parser.Warnings.Count > 0)
-            {
-                Console.WriteLine("Parsing had Warnings:");
-                foreach (string error in parser.Warnings)
-                {
-                    Console.WriteLine(error);
-                }
-            }
-            if(parser.HasParsed == false){
-                Console.WriteLine("Parsing had Errors, check _parser.log!");
-                return  0;
-            }
-            PrettyPrinter astPrinter = new PrettyPrinter();
-            using (System.IO.StreamWriter file = new System.IO.StreamWriter(@"_ast.out", false)){
-                Console.SetOut(file);
-                astPrinter.Print(program);
-                var standardOutput = new StreamWriter(Console.OpenStandardOutput());
-                standardOutput.AutoFlush = true;
-                Console.SetOut(standardOutput);
-            }
+            if(parser.HasParsed == false){ return 0; }
 
 //////////////////////////////////////////////////////// CHUNK
 
-            Chunker code_generator = new Chunker(program, name, Prelude.GetPrelude());
-            Chunk chunk = code_generator.Chunk;
-            if(code_generator.Errors.Count > 0)
+            Chunker chunker = new Chunker(program, name, Prelude.GetPrelude());
+            Chunk chunk = chunker.Chunk;
+            if(chunker.Errors.Count > 0)
             {
                 Console.WriteLine("\nCompiling had errors!");
-                foreach(string e in code_generator.Errors)
+                foreach(string e in chunker.Errors)
                 {
                     Console.WriteLine(e);
                 }
                 return 0;
             }
-            if (code_generator.HasChunked == true)
+            if (chunker.HasChunked == true)
             {
                 using (System.IO.StreamWriter file = new System.IO.StreamWriter(@"_chunk.out", false)){
                     Console.SetOut(file);
@@ -108,7 +89,7 @@ namespace interpreter
             }
             else
             {
-                if (code_generator.Errors.Count > 0)
+                if (chunker.Errors.Count > 0)
                 {
                     Console.WriteLine("Code generation had errors, check _chunker.log");
                     return 0;
