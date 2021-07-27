@@ -602,8 +602,10 @@ namespace lightning
             //////////////////////////////////////////////////////
             Unit Eval(VM p_vm)
             {
-                string eval_code = p_vm.GetString(0);;
-                Scanner scanner = new Scanner(eval_code);
+                string eval_code = p_vm.GetString(0);
+                string eval_name = eval_code.GetHashCode().ToString();
+
+                Scanner scanner = new Scanner(eval_code, eval_name);
 
                 Parser parser = new Parser(scanner.Tokens);
                 if (parser.Errors.Count > 0)
@@ -618,7 +620,6 @@ namespace lightning
 
                 Node program = parser.ParsedTree;
 
-                string eval_name = eval_code.GetHashCode().ToString();
                 Chunker code_generator = new Chunker(program, eval_name, p_vm.Prelude);
                 Chunk chunk = code_generator.Chunk;
                 if (code_generator.Errors.Count > 0)
@@ -647,9 +648,10 @@ namespace lightning
             Unit Require(VM p_vm)
             {
                 string path = p_vm.GetString(0);
+                string name = System.IO.Path.ChangeExtension(path, null);
                 foreach (ModuleUnit v in p_vm.modules)// skip already imported modules
                 {
-                    if (v.Name == path)
+                    if (v.Name == name)
                         return new Unit(v);
                 }
                 string module_code;
@@ -660,7 +662,7 @@ namespace lightning
                 if (module_code != null)
                 {
 
-                    Scanner scanner = new Scanner(module_code);
+                    Scanner scanner = new Scanner(module_code, name);
 
                     Parser parser = new Parser(scanner.Tokens);
                     if (parser.Errors.Count > 0)
@@ -675,7 +677,7 @@ namespace lightning
 
                     Node program = parser.ParsedTree;
 
-                    Chunker code_generator = new Chunker(program, path, p_vm.Prelude);
+                    Chunker code_generator = new Chunker(program, name, p_vm.Prelude);
                     Chunk chunk = code_generator.Chunk;
                     if (code_generator.Errors.Count > 0)
                     {
@@ -691,7 +693,7 @@ namespace lightning
                         VMResult result = imported_vm.ProtectedRun();
                         if (result.status == VMResultType.OK)
                         {
-                            MakeModule(result.value, path, p_vm, imported_vm);
+                            MakeModule(result.value, name, p_vm, imported_vm);
                             return result.value;
                         }
                     }

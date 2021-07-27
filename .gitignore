@@ -29,6 +29,8 @@ bld/
 #Custom
 win_builds/
 linux_builds/
+*.tokens
+*.ast
 
 # Visual Studio 2015/2017 cache/options directory
 .vs/

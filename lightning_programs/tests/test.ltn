@@ -68,7 +68,7 @@ errors += require("tests/try.ltn")
 {
     var a_table = [1: \(a) return a]
     a_table[1]
-    (1+1)
+    1+1
 }
 
 //////////////////////////////// end scratch

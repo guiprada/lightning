@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Text.RegularExpressions;
 
 #if DOUBLE
@@ -35,33 +36,55 @@ namespace lightning
         };
 
         private char[] source;
+        private string moduleName;
         private int line;
         private int start;
         private int current;
-
-        public List<string> Errors {
-            get{
-                return errors;
-            }
-        }
-        private List<string> errors;
-
         private List<Token> tokens;
         private bool hasScanned;
+        private List<string> errors;
+        public List<string> Errors { get{ return errors; } }
         public List<Token> Tokens{
             get
             {
                 if (hasScanned == false)
                 {
                     ScanTokens();
-                    hasScanned = true;
+                    if (errors.Count > 0)
+                    {
+                        Console.WriteLine("Scanning had errors on module: " + moduleName);
+                        foreach(string error in errors)
+                            Console.WriteLine(error);
+
+                        using (System.IO.StreamWriter file = new System.IO.StreamWriter(moduleName + "_scanner.log", false)){
+                            Console.SetOut(file);
+                            foreach(string error in errors)
+                                Console.WriteLine(error);
+
+                            var standardOutput = new StreamWriter(Console.OpenStandardOutput());
+                            standardOutput.AutoFlush = true;
+                            Console.SetOut(standardOutput);
+                        }
+                        return null;
+                    }else{
+                        using (System.IO.StreamWriter file = new System.IO.StreamWriter(moduleName + ".tokens", false)){
+                            Console.SetOut(file);
+                            foreach (Token token in tokens)
+                                Console.WriteLine(token.ToString());
+                            var standardOutput = new StreamWriter(Console.OpenStandardOutput());
+                            standardOutput.AutoFlush = true;
+                            Console.SetOut(standardOutput);
+                        }
+                        hasScanned = true;
+                    }
                 }
                 return tokens;
             }}
 
-        public Scanner(string p_input)
+        public Scanner(string p_input, string p_moduleName)
         {
             source = p_input.ToCharArray();
+            moduleName = p_moduleName;
             hasScanned = false;
             errors = new List<string>();
             line = 1;
@@ -88,6 +111,7 @@ namespace lightning
         private void ScanToken()
         {
             char c = Advance();
+            char[] new_line = Environment.NewLine.ToCharArray();
             switch (c)
             {
                 case ' ':
@@ -96,6 +120,10 @@ namespace lightning
                     // Ignore whitespace.
                     break;
                 case '\n':
+                    while (IsWhiteSpace(Peek()) )
+                        Advance();
+                    if(Peek() == '(')
+                        Error("Parentheses can not be used in the beggining of a line!");
                     line++;
                     break;
                 case '(': tokens.Add(new Token(TokenType.LEFT_PAREN, line)); break;
@@ -232,6 +260,10 @@ namespace lightning
         {
             bool is_end = current >= source.Length;
             return is_end;
+        }
+
+        private bool IsWhiteSpace(char p_c){
+            return (p_c == ' ' || p_c == '\t');
         }
 
         private bool IsDigit(char p_c)

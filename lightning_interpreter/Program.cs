@@ -30,7 +30,8 @@ namespace interpreter
                 {
                    input = sr.ReadToEnd();
                 }
-                return Run(input);
+                string name = System.IO.Path.ChangeExtension(path, null);
+                return Run(input, name);
             }
             catch (IOException e)
             {
@@ -41,31 +42,11 @@ namespace interpreter
             }
         }
 
-        static int Run(string input)
+        static int Run(string input, string name)
         {
 //////////////////////////////////////////////////////// TOKENS
-            Scanner scanner = new Scanner(input);
+            Scanner scanner = new Scanner(input, name);
             Parser parser = new Parser(scanner.Tokens);
-            if (scanner.Errors.Count > 0)
-            {
-                Console.WriteLine("Scanning had errors:");
-                foreach(string error in scanner.Errors)
-                {
-                    Console.WriteLine(error);
-                }
-                return 0;
-            }
-
-            using (System.IO.StreamWriter file = new System.IO.StreamWriter(@"_tokens.out", false)){
-                Console.SetOut(file);
-                foreach (Token token in scanner.Tokens)
-                {
-                    Console.WriteLine(token.ToString());
-                }
-                var standardOutput = new StreamWriter(Console.OpenStandardOutput());
-                standardOutput.AutoFlush = true;
-                Console.SetOut(standardOutput);
-            }
 
 //////////////////////////////////////////////////////// AST
             Node program = parser.ParsedTree;
@@ -92,7 +73,7 @@ namespace interpreter
 
 //////////////////////////////////////////////////////// CHUNK
 
-            Chunker code_generator = new Chunker(program, "main", Prelude.GetPrelude());
+            Chunker code_generator = new Chunker(program, name, Prelude.GetPrelude());
             Chunk chunk = code_generator.Chunk;
             if(code_generator.Errors.Count > 0)
             {

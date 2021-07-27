@@ -695,25 +695,18 @@ namespace lightning
 
         Node CallTail(Node p_functionCallNode)
         {
-            bool go_on = true;
-            while(Check(TokenType.LEFT_PAREN) && go_on)
+            while(Check(TokenType.LEFT_PAREN))
             {
                 FunctionCallNode this_function_call_node = (FunctionCallNode)p_functionCallNode;
                 this_function_call_node.Calls.Add(Arguments());
 
-                if(Check(TokenType.DOT)){
-                    if(Check2(TokenType.LEFT_PAREN)){
-                        Match(TokenType.DOT);
-                        this_function_call_node.IndexedAccess.Add(null);
-                    }else{
-                        if(Check2(TokenType.LEFT_BRACKET)){
-                            Match(TokenType.DOT);
-                        }
-                        this_function_call_node.IndexedAccess.Add(IndexedAccess(this_function_call_node.Variable.Name, this_function_call_node.Line) as VariableNode);
-                    }
+                if(Check(TokenType.DOT) || Check(TokenType.LEFT_BRACKET)){
+                    this_function_call_node.IndexedAccess.Add(
+                        IndexedAccess(
+                            this_function_call_node.Variable.Name,
+                            this_function_call_node.Line) as VariableNode);
                 }else{
                     this_function_call_node.IndexedAccess.Add(null);
-                    go_on = false;
                 }
             }
             if(Check(TokenType.COLON))

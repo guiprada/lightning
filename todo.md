@@ -12,6 +12,7 @@ method and member function declaration
 
 To be Done
 ----------
+file read and write test
 remove DUP and STASH
 require should genenate .out
 eval should generate .out
