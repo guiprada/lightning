@@ -59,7 +59,7 @@ namespace lightning
                         }
                     }catch (Exception e){
                         using (System.IO.StreamWriter file = new System.IO.StreamWriter(moduleName + "_parser.log", false)){
-                            Console.WriteLine("Parsing broke the runtime, check _parser.log!");
+                            Console.WriteLine("Parsing broke the runtime, check " + moduleName + "_parser.log!");
                             Console.SetOut(file);
                             Console.WriteLine(e);
                             var standardOutput = new StreamWriter(Console.OpenStandardOutput());
