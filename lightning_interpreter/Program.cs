@@ -30,7 +30,7 @@ namespace interpreter
                 {
                    input = sr.ReadToEnd();
                 }
-                string name = System.IO.Path.ChangeExtension(path, null);
+                string name = Utils.ModuleName(path);
                 return Run(input, name);
             }
             catch (IOException e)
@@ -52,8 +52,6 @@ namespace interpreter
             Node program = parser.ParsedTree;
             if(parser.HasParsed == false){ return 0; }
 
-//////////////////////////////////////////////////////// CHUNK
-
             Chunker chunker = new Chunker(program, name, Prelude.GetPrelude());
             Chunk chunk = chunker.Chunk;
             if (chunker.HasChunked == true)
@@ -61,7 +59,7 @@ namespace interpreter
                 VM vm = new VM(chunk);
                 VMResult result = vm.ProtectedRun();
                 if (result.status != VMResultType.OK)
-                    Console.WriteLine("Program returned ERROR");
+                    Console.WriteLine("Program returned ERROR!");
                 else if (result.value.Type != UnitType.Null)
                     Console.WriteLine("Program returned: " + result.value);
 
@@ -69,14 +67,6 @@ namespace interpreter
                 Unit my_func = chunk.GetUnitFromTable("machine", "memory_use");
                 Unit call_result = vm.ProtectedCallFunction(my_func, null);
                 Console.WriteLine(call_result);
-            }
-            else
-            {
-                if (chunker.Errors.Count > 0)
-                {
-                    Console.WriteLine("Code generation had errors, check _chunker.log");
-                    return 0;
-                }
             }
             return 0;
         }

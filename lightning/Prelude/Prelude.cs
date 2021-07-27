@@ -603,7 +603,7 @@ namespace lightning
             Unit Eval(VM p_vm)
             {
                 string eval_code = p_vm.GetString(0);
-                string eval_name = eval_code.GetHashCode().ToString();
+                string eval_name = "eval(" + eval_code.GetHashCode().ToString() + ")";
 
                 Scanner scanner = new Scanner(eval_code, eval_name);
                 List<Token> tokens = scanner.Tokens;
@@ -642,7 +642,7 @@ namespace lightning
             Unit Require(VM p_vm)
             {
                 string path = p_vm.GetString(0);
-                string name = System.IO.Path.ChangeExtension(path, null);
+                string name = Utils.ModuleName(path);
                 foreach (ModuleUnit v in p_vm.modules)// skip already imported modules
                 {
                     if (v.Name == name)
