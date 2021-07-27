@@ -6,7 +6,8 @@ namespace lightning
             string current_dir_string = "." + System.IO.Path.DirectorySeparatorChar;
             if (name.StartsWith(current_dir_string))
                 name = name.Substring(2);
-            name = name.Replace(System.IO.Path.DirectorySeparatorChar, '.');
+            name = name.Replace('\\', '.');
+            name = name.Replace('/', '.');
             return name;
         }
         public static string ToPath(string p_moduleName){
