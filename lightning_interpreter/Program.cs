@@ -63,10 +63,13 @@ namespace interpreter
                 else if (result.value.Type != UnitType.Null)
                     Console.WriteLine("Program returned: " + result.value);
 
+                // Print modules
+                Unit machine_modules = chunk.GetUnitFromTable("machine", "modules");
+                Console.WriteLine(vm.ProtectedCallFunction(machine_modules, null));
+
                 // Print memory_use
-                Unit my_func = chunk.GetUnitFromTable("machine", "memory_use");
-                Unit call_result = vm.ProtectedCallFunction(my_func, null);
-                Console.WriteLine(call_result);
+                Unit machine_memory_use = chunk.GetUnitFromTable("machine", "memory_use");
+                Console.WriteLine(vm.ProtectedCallFunction(machine_memory_use, null));
             }
             return 0;
         }

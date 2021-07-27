@@ -83,5 +83,5 @@ else{
 }
 write_line("-- Finished tests! --")
 write_line("Elapsed time: " .. start_time:elapsed() .. " ms")
-write_line("Loaded modules: " .. machine.modules())
+// write_line("Loaded modules: " .. machine.modules())
 // write_line(machine.memory_use())

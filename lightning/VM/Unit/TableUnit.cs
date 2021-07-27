@@ -713,16 +713,12 @@ namespace lightning
                     TableUnit table = vm.GetTable(0);
                     Unit func = vm.GetUnit(1);
 
-                    VM map_vm = vm.GetParallelVM();
-
                     for(int index=0; index<table.ECount; index++){
                         List<Unit> args = new List<Unit>();
                         args.Add(new Unit(index));
                         args.Add(new Unit(table));
-                        map_vm.ProtectedCallFunction(func, args);
+                        vm.ProtectedCallFunction(func, args);
                     }
-
-                    vm.RecycleVM(map_vm);
 
                     return new Unit(UnitType.Null);
                 }
@@ -806,19 +802,13 @@ namespace lightning
                     Unit func = vm.GetUnit(1);
                     Unit accumulator = vm.GetUnit(2);
 
-                    VM reduce_vm = vm.GetParallelVM();
-
-                    // Unit accumulator = new Unit(new TableUnit(null, null, null));
-                    // accumulator.heapUnitValue.Set(new Unit("value"), new Unit((Integer)0));
                     for(int index=0; index<table.ECount; index++){
                         List<Unit> args = new List<Unit>();
                         args.Add(new Unit(index));
                         args.Add(new Unit(table));
                         args.Add(accumulator);
-                        reduce_vm.ProtectedCallFunction(func, args);
+                        vm.ProtectedCallFunction(func, args);
                     }
-
-                    vm.RecycleVM(reduce_vm);
 
                     return accumulator;
                 }
