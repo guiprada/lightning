@@ -14,7 +14,12 @@ var assert_not = assert_counter.assert_not
     success = try(\{
         write_line(array1[0])
         a = 2
-    }, ["oi", "mundo"])
+    }, null)
     assert(a, 1, "Failed try() Test 2.")
+
+    try(\{
+        a = 2
+    }, [])
+    assert(a, 2, "Failed try() Test 3.")
 }
 return assert_counter.get_error_counter()

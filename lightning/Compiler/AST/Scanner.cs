@@ -57,7 +57,7 @@ namespace lightning
                             return null;
                         }else{
                             hasScanned = true;
-                            using (System.IO.StreamWriter file = new System.IO.StreamWriter(moduleName + ".tokens", false)){
+                            using (System.IO.StreamWriter file = new System.IO.StreamWriter(Path.ToPath(moduleName) + ".tokens", false)){
                                 Console.SetOut(file);
                                 foreach (Token token in tokens)
                                     Console.WriteLine(token.ToString());
@@ -67,8 +67,8 @@ namespace lightning
                             }
                         }
                     }catch (Exception e){
-                        using (System.IO.StreamWriter file = new System.IO.StreamWriter(moduleName + "_scanner.log", false)){
-                            Console.WriteLine("Scanning broke the runtime, check " + moduleName + "_scanner.log!");
+                        using (System.IO.StreamWriter file = new System.IO.StreamWriter(Path.ToPath(moduleName) + "_scanner.log", false)){
+                            Console.WriteLine("Scanning broke the runtime, check out" + System.IO.Path.DirectorySeparatorChar + moduleName + "_scanner.log!");
                             Console.SetOut(file);
                             Console.WriteLine(e);
                             var standardOutput = new StreamWriter(Console.OpenStandardOutput());

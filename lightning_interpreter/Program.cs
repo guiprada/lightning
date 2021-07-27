@@ -30,7 +30,7 @@ namespace interpreter
                 {
                    input = sr.ReadToEnd();
                 }
-                string name = Utils.ModuleName(path);
+                string name = lightning.Path.ModuleName(path);
                 return Run(input, name);
             }
             catch (IOException e)

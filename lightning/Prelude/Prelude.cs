@@ -642,7 +642,7 @@ namespace lightning
             Unit Require(VM p_vm)
             {
                 string path = p_vm.GetString(0);
-                string name = Utils.ModuleName(path);
+                string name = Path.ModuleName(path);
                 foreach (ModuleUnit v in p_vm.modules)// skip already imported modules
                 {
                     if (v.Name == name)
@@ -691,7 +691,8 @@ namespace lightning
 
             //////////////////////////////////////////////////////
             // start a new _try.log file
-            using (System.IO.StreamWriter file = new System.IO.StreamWriter(@"_try.log", false)){
+            string try_log_path = @"try.log";
+            using (System.IO.StreamWriter file = new System.IO.StreamWriter(try_log_path, false)){
                 Console.SetOut(file);
                 Console.WriteLine("------------------- try log:");
                 var standardOutput = new StreamWriter(Console.OpenStandardOutput());
@@ -702,15 +703,20 @@ namespace lightning
             Unit Try(VM p_vm)
             {
                 Unit this_callable = p_vm.GetUnit(0);
-                TableUnit this_arguments = p_vm.GetTable(1);
+                Unit this_unit = p_vm.GetUnit(1);
+                List<Unit> this_arguments = null;
+                if(this_unit.Type == UnitType.Table)
+                    this_arguments = ((TableUnit)this_unit.heapUnitValue).Elements;
+
                 VM try_vm = p_vm.GetVM();
                 try{
-                    try_vm.CallFunction(this_callable, this_arguments.Elements);
+                    try_vm.CallFunction(this_callable, this_arguments);
                     p_vm.RecycleVM(try_vm);
                     return new Unit(true);
                 }catch(Exception e){
-                    using (System.IO.StreamWriter file = new System.IO.StreamWriter(@"_try.log", true)){
+                    using (System.IO.StreamWriter file = new System.IO.StreamWriter(try_log_path, true)){
                         Console.SetOut(file);
+                        Console.WriteLine("-------------------\n" + p_vm.ErrorLocation());
                         Console.WriteLine(e);
                         var standardOutput = new StreamWriter(Console.OpenStandardOutput());
                         standardOutput.AutoFlush = true;

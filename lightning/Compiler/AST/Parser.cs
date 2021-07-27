@@ -49,7 +49,7 @@ namespace lightning
                         else{
                             hasParsed = true;
                             PrettyPrinter astPrinter = new PrettyPrinter();
-                            using (System.IO.StreamWriter file = new System.IO.StreamWriter(moduleName + ".ast", false)){
+                            using (System.IO.StreamWriter file = new System.IO.StreamWriter(Path.ToPath(moduleName) + ".ast", false)){
                                 Console.SetOut(file);
                                 astPrinter.Print(ParsedTree);
                                 var standardOutput = new StreamWriter(Console.OpenStandardOutput());
@@ -58,8 +58,8 @@ namespace lightning
                             }
                         }
                     }catch (Exception e){
-                        using (System.IO.StreamWriter file = new System.IO.StreamWriter(moduleName + "_parser.log", false)){
-                            Console.WriteLine("Parsing broke the runtime, check " + moduleName + "_parser.log!");
+                        using (System.IO.StreamWriter file = new System.IO.StreamWriter(Path.ToPath(moduleName) + "_parser.log", false)){
+                            Console.WriteLine("Parsing broke the runtime, check out" + System.IO.Path.DirectorySeparatorChar + moduleName + "_parser.log!");
                             Console.SetOut(file);
                             Console.WriteLine(e);
                             var standardOutput = new StreamWriter(Console.OpenStandardOutput());

@@ -78,7 +78,7 @@ namespace lightning
                             return null;
                         }else{
                             HasChunked = true;
-                            using (System.IO.StreamWriter file = new System.IO.StreamWriter(moduleName + ".chunk", false)){
+                            using (System.IO.StreamWriter file = new System.IO.StreamWriter(Path.ToPath(moduleName) + ".chunk", false)){
                                 Console.SetOut(file);
                                 chunk.Print();
                                 var standardOutput = new StreamWriter(Console.OpenStandardOutput());
@@ -89,8 +89,8 @@ namespace lightning
                     }
                     catch (Exception e)
                     {
-                        using (System.IO.StreamWriter file = new System.IO.StreamWriter(moduleName + "_chunker.log", false)){
-                            Console.WriteLine("Chunking broke the runtime, check " + moduleName + "_chunker.log!");
+                        using (System.IO.StreamWriter file = new System.IO.StreamWriter(Path.ToPath(moduleName) + "_chunker.log", false)){
+                            Console.WriteLine("Chunking broke the runtime, check" + System.IO.Path.DirectorySeparatorChar + moduleName + "_chunker.log!");
                             Console.SetOut(file);
                             Console.WriteLine(e);
                             var standardOutput = new StreamWriter(Console.OpenStandardOutput());
