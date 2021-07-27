@@ -637,9 +637,31 @@ namespace lightning
                     string this_name = (Previous() as TokenString).value;
                     VariableNode index = new VariableNode(this_name, new List<Node>(), VarAccessType.METHOD, Previous().Line);
                     (p_node as VariableNode).Indexes.Add(index);
-                }else if(Match(TokenType.STRING)){
+                }else if(Match(TokenType.STRING)){// Convert String to identifier
                     string this_name = (Previous() as TokenString).value;
                     VariableNode index = new VariableNode(this_name, new List<Node>(), VarAccessType.METHOD, Previous().Line);
+                    (p_node as VariableNode).Indexes.Add(index);
+                }else if(Match(TokenType.MINUS)){// Convert Negative Number to expression
+                    if(Match(TokenType.NUMBER)){
+                        Type this_type = ((TokenNumber)Previous()).type;
+                        Node this_value;
+                        if (this_type == typeof(Integer))
+                            this_value = new LiteralNode(-((TokenNumber)Previous()).integerValue, Previous().Line);
+                        else
+                            this_value = new LiteralNode(-((TokenNumber)Previous()).floatValue, Previous().Line);
+                        VariableNode index = new VariableNode(this_value, new List<Node>(), VarAccessType.METHOD, Previous().Line);
+                        (p_node as VariableNode).Indexes.Add(index);
+                    }else{
+                        Error("Expected Number after '-' in 'Method Access'");
+                    }
+                }else if(Match(TokenType.NUMBER)){// Convert Number to expression
+                    Type this_type = ((TokenNumber)Previous()).type;
+                    Node this_value;
+                    if (this_type == typeof(Integer))
+                        this_value = new LiteralNode(((TokenNumber)Previous()).integerValue, Previous().Line);
+                    else
+                        this_value = new LiteralNode(((TokenNumber)Previous()).floatValue, Previous().Line);
+                    VariableNode index = new VariableNode(this_value, new List<Node>(), VarAccessType.METHOD, Previous().Line);
                     (p_node as VariableNode).Indexes.Add(index);
                 }else if (Match(TokenType.LEFT_BRACKET)) {
                     VariableNode index = new VariableNode(Expression(), new List<Node>(), VarAccessType.METHOD, Previous().Line);

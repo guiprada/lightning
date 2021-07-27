@@ -65,6 +65,12 @@ errors += require("tests/try.ltn")
     // }
     // write_line(a_table.a_function())
 }
+{
+    var a_table = [1: \(a) return a]
+    a_table[1]
+    (1+1)
+}
+
 //////////////////////////////// end scratch
 machine.trim()
 

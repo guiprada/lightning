@@ -17,7 +17,8 @@ var assert_not = assert_counter.assert_not
             self.position.y = self.position.y + y;
             return self.position
         }
-        player[2] = player.move
+        player[-2] = player.move
+        player[-2.5] = player.move
 
         return player
     }
@@ -29,14 +30,15 @@ var assert_not = assert_counter.assert_not
     var name = "move"
     assert(p1[name](p1,0,3).y, 6, "Failed method call test 3.")
     assert(p1["move"](p1,0,0).y, 6, "Failed method call test 4.")
-    assert(p1[1+1](p1,0,0).y, 6, "Failed method call test 5.")
+    assert(p1[-(1+1)](p1,0,0).y, 6, "Failed method call test 5.")
     assert(p1["mo".."ve"](p1,0,0).y, 6, "Failed method call test 6.")
 
     assert(p1:[name](0,0).y, 6, "Failed method call test 7.")
     assert(p1:"move"(0,0).y, 6, "Failed method call test 8.")
     assert(p1:["move"](0,0).y, 6, "Failed method call test 9.")
-    assert(p1:[1 + 1](0,0).y, 6, "Failed method call test 10.")
-    assert(p1:["mo".."ve"](0,0).y, 6, "Failed method call test 11.")
-
+    assert(p1:[-(1 + 1)](0,0).y, 6, "Failed method call test 10.")
+    assert(p1:-2(0,0).y, 6, "Failed method call test 11.")
+    assert(p1:-2.5(0,0).y, 6, "Failed method call test 12.")
+    assert(p1:["mo".."ve"](0,0).y, 6, "Failed method call test 13.")
 }
 return assert_counter.get_error_counter()

@@ -55,11 +55,13 @@
     [EXPR_STMT [ASSIGMENT_OP errors += [FUNCTION CALL [VARIABLE require]([LITERAL "tests/anonymous_call.ltn"])]]]
     [EXPR_STMT [ASSIGMENT_OP errors += [FUNCTION CALL [VARIABLE require]([LITERAL "tests/try.ltn"])]]]
     [BLOCK
-        [VARIABLE DECLARATION a = 
-            [FUNCTION EXPRESSION ()
-                [RETURN [LITERAL 99]]
+    ]
+    [BLOCK
+        [VARIABLE DECLARATION a_table = [LIST [LITERAL 1] : 
+            [FUNCTION EXPRESSION (a)
+                [RETURN [VARIABLE a]]
             ]]
-        [EXPR_STMT [FUNCTION CALL [VARIABLE write_line]([FUNCTION CALL [VARIABLE a]()])]]
+        [EXPR_STMT [FUNCTION CALL [VARIABLE a_table[[VAR_EXPRESSION ]]]([BINARY [LITERAL 1] + [LITERAL 1]])]]
     ]
     [EXPR_STMT [FUNCTION CALL [VARIABLE machine.[IDENTIFIER trim]]()]]
     [IF [BINARY [VARIABLE errors] == [LITERAL 0]]

@@ -292,77 +292,89 @@ LEFT_PAREN line: 58
 STRING string: tests/try.ltn line: 58
 RIGHT_PAREN line: 58
 LEFT_BRACE line: 61
-VAR line: 67
-IDENTIFIER string: a line: 67
-EQUAL line: 67
-FUN line: 67
-RETURN line: 67
-NUMBER Integer: 99 line: 67
-IDENTIFIER string: write_line line: 68
-LEFT_PAREN line: 68
-IDENTIFIER string: a line: 68
-LEFT_PAREN line: 68
-RIGHT_PAREN line: 68
-RIGHT_PAREN line: 68
-RIGHT_BRACE line: 69
-IDENTIFIER string: machine line: 71
-DOT line: 71
-IDENTIFIER string: trim line: 71
+RIGHT_BRACE line: 67
+LEFT_BRACE line: 68
+VAR line: 69
+IDENTIFIER string: a_table line: 69
+EQUAL line: 69
+LEFT_BRACKET line: 69
+NUMBER Integer: 1 line: 69
+COLON line: 69
+FUN line: 69
+LEFT_PAREN line: 69
+IDENTIFIER string: a line: 69
+RIGHT_PAREN line: 69
+RETURN line: 69
+IDENTIFIER string: a line: 69
+RIGHT_BRACKET line: 69
+IDENTIFIER string: a_table line: 70
+LEFT_BRACKET line: 70
+NUMBER Integer: 1 line: 70
+RIGHT_BRACKET line: 70
 LEFT_PAREN line: 71
+NUMBER Integer: 1 line: 71
+PLUS line: 71
+NUMBER Integer: 1 line: 71
 RIGHT_PAREN line: 71
-IF line: 73
-LEFT_PAREN line: 73
-IDENTIFIER string: errors line: 73
-EQUAL_EQUAL line: 73
-NUMBER Integer: 0 line: 73
-RIGHT_PAREN line: 73
-LEFT_BRACE line: 73
-IDENTIFIER string: write_line line: 74
-LEFT_PAREN line: 74
-STRING string: No errors found! :) line: 74
-RIGHT_PAREN line: 74
-RIGHT_BRACE line: 75
-ELSE line: 76
-LEFT_BRACE line: 76
-IDENTIFIER string: write line: 77
+RIGHT_BRACE line: 72
+IDENTIFIER string: machine line: 75
+DOT line: 75
+IDENTIFIER string: trim line: 75
+LEFT_PAREN line: 75
+RIGHT_PAREN line: 75
+IF line: 77
 LEFT_PAREN line: 77
-IDENTIFIER string: new_line line: 77
-LEFT_PAREN line: 77
+IDENTIFIER string: errors line: 77
+EQUAL_EQUAL line: 77
+NUMBER Integer: 0 line: 77
 RIGHT_PAREN line: 77
-RIGHT_PAREN line: 77
+LEFT_BRACE line: 77
 IDENTIFIER string: write_line line: 78
 LEFT_PAREN line: 78
-STRING string: :(  line: 78
-APPEND line: 78
-IDENTIFIER string: errors line: 78
-APPEND line: 78
-STRING string:  errors found! line: 78
+STRING string: No errors found! :) line: 78
 RIGHT_PAREN line: 78
 RIGHT_BRACE line: 79
-IDENTIFIER string: write_line line: 80
-LEFT_PAREN line: 80
-STRING string: -- Finished tests! -- line: 80
-RIGHT_PAREN line: 80
-IDENTIFIER string: write_line line: 81
+ELSE line: 80
+LEFT_BRACE line: 80
+IDENTIFIER string: write line: 81
 LEFT_PAREN line: 81
-STRING string: Elapsed time:  line: 81
-APPEND line: 81
-IDENTIFIER string: start_time line: 81
-COLON line: 81
-IDENTIFIER string: elapsed line: 81
+IDENTIFIER string: new_line line: 81
 LEFT_PAREN line: 81
 RIGHT_PAREN line: 81
-APPEND line: 81
-STRING string:  ms line: 81
 RIGHT_PAREN line: 81
 IDENTIFIER string: write_line line: 82
 LEFT_PAREN line: 82
-STRING string: Loaded modules:  line: 82
+STRING string: :(  line: 82
 APPEND line: 82
-IDENTIFIER string: machine line: 82
-DOT line: 82
-IDENTIFIER string: modules line: 82
-LEFT_PAREN line: 82
+IDENTIFIER string: errors line: 82
+APPEND line: 82
+STRING string:  errors found! line: 82
 RIGHT_PAREN line: 82
-RIGHT_PAREN line: 82
-EOF line: 83
+RIGHT_BRACE line: 83
+IDENTIFIER string: write_line line: 84
+LEFT_PAREN line: 84
+STRING string: -- Finished tests! -- line: 84
+RIGHT_PAREN line: 84
+IDENTIFIER string: write_line line: 85
+LEFT_PAREN line: 85
+STRING string: Elapsed time:  line: 85
+APPEND line: 85
+IDENTIFIER string: start_time line: 85
+COLON line: 85
+IDENTIFIER string: elapsed line: 85
+LEFT_PAREN line: 85
+RIGHT_PAREN line: 85
+APPEND line: 85
+STRING string:  ms line: 85
+RIGHT_PAREN line: 85
+IDENTIFIER string: write_line line: 86
+LEFT_PAREN line: 86
+STRING string: Loaded modules:  line: 86
+APPEND line: 86
+IDENTIFIER string: machine line: 86
+DOT line: 86
+IDENTIFIER string: modules line: 86
+LEFT_PAREN line: 86
+RIGHT_PAREN line: 86
+RIGHT_PAREN line: 86
+EOF line: 87
