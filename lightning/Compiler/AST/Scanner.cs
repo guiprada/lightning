@@ -68,7 +68,7 @@ namespace lightning
                         }
                     }catch (Exception e){
                         using (System.IO.StreamWriter file = new System.IO.StreamWriter(moduleName + "_scanner.log", false)){
-                            Console.WriteLine("Scanning broke the runtime, check _scanner.log!");
+                            Console.WriteLine("Scanning broke the runtime, check " + moduleName + "_scanner.log!");
                             Console.SetOut(file);
                             Console.WriteLine(e);
                             var standardOutput = new StreamWriter(Console.OpenStandardOutput());
@@ -94,9 +94,10 @@ namespace lightning
         }
 
         private void PrintErrors(){
-            Console.WriteLine("Scanning had errors on module: " + moduleName);
-                foreach(string error in errors)
-                    Console.WriteLine(error);
+            if (errors.Count > 0)
+                Console.WriteLine("Scanning had errors on module: " + moduleName);
+                    foreach(string error in errors)
+                        Console.WriteLine(error);
         }
 
         private List<Token> ScanTokens()
