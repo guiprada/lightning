@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Threading;
 
 namespace lightning
 {
@@ -19,19 +20,38 @@ namespace lightning
         }
 
         static async void ProcessQueue(){
-            isProcessing = true;
-            while(queue.Count > 0){
-                LogEntry entry = queue.Dequeue();
-                using (System.IO.StreamWriter file = new System.IO.StreamWriter(entry.path, true)){
-                    await file.WriteLineAsync(entry.message);
+            lock(isProcessing as object)
+                isProcessing = true;
+
+            LogEntry entry =  default(LogEntry);
+            bool has_entry = false;
+            do{
+                if(has_entry)
+                    using (System.IO.StreamWriter file = new System.IO.StreamWriter(entry.path, true))
+                        await file.WriteLineAsync(entry.message);
+                lock(queue){
+                    if (queue.Count > 0){
+                        entry = queue.Dequeue();
+                        has_entry = true;
+                    }else
+                        has_entry = false;
                 }
-            }
-            isProcessing = false;
+            }while(has_entry);
+
+            lock(isProcessing as object)
+                isProcessing = false;
         }
         public static void AddLine(string p_message, string p_path){
-            queue.Enqueue(new LogEntry(p_message, p_path));
-            if(isProcessing == false)
-                ProcessQueue();
+            lock(queue)
+                queue.Enqueue(new LogEntry(p_message, p_path));
+
+            bool is_processing;
+            lock(isProcessing as object)
+                is_processing = isProcessing;
+            if(is_processing == false){
+                Thread dequeue = new Thread(ProcessQueue);
+                dequeue.Start();
+            }
         }
     }
 }
