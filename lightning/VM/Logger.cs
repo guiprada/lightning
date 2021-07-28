@@ -33,18 +33,18 @@ namespace lightning
                     if (queue.Count > 0){
                         entry = queue.Dequeue();
                         has_entry = true;
-                    }else
+                    }else{
                         has_entry = false;
+                        lock(isProcessing as object)
+                            isProcessing = false;
+                    }
                 }
             }while(has_entry);
-
-            lock(isProcessing as object)
-                isProcessing = false;
         }
         public static void AddLine(string p_message, string p_path){
-            lock(queue)
+            lock(queue){
                 queue.Enqueue(new LogEntry(p_message, p_path));
-
+            }
             bool is_processing;
             lock(isProcessing as object)
                 is_processing = isProcessing;
