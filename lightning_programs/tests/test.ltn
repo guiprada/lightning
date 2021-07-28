@@ -1,17 +1,22 @@
 ﻿write_line("*** Welcome to lightning test suite Zzz :) ***")
+{
+    var os_string = get_os()
+    var os = "Unknown"
+    if (os_string:contains("Windows"))
+        os = "Windows"
+    else if (os_string:contains("Unix"))
+        os = "Unix"
 
-var os_string = get_os()
-var os = "Unknown"
-if(os_string:contains("Windows"))
-    os = "Windows"
-else if(os_string:contains("Unix"))
-    os = "Unix"
+    write_line(get_os())
 
-write_line(get_os())
-
-if (intrinsic.create == null){
-    write_line("No inline intrinsic support!")
+    var processor_count = machine.processor_count()
+    if (processor_count > 1)
+        write_line("Running on " .. processor_count .. " processors" )
+    else
+        write_line("Running Humbly on " .. processor_count .. " processor" )
 }
+if (intrinsic.create == null)
+    write_line("No inline intrinsic support!")
 
 write_line("-- Starting tests --")
 var start_time = time.now()

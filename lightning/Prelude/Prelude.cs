@@ -123,6 +123,13 @@ namespace lightning
                 }
                 machine.Set("count_vms", new IntrinsicUnit("count_vms", CountVMs, 0));
 
+                //////////////////////////////////////////////////////
+                Unit ProcessorCount(VM p_vm)
+                {
+                    return new Unit(Environment.ProcessorCount);
+                }
+                machine.Set("processor_count", new IntrinsicUnit("processor_count", ProcessorCount, 0));
+
                 tables.Add("machine", machine);
             }
             ////////////////////////////////////////////////////////////////////////////////////////////////////////////
