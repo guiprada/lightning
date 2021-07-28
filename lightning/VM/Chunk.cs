@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 
 using Operand = System.UInt16;
 
@@ -214,6 +215,16 @@ namespace lightning
             constants = new List<Unit>();
             Prelude = p_prelude;
             ModuleName = p_moduleName;
+        }
+
+        public void PrintToFile(string p_path, bool p_append = false){
+            using (System.IO.StreamWriter file = new System.IO.StreamWriter(p_path, p_append)){
+                Console.SetOut(file);
+                Print();
+                var standardOutput = new StreamWriter(Console.OpenStandardOutput());
+                standardOutput.AutoFlush = true;
+                Console.SetOut(standardOutput);
+            }
         }
 
         public void Print()

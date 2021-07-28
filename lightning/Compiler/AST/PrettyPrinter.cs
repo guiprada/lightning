@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 
 namespace lightning
 {
@@ -12,6 +13,15 @@ namespace lightning
         {
             identLevel = 0;
             identString = "";
+        }
+        public void PrintToFile(Node p_node, string p_path, bool p_append = false){
+            using (System.IO.StreamWriter file = new System.IO.StreamWriter(p_path, p_append)){
+                Console.SetOut(file);
+                Print(p_node);
+                var standardOutput = new StreamWriter(Console.OpenStandardOutput());
+                standardOutput.AutoFlush = true;
+                Console.SetOut(standardOutput);
+            }
         }
         public void Print(Node p_node)
         {

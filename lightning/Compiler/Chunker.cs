@@ -78,25 +78,14 @@ namespace lightning
                             return null;
                         }else{
                             HasChunked = true;
-                            using (System.IO.StreamWriter file = new System.IO.StreamWriter(Path.ToPath(moduleName) + ".chunk", false)){
-                                Console.SetOut(file);
-                                chunk.Print();
-                                var standardOutput = new StreamWriter(Console.OpenStandardOutput());
-                                standardOutput.AutoFlush = true;
-                                Console.SetOut(standardOutput);
-                            }
+                            chunk.PrintToFile(Path.ToPath(moduleName) + ".chunk");
                         }
                     }
                     catch (Exception e)
                     {
-                        using (System.IO.StreamWriter file = new System.IO.StreamWriter(Path.ToPath(moduleName) + "_chunker.log", false)){
-                            Console.WriteLine("Chunking broke the runtime, check" + System.IO.Path.DirectorySeparatorChar + moduleName + "_chunker.log!");
-                            Console.SetOut(file);
-                            Console.WriteLine(e);
-                            var standardOutput = new StreamWriter(Console.OpenStandardOutput());
-                            standardOutput.AutoFlush = true;
-                            Console.SetOut(standardOutput);
-                        }
+                        Console.WriteLine("Chunking broke the runtime, check" + System.IO.Path.DirectorySeparatorChar + moduleName + "_chunker.log!");
+                        using (System.IO.StreamWriter file = new System.IO.StreamWriter(Path.ToPath(moduleName) + "_chunker.log", false))
+                            file.WriteLine(e);
                         PrintErrors();
                         return null;
                     }
