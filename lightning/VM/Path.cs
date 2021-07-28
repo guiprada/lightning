@@ -1,6 +1,6 @@
 namespace lightning
 {
-        public class Path{
+    public class Path{
         public static string ModuleName(string p_path){
             string name = System.IO.Path.ChangeExtension(p_path, null);
             string current_dir_string = "." + System.IO.Path.DirectorySeparatorChar;

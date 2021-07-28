@@ -721,14 +721,8 @@ namespace lightning
                     p_vm.RecycleVM(try_vm);
                     return new Unit(true);
                 }catch(Exception e){
-                    using (System.IO.StreamWriter file = new System.IO.StreamWriter(try_log_path, true)){
-                        Console.SetOut(file);
-                        Console.WriteLine("-------------------\n" + p_vm.ErrorLocation());
-                        Console.WriteLine(e);
-                        var standardOutput = new StreamWriter(Console.OpenStandardOutput());
-                        standardOutput.AutoFlush = true;
-                        Console.SetOut(standardOutput);
-                    }
+                    Logger.AddLine("-------------------\n" + p_vm.ErrorLocation(), try_log_path);
+                    Logger.AddLine(e.ToString(), try_log_path);
                     p_vm.RecycleVM(try_vm);
                     return new Unit(false);
                 }

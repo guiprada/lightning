@@ -13,8 +13,7 @@ use tuples as structs with named access
 
 To be Done
 ----------
-table initialization could be done in parallel( table:init() and List())
-convert log try async
+rename TableUnit to BucketUnit
 file read and write test
 remove DUP and STASH
 require should genenate .out
@@ -167,3 +166,4 @@ Done
     - cast methods to_float() to_integer() to_string()
     - table class
     - move Table Get and Set for negative indices to GetElement and SetElement
+    - added async logger
