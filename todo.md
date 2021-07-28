@@ -8,11 +8,14 @@ strong typed dynamic language
 add typing tests
 examine overflows in numeric operations
 method and member function declaration
+use tuples as structs with named access
 
 
 To be Done
 ----------
-log try async
+move Table Get and Set for negative indices to GetElement and SetElement
+table initialization could be done in parallel( table:init() and List())
+convert log try async
 file read and write test
 remove DUP and STASH
 require should genenate .out
