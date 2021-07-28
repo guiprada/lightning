@@ -13,7 +13,6 @@ use tuples as structs with named access
 
 To be Done
 ----------
-move Table Get and Set for negative indices to GetElement and SetElement
 table initialization could be done in parallel( table:init() and List())
 convert log try async
 file read and write test
@@ -167,3 +166,4 @@ Done
     - sync grammar with parser
     - cast methods to_float() to_integer() to_string()
     - table class
+    - move Table Get and Set for negative indices to GetElement and SetElement

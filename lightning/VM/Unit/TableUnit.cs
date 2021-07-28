@@ -90,25 +90,18 @@ namespace lightning
             UnitType key_type = p_key.Type;
             switch(key_type){
                 case UnitType.Integer:
-                    if(p_key.integerValue >= 0)
-                        ElementSet(p_key, p_value);
-                    else
-                        TableSet(p_key, p_value);
+                    ElementSet(p_key, p_value);
                     break;
                 default:
                     TableSet(p_key, p_value);
                     break;
             }
         }
-
         public override Unit Get(Unit p_key){
             UnitType key_type = p_key.Type;
             switch(key_type){
                 case UnitType.Integer:
-                    if(p_key.integerValue >= 0)
-                        return GetElement(p_key);
-                    else
-                        return GetTable(p_key);
+                    return GetElement(p_key);
                 default:
                     return GetTable(p_key);
             }
@@ -123,19 +116,20 @@ namespace lightning
         }
 
         Unit GetElement(Unit p_key){
-            if(p_key.integerValue < Elements.Count)
-                return Elements[(int)p_key.integerValue];
+            Integer index = p_key.integerValue;
+            if((index >= 0) && (index < Elements.Count))
+                return Elements[(int)index];
             Unit this_unit;
             if(Table.TryGetValue(p_key, out this_unit))
                     return this_unit;
-            throw new Exception("List does not contain index: " + p_key.ToString());
+            throw new Exception("Table does not contain index: " + p_key.ToString());
         }
         void ElementSet(Unit p_key, Unit value)
         {
             Integer index = p_key.integerValue;
-            if (index <= Elements.Count - 1)
+            if ((index >= 0) && (index <= Elements.Count - 1))
                 Elements[(int)index] = value;
-            else if (index > Elements.Count)
+            else if ((index < 0) || (index > Elements.Count))
                 TableSet(p_key, value);
             else if (index == Elements.Count){
                 Unit this_unit;
