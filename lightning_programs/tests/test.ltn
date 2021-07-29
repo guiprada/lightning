@@ -70,10 +70,17 @@ errors += require("tests/try.ltn")
     // }
     // write_line(a_table.a_function())
 }
+// function a_function (){
+//     return 99
+// }
 {
+    function a_function (){
+        return 99
+    }
     var a_table = [1: \(a) return a]
     a_table[1]
     1+1
+    write_line(a_table[1])
 }
 
 //////////////////////////////// end scratch

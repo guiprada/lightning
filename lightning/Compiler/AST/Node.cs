@@ -401,9 +401,9 @@ namespace lightning
 
     public class FunctionDeclarationNode : FunctionExpressionNode
     {
-        public string Name { get; private set; }
+        public VariableNode Name { get; private set;}
 
-        public FunctionDeclarationNode(string p_Name, List<string> p_Parameters, List<Node> p_Body, int p_Line)
+        public FunctionDeclarationNode(VariableNode p_Name, List<string> p_Parameters, List<Node> p_Body, int p_Line)
             : base(p_Parameters, p_Body, p_Line, NodeType.FUNCTION_DECLARATION)
         {
             Name = p_Name;

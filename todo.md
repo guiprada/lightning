@@ -13,12 +13,11 @@ use tuples as structs with named access
 
 To be Done
 ----------
-rename TableUnit to BucketUnit
+improve function declaration - add method declaration
+rename TableUnit to BucketUnit - separate List and Map
 file read and write test
 remove DUP and STASH
-require should genenate .out
-eval should generate .out
-separate List and Map
+tuple class
 
 add a make_closure(a_function, a_table_with_values) method to set up "protected" table variables
 
@@ -29,8 +28,6 @@ table and wrapper could have and add overridable add method
 floor() ceil() and round()
 
 better list sort tests
-
-tuple and nuple class
 
 add Type to Table and Wrapper so they can be retrieved from lightining and overrided
 properties, protected indexes and operator override

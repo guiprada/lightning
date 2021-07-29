@@ -701,20 +701,25 @@ namespace lightning
         private void ChunkFunctionDeclaration(FunctionDeclarationNode p_node)
         {
             //register name
-            if (globals.Contains(p_node.Name))
-                Error("Local functions cant have the same name as global ones, yet :)", p_node.Line);
+            if (p_node.Name.Indexes.Count == 0){
+                if (globals.Contains(p_node.Name.Name))
+                    Error("Local functions can not override global ones.", p_node.Line);
 
-            Nullable<Variable> maybe_name = SetVar(p_node.Name);
+                Nullable<Variable> maybe_name = SetVar(p_node.Name.Name);
 
-            if (maybe_name.HasValue){
-                Variable this_function = maybe_name.Value;
-
-                if (this_function.type == ValueType.Global)
-                    CompileFunction(this_function.name, p_node.Line, p_node, true);
-                else
-                    CompileFunction(this_function.name, p_node.Line, p_node, false);
-            }else
-                Error("Function name has already been used!", p_node.Line);
+                if (maybe_name.HasValue){
+                    Variable this_function = maybe_name.Value;
+                    if (this_function.type == ValueType.Global)
+                        CompileFunction(this_function.name, p_node.Line, p_node, true);
+                    else
+                        CompileFunction(this_function.name, p_node.Line, p_node, false);
+                }else
+                    Error("Function name has already been used!", p_node.Line);
+            }
+            else
+            {
+                Error("Member function declaration not supported yet!", p_node.Line);
+            }
         }
 
         private void CompileFunction(string p_name, int p_line, FunctionExpressionNode p_node, bool p_isGlobal)

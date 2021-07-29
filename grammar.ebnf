@@ -14,7 +14,7 @@ primary         <- NUMBER
 declaration     <- functionDecl
                 | varDecl
                 | statement;
-functionDecl    <- "function" | "\" IDENTIFIER function;
+functionDecl    <- "function" | "\" compoundVar function;
 function        <- ("(" parameters ")")? statement;
 parameters      <- IDENTIFIER ( "," IDENTIFIER )*;
 varDecl         <- "var" IDENTIFIER ( "=" expression ) ? ";";

@@ -231,11 +231,12 @@ namespace lightning
 
         Node FunctionDecl()
         {
-            TokenString name = Consume(TokenType.IDENTIFIER, "Expected 'function identifier'.", true) as TokenString;
+            // TokenString name = Consume(TokenType.IDENTIFIER, "Expected 'function identifier'.", true) as TokenString;
 
+            VariableNode name = (VariableNode)CompoundVar();
             FunctionStruct this_function = Function();
 
-            return new FunctionDeclarationNode(name.value, this_function.parameters, this_function.statements, name.Line);
+            return new FunctionDeclarationNode(name, this_function.parameters, this_function.statements, name.Line);
         }
 
         Node Statement()
