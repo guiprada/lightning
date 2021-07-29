@@ -156,7 +156,7 @@ namespace lightning
 
         private void PrintTable(TableNode p_node)
         {
-            Console.Write("[LIST ");
+            Console.Write("[TABLE ");
             if (p_node.Elements != null){
                 bool first = true;
                 foreach(Node n in p_node.Elements){
@@ -436,7 +436,7 @@ namespace lightning
 
         private void PrintFunctionDeclaration(FunctionDeclarationNode p_node)
         {
-            Console.Write(identString + "[FUNCTION DECLARATION " + p_node.Name + " (");
+            Console.Write(identString + "[FUNCTION DECLARATION " + p_node.Variable + " (");
             bool is_first = true;
 
             if(p_node.Parameters != null)

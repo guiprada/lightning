@@ -52,7 +52,7 @@ namespace lightning
                             astPrinter.PrintToFile(ParsedTree, Path.ToPath(moduleName) + ".ast");
                         }
                     }catch (Exception e){
-                        Console.WriteLine("Parsing broke the runtime, check out" + System.IO.Path.DirectorySeparatorChar + moduleName + "_parser.log!");
+                        Console.WriteLine("Parsing broke the runtime, check out" + System.IO.Path.DirectorySeparatorChar + Path.ToPath(moduleName) + "_parser.log!");
                         FileWriter.Create(e.ToString(), Path.ToPath(moduleName) + "_parser.log");
                         PrintWarnings();
                         PrintErrors();
@@ -229,10 +229,7 @@ namespace lightning
             return new FunctionExpressionNode(this_function.parameters, this_function.statements, function_token.Line);
         }
 
-        Node FunctionDecl()
-        {
-            // TokenString name = Consume(TokenType.IDENTIFIER, "Expected 'function identifier'.", true) as TokenString;
-
+        Node FunctionDecl(){
             VariableNode name = (VariableNode)CompoundVar();
             FunctionStruct this_function = Function();
 

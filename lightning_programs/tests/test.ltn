@@ -64,23 +64,17 @@ errors += require("tests/try.ltn")
 
 //////////////////////////////// scratch
 {
-    // var a_table = []
-    // function a_table.a_function (){
-    //     return 99
-    // }
-    // write_line(a_table.a_function())
-}
-// function a_function (){
-//     return 99
-// }
-{
-    function a_function (){
+    var a_table = []
+    function a_table.a_function (){
         return 99
     }
-    var a_table = [1: \(a) return a]
-    a_table[1]
+    write_line(a_table)
+    write_line(a_table.a_function())
+}
+{
+    var another_table = [1: \(a) return a]
+    another_table[1]
     1+1
-    write_line(a_table[1])
 }
 
 //////////////////////////////// end scratch

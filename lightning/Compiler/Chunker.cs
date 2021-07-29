@@ -83,7 +83,7 @@ namespace lightning
                     }
                     catch (Exception e)
                     {
-                        Console.WriteLine("Chunking broke the runtime, check" + System.IO.Path.DirectorySeparatorChar + moduleName + "_chunker.log!");
+                        Console.WriteLine("Chunking broke the runtime, check" + System.IO.Path.DirectorySeparatorChar + Path.ToPath(moduleName) + "_chunker.log!");
                         using (System.IO.StreamWriter file = new System.IO.StreamWriter(Path.ToPath(moduleName) + "_chunker.log", false))
                             file.WriteLine(e);
                         PrintErrors();
@@ -701,11 +701,11 @@ namespace lightning
         private void ChunkFunctionDeclaration(FunctionDeclarationNode p_node)
         {
             //register name
-            if (p_node.Name.Indexes.Count == 0){
-                if (globals.Contains(p_node.Name.Name))
+            if (p_node.Variable.Indexes.Count == 0){
+                if (globals.Contains(p_node.Variable.Name))
                     Error("Local functions can not override global ones.", p_node.Line);
 
-                Nullable<Variable> maybe_name = SetVar(p_node.Name.Name);
+                Nullable<Variable> maybe_name = SetVar(p_node.Variable.Name);
 
                 if (maybe_name.HasValue){
                     Variable this_function = maybe_name.Value;
@@ -718,7 +718,9 @@ namespace lightning
             }
             else
             {
-                Error("Member function declaration not supported yet!", p_node.Line);
+                FunctionExpressionNode extracted_function = new FunctionExpressionNode(p_node.Parameters, p_node.Body, p_node.Line);
+                AssignmentNode new_assigment = new AssignmentNode(p_node.Variable, extracted_function, p_node.Line);
+                ChunkIt(new_assigment);
             }
         }
 
