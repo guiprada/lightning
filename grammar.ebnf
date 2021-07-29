@@ -14,7 +14,7 @@ primary         <- NUMBER
 declaration     <- functionDecl
                 | varDecl
                 | statement;
-functionDecl    <- "function" | "\" function IDENTIFIER;
+functionDecl    <- "function" | "\" IDENTIFIER function;
 function        <- ("(" parameters ")")? statement;
 parameters      <- IDENTIFIER ( "," IDENTIFIER )*;
 varDecl         <- "var" IDENTIFIER ( "=" expression ) ? ";";
@@ -48,14 +48,13 @@ unary           <- ( "!" | "-" ) unary | call;
 
 (* CALL *)
 call                <- primary (callTail | anonymousMethodCall);
-callTail            <- "(" arguments* ")" pipedAccess* sequentialCall* anonymousMethodCall?;
+callTail            <- "(" arguments* ")" indexedAccess* sequentialCall* anonymousMethodCall?;
 anonymousMethodCall <- methodAccess callTail;
 sequentialCall      <- ("." "(" arguments* ")");
 arguments           <- expression ( "," expression )*;
 
 (* ACCESS *)
 compoundVar     <- IDENTIFIER indexedAccess* methodAccess;
-pipedAccess     <- "." ( "[" expression "]" ) | ( IDENTIFIER );
 indexedAccess   <- ( "[" expression "]" ) | ( "." IDENTIFIER );
 methodAccess    <-  ( ":" IDENTIFIER )?;
 
