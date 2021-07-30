@@ -16,7 +16,7 @@ To be Done
 add column info
     fix eval inconstant naming
     replace lambda counter with line?
-create an indexNode
+
 
 add variable data to chunk
 improve function declaration - add method declaration
@@ -173,3 +173,4 @@ Done
     - added async logger
     - merge chunk assignment and assignmentOp
     - rename constants data
+    - create an indexNode, add index node pretty print
