@@ -67,7 +67,7 @@ namespace lightning
         public static void Write(string p_line, string p_path){
             Add(new Entry(p_line, p_path, false, true));
         }
-        public static void Create(string p_contents, string p_path){
+        public static void New(string p_contents, string p_path){
             Add(new Entry(p_contents, p_path, true, false));
         }
     }

@@ -16,6 +16,7 @@ To be Done
 create an indexNode
 rename constants data_literals
 improve function declaration - add method declaration
+global function override?
 rename TableUnit to BucketUnit - separate List and Map
 file read and write test
 remove DUP and STASH
