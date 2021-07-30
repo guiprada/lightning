@@ -703,11 +703,11 @@ namespace lightning
                             name += "." + this_index.Name;
                     }
                 }
+                // Break it down
                 MemberFunctionDeclarationNode extracted_function = new MemberFunctionDeclarationNode(name, p_node.Parameters, p_node.Body, p_node.Line);
                 AssignmentNode new_assigment = new AssignmentNode(p_node.Variable, extracted_function, AssignmentOperatorType.ASSIGN, p_node.Line);
                 StmtExprNode new_stmt_expr = new StmtExprNode(new_assigment, p_node.Line);
                 ChunkIt(new_stmt_expr);
-                // Add(OpCode.POP, p_node.Line);
             }
         }
 

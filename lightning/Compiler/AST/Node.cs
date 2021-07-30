@@ -381,6 +381,7 @@ namespace lightning
     public class ReturnNode : Node
     {
         public Node Expr { get; private set; }
+
         public ReturnNode(Node p_Expr, int p_Line)
             : base(NodeType.RETURN, p_Line)
         {
