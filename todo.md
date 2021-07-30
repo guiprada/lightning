@@ -13,6 +13,8 @@ use tuples as structs with named access
 
 To be Done
 ----------
+add column info
+fix eval inconstant naming
 replace lambda counter with line?
 create an indexNode
 rename constants data_literals
