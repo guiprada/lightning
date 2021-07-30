@@ -2,7 +2,7 @@ using System.Collections.Generic;
 
 using Operand = System.UInt16;
 namespace lightning{
-    public struct Instructions
+    public struct InstructionStack
     {
         int currentInstructionsIndex;
         FunctionUnit[] functions;
@@ -34,7 +34,7 @@ namespace lightning{
             }
         }
 
-        public Instructions(int p_functionDeepness, FunctionUnit p_main, out List<Instruction> p_instructionsCache){
+        public InstructionStack(int p_functionDeepness, FunctionUnit p_main, out List<Instruction> p_instructionsCache){
             functions = new FunctionUnit[p_functionDeepness];
             returnAddress = new Operand[2 * p_functionDeepness];
             funCallEnv = new int[p_functionDeepness];

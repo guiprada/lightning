@@ -39,7 +39,7 @@ namespace lightning
         FunctionUnit main;
         private bool parallelVM;
 
-        Instructions instructions;
+        InstructionStack instructions;
         List<Instruction> instructionsCache;
 
         Memory<Unit> globals; // used for global variables
@@ -78,7 +78,7 @@ namespace lightning
 
             main = p_chunk.MainFunctionUnit("main");
 
-            instructions = new Instructions(functionDeepness, main, out instructionsCache);
+            instructions = new InstructionStack(functionDeepness, main, out instructionsCache);
 
             stack = new Stack(functionDeepness);
 
@@ -123,7 +123,7 @@ namespace lightning
             IP = 0;
             parallelVM = p_parallelVM;
 
-            instructions = new Instructions(functionDeepness, main, out instructionsCache);
+            instructions = new InstructionStack(functionDeepness, main, out instructionsCache);
             stack = new Stack(functionDeepness);
             variables = new Memory<Unit>();
             upValues = new Memory<UpValueUnit>();
