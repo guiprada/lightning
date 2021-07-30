@@ -87,6 +87,15 @@ namespace lightning
         BRACKET,
     }
 
+    public struct CallInfo{
+        public List<Node> Arguments;
+        public List<IndexNode> Indexes;
+        public CallInfo(List<Node> p_Arguments, List<IndexNode> p_Indexes)
+        {
+            Arguments = p_Arguments;
+            Indexes = p_Indexes;
+        }
+    }
     public abstract class Node
     {
         public NodeType Type { get; private set; }
@@ -359,15 +368,13 @@ namespace lightning
     public class FunctionCallNode : Node
     {
         public VariableNode Variable { get; private set; }
-        public List<List<Node>> Calls { get; private set; }
-        public List<List<IndexNode>> IndexedAccess { get; private set; }
+        public List<CallInfo> Calls { get; private set; }
 
-        public FunctionCallNode(VariableNode p_Name, List<List<Node>> p_Calls, List<List<IndexNode>> p_IndexedAccess, int p_Line)
+        public FunctionCallNode(VariableNode p_Name, int p_Line)
             : base(NodeType.FUNCTION_CALL, p_Line)
         {
             Variable = p_Name;
-            Calls = p_Calls;
-            IndexedAccess = p_IndexedAccess;
+            Calls = new List<CallInfo>();
         }
     }
 

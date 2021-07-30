@@ -382,10 +382,10 @@ namespace lightning
             Print(p_node.Variable);
 
             int counter = 0;
-            foreach (List<Node> arguments in p_node.Calls){
+            foreach (CallInfo call in p_node.Calls){
                 Console.Write("(");
                 bool is_first = true;
-                foreach (Node n in arguments){
+                foreach (Node n in call.Arguments){
                     if (is_first){
                         Print(n);
                         is_first = false;
@@ -395,11 +395,9 @@ namespace lightning
                     }
                 }
                 Console.Write(")");
-                if(p_node.IndexedAccess[counter] != null){
-                    Console.Write(".indexedAccess(");
-                    foreach(Node n in p_node.IndexedAccess[counter])
+                if(call.Indexes != null){
+                    foreach(Node n in call.Indexes)
                         Print(n);
-                    Console.Write(")");
                 }
                 counter++;
             }

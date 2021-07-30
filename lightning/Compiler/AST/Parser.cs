@@ -791,12 +791,8 @@ namespace lightning
 
             if (Check(TokenType.LEFT_PAREN))
             {
-                List<List<Node>> calls = new List<List<Node>>();
-                List<List<IndexNode>> indexed_access = new List<List<IndexNode>>();
                 Node function_call_node = new FunctionCallNode(
                     (maybe_func as VariableNode),
-                    calls,
-                    indexed_access,
                     maybe_func.Line);
                 function_call_node = CallTail(function_call_node);
                 return function_call_node;
@@ -898,12 +894,8 @@ namespace lightning
                 );
                 variable_node = (VariableNode)MethodAccess(variable_node);
 
-                List<List<Node>> calls = new List<List<Node>>();
-                List<List<IndexNode>> indexed_access = new List<List<IndexNode>>();
                 Node function_call_node = new FunctionCallNode(
                     variable_node,
-                    calls,
-                    indexed_access,
                     p_node.Line);
 
                 function_call_node = CallTail(function_call_node);
@@ -919,14 +911,14 @@ namespace lightning
             {
                 FunctionCallNode this_function_call_node =
                     (FunctionCallNode)p_functionCallNode;
-                this_function_call_node.Calls.Add(Arguments());
-
+                List<Node> arguments = Arguments();
+                List<IndexNode> indexes;
                 if(Check(TokenType.DOT) || Check(TokenType.LEFT_BRACKET)){
-                    this_function_call_node.IndexedAccess.Add(
-                        IndexedAccess());
+                    indexes = IndexedAccess();
                 }else{
-                    this_function_call_node.IndexedAccess.Add(null);
+                    indexes = null;
                 }
+                this_function_call_node.Calls.Add(new CallInfo(arguments, indexes));
             }
             if(Check(TokenType.COLON))
                 p_functionCallNode = AnonymousCall(p_functionCallNode);

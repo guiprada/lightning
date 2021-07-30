@@ -581,8 +581,8 @@ namespace lightning
         private void ChunkFunctionCall(FunctionCallNode p_node)
         {
             //push parameters on stack
-            for(int i=p_node.Calls[0].Count-1; i>=0; i--)
-                ChunkIt(p_node.Calls[0][i]);
+            for(int i=p_node.Calls[0].Arguments.Count -1; i>=0; i--)
+                ChunkIt(p_node.Calls[0].Arguments[i]);
 
             // the first call, we need to decode the function name, or object
             Variable this_call;
@@ -623,10 +623,10 @@ namespace lightning
             // Call
             Add(OpCode.CALL, p_node.Line);
             // Does it have IndexedAccess?
-            if (p_node.IndexedAccess[0] != null)
+            if (p_node.Calls[0].Indexes != null)
             {
-                LoadIndexes(p_node.IndexedAccess[0]);
-                Add(OpCode.TABLE_GET, (Operand)p_node.IndexedAccess[0].Count, p_node.Line);
+                LoadIndexes(p_node.Calls[0].Indexes);
+                Add(OpCode.TABLE_GET, (Operand)p_node.Calls[0].Indexes.Count, p_node.Line);
             }
 
             // Is it a compound call?
@@ -634,16 +634,16 @@ namespace lightning
             {
                 Add(OpCode.PUSH_STASH, p_node.Line);
 
-                for(int j=p_node.Calls[i].Count-1; j>=0; j--)
-                    ChunkIt(p_node.Calls[i][j]);
+                for(int j=p_node.Calls[i].Arguments.Count -1; j>=0; j--)
+                    ChunkIt(p_node.Calls[i].Arguments[j]);
 
                 Add(OpCode.POP_STASH, p_node.Line);
                 Add(OpCode.CALL, p_node.Line);
 
-                if (p_node.IndexedAccess[i] != null)
+                if (p_node.Calls[i].Indexes != null)
                 {
-                    LoadIndexes(p_node.IndexedAccess[i]);
-                    Add(OpCode.TABLE_GET, (Operand)p_node.IndexedAccess[i].Count, p_node.Line);
+                    LoadIndexes(p_node.Calls[i].Indexes);
+                    Add(OpCode.TABLE_GET, (Operand)p_node.Calls[i].Indexes.Count, p_node.Line);
                 }
             }
         }
