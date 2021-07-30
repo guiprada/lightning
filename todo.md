@@ -13,9 +13,8 @@ use tuples as structs with named access
 
 To be Done
 ----------
-create and indexNode
+create an indexNode
 rename constants data_literals
-merge chunk assignment and assignmentOp
 improve function declaration - add method declaration
 rename TableUnit to BucketUnit - separate List and Map
 file read and write test
@@ -167,3 +166,4 @@ Done
     - table class
     - move Table Get and Set for negative indices to GetElement and SetElement
     - added async logger
+    - merge chunk assignment and assignmentOp

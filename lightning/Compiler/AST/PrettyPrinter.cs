@@ -57,11 +57,8 @@ namespace lightning
                 case NodeType.VAR_DECLARATION:
                     PrintVarDeclaration(p_node as VarDeclarationNode);
                     break;
-                case NodeType.ASSIGMENT:
-                    Printassignment(p_node as AssignmentNode);
-                    break;
                 case NodeType.ASSIGMENT_OP:
-                    PrintassignmentOp(p_node as AssignmentOpNode);
+                    PrintassignmentOp(p_node as AssignmentNode);
                     break;
                 case NodeType.LOGICAL:
                     PrintLogical(p_node as LogicalNode);
@@ -273,22 +270,19 @@ namespace lightning
 
         private void PrintVariable(VariableNode p_node)
         {
-
-            if (p_node.AccessType == VarAccessType.METHOD)
-                Console.Write("[METHOD " + p_node.Name);
-            else if (p_node.AccessType == VarAccessType.DOTTED)
-                Console.Write("[IDENTIFIER " + p_node.Name);
-            else if (p_node.IsAnonymous)
+            if (p_node.IsAnonymous){
                 Console.Write("[VAR_EXPRESSION " + p_node.Name);
-            else
+                Print(p_node.Expression);
+            }else{
                 Console.Write("[VARIABLE " + p_node.Name);
+            }
 
             for (int i = 0; i < p_node.Indexes.Count; i++) {
-                if ((p_node.Indexes[i].GetType() != typeof(VariableNode)) || (p_node.Indexes[i]as VariableNode).AccessType == VarAccessType.PLAIN){
+                if ((p_node.Indexes[i].GetType() != typeof(VariableNode)) || (p_node.Indexes[i]as VariableNode).AccessType == VarAccessType.BRACKET){
                     Console.Write("[");
                     Print(p_node.Indexes[i]);
                     Console.Write("]");
-                }else if ((p_node.Indexes[i] as VariableNode).AccessType == VarAccessType.METHOD){
+                }else if ((p_node.Indexes[i] as VariableNode).AccessType == VarAccessType.COLON){
                     Console.Write(":");
                     Print(p_node.Indexes[i]);
                 }else{
@@ -309,14 +303,7 @@ namespace lightning
             Console.WriteLine("]");
         }
 
-        private void Printassignment(AssignmentNode p_node)
-        {
-            Console.Write("[ASSIGMENT " + p_node.Assigned.Name + " = ");
-            Print(p_node.Value);
-            Console.Write("]");
-        }
-
-        private void PrintassignmentOp(AssignmentOpNode p_node)
+        private void PrintassignmentOp(AssignmentNode p_node)
         {
             Console.Write("[ASSIGMENT_OP " + p_node.Assigned.Name);
             string op;
@@ -436,7 +423,9 @@ namespace lightning
 
         private void PrintFunctionDeclaration(FunctionDeclarationNode p_node)
         {
-            Console.Write(identString + "[FUNCTION DECLARATION " + p_node.Variable + " (");
+            Console.Write(identString + "[FUNCTION DECLARATION ");
+            Print(p_node.Variable);
+            Console.Write(" (");
             bool is_first = true;
 
             if(p_node.Parameters != null)

@@ -144,7 +144,7 @@ namespace lightning
             {
                 if (Match(TokenType.LEFT_BRACKET))
                 {
-                    VariableNode index = new VariableNode(Expression(), new List<Node>(), VarAccessType.PLAIN, Previous().Line);
+                    VariableNode index = new VariableNode(Expression(), new List<Node>(), VarAccessType.BRACKET, Previous().Line);
                     indexes.Add(index);
 
                     Consume(TokenType.RIGHT_BRACKET, "Expected ']' after 'compoundVar identifier'", true);
@@ -153,11 +153,11 @@ namespace lightning
                 {
                     Match(TokenType.IDENTIFIER);
                     string this_name = (Previous() as TokenString).value;
-                    VariableNode index = new VariableNode(this_name, new List<Node>(), VarAccessType.DOTTED, Previous().Line);
+                    VariableNode index = new VariableNode(this_name, new List<Node>(), VarAccessType.DOT, Previous().Line);
                     indexes.Add(index);
                 }
             }
-            return new VariableNode(p_name, indexes, VarAccessType.PLAIN, p_line);
+            return new VariableNode(p_name, indexes, VarAccessType.NONE, p_line);
         }
 
         Node VarDecl()
@@ -372,7 +372,7 @@ namespace lightning
                 Node value = Assignment();
 
                 if (assigned.Type == NodeType.VARIABLE)
-                    return new AssignmentOpNode((VariableNode)assigned, value, AssignmentOperatorType.ADDITION_ASSIGN, assigned.Line);
+                    return new AssignmentNode((VariableNode)assigned, value, AssignmentOperatorType.ADDITION_ASSIGN, assigned.Line);
                 else
                     Error("Invalid assignment.");
             }
@@ -381,7 +381,7 @@ namespace lightning
                 Node value = new LiteralNode(1, assigned.Line);
 
                 if (assigned.Type == NodeType.VARIABLE)
-                    return new AssignmentOpNode((VariableNode)assigned, value, AssignmentOperatorType.ADDITION_ASSIGN, assigned.Line);
+                    return new AssignmentNode((VariableNode)assigned, value, AssignmentOperatorType.ADDITION_ASSIGN, assigned.Line);
                 else
                     Error("Invalid assignment.");
             }
@@ -390,7 +390,7 @@ namespace lightning
                 Node value = Assignment();
 
                 if (assigned.Type == NodeType.VARIABLE)
-                    return new AssignmentOpNode((VariableNode)assigned, value, AssignmentOperatorType.SUBTRACTION_ASSIGN, assigned.Line);
+                    return new AssignmentNode((VariableNode)assigned, value, AssignmentOperatorType.SUBTRACTION_ASSIGN, assigned.Line);
                 else
                     Error("Invalid assignment.");
             }
@@ -399,7 +399,7 @@ namespace lightning
                 Node value = new LiteralNode(1, assigned.Line);
 
                 if (assigned.Type == NodeType.VARIABLE)
-                    return new AssignmentOpNode((VariableNode)assigned, value, AssignmentOperatorType.SUBTRACTION_ASSIGN, assigned.Line);
+                    return new AssignmentNode((VariableNode)assigned, value, AssignmentOperatorType.SUBTRACTION_ASSIGN, assigned.Line);
                 else
                     Error("Invalid assignment.");
             }
@@ -408,7 +408,7 @@ namespace lightning
                 Node value = Assignment();
 
                 if (assigned.Type == NodeType.VARIABLE)
-                    return new AssignmentOpNode((VariableNode)assigned, value, AssignmentOperatorType.MULTIPLICATION_ASSIGN, assigned.Line);
+                    return new AssignmentNode((VariableNode)assigned, value, AssignmentOperatorType.MULTIPLICATION_ASSIGN, assigned.Line);
                 else
                     Error("Invalid assignment.");
             }
@@ -417,7 +417,7 @@ namespace lightning
                 Node value = Assignment();
 
                 if (assigned.Type == NodeType.VARIABLE)
-                    return new AssignmentOpNode((VariableNode)assigned, value, AssignmentOperatorType.DIVISION_ASSIGN, assigned.Line);
+                    return new AssignmentNode((VariableNode)assigned, value, AssignmentOperatorType.DIVISION_ASSIGN, assigned.Line);
                 else
                     Error("Invalid assignment.");
             }
@@ -426,7 +426,7 @@ namespace lightning
                 Node value = Assignment();
 
                 if (assigned.Type == NodeType.VARIABLE)
-                    return new AssignmentNode((VariableNode)assigned, value, assigned.Line);
+                    return new AssignmentNode((VariableNode)assigned, value, AssignmentOperatorType.ASSIGN, assigned.Line);
                 else
                     Error("Invalid assignment.");
             }
@@ -652,11 +652,11 @@ namespace lightning
             {// Method Call
                 if(Match(TokenType.IDENTIFIER)){
                     string this_name = (Previous() as TokenString).value;
-                    VariableNode index = new VariableNode(this_name, new List<Node>(), VarAccessType.METHOD, Previous().Line);
+                    VariableNode index = new VariableNode(this_name, new List<Node>(), VarAccessType.COLON, Previous().Line);
                     (p_node as VariableNode).Indexes.Add(index);
                 }else if(Match(TokenType.STRING)){// Convert String to identifier
                     string this_name = (Previous() as TokenString).value;
-                    VariableNode index = new VariableNode(this_name, new List<Node>(), VarAccessType.METHOD, Previous().Line);
+                    VariableNode index = new VariableNode(this_name, new List<Node>(), VarAccessType.COLON, Previous().Line);
                     (p_node as VariableNode).Indexes.Add(index);
                 }else if(Match(TokenType.MINUS)){// Convert Negative Number to expression
                     if(Match(TokenType.NUMBER)){
@@ -666,7 +666,7 @@ namespace lightning
                             this_value = new LiteralNode(-((TokenNumber)Previous()).integerValue, Previous().Line);
                         else
                             this_value = new LiteralNode(-((TokenNumber)Previous()).floatValue, Previous().Line);
-                        VariableNode index = new VariableNode(this_value, new List<Node>(), VarAccessType.METHOD, Previous().Line);
+                        VariableNode index = new VariableNode(this_value, new List<Node>(), VarAccessType.COLON, Previous().Line);
                         (p_node as VariableNode).Indexes.Add(index);
                     }else{
                         Error("Expected Number after '-' in 'Method Access'");
@@ -678,10 +678,10 @@ namespace lightning
                         this_value = new LiteralNode(((TokenNumber)Previous()).integerValue, Previous().Line);
                     else
                         this_value = new LiteralNode(((TokenNumber)Previous()).floatValue, Previous().Line);
-                    VariableNode index = new VariableNode(this_value, new List<Node>(), VarAccessType.METHOD, Previous().Line);
+                    VariableNode index = new VariableNode(this_value, new List<Node>(), VarAccessType.COLON, Previous().Line);
                     (p_node as VariableNode).Indexes.Add(index);
                 }else if (Match(TokenType.LEFT_BRACKET)) {
-                    VariableNode index = new VariableNode(Expression(), new List<Node>(), VarAccessType.METHOD, Previous().Line);
+                    VariableNode index = new VariableNode(Expression(), new List<Node>(), VarAccessType.COLON, Previous().Line);
                     (p_node as VariableNode).Indexes.Add(index);
                     Consume(TokenType.RIGHT_BRACKET, "Expected ']' after 'Method Access'", true);
                 }
@@ -692,7 +692,7 @@ namespace lightning
         Node AnonymousCall(Node p_node){
             if(Check(TokenType.COLON))
             {
-                VariableNode variable_node = new VariableNode(p_node, new List<Node>(), VarAccessType.PLAIN, p_node.Line);
+                VariableNode variable_node = new VariableNode(p_node, new List<Node>(), VarAccessType.BRACKET, p_node.Line);
                 variable_node = (VariableNode)MethodAccess(variable_node);
 
                 List<List<Node>> calls = new List<List<Node>>();

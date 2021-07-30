@@ -81,9 +81,10 @@ namespace lightning
 
     public enum VarAccessType
     {
-        DOTTED,
-        METHOD,
-        PLAIN,
+        DOT,
+        COLON,
+        BRACKET,
+        NONE,
     }
 
     public abstract class Node
@@ -275,6 +276,7 @@ namespace lightning
         public VariableNode(Node p_Expression, List<Node> p_Indexes, VarAccessType p_AccessType, int p_Line)
             : base(NodeType.VARIABLE, p_Line)
         {
+            Name = null;
             Expression = p_Expression;
             Indexes = p_Indexes;
             AccessType = p_AccessType;
@@ -299,22 +301,9 @@ namespace lightning
         public VariableNode Assigned { get; private set; }
         public Node Value { get; private set; }
 
-        public AssignmentNode(VariableNode p_Assigned, Node p_Value, int p_Line)
-        : base(NodeType.ASSIGMENT, p_Line)
-        {
-            Assigned = p_Assigned;
-            Value = p_Value;
-        }
-    }
-
-    public class AssignmentOpNode : Node
-    {
-        public VariableNode Assigned { get; private set; }
-        public Node Value { get; private set; }
-
         public AssignmentOperatorType Op { get; private set; }
 
-        public AssignmentOpNode(VariableNode p_Assigned, Node p_Value, AssignmentOperatorType p_Op, int p_Line)
+        public AssignmentNode(VariableNode p_Assigned, Node p_Value, AssignmentOperatorType p_Op, int p_Line)
         : base(NodeType.ASSIGMENT_OP, p_Line)
         {
             Assigned = p_Assigned;

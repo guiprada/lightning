@@ -65,11 +65,11 @@ errors += require("tests/try.ltn")
 //////////////////////////////// scratch
 {
     var a_table = []
-    function a_table.a_function (){
+    function a_table["he" .. "y"] (){
         return 99
     }
-    write_line(a_table)
-    write_line(a_table.a_function())
+    write_line(a_table.hey)
+    write_line(a_table["hey"]())
 }
 {
     var another_table = [1: \(a) return a]

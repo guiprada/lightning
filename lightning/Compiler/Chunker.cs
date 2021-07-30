@@ -165,11 +165,8 @@ namespace lightning
                 case NodeType.VAR_DECLARATION:
                     ChunkVarDeclaration(p_node as VarDeclarationNode);
                     break;
-                case NodeType.ASSIGMENT:
-                    Chunkassignment(p_node as AssignmentNode);
-                    break;
                 case NodeType.ASSIGMENT_OP:
-                    ChunkassignmentOp(p_node as AssignmentOpNode);
+                    ChunkAssignmentOp(p_node as AssignmentNode);
                     break;
                 case NodeType.LOGICAL:
                     ChunkLogical(p_node as LogicalNode);
@@ -505,38 +502,7 @@ namespace lightning
                 Error("Variable Name has already been used!", p_node.Line);
         }
 
-        private void Chunkassignment(AssignmentNode p_node)
-        {
-            ChunkIt(p_node.Value);
-            Nullable<Variable> maybe_var = GetVar(p_node.Assigned.Name, p_node.Line);
-            Operand op = (Operand)AssignmentOperatorType.ASSIGN;
-            if (maybe_var.HasValue){
-                Variable this_var = maybe_var.Value;
-                if (p_node.Assigned.Indexes.Count == 0){
-                    switch (this_var.type){
-                        case ValueType.Local:
-                            Add(OpCode.ASSIGN_VARIABLE, (Operand)this_var.address, (Operand)this_var.envIndex, op, p_node.Line);
-                            break;
-                        case ValueType.Global:
-                            Add(OpCode.ASSIGN_GLOBAL, (Operand)this_var.address, op, p_node.Line);
-                            break;
-                        case ValueType.UpValue:
-                            int this_index = upvalueStack.Peek().IndexOf(this_var);
-                            Add(OpCode.ASSIGN_UPVALUE, (Operand)this_index, op, p_node.Line);
-                            break;
-
-                    }
-                }else{//  it is a compoundVar
-                    LoadVariable(this_var, p_node.Line);
-                    LoadIndexes(p_node.Assigned);
-                    Add(OpCode.TABLE_SET, (Operand)p_node.Assigned.Indexes.Count, op, p_node.Line);
-                }
-            }else{
-                Error("assignment to non existing variable!", p_node.Line);
-            }
-        }
-
-        private void ChunkassignmentOp(AssignmentOpNode p_node)
+        private void ChunkAssignmentOp(AssignmentNode p_node)
         {
             ChunkIt(p_node.Value);
             Nullable<Variable> maybe_var = GetVar(p_node.Assigned.Name, p_node.Line);
@@ -634,7 +600,7 @@ namespace lightning
             if (p_node.Variable.Indexes.Count == 0)
                 LoadVariable(this_call, p_node.Line);
             else{// it is a compoundCall/method/IndexedAccess!
-                if ((p_node.Variable.Indexes[p_node.Variable.Indexes.Count - 1] as VariableNode).AccessType == VarAccessType.METHOD)
+                if ((p_node.Variable.Indexes[p_node.Variable.Indexes.Count - 1] as VariableNode).AccessType == VarAccessType.COLON)
                 {// is it a method!
                     LoadVariable(this_call, p_node.Line);
                     Add(OpCode.DUP, p_node.Line);// it is a method so we push the table again, to be used as parameter!
@@ -701,7 +667,6 @@ namespace lightning
 
         private void ChunkMemberFunctionDeclaration(MemberFunctionDeclarationNode p_node)
         {
-            Console.WriteLine(p_node.Name);
             CompileFunction(p_node.Name, p_node, false);
         }
 
@@ -728,14 +693,22 @@ namespace lightning
                 // assemble a name for it
                 string name = p_node.Variable.Name;
                 for(int i=0; i<p_node.Variable.Indexes.Count; i++){
-                    if(p_node.Variable.Indexes[i].Type == NodeType.VARIABLE)
-                        name += "." + ((VariableNode)p_node.Variable.Indexes[i]).Name;
-                    else
-                        Error("Member Function declaration with non literal indices is not supported!", p_node.Line);
+                    if(p_node.Variable.Indexes[i].Type == NodeType.VARIABLE){
+                        VariableNode this_index = (VariableNode)p_node.Variable.Indexes[i];
+                        if(this_index.AccessType == VarAccessType.COLON)
+                            Error("Method Declaration is not supported yet!", p_node.Line);
+                        if(this_index.IsAnonymous){
+                            name += ".lambda" + lambdaCounter;
+                            lambdaCounter++;
+                        }else
+                            name += "." + this_index.Name;
+                    }
                 }
                 MemberFunctionDeclarationNode extracted_function = new MemberFunctionDeclarationNode(name, p_node.Parameters, p_node.Body, p_node.Line);
-                AssignmentNode new_assigment = new AssignmentNode(p_node.Variable, extracted_function, p_node.Line);
-                ChunkIt(new_assigment);
+                AssignmentNode new_assigment = new AssignmentNode(p_node.Variable, extracted_function, AssignmentOperatorType.ASSIGN, p_node.Line);
+                StmtExprNode new_stmt_expr = new StmtExprNode(new_assigment, p_node.Line);
+                ChunkIt(new_stmt_expr);
+                // Add(OpCode.POP, p_node.Line);
             }
         }
 
