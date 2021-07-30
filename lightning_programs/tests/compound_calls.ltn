@@ -17,8 +17,9 @@ var assert_not = assert_counter.assert_not
 
     var func1 = return_table_with_function ()
     assert(func1().another_function("viva"), "viva", "Failed compound calls test 1.")
+    assert(func1()["another_function"]("viva"), "viva", "Failed compound calls test 2.")
 
-    assert(return_table_with_function()().another_function("viva"), "viva", "Failed compound calls test 2.")
+    assert(return_table_with_function()().another_function("viva"), "viva", "Failed compound calls test 3.")
     var table1 = []
     {
         table1.inner_table = []
@@ -29,7 +30,7 @@ var assert_not = assert_counter.assert_not
             return [x:self.x, y:2]
         }
     }
-    assert(table1.inner_table:closure().x, 1, "Failed compound calls test 3.")
+    assert(table1.inner_table:closure().x, 1, "Failed compound calls test 4.")
 
     var table2 = []
     table2.value = 99
@@ -38,7 +39,7 @@ var assert_not = assert_counter.assert_not
             return self.value
         }
     }
-    assert(table2:return_function()(), 99, "Failed compound calls test 4.")
+    assert(table2:return_function()(), 99, "Failed compound calls test 5.")
 }
 {
     // Testing Grouping after function Call

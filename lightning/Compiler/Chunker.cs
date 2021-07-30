@@ -463,8 +463,8 @@ namespace lightning
                 Add(OpCode.LOAD_DATA, string_address, p_node.Line);
             }
         }
-        private void LoadIndexes(VariableNode p_node){
-            foreach (IndexNode n in p_node.Indexes){
+        private void LoadIndexes(List<IndexNode> p_node){
+            foreach (IndexNode n in p_node){
                 LoadIndex(n);
             }
         }
@@ -477,7 +477,7 @@ namespace lightning
                 LoadVariable(this_var, p_node.Line);
 
                 if (p_node.Indexes.Count > 0){// it is a compoundVar
-                    LoadIndexes(p_node);
+                    LoadIndexes(p_node.Indexes);
                     Add(OpCode.TABLE_GET, (Operand)p_node.Indexes.Count, p_node.Line);
                 }
             }
@@ -526,7 +526,7 @@ namespace lightning
                     }
                 }else{//  it is a compoundVar
                     LoadVariable(this_var, p_node.Line);
-                    LoadIndexes(p_node.Assigned);
+                    LoadIndexes(p_node.Assigned.Indexes);
                     Add(OpCode.TABLE_SET, (Operand)p_node.Assigned.Indexes.Count, op, p_node.Line);
                 }
             }else{
@@ -616,7 +616,7 @@ namespace lightning
                     LoadVariable(this_call, p_node.Line);
                 }
 
-                LoadIndexes(p_node.Variable);
+                LoadIndexes(p_node.Variable.Indexes);
                 Add(OpCode.TABLE_GET, (Operand)p_node.Variable.Indexes.Count, p_node.Line);
             }
 
@@ -626,7 +626,7 @@ namespace lightning
             if (p_node.IndexedAccess[0] != null)
             {
                 LoadIndexes(p_node.IndexedAccess[0]);
-                Add(OpCode.TABLE_GET, (Operand)p_node.IndexedAccess[0].Indexes.Count, p_node.Line);
+                Add(OpCode.TABLE_GET, (Operand)p_node.IndexedAccess[0].Count, p_node.Line);
             }
 
             // Is it a compound call?
@@ -643,7 +643,7 @@ namespace lightning
                 if (p_node.IndexedAccess[i] != null)
                 {
                     LoadIndexes(p_node.IndexedAccess[i]);
-                    Add(OpCode.TABLE_GET, (Operand)p_node.IndexedAccess[i].Indexes.Count, p_node.Line);
+                    Add(OpCode.TABLE_GET, (Operand)p_node.IndexedAccess[i].Count, p_node.Line);
                 }
             }
         }

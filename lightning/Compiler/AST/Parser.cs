@@ -146,14 +146,15 @@ namespace lightning
             string name = last_token.value;
             int line = last_token.Line;
 
-            Node indexed_access = IndexedAccess(name, line);
+            List<IndexNode> indexes = IndexedAccess();
 
-            Node method_call = MethodAccess(indexed_access);
+            VariableNode indexed_variable = new VariableNode(name, indexes, line);
+            Node method_call = MethodAccess(indexed_variable);
 
             return method_call;
         }
 
-        Node IndexedAccess(string p_name, int p_line) {
+        List<IndexNode> IndexedAccess() {
             List<IndexNode> indexes = new List<IndexNode>();
             while (Check(TokenType.LEFT_BRACKET) || Check(TokenType.DOT))
             {
@@ -182,11 +183,7 @@ namespace lightning
                     indexes.Add(index);
                 }
             }
-            return new VariableNode(
-                p_name,
-                indexes,
-                p_line
-            );
+            return indexes;
         }
 
         Node VarDecl()
@@ -795,7 +792,7 @@ namespace lightning
             if (Check(TokenType.LEFT_PAREN))
             {
                 List<List<Node>> calls = new List<List<Node>>();
-                List<VariableNode> indexed_access = new List<VariableNode>();
+                List<List<IndexNode>> indexed_access = new List<List<IndexNode>>();
                 Node function_call_node = new FunctionCallNode(
                     (maybe_func as VariableNode),
                     calls,
@@ -902,7 +899,7 @@ namespace lightning
                 variable_node = (VariableNode)MethodAccess(variable_node);
 
                 List<List<Node>> calls = new List<List<Node>>();
-                List<VariableNode> indexed_access = new List<VariableNode>();
+                List<List<IndexNode>> indexed_access = new List<List<IndexNode>>();
                 Node function_call_node = new FunctionCallNode(
                     variable_node,
                     calls,
@@ -926,9 +923,7 @@ namespace lightning
 
                 if(Check(TokenType.DOT) || Check(TokenType.LEFT_BRACKET)){
                     this_function_call_node.IndexedAccess.Add(
-                        IndexedAccess(
-                            this_function_call_node.Variable.Name,
-                            this_function_call_node.Line) as VariableNode);
+                        IndexedAccess());
                 }else{
                     this_function_call_node.IndexedAccess.Add(null);
                 }

@@ -397,7 +397,7 @@ namespace lightning
                 Console.Write(")");
                 if(p_node.IndexedAccess[counter] != null){
                     Console.Write(".indexedAccess(");
-                    foreach(Node n in p_node.IndexedAccess[counter].Indexes)
+                    foreach(Node n in p_node.IndexedAccess[counter])
                         Print(n);
                     Console.Write(")");
                 }
