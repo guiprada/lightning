@@ -17,13 +17,18 @@ add column info
     fix eval inconstant naming
     replace lambda counter with line?
 
-
 add variable data to chunk
+
 improve function declaration - add method declaration
+
 global function override?
+
 rename TableUnit to BucketUnit - separate List and Map
+
 file read and write test
+
 remove DUP and STASH
+
 tuple class
 
 add a make_closure(a_function, a_table_with_values) method to set up "protected" table variables
