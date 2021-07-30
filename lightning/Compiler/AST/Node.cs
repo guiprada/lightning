@@ -35,6 +35,7 @@ namespace lightning
         BLOCK,
         FUNCTION_CALL,
         FUNCTION_DECLARATION,
+        MEMBER_FUNCTION_DECLARATION,
         FUNCTION_EXPRESSION,
 
         RETURN,
@@ -399,14 +400,25 @@ namespace lightning
         }
     }
 
+    public class MemberFunctionDeclarationNode: FunctionExpressionNode
+    {
+        public string Name { get; private set;}
+
+        public MemberFunctionDeclarationNode(String p_Name, List<string> p_Parameters, List<Node> p_Body, int p_Line)
+            : base(p_Parameters, p_Body, p_Line, NodeType.MEMBER_FUNCTION_DECLARATION)
+        {
+            Name = p_Name;
+        }
+    }
+
     public class FunctionDeclarationNode : FunctionExpressionNode
     {
         public VariableNode Variable { get; private set;}
 
-        public FunctionDeclarationNode(VariableNode p_Name, List<string> p_Parameters, List<Node> p_Body, int p_Line)
+        public FunctionDeclarationNode(VariableNode p_Variable, List<string> p_Parameters, List<Node> p_Body, int p_Line)
             : base(p_Parameters, p_Body, p_Line, NodeType.FUNCTION_DECLARATION)
         {
-            Variable = p_Name;
+            Variable = p_Variable;
         }
     }
 }

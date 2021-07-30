@@ -186,6 +186,9 @@ namespace lightning
                 case NodeType.FUNCTION_DECLARATION:
                     ChunkFunctionDeclaration(p_node as FunctionDeclarationNode);
                     break;
+                case NodeType.MEMBER_FUNCTION_DECLARATION:
+                    ChunkMemberFunctionDeclaration(p_node as MemberFunctionDeclarationNode);
+                    break;
                 case NodeType.FUNCTION_EXPRESSION:
                     ChunkFunctionExpression(p_node as FunctionExpressionNode);
                     break;
@@ -692,10 +695,14 @@ namespace lightning
 
         private void ChunkFunctionExpression(FunctionExpressionNode p_node)
         {
-            //set the address
-
-            CompileFunction("lambda" + lambdaCounter, p_node.Line, p_node, false);
+            CompileFunction("lambda" + lambdaCounter, p_node, false);
             lambdaCounter++;
+        }
+
+        private void ChunkMemberFunctionDeclaration(MemberFunctionDeclarationNode p_node)
+        {
+            Console.WriteLine(p_node.Name);
+            CompileFunction(p_node.Name, p_node, false);
         }
 
         private void ChunkFunctionDeclaration(FunctionDeclarationNode p_node)
@@ -710,28 +717,36 @@ namespace lightning
                 if (maybe_name.HasValue){
                     Variable this_function = maybe_name.Value;
                     if (this_function.type == ValueType.Global)
-                        CompileFunction(this_function.name, p_node.Line, p_node, true);
+                        CompileFunction(this_function.name, p_node, true);
                     else
-                        CompileFunction(this_function.name, p_node.Line, p_node, false);
+                        CompileFunction(this_function.name, p_node, false);
                 }else
                     Error("Function name has already been used!", p_node.Line);
             }
             else
             {// it is a member function
-                FunctionExpressionNode extracted_function = new FunctionExpressionNode(p_node.Parameters, p_node.Body, p_node.Line);
+                // assemble a name for it
+                string name = p_node.Variable.Name;
+                for(int i=0; i<p_node.Variable.Indexes.Count; i++){
+                    if(p_node.Variable.Indexes[i].Type == NodeType.VARIABLE)
+                        name += "." + ((VariableNode)p_node.Variable.Indexes[i]).Name;
+                    else
+                        Error("Member Function declaration with non literal indices is not supported!", p_node.Line);
+                }
+                MemberFunctionDeclarationNode extracted_function = new MemberFunctionDeclarationNode(name, p_node.Parameters, p_node.Body, p_node.Line);
                 AssignmentNode new_assigment = new AssignmentNode(p_node.Variable, extracted_function, p_node.Line);
                 ChunkIt(new_assigment);
             }
         }
 
-        private void CompileFunction(string p_name, int p_line, FunctionExpressionNode p_node, bool p_isGlobal)
+        private void CompileFunction(string p_name, FunctionExpressionNode p_node, bool p_isGlobal)
         {
 
             FunctionUnit new_function = new FunctionUnit(p_name, moduleName);
             Operand this_address = (Operand)AddConstant(new_function);
 
-            if (p_node.GetType() == typeof(FunctionExpressionNode))
-                Add(OpCode.DECLARE_FUNCTION, 0, 1, this_address, p_line);
+            if (p_node.Type != NodeType.FUNCTION_DECLARATION)
+                Add(OpCode.DECLARE_FUNCTION, 0, 1, this_address, p_node.Line);
             else{
                 if (p_isGlobal)
                     Add(OpCode.DECLARE_FUNCTION, 0, 0, this_address, p_node.Line);// zero for gloabal
@@ -744,18 +759,18 @@ namespace lightning
 
             // env
             env.Add(new List<string>());
-            Add(OpCode.OPEN_ENV, p_line);
+            Add(OpCode.OPEN_ENV, p_node.Line);
             //Add funStartEnv
             funStartEnv.Push(env.Count - 1);
 
             int exit_instruction_address = instructionCounter;
-            Add(OpCode.RETURN_SET, 0, p_line);
+            Add(OpCode.RETURN_SET, 0, p_node.Line);
 
             Operand arity = 0;
             if(p_node.Parameters != null)
                 foreach (string p in p_node.Parameters){
                     SetVar(p);// it is always local
-                    Add(OpCode.DECLARE_VARIABLE, p_line);
+                    Add(OpCode.DECLARE_VARIABLE, p_node.Line);
                     arity++;
                 }
 
@@ -780,9 +795,9 @@ namespace lightning
             chunk.FixInstruction(exit_instruction_address, null, (Operand)(instructionCounter - exit_instruction_address), null, null);
 
             if (is_closure == true)
-                Add(OpCode.CLOSE_CLOSURE, p_line);
+                Add(OpCode.CLOSE_CLOSURE, p_node.Line);
             else
-                Add(OpCode.CLOSE_FUNCTION, p_line);
+                Add(OpCode.CLOSE_FUNCTION, p_node.Line);
 
             new_function.Set(
                 arity,

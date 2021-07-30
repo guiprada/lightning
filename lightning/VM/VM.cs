@@ -473,12 +473,12 @@ namespace lightning
                         {
                             IP++;
                             Operand env = instruction.opA;
-                            Operand lambda = instruction.opB;
+                            Operand is_function_expression = instruction.opB;
                             Operand new_fun_address = instruction.opC;
                             Unit this_callable = constants[new_fun_address];
                             if (this_callable.Type == UnitType.Function)
                             {
-                                if (lambda == 0)
+                                if (is_function_expression == 0)
                                     if (env == 0)// Global
                                     {
                                         globals.Add(this_callable);
@@ -505,7 +505,7 @@ namespace lightning
                                 ClosureUnit new_closure = new ClosureUnit(this_closure.Function, new_upValues);
 
                                 Unit new_closure_unit = new Unit(new_closure);
-                                if (lambda == 0)
+                                if (is_function_expression == 0)
                                     if (env == 0)// yes they exist!
                                     {
                                         globals.Add(new_closure_unit);

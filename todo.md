@@ -13,6 +13,8 @@ use tuples as structs with named access
 
 To be Done
 ----------
+create and indexNode
+rename constants data_literals
 merge chunk assignment and assignmentOp
 improve function declaration - add method declaration
 rename TableUnit to BucketUnit - separate List and Map
