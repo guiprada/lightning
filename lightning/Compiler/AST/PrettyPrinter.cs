@@ -54,6 +54,9 @@ namespace lightning
                 case NodeType.VARIABLE:
                     PrintVariable(p_node as VariableNode);
                     break;
+                case NodeType.INDEX:
+                    PrintIndex(p_node as IndexNode);
+                    break;
                 case NodeType.VAR_DECLARATION:
                     PrintVarDeclaration(p_node as VarDeclarationNode);
                     break;
@@ -271,26 +274,42 @@ namespace lightning
         private void PrintVariable(VariableNode p_node)
         {
             if (p_node.IsAnonymous){
-                Console.Write("[VAR_EXPRESSION " + p_node.Name);
+                Console.Write("[VAR_EXPRESSION ");
                 Print(p_node.Expression);
             }else{
                 Console.Write("[VARIABLE " + p_node.Name);
             }
 
             for (int i = 0; i < p_node.Indexes.Count; i++) {
-                if ((p_node.Indexes[i].GetType() != typeof(VariableNode)) || (p_node.Indexes[i]as VariableNode).AccessType == VarAccessType.BRACKET){
-                    Console.Write("[");
-                    Print(p_node.Indexes[i]);
-                    Console.Write("]");
-                }else if ((p_node.Indexes[i] as VariableNode).AccessType == VarAccessType.COLON){
-                    Console.Write(":");
-                    Print(p_node.Indexes[i]);
-                }else{
-                    Console.Write(".");
-                    Print(p_node.Indexes[i]);
-                }
+                Print(p_node.Indexes[i]);
             }
             Console.Write("]");
+        }
+
+        private void PrintIndex(IndexNode p_node)
+        {
+            if (p_node.IsAnonymous){
+                if ((p_node.GetType() != typeof(VariableNode)) || p_node.AccessType == VarAccessType.BRACKET){
+                    Console.Write("[");
+                    Print(p_node.Expression);
+                    Console.Write("]");
+                }else if (p_node.AccessType == VarAccessType.COLON){
+                    Console.Write(":");
+                    Print(p_node.Expression);
+                }else if (p_node.AccessType == VarAccessType.DOT){
+                    Console.Write(".");
+                    Print(p_node.Expression);
+                }
+            }else{
+                if ((p_node.GetType() != typeof(VariableNode)) || p_node.AccessType == VarAccessType.BRACKET){
+                    Console.Write("[" +  p_node.Name + "]");
+                }else if (p_node.AccessType == VarAccessType.COLON){
+                    Console.Write(":" +  p_node.Name);
+                }else if (p_node.AccessType == VarAccessType.DOT){
+                    Console.Write("." +  p_node.Name);
+                }
+            }
+
         }
 
         private void PrintVarDeclaration(VarDeclarationNode p_node)

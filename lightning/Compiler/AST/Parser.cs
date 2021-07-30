@@ -154,14 +154,13 @@ namespace lightning
         }
 
         Node IndexedAccess(string p_name, int p_line) {
-            List<Node> indexes = new List<Node>();
+            List<IndexNode> indexes = new List<IndexNode>();
             while (Check(TokenType.LEFT_BRACKET) || Check(TokenType.DOT))
             {
                 if (Match(TokenType.LEFT_BRACKET))
                 {
-                    VariableNode index = new VariableNode(
+                    IndexNode index = new IndexNode(
                         Expression(),
-                        new List<Node>(),
                         VarAccessType.BRACKET,
                         Previous().Line);
                     indexes.Add(index);
@@ -176,9 +175,8 @@ namespace lightning
                 {
                     Match(TokenType.IDENTIFIER);
                     string this_name = (Previous() as TokenString).value;
-                    VariableNode index = new VariableNode(
+                    IndexNode index = new IndexNode(
                         this_name,
-                        new List<Node>(),
                         VarAccessType.DOT,
                         Previous().Line);
                     indexes.Add(index);
@@ -187,7 +185,6 @@ namespace lightning
             return new VariableNode(
                 p_name,
                 indexes,
-                VarAccessType.NONE,
                 p_line
             );
         }
@@ -818,9 +815,8 @@ namespace lightning
             {// Method Call
                 if(Match(TokenType.IDENTIFIER)){
                     string this_name = (Previous() as TokenString).value;
-                    VariableNode index = new VariableNode(
+                    IndexNode index = new IndexNode(
                         this_name,
-                        new List<Node>(),
                         VarAccessType.COLON,
                         Previous().Line
                     );
@@ -828,9 +824,8 @@ namespace lightning
                 }else if(Match(TokenType.STRING)){
                     // Convert String to identifier
                     string this_name = (Previous() as TokenString).value;
-                    VariableNode index = new VariableNode(
+                    IndexNode index = new IndexNode(
                         this_name,
-                        new List<Node>(),
                         VarAccessType.COLON,
                         Previous().Line
                     );
@@ -850,9 +845,8 @@ namespace lightning
                                 -((TokenNumber)Previous()).floatValue,
                                 Previous().Line
                             );
-                        VariableNode index = new VariableNode(
+                        IndexNode index = new IndexNode(
                             this_value,
-                            new List<Node>(),
                             VarAccessType.COLON,
                             Previous().Line
                         );
@@ -874,17 +868,15 @@ namespace lightning
                             ((TokenNumber)Previous()).floatValue,
                             Previous().Line
                         );
-                    VariableNode index = new VariableNode(
+                    IndexNode index = new IndexNode(
                         this_value,
-                        new List<Node>(),
                         VarAccessType.COLON,
                         Previous().Line
                     );
                     (p_node as VariableNode).Indexes.Add(index);
                 }else if (Match(TokenType.LEFT_BRACKET)) {
-                    VariableNode index = new VariableNode(
+                    IndexNode index = new IndexNode(
                         Expression(),
-                        new List<Node>(),
                         VarAccessType.COLON,
                         Previous().Line
                     );
@@ -904,8 +896,7 @@ namespace lightning
             {
                 VariableNode variable_node = new VariableNode(
                     p_node,
-                    new List<Node>(),
-                    VarAccessType.BRACKET,
+                    new List<IndexNode>(),
                     p_node.Line
                 );
                 variable_node = (VariableNode)MethodAccess(variable_node);

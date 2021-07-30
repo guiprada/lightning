@@ -455,7 +455,7 @@ namespace lightning
                     break;
             }
         }
-        private void LoadIndex(VariableNode p_node){
+        private void LoadIndex(IndexNode p_node){
             if(p_node.IsAnonymous)
                 ChunkIt(p_node.Expression);
             else{
@@ -464,8 +464,8 @@ namespace lightning
             }
         }
         private void LoadIndexes(VariableNode p_node){
-            foreach (Node n in p_node.Indexes){
-                LoadIndex((VariableNode)n);
+            foreach (IndexNode n in p_node.Indexes){
+                LoadIndex(n);
             }
         }
 
@@ -599,7 +599,7 @@ namespace lightning
             if (p_node.Variable.Indexes.Count == 0)
                 LoadVariable(this_call, p_node.Line);
             else{// it is a compoundCall/method/IndexedAccess!
-                if ((p_node.Variable.Indexes[p_node.Variable.Indexes.Count - 1] as VariableNode).AccessType == VarAccessType.COLON)
+                if (p_node.Variable.Indexes[p_node.Variable.Indexes.Count - 1].AccessType == VarAccessType.COLON)
                 {// is it a method!
                     LoadVariable(this_call, p_node.Line);
                     Add(OpCode.DUP, p_node.Line);// it is a method so we push the table again, to be used as parameter!
@@ -607,7 +607,7 @@ namespace lightning
 
                     for (int i = 0; i < p_node.Variable.Indexes.Count - 1; i++)
                     {
-                        LoadIndex((VariableNode)p_node.Variable.Indexes[i]);
+                        LoadIndex(p_node.Variable.Indexes[i]);
                     }
 
                     Add(OpCode.TABLE_GET, (Operand)(p_node.Variable.Indexes.Count - 1), p_node.Line);
@@ -693,7 +693,7 @@ namespace lightning
                 string name = p_node.Variable.Name;
                 for(int i=0; i<p_node.Variable.Indexes.Count; i++){
                     if(p_node.Variable.Indexes[i].Type == NodeType.VARIABLE){
-                        VariableNode this_index = (VariableNode)p_node.Variable.Indexes[i];
+                        IndexNode this_index = p_node.Variable.Indexes[i];
                         if(this_index.AccessType == VarAccessType.COLON)
                             Error("Method Declaration is not supported yet!", p_node.Line);
                         if(this_index.IsAnonymous){
