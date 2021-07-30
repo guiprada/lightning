@@ -52,8 +52,11 @@ namespace lightning
                             astPrinter.PrintToFile(ParsedTree, Path.ToPath(moduleName) + ".ast");
                         }
                     }catch (Exception e){
-                        Console.WriteLine("Parsing broke the runtime, check out" + System.IO.Path.DirectorySeparatorChar + Path.ToPath(moduleName) + "_parser.log!");
-                        FileWriter.Create(e.ToString(), Path.ToPath(moduleName) + "_parser.log");
+                        Console.WriteLine("Parsing broke the runtime, check out" +
+                            System.IO.Path.DirectorySeparatorChar +
+                            Path.ToPath(moduleName) +
+                            "_parser.log!");
+                        FileWriter.New(e.ToString(), Path.ToPath(moduleName) + "_parser.log");
                         PrintWarnings();
                         PrintErrors();
                         return null;
@@ -144,16 +147,28 @@ namespace lightning
             {
                 if (Match(TokenType.LEFT_BRACKET))
                 {
-                    VariableNode index = new VariableNode(Expression(), new List<Node>(), VarAccessType.BRACKET, Previous().Line);
+                    VariableNode index = new VariableNode(
+                        Expression(),
+                        new List<Node>(),
+                        VarAccessType.BRACKET,
+                        Previous().Line);
                     indexes.Add(index);
 
-                    Consume(TokenType.RIGHT_BRACKET, "Expected ']' after 'compoundVar identifier'", true);
+                    Consume(
+                        TokenType.RIGHT_BRACKET,
+                        "Expected ']' after 'compoundVar identifier'",
+                        true
+                    );
                 }
                 else if (Match(TokenType.DOT))
                 {
                     Match(TokenType.IDENTIFIER);
                     string this_name = (Previous() as TokenString).value;
-                    VariableNode index = new VariableNode(this_name, new List<Node>(), VarAccessType.DOT, Previous().Line);
+                    VariableNode index = new VariableNode(
+                        this_name,
+                        new List<Node>(),
+                        VarAccessType.DOT,
+                        Previous().Line);
                     indexes.Add(index);
                 }
             }
@@ -162,7 +177,11 @@ namespace lightning
 
         Node VarDecl()
         {
-            TokenString name = Consume(TokenType.IDENTIFIER, "Expected 'variable identifier' after 'var'.", true) as TokenString;
+            TokenString name = (TokenString)Consume(
+                TokenType.IDENTIFIER,
+                "Expected 'variable identifier' after 'var'.",
+                true
+            );
             Node initializer;
             if (Match(TokenType.EQUAL))
                 initializer = Expression();
@@ -178,11 +197,19 @@ namespace lightning
             bool has_parameter = Check(TokenType.IDENTIFIER);
             while (has_parameter)
             {
-                TokenString new_parameter = Consume(TokenType.IDENTIFIER, "Expected 'identifier' as 'function parameter'.", true) as TokenString;
+                TokenString new_parameter = (TokenString)Consume(
+                    TokenType.IDENTIFIER,
+                    "Expected 'identifier' as 'function parameter'.",
+                    true
+                );
                 parameters.Add(new_parameter.value);
                 if (Check(TokenType.COMMA))
                 {
-                    Consume(TokenType.COMMA, "Expected ',' separating parameter list", true);
+                    Consume(
+                        TokenType.COMMA,
+                        "Expected ',' separating parameter list",
+                        true
+                    );
                     has_parameter = Check(TokenType.IDENTIFIER);
                 }
                 else
@@ -190,7 +217,11 @@ namespace lightning
                     has_parameter = false;
                 }
             }
-            Consume(TokenType.RIGHT_PAREN, "Expected ')' after 'function expression'.", true);
+            Consume(
+                TokenType.RIGHT_PAREN,
+                "Expected ')' after 'function expression'.",
+                true
+            );
 
             return parameters;
         }
@@ -213,7 +244,8 @@ namespace lightning
                 statements.Add(body);
             }
 
-            if (statements.Count == 0 || statements[^1].GetType() != typeof(ReturnNode))
+            if ((statements.Count == 0) ||
+                (statements[^1].GetType() != typeof(ReturnNode)))
             {
                 statements.Add(new ReturnNode(null, Previous().Line));
             }
@@ -222,18 +254,31 @@ namespace lightning
         }
 		Node FunctionExpr()
         {
-            Token function_token = Consume(TokenType.FUN, "Expected 'function' or '\' to start 'function expression'.", true);
+            Token function_token = Consume(
+                TokenType.FUN,
+                "Expected 'function' or '\' to start 'function expression'.",
+                true
+            );
 
             FunctionStruct this_function = Function();
 
-            return new FunctionExpressionNode(this_function.parameters, this_function.statements, function_token.Line);
+            return new FunctionExpressionNode(
+                this_function.parameters,
+                this_function.statements,
+                function_token.Line
+            );
         }
 
         Node FunctionDecl(){
             VariableNode name = (VariableNode)CompoundVar();
             FunctionStruct this_function = Function();
 
-            return new FunctionDeclarationNode(name, this_function.parameters, this_function.statements, name.Line);
+            return new FunctionDeclarationNode(
+                name,
+                this_function.parameters,
+                this_function.statements,
+                name.Line
+            );
         }
 
         Node Statement()
@@ -346,7 +391,11 @@ namespace lightning
             {
                 statements.Add(Declaration());
             }
-            Consume(TokenType.RIGHT_BRACE, "Expected '}' to terminate 'block'.", true);
+            Consume(
+                TokenType.RIGHT_BRACE,
+                "Expected '}' to terminate 'block'.",
+                true
+            );
             return new BlockNode(statements, line);
         }
 
@@ -372,7 +421,12 @@ namespace lightning
                 Node value = Assignment();
 
                 if (assigned.Type == NodeType.VARIABLE)
-                    return new AssignmentNode((VariableNode)assigned, value, AssignmentOperatorType.ADDITION_ASSIGN, assigned.Line);
+                    return new AssignmentNode(
+                        (VariableNode)assigned,
+                        value,
+                        AssignmentOperatorType.ADDITION_ASSIGN,
+                        assigned.Line
+                    );
                 else
                     Error("Invalid assignment.");
             }
@@ -381,7 +435,12 @@ namespace lightning
                 Node value = new LiteralNode(1, assigned.Line);
 
                 if (assigned.Type == NodeType.VARIABLE)
-                    return new AssignmentNode((VariableNode)assigned, value, AssignmentOperatorType.ADDITION_ASSIGN, assigned.Line);
+                    return new AssignmentNode(
+                        (VariableNode)assigned,
+                        value,
+                        AssignmentOperatorType.ADDITION_ASSIGN,
+                        assigned.Line
+                    );
                 else
                     Error("Invalid assignment.");
             }

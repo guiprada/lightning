@@ -84,8 +84,7 @@ namespace lightning
                     catch (Exception e)
                     {
                         Console.WriteLine("Chunking broke the runtime, check" + System.IO.Path.DirectorySeparatorChar + Path.ToPath(moduleName) + "_chunker.log!");
-                        using (System.IO.StreamWriter file = new System.IO.StreamWriter(Path.ToPath(moduleName) + "_chunker.log", false))
-                            file.WriteLine(e);
+                        FileWriter.New(e.ToString(), Path.ToPath(moduleName) + "_chunker.log");
                         PrintErrors();
                         return null;
                     }
