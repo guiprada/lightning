@@ -701,7 +701,7 @@ namespace lightning
         private void ChunkFunctionDeclaration(FunctionDeclarationNode p_node)
         {
             //register name
-            if (p_node.Variable.Indexes.Count == 0){
+            if (p_node.Variable.Indexes.Count == 0){// it is a regular function
                 if (globals.Contains(p_node.Variable.Name))
                     Error("Local functions can not override global ones.", p_node.Line);
 
@@ -717,7 +717,7 @@ namespace lightning
                     Error("Function name has already been used!", p_node.Line);
             }
             else
-            {
+            {// it is a member function
                 FunctionExpressionNode extracted_function = new FunctionExpressionNode(p_node.Parameters, p_node.Body, p_node.Line);
                 AssignmentNode new_assigment = new AssignmentNode(p_node.Variable, extracted_function, p_node.Line);
                 ChunkIt(new_assigment);
