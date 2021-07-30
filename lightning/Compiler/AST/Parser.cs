@@ -18,7 +18,11 @@ namespace lightning
 		{
 			public List<string> parameters;
             public List<Node> statements;
-            public FunctionStruct(List<string> p_parameters, List<Node> p_statements){
+            public FunctionStruct(
+                List<string> p_parameters,
+                List<Node> p_statements
+            )
+            {
                 parameters = p_parameters;
                 statements = p_statements;
             }
@@ -49,14 +53,22 @@ namespace lightning
                         else{
                             hasParsed = true;
                             PrettyPrinter astPrinter = new PrettyPrinter();
-                            astPrinter.PrintToFile(ParsedTree, Path.ToPath(moduleName) + ".ast");
+                            astPrinter.PrintToFile(
+                                ParsedTree,
+                                Path.ToPath(moduleName) + ".ast"
+                            );
                         }
                     }catch (Exception e){
-                        Console.WriteLine("Parsing broke the runtime, check out" +
+                        Console.WriteLine(
+                            "Parsing broke the runtime, check out" +
                             System.IO.Path.DirectorySeparatorChar +
                             Path.ToPath(moduleName) +
-                            "_parser.log!");
-                        FileWriter.New(e.ToString(), Path.ToPath(moduleName) + "_parser.log");
+                            "_parser.log!"
+                        );
+                        FileWriter.New(
+                            e.ToString(),
+                            Path.ToPath(moduleName) + "_parser.log"
+                        );
                         PrintWarnings();
                         PrintErrors();
                         return null;
@@ -97,7 +109,7 @@ namespace lightning
             }
         }
 
-        //////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
 
         Node Program()
         {
@@ -172,7 +184,12 @@ namespace lightning
                     indexes.Add(index);
                 }
             }
-            return new VariableNode(p_name, indexes, VarAccessType.NONE, p_line);
+            return new VariableNode(
+                p_name,
+                indexes,
+                VarAccessType.NONE,
+                p_line
+            );
         }
 
         Node VarDecl()
@@ -343,7 +360,11 @@ namespace lightning
                     finalizer = Expression();
                 }
             }
-            Consume(TokenType.RIGHT_PAREN, "Expected ')' after 'for' finalizer.", true);
+            Consume(
+                TokenType.RIGHT_PAREN,
+                "Expected ')' after 'for' finalizer.",
+                 true
+            );
 
             Node body = Statement();
 
@@ -355,8 +376,13 @@ namespace lightning
             int line = Previous().Line;
             Consume(TokenType.LEFT_PAREN, "Expected '(' after 'while'.", true);
             Node condition = Expression();
-            if (condition == null) Error("'while' 'condition' can not be null.");
-            Consume(TokenType.RIGHT_PAREN, "Expected ')' after 'while' condition.", true);
+            if (condition == null)
+                Error("'while' 'condition' can not be null.");
+            Consume(
+                TokenType.RIGHT_PAREN,
+                "Expected ')' after 'while' condition.",
+                 true
+            );
 
             Node body = Statement();
 
@@ -366,10 +392,18 @@ namespace lightning
         Node If()
         {
             int line = Previous().Line;
-            Token start = Consume(TokenType.LEFT_PAREN, "Expected '(' after 'if'.", true);
+            Token start = Consume(
+                TokenType.LEFT_PAREN,
+                "Expected '(' after 'if'.",
+                true
+            );
             Node condition = Expression();
             if (condition == null) Error("'if' 'condition' can not be null.");
-            Consume(TokenType.RIGHT_PAREN, "Expected ')' after 'if' condition.", true);
+            Consume(
+                TokenType.RIGHT_PAREN,
+                "Expected ')' after 'if' condition.",
+                true
+            );
 
             Node then_branch = Statement();
 
@@ -449,7 +483,12 @@ namespace lightning
                 Node value = Assignment();
 
                 if (assigned.Type == NodeType.VARIABLE)
-                    return new AssignmentNode((VariableNode)assigned, value, AssignmentOperatorType.SUBTRACTION_ASSIGN, assigned.Line);
+                    return new AssignmentNode(
+                        (VariableNode)assigned,
+                        value,
+                        AssignmentOperatorType.SUBTRACTION_ASSIGN,
+                        assigned.Line
+                    );
                 else
                     Error("Invalid assignment.");
             }
@@ -458,7 +497,11 @@ namespace lightning
                 Node value = new LiteralNode(1, assigned.Line);
 
                 if (assigned.Type == NodeType.VARIABLE)
-                    return new AssignmentNode((VariableNode)assigned, value, AssignmentOperatorType.SUBTRACTION_ASSIGN, assigned.Line);
+                    return new AssignmentNode(
+                        (VariableNode)assigned,
+                        value, AssignmentOperatorType.SUBTRACTION_ASSIGN,
+                        assigned.Line
+                    );
                 else
                     Error("Invalid assignment.");
             }
@@ -467,7 +510,12 @@ namespace lightning
                 Node value = Assignment();
 
                 if (assigned.Type == NodeType.VARIABLE)
-                    return new AssignmentNode((VariableNode)assigned, value, AssignmentOperatorType.MULTIPLICATION_ASSIGN, assigned.Line);
+                    return new AssignmentNode(
+                        (VariableNode)assigned,
+                        value,
+                        AssignmentOperatorType.MULTIPLICATION_ASSIGN,
+                        assigned.Line
+                    );
                 else
                     Error("Invalid assignment.");
             }
@@ -476,7 +524,12 @@ namespace lightning
                 Node value = Assignment();
 
                 if (assigned.Type == NodeType.VARIABLE)
-                    return new AssignmentNode((VariableNode)assigned, value, AssignmentOperatorType.DIVISION_ASSIGN, assigned.Line);
+                    return new AssignmentNode(
+                        (VariableNode)assigned,
+                        value,
+                        AssignmentOperatorType.DIVISION_ASSIGN,
+                        assigned.Line
+                    );
                 else
                     Error("Invalid assignment.");
             }
@@ -485,7 +538,12 @@ namespace lightning
                 Node value = Assignment();
 
                 if (assigned.Type == NodeType.VARIABLE)
-                    return new AssignmentNode((VariableNode)assigned, value, AssignmentOperatorType.ASSIGN, assigned.Line);
+                    return new AssignmentNode(
+                        (VariableNode)assigned,
+                        value,
+                        AssignmentOperatorType.ASSIGN,
+                        assigned.Line
+                    );
                 else
                     Error("Invalid assignment.");
             }
@@ -501,7 +559,12 @@ namespace lightning
             {
                 Node right = LogicalAnd();
 
-                left = new LogicalNode(left, OperatorType.OR, right, left.Line);
+                left = new LogicalNode(
+                    left,
+                    OperatorType.OR,
+                    right,
+                    left.Line
+                );
             }
 
             return left;
@@ -515,7 +578,12 @@ namespace lightning
             {
                 Node right = LogicalXor();
 
-                left = new LogicalNode(left, OperatorType.AND, right, left.Line);
+                left = new LogicalNode(
+                    left,
+                    OperatorType.AND,
+                    right,
+                    left.Line
+                );
             }
 
             return left;
@@ -529,7 +597,12 @@ namespace lightning
             {
                 Node right = LogicalNand();
 
-                left = new LogicalNode(left, OperatorType.XOR, right, left.Line);
+                left = new LogicalNode(
+                    left,
+                    OperatorType.XOR,
+                    right,
+                    left.Line
+                );
             }
 
             return left;
@@ -543,7 +616,12 @@ namespace lightning
             {
                 Node right = LogicalNor();
 
-                left = new LogicalNode(left, OperatorType.NAND, right, left.Line);
+                left = new LogicalNode(
+                    left,
+                    OperatorType.NAND,
+                    right,
+                    left.Line
+                );
             }
 
             return left;
@@ -557,7 +635,12 @@ namespace lightning
             {
                 Node right = LogicalXnor();
 
-                left = new LogicalNode(left, OperatorType.NOR, right, left.Line);
+                left = new LogicalNode(
+                    left,
+                    OperatorType.NOR,
+                    right,
+                    left.Line
+                );
             }
 
             return left;
@@ -571,7 +654,12 @@ namespace lightning
             {
                 Node right = Equality();
 
-                left = new LogicalNode(left, OperatorType.XNOR, right, left.Line);
+                left = new LogicalNode(
+                    left,
+                    OperatorType.XNOR,
+                    right,
+                    left.Line
+                );
             }
 
             return left;
@@ -586,8 +674,10 @@ namespace lightning
                 Token op = Previous();
                 OperatorType this_op;
 
-                if (op.Type == TokenType.BANG_EQUAL) this_op = OperatorType.NOT_EQUAL;
-                else this_op = OperatorType.EQUAL;
+                if (op.Type == TokenType.BANG_EQUAL)
+                    this_op = OperatorType.NOT_EQUAL;
+                else
+                    this_op = OperatorType.EQUAL;
 
                 Node right = Comparison();
                 left = new BinaryNode(left, this_op, right, op.Line);
@@ -600,14 +690,21 @@ namespace lightning
         {
             Node left = Addition();
 
-            while (Match(TokenType.GREATER, TokenType.GREATER_EQUAL, TokenType.LESS, TokenType.LESS_EQUAL))
+            while (Match(TokenType.GREATER,
+                TokenType.GREATER_EQUAL,
+                TokenType.LESS,
+                TokenType.LESS_EQUAL
+            ))
             {
                 Token op = Previous();
                 OperatorType this_op;
 
-                if (op.Type == TokenType.GREATER) this_op = OperatorType.GREATER;
-                else if( op.Type == TokenType.GREATER_EQUAL) this_op = OperatorType.GREATER_EQUAL;
-                else if (op.Type == TokenType.LESS) this_op = OperatorType.LESS;
+                if (op.Type == TokenType.GREATER)
+                    this_op = OperatorType.GREATER;
+                else if( op.Type == TokenType.GREATER_EQUAL)
+                    this_op = OperatorType.GREATER_EQUAL;
+                else if (op.Type == TokenType.LESS)
+                    this_op = OperatorType.LESS;
                 else this_op = OperatorType.LESS_EQUAL;
 
                 Node right = Addition();
@@ -626,9 +723,12 @@ namespace lightning
                 Token op = Previous();
                 OperatorType this_op;
 
-                if (op.Type == TokenType.MINUS) this_op = OperatorType.SUBTRACTION;
-                else if (op.Type == TokenType.PLUS) this_op = OperatorType.ADDITION;
-                else this_op = OperatorType.APPEND;
+                if (op.Type == TokenType.MINUS)
+                    this_op = OperatorType.SUBTRACTION;
+                else if (op.Type == TokenType.PLUS)
+                    this_op = OperatorType.ADDITION;
+                else
+                    this_op = OperatorType.APPEND;
 
                 Node right = Multiplication();
                 left = new BinaryNode(left, this_op, right, op.Line);
@@ -646,8 +746,10 @@ namespace lightning
                 Token op = Previous();
                 OperatorType this_op;
 
-                if (op.Type == TokenType.SLASH) this_op = OperatorType.DIVISION;
-                else this_op = OperatorType.MULTIPLICATION;
+                if (op.Type == TokenType.SLASH)
+                    this_op = OperatorType.DIVISION;
+                else
+                    this_op = OperatorType.MULTIPLICATION;
 
                 Node right = Unary();
                 left = new BinaryNode(left, this_op, right, op.Line);
@@ -658,7 +760,12 @@ namespace lightning
 
         Node Unary()
         {
-            if (Match(TokenType.BANG, TokenType.MINUS, TokenType.MINUS_MINUS, TokenType.PLUS_PLUS))
+            if (Match(
+                TokenType.BANG,
+                TokenType.MINUS,
+                TokenType.MINUS_MINUS,
+                TokenType.PLUS_PLUS
+            ))
             {
                 Token op = Previous();
                 OperatorType this_op;
@@ -711,38 +818,82 @@ namespace lightning
             {// Method Call
                 if(Match(TokenType.IDENTIFIER)){
                     string this_name = (Previous() as TokenString).value;
-                    VariableNode index = new VariableNode(this_name, new List<Node>(), VarAccessType.COLON, Previous().Line);
+                    VariableNode index = new VariableNode(
+                        this_name,
+                        new List<Node>(),
+                        VarAccessType.COLON,
+                        Previous().Line
+                    );
                     (p_node as VariableNode).Indexes.Add(index);
-                }else if(Match(TokenType.STRING)){// Convert String to identifier
+                }else if(Match(TokenType.STRING)){
+                    // Convert String to identifier
                     string this_name = (Previous() as TokenString).value;
-                    VariableNode index = new VariableNode(this_name, new List<Node>(), VarAccessType.COLON, Previous().Line);
+                    VariableNode index = new VariableNode(
+                        this_name,
+                        new List<Node>(),
+                        VarAccessType.COLON,
+                        Previous().Line
+                    );
                     (p_node as VariableNode).Indexes.Add(index);
-                }else if(Match(TokenType.MINUS)){// Convert Negative Number to expression
+                }else if(Match(TokenType.MINUS)){
+                    // Convert Negative Number to expression
                     if(Match(TokenType.NUMBER)){
                         Type this_type = ((TokenNumber)Previous()).type;
                         Node this_value;
                         if (this_type == typeof(Integer))
-                            this_value = new LiteralNode(-((TokenNumber)Previous()).integerValue, Previous().Line);
+                            this_value = new LiteralNode(
+                                -((TokenNumber)Previous()).integerValue,
+                                Previous().Line
+                            );
                         else
-                            this_value = new LiteralNode(-((TokenNumber)Previous()).floatValue, Previous().Line);
-                        VariableNode index = new VariableNode(this_value, new List<Node>(), VarAccessType.COLON, Previous().Line);
+                            this_value = new LiteralNode(
+                                -((TokenNumber)Previous()).floatValue,
+                                Previous().Line
+                            );
+                        VariableNode index = new VariableNode(
+                            this_value,
+                            new List<Node>(),
+                            VarAccessType.COLON,
+                            Previous().Line
+                        );
                         (p_node as VariableNode).Indexes.Add(index);
                     }else{
                         Error("Expected Number after '-' in 'Method Access'");
                     }
-                }else if(Match(TokenType.NUMBER)){// Convert Number to expression
+                }else if(Match(TokenType.NUMBER)){
+                    // Convert Number to expression
                     Type this_type = ((TokenNumber)Previous()).type;
                     Node this_value;
                     if (this_type == typeof(Integer))
-                        this_value = new LiteralNode(((TokenNumber)Previous()).integerValue, Previous().Line);
+                        this_value = new LiteralNode(
+                            ((TokenNumber)Previous()).integerValue,
+                            Previous().Line
+                        );
                     else
-                        this_value = new LiteralNode(((TokenNumber)Previous()).floatValue, Previous().Line);
-                    VariableNode index = new VariableNode(this_value, new List<Node>(), VarAccessType.COLON, Previous().Line);
+                        this_value = new LiteralNode(
+                            ((TokenNumber)Previous()).floatValue,
+                            Previous().Line
+                        );
+                    VariableNode index = new VariableNode(
+                        this_value,
+                        new List<Node>(),
+                        VarAccessType.COLON,
+                        Previous().Line
+                    );
                     (p_node as VariableNode).Indexes.Add(index);
                 }else if (Match(TokenType.LEFT_BRACKET)) {
-                    VariableNode index = new VariableNode(Expression(), new List<Node>(), VarAccessType.COLON, Previous().Line);
+                    VariableNode index = new VariableNode(
+                        Expression(),
+                        new List<Node>(),
+                        VarAccessType.COLON,
+                        Previous().Line
+                    );
                     (p_node as VariableNode).Indexes.Add(index);
-                    Consume(TokenType.RIGHT_BRACKET, "Expected ']' after 'Method Access'", true);
+                    Consume(
+                        TokenType.RIGHT_BRACKET,
+                        "Expected ']' after 'Method Access'",
+                        true
+                    );
                 }
             }
             return p_node;
@@ -751,7 +902,12 @@ namespace lightning
         Node AnonymousCall(Node p_node){
             if(Check(TokenType.COLON))
             {
-                VariableNode variable_node = new VariableNode(p_node, new List<Node>(), VarAccessType.BRACKET, p_node.Line);
+                VariableNode variable_node = new VariableNode(
+                    p_node,
+                    new List<Node>(),
+                    VarAccessType.BRACKET,
+                    p_node.Line
+                );
                 variable_node = (VariableNode)MethodAccess(variable_node);
 
                 List<List<Node>> calls = new List<List<Node>>();
@@ -773,7 +929,8 @@ namespace lightning
         {
             while(Check(TokenType.LEFT_PAREN))
             {
-                FunctionCallNode this_function_call_node = (FunctionCallNode)p_functionCallNode;
+                FunctionCallNode this_function_call_node =
+                    (FunctionCallNode)p_functionCallNode;
                 this_function_call_node.Calls.Add(Arguments());
 
                 if(Check(TokenType.DOT) || Check(TokenType.LEFT_BRACKET)){
@@ -792,7 +949,11 @@ namespace lightning
         }
 
         List<Node> Arguments(){
-            Consume(TokenType.LEFT_PAREN, "Expected '(' before 'function call' arguments.", true);
+            Consume(
+                TokenType.LEFT_PAREN,
+                "Expected '(' before 'function call' arguments.",
+                true
+            );
             List<Node> arguments = new List<Node>();
             if (!Check(TokenType.RIGHT_PAREN))
             {
@@ -800,7 +961,11 @@ namespace lightning
                     arguments.Add(Expression());
                 }while (Match(TokenType.COMMA));
             }
-            Consume(TokenType.RIGHT_PAREN, "Expected ')' after 'function call' arguments.", true);
+            Consume(
+                TokenType.RIGHT_PAREN,
+                "Expected ')' after 'function call' arguments.",
+                true
+            );
 
             return arguments;
         }
@@ -818,7 +983,10 @@ namespace lightning
                 if((Peek2() != null) && (Peek2().Type == TokenType.COLON)){
                     if (Match(TokenType.IDENTIFIER))
                     {
-                        Node item = new LiteralNode((Previous() as TokenString).value, Previous().Line);
+                        Node item = new LiteralNode(
+                            (Previous() as TokenString).value,
+                            Previous().Line
+                        );
 
                         if(Match(TokenType.COLON)){
                             Node value = Primary();
@@ -829,11 +997,17 @@ namespace lightning
                     else
                     {
                         Node item = Primary();
-                        Consume(TokenType.COLON, "Expected ':' separating key:values in table constructor", true);
+                        Consume(
+                            TokenType.COLON,
+                            "Expected ':' separating key:values" +
+                            "in table constructor",
+                            true
+                        );
                         if(((LiteralNode)item).ValueType == typeof(Float)){
                             LiteralNode number_value = (LiteralNode)item;
                             if(!is_negative){
-                                if((Float)(number_value.Value) == elements.Count)
+                                if((Float)(number_value.Value)
+                                    == elements.Count)
                                     elements.Add(Primary());
                                 else
                                     table.Add(number_value, Primary());
@@ -841,10 +1015,12 @@ namespace lightning
                                 number_value.SetNegative();
                                 table.Add(number_value, Primary());
                             }
-                        }else if(((LiteralNode)item).ValueType == typeof(Integer)){
+                        }else if(((LiteralNode)item).ValueType
+                            == typeof(Integer)){
                             LiteralNode number_value = (LiteralNode)item;
                             if(!is_negative){
-                                if((Integer)(number_value.Value) == elements.Count)
+                                if((Integer)(number_value.Value)
+                                    == elements.Count)
                                     elements.Add(Primary());
                                 else
                                     table.Add(number_value, Primary());
@@ -852,9 +1028,11 @@ namespace lightning
                                 number_value.SetNegative();
                                 table.Add(number_value, Primary());
                             }
-                        }else if(((LiteralNode)item).ValueType == typeof(string)){
+                        }else if(((LiteralNode)item).ValueType
+                            == typeof(string)){
                             if(is_negative)
-                                Error("Minus Sign should only be used by Numeric Types in List Declaration.");
+                                Error("Minus Sign should only be used" +
+                                    "by Numeric Types in List Declaration.");
                             LiteralNode string_value = (LiteralNode)item;
                             table.Add(string_value, Primary());
                         }
@@ -867,7 +1045,8 @@ namespace lightning
                     if(is_negative){
                         if(item.Type == NodeType.LITERAL){
                             LiteralNode literal_node = (LiteralNode)item;
-                            if(literal_node.ValueType == typeof(Integer) || literal_node.ValueType == typeof(Float))
+                            if(literal_node.ValueType == typeof(Integer) ||
+                                literal_node.ValueType == typeof(Float))
                                 ((LiteralNode)item).SetNegative();
                             else
                                 minus_error = true;
@@ -875,7 +1054,8 @@ namespace lightning
                             minus_error = true;
                     }
                     if(minus_error == true)
-                        Error("Minus Sign should only be used by Numeric Types in List Declaration.");
+                        Error("Minus Sign should only be used by Numeric" +
+                            "Types in List Declaration.");
                     elements.Add(item);
                 }
             }
@@ -897,7 +1077,11 @@ namespace lightning
                     table_node = TableEntry(table_node);
                 }while(Match(TokenType.COMMA));
 
-                Consume(TokenType.RIGHT_BRACKET, "Expected ']' to close 'table'", true);
+                Consume(
+                    TokenType.RIGHT_BRACKET,
+                    "Expected ']' to close 'table'",
+                    true
+                );
 
                 return table_node;
             }
@@ -921,16 +1105,32 @@ namespace lightning
             else if (Match(TokenType.NUMBER)){
                 Type this_type = ((TokenNumber)Previous()).type;
                 if (this_type == typeof(Integer))
-                    return new LiteralNode(((TokenNumber)Previous()).integerValue, Previous().Line);
+                    return new LiteralNode(
+                        ((TokenNumber)Previous()).integerValue,
+                        Previous().Line
+                    );
                 else
-                    return new LiteralNode(((TokenNumber)Previous()).floatValue, Previous().Line);
+                    return new LiteralNode(
+                        ((TokenNumber)Previous()).floatValue,
+                        Previous().Line
+                    );
             }else if (Match(TokenType.STRING))
-                return new LiteralNode(((TokenString)Previous()).value, Previous().Line);
+                return new LiteralNode(
+                    ((TokenString)Previous()).value,
+                    Previous().Line
+                );
             else if (Match(TokenType.CHAR))
-                return new LiteralNode(((TokenChar)Previous()).value , Previous().Line);
+                return new LiteralNode(
+                    ((TokenChar)Previous()).value,
+                    Previous().Line
+                );
             else if (Match(TokenType.LEFT_PAREN)){
                 Node expr = Expression();
-                Consume(TokenType.RIGHT_PAREN, "Expected ')' after grouping'", true);
+                Consume(
+                    TokenType.RIGHT_PAREN,
+                    "Expected ')' after grouping'",
+                    true
+                );
                 return new GroupingNode(expr, expr.Line);
             }else if (Check(TokenType.FUN))
                 return FunctionExpr();
@@ -940,9 +1140,15 @@ namespace lightning
                 if (Match(TokenType.NUMBER)){
                     Type this_type = ((TokenNumber)Previous()).type;
                     if (this_type == typeof(Integer))
-                        return new LiteralNode(-((TokenNumber)Previous()).integerValue, Previous().Line);
+                        return new LiteralNode(
+                            -((TokenNumber)Previous()).integerValue,
+                            Previous().Line
+                        );
                     else
-                        return new LiteralNode(-((TokenNumber)Previous()).floatValue, Previous().Line);
+                        return new LiteralNode(
+                            -((TokenNumber)Previous()).floatValue,
+                            Previous().Line
+                        );
                 }else{
                     Error("Number expected after (-)! " + Previous().Line);
                     return new LiteralNode(Previous().Line);
@@ -953,7 +1159,7 @@ namespace lightning
             }
         }
 
-        //////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
         Token Advance()
         {
             if (!IsAtEnd()) current++;
@@ -1027,9 +1233,17 @@ namespace lightning
             return false;
         }
 
-        bool Match(TokenType p_type1, TokenType p_type2, TokenType p_type3, TokenType p_type4)
+        bool Match(
+            TokenType p_type1,
+            TokenType p_type2,
+            TokenType p_type3,
+            TokenType p_type4
+        )
         {
-            if (Check(p_type1) || Check(p_type2) || Check(p_type3) || Check(p_type4))
+            if (Check(p_type1) ||
+                Check(p_type2) ||
+                Check(p_type3) ||
+                Check(p_type4))
             {
                 Advance();
                 return true;

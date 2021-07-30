@@ -13,6 +13,7 @@ use tuples as structs with named access
 
 To be Done
 ----------
+replace lambda counter with line?
 create an indexNode
 rename constants data_literals
 improve function declaration - add method declaration
