@@ -44,7 +44,7 @@ namespace lightning
 
         Memory<Unit> globals; // used for global variables
         Memory<Unit> variables; // used for scoped variables
-        List<Unit> constants;
+        List<Unit> data;
 
         public Stack stack;
 
@@ -55,7 +55,7 @@ namespace lightning
         public Library Prelude { get; private set; }
         public Dictionary<string, int> LoadedModules { get; private set; }
         public List<ModuleUnit> modules;
-        public List<Unit> Constants{ get {return constants;}}
+        public List<Unit> Data{ get {return data;}}
         int Env{ get{ return variables.Env; } }
 
         const Operand ASSIGN = (Operand)AssignmentOperatorType.ASSIGN;
@@ -76,7 +76,7 @@ namespace lightning
             IP = 0;
             parallelVM = false;
 
-            main = p_chunk.GetFunctionUnit("main");
+            main = p_chunk.MainFunctionUnit("main");
 
             instructions = new Instructions(functionDeepness, main, out instructionsCache);
 
@@ -86,7 +86,7 @@ namespace lightning
             upValues = new Memory<UpValueUnit>();
             registeredUpValues = new UpValueEnv(variables);
 
-            constants = p_chunk.GetConstants;
+            data = p_chunk.GetData;
             Prelude = p_chunk.Prelude;
             globals = new Memory<Unit>();
             Intrinsics = p_chunk.Prelude.intrinsics;
@@ -106,7 +106,7 @@ namespace lightning
 
         private VM(
             FunctionUnit p_main,
-            List<Unit> p_constants,
+            List<Unit> p_data,
             Memory<Unit> p_globals,
             Library p_Prelude,
             Dictionary<string,int> p_LoadedModules,
@@ -114,7 +114,7 @@ namespace lightning
             bool p_parallelVM)
         {
             main = p_main;
-            constants = p_constants;
+            data = p_data;
             globals = p_globals;
             Prelude = p_Prelude;
             LoadedModules = p_LoadedModules;
@@ -182,7 +182,7 @@ namespace lightning
             }
             else
             {
-                VM new_vm = new VM(main, constants, globals, Prelude, LoadedModules, modules, p_parallelVM);
+                VM new_vm = new VM(main, data, globals, Prelude, LoadedModules, modules, p_parallelVM);
                 return new_vm;
             }
         }
@@ -420,9 +420,9 @@ namespace lightning
                         IP++;
                         stack.Push(stack.Peek());
                         break;
-                    case OpCode.LOAD_CONSTANT:
+                    case OpCode.LOAD_DATA:
                         IP++;
-                        stack.Push(constants[instruction.opA]);
+                        stack.Push(data[instruction.opA]);
                         break;
                     case OpCode.LOAD_VARIABLE:
                         IP++;
@@ -437,9 +437,9 @@ namespace lightning
                         Unit global = modules[instruction.opB].GetGlobal(instruction.opA);
                         stack.Push(global);
                         break;
-                    case OpCode.LOAD_IMPORTED_CONSTANT:
+                    case OpCode.LOAD_IMPORTED_DATA:
                         IP++;
-                        stack.Push(modules[instruction.opB].GetConstant(instruction.opA));
+                        stack.Push(modules[instruction.opB].GetData(instruction.opA));
                         break;
                     case OpCode.LOAD_UPVALUE:
                         IP++;
@@ -475,7 +475,7 @@ namespace lightning
                             Operand env = instruction.opA;
                             Operand is_function_expression = instruction.opB;
                             Operand new_fun_address = instruction.opC;
-                            Unit this_callable = constants[new_fun_address];
+                            Unit this_callable = data[new_fun_address];
                             if (this_callable.Type == UnitType.Function)
                             {
                                 if (is_function_expression == 0)

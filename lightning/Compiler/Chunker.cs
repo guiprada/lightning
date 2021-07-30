@@ -56,7 +56,7 @@ namespace lightning
 
         public bool HasChunked { get; private set; }
         private int instructionCounter;
-        private List<object> constants;
+        private List<object> dataLiterals;
         private List<List<string>> env;
         private List<string> globals;
         private Stack<List<Variable>> upvalueStack;
@@ -102,14 +102,14 @@ namespace lightning
             HasChunked = false;
             Errors = new List<string>();
             globals = new List<string>();
-            constants = new List<dynamic>();
+            dataLiterals = new List<dynamic>();
             upvalueStack = new Stack<List<Variable>>();
             env = new List<List<string>>();
             env.Add(globals);// set env[0] to globals
             funStartEnv = new Stack<int>();
             lambdaCounter = 0;
 
-            // place prelude functions on constans
+            // place prelude functions on data
             foreach (IntrinsicUnit v in p_prelude.intrinsics)
             {
                 SetGlobalVar(v.Name);
@@ -333,23 +333,23 @@ namespace lightning
             }
             else if (p_node.ValueType == typeof(Float))
             {
-                int address = AddConstant((Float)p_node.Value);
-                Add(OpCode.LOAD_CONSTANT, (Operand)address, p_node.Line);
+                int address = AddData((Float)p_node.Value);
+                Add(OpCode.LOAD_DATA, (Operand)address, p_node.Line);
             }
             else if (p_node.ValueType == typeof(Integer))
             {
-                int address = AddConstant((Integer)p_node.Value);
-                Add(OpCode.LOAD_CONSTANT, (Operand)address, p_node.Line);
+                int address = AddData((Integer)p_node.Value);
+                Add(OpCode.LOAD_DATA, (Operand)address, p_node.Line);
             }
             else if (p_node.ValueType == typeof(string))
             {
-                int address = AddConstant((string)p_node.Value);
-                Add(OpCode.LOAD_CONSTANT, (Operand)address, p_node.Line);
+                int address = AddData((string)p_node.Value);
+                Add(OpCode.LOAD_DATA, (Operand)address, p_node.Line);
             }
             else if (p_node.ValueType == typeof(char))
             {
-                int address = AddConstant((char)p_node.Value);
-                Add(OpCode.LOAD_CONSTANT, (Operand)address, p_node.Line);
+                int address = AddData((char)p_node.Value);
+                Add(OpCode.LOAD_DATA, (Operand)address, p_node.Line);
             }
             else if ((string)p_node.Value == null)
             {
@@ -459,8 +459,8 @@ namespace lightning
             if(p_node.IsAnonymous)
                 ChunkIt(p_node.Expression);
             else{
-                Operand string_address = (Operand)AddConstant(p_node.Name);
-                Add(OpCode.LOAD_CONSTANT, string_address, p_node.Line);
+                Operand string_address = (Operand)AddData(p_node.Name);
+                Add(OpCode.LOAD_DATA, string_address, p_node.Line);
             }
         }
         private void LoadIndexes(VariableNode p_node){
@@ -715,7 +715,7 @@ namespace lightning
         {
 
             FunctionUnit new_function = new FunctionUnit(p_name, moduleName);
-            Operand this_address = (Operand)AddConstant(new_function);
+            Operand this_address = (Operand)AddData(new_function);
 
             if (p_node.Type != NodeType.FUNCTION_DECLARATION)
                 Add(OpCode.DECLARE_FUNCTION, 0, 1, this_address, p_node.Line);
@@ -759,7 +759,7 @@ namespace lightning
                     new_upvalues.Add(new UpValueUnit((Operand)v.address, (Operand)v.envIndex));
                 }
                 ClosureUnit new_closure = new ClosureUnit(new_function, new_upvalues);
-                chunk.SwapConstant(this_address, new Unit(new_closure));
+                chunk.SwapDataLiteral(this_address, new Unit(new_closure));
             }else
                 upvalueStack.Pop();
 
@@ -864,55 +864,55 @@ namespace lightning
 
         //////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-        private int AddConstant(string p_string)
+        private int AddData(string p_string)
         {
-            if (constants.Contains(p_string))
-                return constants.IndexOf(p_string);
+            if (dataLiterals.Contains(p_string))
+                return dataLiterals.IndexOf(p_string);
             else{
-                constants.Add(p_string);
-                chunk.AddConstant(new Unit(p_string));
-                return constants.Count - 1;
+                dataLiterals.Add(p_string);
+                chunk.AddData(new Unit(p_string));
+                return dataLiterals.Count - 1;
             }
         }
 
-        private int AddConstant(char p_char)
+        private int AddData(char p_char)
         {
-            if (constants.Contains(p_char))
-                return constants.IndexOf(p_char);
+            if (dataLiterals.Contains(p_char))
+                return dataLiterals.IndexOf(p_char);
             else{
-                constants.Add(p_char);
-                chunk.AddConstant(new Unit(p_char));
-                return constants.Count - 1;
+                dataLiterals.Add(p_char);
+                chunk.AddData(new Unit(p_char));
+                return dataLiterals.Count - 1;
             }
         }
 
-        private int AddConstant(Float p_number)
+        private int AddData(Float p_number)
         {
-            if (constants.Contains(p_number))
-                return constants.IndexOf(p_number);
+            if (dataLiterals.Contains(p_number))
+                return dataLiterals.IndexOf(p_number);
             else{
-                constants.Add(p_number);
-                chunk.AddConstant(new Unit(p_number));
-                return constants.Count - 1;
+                dataLiterals.Add(p_number);
+                chunk.AddData(new Unit(p_number));
+                return dataLiterals.Count - 1;
             }
         }
 
-        private int AddConstant(Integer p_number)
+        private int AddData(Integer p_number)
         {
-            if (constants.Contains(p_number))
-                return constants.IndexOf(p_number);
+            if (dataLiterals.Contains(p_number))
+                return dataLiterals.IndexOf(p_number);
             else{
-                constants.Add(p_number);
-                chunk.AddConstant(new Unit(p_number));
-                return constants.Count - 1;
+                dataLiterals.Add(p_number);
+                chunk.AddData(new Unit(p_number));
+                return dataLiterals.Count - 1;
             }
         }
 
-        private int AddConstant(FunctionUnit p_function)
+        private int AddData(FunctionUnit p_function)
         {
-            constants.Add(p_function);
-            chunk.AddConstant(new Unit(p_function));
-            return constants.Count - 1;
+            dataLiterals.Add(p_function);
+            chunk.AddData(new Unit(p_function));
+            return dataLiterals.Count - 1;
         }
 
         //////////////////////////////////////////////////////////////////////////////////////////////////////////

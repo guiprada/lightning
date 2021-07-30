@@ -14,10 +14,11 @@ use tuples as structs with named access
 To be Done
 ----------
 add column info
-fix eval inconstant naming
-replace lambda counter with line?
+    fix eval inconstant naming
+    replace lambda counter with line?
 create an indexNode
-rename constants data_literals
+
+add variable data to chunk
 improve function declaration - add method declaration
 global function override?
 rename TableUnit to BucketUnit - separate List and Map
@@ -171,3 +172,4 @@ Done
     - move Table Get and Set for negative indices to GetElement and SetElement
     - added async logger
     - merge chunk assignment and assignmentOp
+    - rename constants data

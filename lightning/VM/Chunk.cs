@@ -89,7 +89,7 @@ namespace lightning
                     return op.ToString();
 
                 // 1 op
-                case OpCode.LOAD_CONSTANT:
+                case OpCode.LOAD_DATA:
                 case OpCode.LOAD_GLOBAL:
                 case OpCode.LOAD_UPVALUE:
                 case OpCode.LOAD_INTRINSIC:
@@ -104,7 +104,7 @@ namespace lightning
                 case OpCode.ASSIGN_UPVALUE:
                 case OpCode.LOAD_VARIABLE:
                 case OpCode.LOAD_IMPORTED_GLOBAL:
-                case OpCode.LOAD_IMPORTED_CONSTANT:
+                case OpCode.LOAD_IMPORTED_DATA:
                 case OpCode.NEW_TABLE:
                 case OpCode.TABLE_SET:
                     return op.ToString() + " " + this.opA + " " + this.opB;
@@ -120,11 +120,11 @@ namespace lightning
     }
     public enum OpCode: Operand
     {
-        LOAD_CONSTANT,// Loads a constant to stack
-        LOAD_VARIABLE,// Loads o variable to stack
+        LOAD_DATA,
+        LOAD_VARIABLE,
         LOAD_GLOBAL,
         LOAD_IMPORTED_GLOBAL,
-        LOAD_IMPORTED_CONSTANT,
+        LOAD_IMPORTED_DATA,
         LOAD_UPVALUE,
         LOAD_INTRINSIC,
         LOAD_NIL,
@@ -191,17 +191,17 @@ namespace lightning
     public class Chunk
     {
         private List<Instruction> program;
-        private List<Unit> constants;
+        private List<Unit> data;
         private LineCounter lineCounter;
 
         public Library Prelude { get; private set; }
         public Operand ExitAddress { get { return (Operand)program.Count; } }
         public List<Instruction> Body { get { return program; } }
-        public Operand ConstantsCount { get { return (Operand)constants.Count; } }
-        public List<Unit> GetConstants { get{ return constants; } }
+        public Operand DataCount { get { return (Operand)data.Count; } }
+        public List<Unit> GetData { get{ return data; } }
         public LineCounter LineCounter { get { return lineCounter; } }
         public string ModuleName { get; private set; }
-        public FunctionUnit GetFunctionUnit(string p_name)
+        public FunctionUnit MainFunctionUnit(string p_name)
         {
             FunctionUnit this_function_unit = new FunctionUnit(p_name, ModuleName);
             this_function_unit.Set(0, Body, LineCounter, 0);
@@ -212,7 +212,7 @@ namespace lightning
         {
             program = new List<Instruction>();
             lineCounter = new LineCounter(new List<uint>());
-            constants = new List<Unit>();
+            data = new List<Unit>();
             Prelude = p_prelude;
             ModuleName = p_moduleName;
         }
@@ -230,15 +230,15 @@ namespace lightning
         public void Print()
         {
 
-            int constant_counter = 0;
-            Console.WriteLine("------------------- CONSTANTS:");
-            foreach (Unit v in constants)
+            int data_literal_count = 0;
+            Console.WriteLine("------------------- DATA LITERALS:");
+            foreach (Unit v in data)
             {
                 if(v.Type == UnitType.String)
-                    Console.WriteLine("Constant: " + constant_counter.ToString() + " \"" + v.ToString() + "\"");
+                    Console.WriteLine("Data: " + data_literal_count.ToString() + " \"" + v.ToString() + "\"");
                 else
-                    Console.WriteLine("Constant: "+ constant_counter.ToString() + " " + v.ToString());
-                constant_counter++;
+                    Console.WriteLine("Data: "+ data_literal_count.ToString() + " " + v.ToString());
+                data_literal_count++;
             }
 
             Console.WriteLine(Environment.NewLine + "------------------- CHUNK:");
@@ -261,10 +261,10 @@ namespace lightning
             Console.Write(p_instruction.ToString());
         }
 
-        public ushort AddConstant(Unit p_value)
+        public ushort AddData(Unit p_value)
         {
-            constants.Add(p_value);
-            return (ushort)(constants.Count -1);
+            data.Add(p_value);
+            return (ushort)(data.Count -1);
         }
 
         public void WriteInstruction(OpCode p_opCode, Operand p_opA, Operand p_opB, Operand p_opC, uint p_line)
@@ -284,14 +284,14 @@ namespace lightning
            return program[p_address];
         }
 
-        public Unit GetConstant(Operand p_address)
+        public Unit GetDataLiteral(Operand p_address)
         {
-            return constants[p_address];
+            return data[p_address];
         }
 
         public Unit GetFunction(string p_name)
         {
-            foreach(Unit v in constants)
+            foreach(Unit v in data)
             {
                 if(v.Type == UnitType.Function)
                     if( ((FunctionUnit)(v.heapUnitValue)).Name == p_name)
@@ -342,9 +342,9 @@ namespace lightning
                 p_opC ??= old_instruction.opC);
         }
 
-        public void SwapConstant(int p_address, Unit p_new_value)
+        public void SwapDataLiteral(int p_address, Unit p_new_value)
         {
-            constants[p_address] = p_new_value;
+            data[p_address] = p_new_value;
         }
     }
 }

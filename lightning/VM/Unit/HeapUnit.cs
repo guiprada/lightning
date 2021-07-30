@@ -499,19 +499,19 @@ namespace lightning
         public string Name{get; private set;}
         public Dictionary<Unit, Unit> Table{get; private set;}
         public List<Unit> Globals{get; private set;}
-        public List<Unit> Constants{get; private set;}
+        public List<Unit> Data{get; private set;}
         public Operand ImportIndex{get; set;}
         public override UnitType Type{
             get{
                 return UnitType.Module;
             }
         }
-        public ModuleUnit(string p_Name, Dictionary<Unit, Unit> p_Table, List<Unit> p_Globals, List<Unit> p_Constants)
+        public ModuleUnit(string p_Name, Dictionary<Unit, Unit> p_Table, List<Unit> p_Globals, List<Unit> p_Data)
         {
             Name = p_Name;
             Table = p_Table ?? new Dictionary<Unit, Unit>();
             Globals = p_Globals ??= new List<Unit>();
-            Constants = p_Constants ??= new List<Unit>();
+            Data = p_Data ??= new List<Unit>();
             ImportIndex = 0;
         }
 
@@ -523,8 +523,8 @@ namespace lightning
             Globals[p_index] = p_value;
         }
 
-        public Unit GetConstant(Operand p_index){
-            return Constants[p_index];
+        public Unit GetData(Operand p_index){
+            return Data[p_index];
         }
 
         public override bool ToBool()

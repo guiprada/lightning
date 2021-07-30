@@ -318,7 +318,7 @@ namespace lightning
             }
             string this_unescaped_string = Regex.Unescape(this_string);
             if(this_unescaped_string.Length > 1){
-                Error("Trying to declare a Char constant with more than one char! " + this_unescaped_string);
+                Error("Trying to declare a Char literal with more than one char! " + this_unescaped_string);
             }
 
             return this_unescaped_string.ToCharArray()[0];

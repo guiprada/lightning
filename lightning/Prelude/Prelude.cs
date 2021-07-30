@@ -928,8 +928,8 @@ namespace lightning
             public VM importedVM;
             public Dictionary<Operand, Operand> relocatedGlobals;
             public List<Operand> toBeRelocatedGlobals;
-            public Dictionary<Operand, Operand> relocatedConstants;
-            public List<Operand> toBeRelocatedConstants;
+            public Dictionary<Operand, Operand> relocatedData;
+            public List<Operand> toBeRelocatedData;
             public List<int> relocatedTables;
             public Dictionary<Operand, Operand> relocatedModules;
             public ModuleUnit module;
@@ -939,8 +939,8 @@ namespace lightning
                 VM p_importedVM,
                 Dictionary<Operand, Operand> p_relocatedGlobals,
                 List<Operand> p_toBeRelocatedGlobals,
-                Dictionary<Operand, Operand> p_relocatedConstants,
-                List<Operand> p_toBeRelocatedConstants,
+                Dictionary<Operand, Operand> p_relocatedData,
+                List<Operand> p_toBeRelocatedData,
                 List<int> p_relocatedTables,
                 Dictionary<Operand, Operand> p_relocatedModules,
                 ModuleUnit p_module,
@@ -950,8 +950,8 @@ namespace lightning
                 importedVM = p_importedVM;
                 relocatedGlobals = p_relocatedGlobals;
                 toBeRelocatedGlobals = p_toBeRelocatedGlobals;
-                relocatedConstants = p_relocatedConstants;
-                toBeRelocatedConstants = p_toBeRelocatedConstants;
+                relocatedData = p_relocatedData;
+                toBeRelocatedData = p_toBeRelocatedData;
                 relocatedTables = p_relocatedTables;
                 relocatedModules = p_relocatedModules;
                 module = p_module;
@@ -1058,20 +1058,20 @@ namespace lightning
             }
             relocationInfo.toBeRelocatedGlobals.Clear();
 
-            for (Operand i = 0; i < relocationInfo.toBeRelocatedConstants.Count; i++)
+            for (Operand i = 0; i < relocationInfo.toBeRelocatedData.Count; i++)
             {
                 Unit new_value =
-                    relocationInfo.importedVM.Constants[relocationInfo.toBeRelocatedConstants[i]];
+                    relocationInfo.importedVM.Data[relocationInfo.toBeRelocatedData[i]];
 
-                relocationInfo.module.Constants.Add(new_value);
-                relocationInfo.relocatedConstants.Add(
-                    relocationInfo.toBeRelocatedConstants[i],
-                    (Operand)(relocationInfo.module.Constants.Count - 1));
+                relocationInfo.module.Data.Add(new_value);
+                relocationInfo.relocatedData.Add(
+                    relocationInfo.toBeRelocatedData[i],
+                    (Operand)(relocationInfo.module.Data.Count - 1));
 
                 if (new_value.Type == UnitType.Table)
                     relocation_stack.Add((TableUnit)new_value.heapUnitValue);
             }
-            relocationInfo.toBeRelocatedConstants.Clear();
+            relocationInfo.toBeRelocatedData.Clear();
 
             foreach (TableUnit v in relocation_stack)
             {
@@ -1146,45 +1146,45 @@ namespace lightning
                         }
                     }
                 }
-                else if (next.opCode == OpCode.LOAD_CONSTANT)
+                else if (next.opCode == OpCode.LOAD_DATA)
                 {
-                    if (relocationInfo.relocatedConstants.ContainsKey(next.opA))
+                    if (relocationInfo.relocatedData.ContainsKey(next.opA))
                     {
-                        next.opCode = OpCode.LOAD_IMPORTED_CONSTANT;
-                        next.opA = relocationInfo.relocatedConstants[next.opA];
+                        next.opCode = OpCode.LOAD_IMPORTED_DATA;
+                        next.opA = relocationInfo.relocatedData[next.opA];
                         next.opB = relocationInfo.moduleIndex;
                     }
-                    else if (relocationInfo.toBeRelocatedConstants.Contains(next.opA))
+                    else if (relocationInfo.toBeRelocatedData.Contains(next.opA))
                     {
-                        next.opCode = OpCode.LOAD_IMPORTED_CONSTANT;
+                        next.opCode = OpCode.LOAD_IMPORTED_DATA;
                         next.opA =
-                            (Operand)(relocationInfo.toBeRelocatedConstants.IndexOf(next.opA) +
-                            relocationInfo.relocatedConstants.Count);
+                            (Operand)(relocationInfo.toBeRelocatedData.IndexOf(next.opA) +
+                            relocationInfo.relocatedData.Count);
                         next.opB = relocationInfo.moduleIndex;
                     }
                     else
                     {
                         Operand global_count =
-                            (Operand)(relocationInfo.relocatedConstants.Count +
-                            relocationInfo.toBeRelocatedConstants.Count);
-                        relocationInfo.toBeRelocatedConstants.Add(next.opA);
-                        next.opCode = OpCode.LOAD_IMPORTED_CONSTANT;
+                            (Operand)(relocationInfo.relocatedData.Count +
+                            relocationInfo.toBeRelocatedData.Count);
+                        relocationInfo.toBeRelocatedData.Add(next.opA);
+                        next.opCode = OpCode.LOAD_IMPORTED_DATA;
                         next.opA = global_count;
                         next.opB = relocationInfo.moduleIndex;
                     }
                 }
                 else if (next.opCode == OpCode.DECLARE_FUNCTION)
                 {
-                    Unit this_value = relocationInfo.importedVM.Constants[next.opC];
-                    if (relocationInfo.importingVM.Constants.Contains(this_value))
+                    Unit this_value = relocationInfo.importedVM.Data[next.opC];
+                    if (relocationInfo.importingVM.Data.Contains(this_value))
                     {
                         next.opC =
-                            (Operand)relocationInfo.importingVM.Constants.IndexOf(this_value);
+                            (Operand)relocationInfo.importingVM.Data.IndexOf(this_value);
                     }
                     else
                     {
-                        relocationInfo.importingVM.Constants.Add(this_value);
-                        next.opC = (Operand)(relocationInfo.importingVM.Constants.Count - 1);
+                        relocationInfo.importingVM.Data.Add(this_value);
+                        next.opC = (Operand)(relocationInfo.importingVM.Data.Count - 1);
                         RelocateChunk(((ClosureUnit)this_value.heapUnitValue).Function, relocationInfo);
                     }
                 }
@@ -1232,7 +1232,7 @@ namespace lightning
                             Console.WriteLine("Can not find ASSIGN_IMPORTED_GLOBAL index" + function.Module);
                     }
                 }
-                else if (next.opCode == OpCode.LOAD_IMPORTED_CONSTANT)
+                else if (next.opCode == OpCode.LOAD_IMPORTED_DATA)
                 {
                     if (relocationInfo.relocatedModules.ContainsKey(next.opB))
                     {
@@ -1251,7 +1251,7 @@ namespace lightning
                             }
                         }
                         if (found == false)
-                            Console.WriteLine("Can not find LOAD_IMPORTED_CONSTANT index" + function.Module);
+                            Console.WriteLine("Can not find LOAD_IMPORTED_DATA index" + function.Module);
                     }
                 }
 
@@ -1270,7 +1270,7 @@ namespace lightning
                         Instruction next = function.Body[i];
 
                         if ((next.opCode == OpCode.LOAD_IMPORTED_GLOBAL) ||
-                            (next.opCode == OpCode.LOAD_IMPORTED_CONSTANT) ||
+                            (next.opCode == OpCode.LOAD_IMPORTED_DATA) ||
                             (next.opCode == OpCode.ASSIGN_IMPORTED_GLOBAL))
                         {
                             next.opB = new_index;
