@@ -406,7 +406,6 @@ namespace lightning
                 ChunkIt(p_node.Finalizer);
                 Add(OpCode.POP, p_node.Line);
             }
-            //ChunkIt(p_node.Condition);
 
             int go_back_address = instructionCounter;
             Add(OpCode.JUMP_BACK, 0, p_node.Line);
@@ -431,7 +430,6 @@ namespace lightning
 
             int go_back_address = instructionCounter;
             Add(OpCode.JUMP_BACK, 0, p_node.Line);
-            //int body_end = instructionCounter;
 
             chunk.FixInstruction(body_address, null, (Operand)(instructionCounter - body_address), null, null);
             chunk.FixInstruction(go_back_address, null, (Operand)(go_back_address - condition_address), null, null);
@@ -585,23 +583,23 @@ namespace lightning
                 ChunkIt(p_node.Calls[0].Arguments[i]);
 
             // the first call, we need to decode the function name, or object
-            Variable this_call;
+            Variable this_called;
             if(p_node.Variable.IsAnonymous)
-                this_call = new Variable(p_node.Variable.Expression);
+                this_called = new Variable(p_node.Variable.Expression);
             else{
                 Nullable<Variable> maybe_call = GetVar(p_node.Variable.Name, p_node.Line);
                 if (maybe_call.HasValue)
-                    this_call = maybe_call.Value;
+                    this_called = maybe_call.Value;
                 else
                     return;
             }
 
             if (p_node.Variable.Indexes.Count == 0)
-                LoadVariable(this_call, p_node.Line);
+                LoadVariable(this_called, p_node.Line);
             else{// it is a compoundCall/method/IndexedAccess!
                 if (p_node.Variable.Indexes[p_node.Variable.Indexes.Count - 1].AccessType == VarAccessType.COLON)
                 {// is it a method!
-                    LoadVariable(this_call, p_node.Line);
+                    LoadVariable(this_called, p_node.Line);
                     Add(OpCode.DUP, p_node.Line);// it is a method so we push the table again, to be used as parameter!
                     Add(OpCode.PUSH_STASH, p_node.Line);
 
@@ -613,7 +611,7 @@ namespace lightning
                     Add(OpCode.TABLE_GET, (Operand)(p_node.Variable.Indexes.Count - 1), p_node.Line);
                     Add(OpCode.POP_STASH, p_node.Line);
                 }else{
-                    LoadVariable(this_call, p_node.Line);
+                    LoadVariable(this_called, p_node.Line);
                 }
 
                 LoadIndexes(p_node.Variable.Indexes);
