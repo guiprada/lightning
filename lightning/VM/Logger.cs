@@ -1,5 +1,5 @@
 using System;
-using System.Collections.Generic;
+using System.Collections.Concurrent;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -19,17 +19,16 @@ namespace lightning
         }
     }
     public class Logger{
-        private static Queue<LogEntry> queue;
-        private static bool isProcessing;
+        private static ConcurrentQueue<LogEntry> queue;
+        private static volatile bool isProcessing;
 
         static Logger(){
-            queue = new Queue<LogEntry>();
+            queue = new ConcurrentQueue<LogEntry>();
             isProcessing = false;
             AppDomain.CurrentDomain.ProcessExit += new EventHandler(CloseLogger);
         }
 
         static void CloseLogger(object sender, EventArgs e){
-            lock(isProcessing as object)
                 if(isProcessing)
                     Console.WriteLine("ERROR: Logger has unflushed data!!!");
                 else
@@ -37,8 +36,7 @@ namespace lightning
         }
 
         static async Task ProcessQueue(){
-            lock(isProcessing as object)
-                isProcessing = true;
+            isProcessing = true;
             LogEntry entry =  default(LogEntry);
             bool has_entry = false;
             do{
@@ -49,26 +47,13 @@ namespace lightning
                         else
                             await file.WriteAsync(entry.message);
                     }
-                lock(queue){
-                    if (queue.Count > 0){
-                        entry = queue.Dequeue();
-                        has_entry = true;
-                    }else{
-                        has_entry = false;
-                        lock(isProcessing as object)
-                            isProcessing = false;
-                    }
-                }
+                has_entry = queue.TryDequeue(out entry);
             }while(has_entry);
+            isProcessing = false;
         }
         private static void Add(LogEntry entry){
-            lock(queue){
-                queue.Enqueue(entry);
-            }
-            bool is_processing;
-            lock(isProcessing as object)
-                is_processing = isProcessing;
-            if(is_processing == false){
+            queue.Enqueue(entry);
+            if(isProcessing == false){
                 Task.Run(ProcessQueue);
             }
         }
