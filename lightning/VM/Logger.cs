@@ -29,10 +29,12 @@ namespace lightning
         }
 
         static void CloseLogger(object sender, EventArgs e){
-                if(isProcessing)
-                    Console.WriteLine("ERROR: Logger has unflushed data!!!");
-                else
-                    Console.WriteLine("Logger has exited!");
+            if(isProcessing){
+                Console.WriteLine("Waiting for Logger to exit :/");
+                while(isProcessing)
+                    Thread.Sleep(100);
+            }
+            Console.WriteLine("Logger has exited :)");
         }
 
         static async Task ProcessQueue(){
