@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Threading;
+using System.Threading.Tasks;
 
 namespace lightning
 {
@@ -20,58 +21,45 @@ namespace lightning
     public class Logger{
         private static Queue<LogEntry> queue;
         private static bool isProcessing;
-        private static bool isRunning;
-        private static Thread queueProcessing;
 
         static Logger(){
             queue = new Queue<LogEntry>();
             isProcessing = false;
-            isRunning = true;
-            queueProcessing = new Thread(ProcessQueue);
-            queueProcessing.IsBackground = true;
-            AppDomain.CurrentDomain.ProcessExit += FileWriterClose;// Subscribe to Event
+            AppDomain.CurrentDomain.ProcessExit += new EventHandler(CloseLogger);
         }
 
-        private static void FileWriterClose(object sender, EventArgs e){
-            lock(isRunning as object)
-                isRunning = false;
-            queueProcessing.Join();
+        static void CloseLogger(object sender, EventArgs e){
+            lock(isProcessing as object)
+                if(isProcessing)
+                    Console.WriteLine("ERROR: Logger has unflushed data!!!");
+                else
+                    Console.WriteLine("Logger has exited!");
         }
 
-        static async void ProcessQueue(){
-            bool is_running;
-            lock(isRunning as object)
-                is_running = isRunning;
-            while(is_running){
-                lock(isProcessing as object)
-                    isProcessing = true;
-
-                LogEntry entry =  default(LogEntry);
-                bool has_entry = false;
-                do{
-                    if(has_entry)
-                        using (System.IO.StreamWriter file = new System.IO.StreamWriter(entry.path, entry.append)){
-                            if(entry.isLine)
-                                await file.WriteLineAsync(entry.message);
-                            else
-                                await file.WriteAsync(entry.message);
-                        }
-                    lock(queue){
-                        if (queue.Count > 0){
-                            entry = queue.Dequeue();
-                            has_entry = true;
-                        }else{
-                            has_entry = false;
-                            lock(isProcessing as object)
-                                isProcessing = false;
-                        }
+        static async Task ProcessQueue(){
+            lock(isProcessing as object)
+                isProcessing = true;
+            LogEntry entry =  default(LogEntry);
+            bool has_entry = false;
+            do{
+                if(has_entry)
+                    using (System.IO.StreamWriter file = new System.IO.StreamWriter(entry.path, entry.append)){
+                        if(entry.isLine)
+                            await file.WriteLineAsync(entry.message);
+                        else
+                            await file.WriteAsync(entry.message);
                     }
-                }while(has_entry);
-                Thread.Sleep(0);
-                lock(isRunning as object)
-                    is_running = isRunning;
-            }
-            Console.WriteLine("FileWriter Stopped!");
+                lock(queue){
+                    if (queue.Count > 0){
+                        entry = queue.Dequeue();
+                        has_entry = true;
+                    }else{
+                        has_entry = false;
+                        lock(isProcessing as object)
+                            isProcessing = false;
+                    }
+                }
+            }while(has_entry);
         }
         private static void Add(LogEntry entry){
             lock(queue){
@@ -81,7 +69,7 @@ namespace lightning
             lock(isProcessing as object)
                 is_processing = isProcessing;
             if(is_processing == false){
-                queueProcessing.Start();
+                Task.Run(ProcessQueue);
             }
         }
 
