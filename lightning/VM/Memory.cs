@@ -56,7 +56,7 @@ namespace lightning
         }
 
         public T GetAt(int p_index){
-            return values[Marker + p_index];
+            return values[markers[^1] + p_index];
         }
 
         public void SetAt(T p_new_value, int p_index, int p_env){

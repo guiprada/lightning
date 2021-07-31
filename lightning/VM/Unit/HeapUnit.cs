@@ -379,6 +379,7 @@ namespace lightning
         public Operand Address{get; private set;}
         public Operand Env{get; private set;}
         private bool isCaptured;
+        public bool IsCaptured{ get { return isCaptured; } }
         private Memory<Unit> variables;
         private Unit value;
         public override UnitType Type{
@@ -498,7 +499,8 @@ namespace lightning
     {
         public string Name{get; private set;}
         public Dictionary<Unit, Unit> Table{get; private set;}
-        public List<Unit> Globals{get; private set;}
+        public List<Unit> globals;
+        public List<Unit> Globals{ get{ return globals; } private set{ globals = value; } }
         public List<Unit> Data{get; private set;}
         public Operand ImportIndex{get; set;}
         public override UnitType Type{
@@ -516,11 +518,45 @@ namespace lightning
         }
 
         public Unit GetGlobal(Operand p_index){
-            return Globals[p_index];
+            Unit value;
+            lock(globals)
+                value = globals[p_index];
+            return value;
         }
 
         public void SetGlobal(Unit p_value, Operand p_index){
-            Globals[p_index] = p_value;
+            lock(globals)
+                globals[p_index] = p_value;
+        }
+
+        const Operand ASSIGN = (Operand)AssignmentOperatorType.ASSIGN;
+        const Operand ADDITION_ASSIGN = (Operand)AssignmentOperatorType.ADDITION_ASSIGN;
+        const Operand SUBTRACTION_ASSIGN = (Operand)AssignmentOperatorType.SUBTRACTION_ASSIGN;
+        const Operand MULTIPLICATION_ASSIGN = (Operand)AssignmentOperatorType.MULTIPLICATION_ASSIGN;
+        const Operand DIVISION_ASSIGN = (Operand)AssignmentOperatorType.DIVISION_ASSIGN;
+        public void SetOpGlobal(Unit p_value, Operand op, Operand p_index){
+            switch(op){
+                case ASSIGN:
+                    lock(globals)
+                        globals[p_index] = p_value;
+                    break;
+                case ADDITION_ASSIGN:
+                    lock(globals)
+                        globals[p_index] += p_value;
+                    break;
+                case SUBTRACTION_ASSIGN:
+                    lock(globals)
+                        globals[p_index] -= p_value;
+                    break;
+                case MULTIPLICATION_ASSIGN:
+                    lock(globals)
+                        globals[p_index] *= p_value;
+                    break;
+                case DIVISION_ASSIGN:
+                    lock(globals)
+                        globals[p_index] /= p_value;
+                    break;
+            }
         }
 
         public Unit GetData(Operand p_index){

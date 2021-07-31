@@ -92,11 +92,13 @@ namespace lightning
             Intrinsics = p_chunk.Prelude.intrinsics;
             foreach (IntrinsicUnit v in Intrinsics)
             {
-                globals.Add(new Unit(v));
+                lock(globals)
+                    globals.Add(new Unit(v));
             }
             foreach (KeyValuePair<string, TableUnit> entry in p_chunk.Prelude.tables)
             {
-                globals.Add(new Unit(entry.Value));
+                lock(globals)
+                    globals.Add(new Unit(entry.Value));
             }
             LoadedModules = new Dictionary<string, int>();
             modules = new List<ModuleUnit>();
@@ -200,7 +202,10 @@ namespace lightning
 
         public Unit GetGlobal(Operand p_address)
         {
-            return globals.Get(p_address);
+            Unit value;
+            lock(globals)
+                value = globals.Get(p_address);
+            return value;
         }
 
 //////////////////////////// Accessors
@@ -315,12 +320,14 @@ namespace lightning
                 instructions.PushRET((Operand)(main.Body.Count - 1));
                 ClosureUnit this_closure = (ClosureUnit)(p_callable.heapUnitValue);
 
-                upValues.PushEnv();
+                lock(upValues)
+                    upValues.PushEnv();
 
-                foreach (UpValueUnit u in this_closure.UpValues)
-                {
-                    upValues.Add(u);
-                }
+                lock(upValues)
+                    foreach (UpValueUnit u in this_closure.UpValues)
+                    {
+                        upValues.Add(u);
+                    }
                 instructions.PushFunction(this_closure.Function, Env, out instructionsCache);
 
                 IP = 0;
@@ -430,12 +437,13 @@ namespace lightning
                         break;
                     case OpCode.LOAD_GLOBAL:
                         IP++;
-                        stack.Push(globals.Get(instruction.opA));
+                        lock(globals)
+                            stack.Push(globals.Get(instruction.opA));
                         break;
                     case OpCode.LOAD_IMPORTED_GLOBAL:
                         IP++;
-                        Unit global = modules[instruction.opB].GetGlobal(instruction.opA);
-                        stack.Push(global);
+                        lock(modules[instruction.opB].Globals)
+                            stack.Push(modules[instruction.opB].GetGlobal(instruction.opA));
                         break;
                     case OpCode.LOAD_IMPORTED_DATA:
                         IP++;
@@ -443,7 +451,8 @@ namespace lightning
                         break;
                     case OpCode.LOAD_UPVALUE:
                         IP++;
-                        stack.Push(upValues.GetAt(instruction.opA).UpValue);
+                        lock(upValues)
+                            stack.Push(upValues.GetAt(instruction.opA).UpValue);
                         break;
                     case OpCode.LOAD_NIL:
                         IP++;
@@ -467,7 +476,8 @@ namespace lightning
                         break;
                     case OpCode.DECLARE_GLOBAL:
                         IP++;
-                        globals.Add(stack.Pop());
+                        lock(globals)
+                            globals.Add(stack.Pop());
                         break;
                     case OpCode.DECLARE_FUNCTION:
                         {
@@ -481,7 +491,8 @@ namespace lightning
                                 if (is_function_expression == 0)
                                     if (env == 0)// Global
                                     {
-                                        globals.Add(this_callable);
+                                        lock(globals)
+                                            globals.Add(this_callable);
                                     }
                                     else
                                     {
@@ -508,7 +519,8 @@ namespace lightning
                                 if (is_function_expression == 0)
                                     if (env == 0)// yes they exist!
                                     {
-                                        globals.Add(new_closure_unit);
+                                        lock(globals)
+                                            globals.Add(new_closure_unit);
                                     }
                                     else
                                     {
@@ -558,10 +570,12 @@ namespace lightning
                             Operand address = instruction.opA;
                             Operand op = instruction.opB;
                             Unit new_value = stack.Peek();
-                            if (op == ASSIGN){
-                                globals.Set(new_value, address);
-                            }else if(parallelVM == true){
+                            if(parallelVM == true){
                                 switch(op){
+                                    case ASSIGN:
+                                        lock(globals)
+                                            globals.Set(new_value, address);
+                                        break;
                                     case ADDITION_ASSIGN:
                                         lock(globals){
                                             Unit result = globals.Get(address) + new_value;
@@ -592,120 +606,87 @@ namespace lightning
                             }else{
                                 Unit result;
                                 switch(op){
+                                     case ASSIGN:
+                                        globals.Set(new_value, address);
+                                        break;
                                     case ADDITION_ASSIGN:
                                         result = globals.Get(address) + new_value;
+                                        globals.Set(result, address);
                                         break;
                                     case SUBTRACTION_ASSIGN:
                                         result = globals.Get(address) - new_value;
+                                        globals.Set(result, address);
                                         break;
                                     case MULTIPLICATION_ASSIGN:
                                         result = globals.Get(address) * new_value;
+                                        globals.Set(result, address);
                                         break;
                                     case DIVISION_ASSIGN:
                                         result = globals.Get(address) / new_value;
+                                        globals.Set(result, address);
                                         break;
                                     default:
                                         throw new Exception("Unknown operator");
                                 }
-                                globals.Set(result, address);
                             }
                             break;
                         }
                     case OpCode.ASSIGN_IMPORTED_GLOBAL:
-                        {
-                            IP++;
-                            Operand op = instruction.opC;
-                            Unit new_value = stack.Peek();
-                            if (op == ASSIGN){
-                                modules[instruction.opB].SetGlobal(new_value, instruction.opA);
-                                //modules[instruction.opB].GetGlobal(instruction.opA);
-                            }else if(parallelVM == true){
-                                switch(op){
-                                    case ADDITION_ASSIGN:
-                                        lock(modules[instruction.opB].Globals){
-                                            Unit result = modules[instruction.opB].GetGlobal(instruction.opA) + new_value;
-                                            modules[instruction.opB].SetGlobal(result, instruction.opA);
-                                        }
-                                        break;
-                                    case SUBTRACTION_ASSIGN:
-                                        lock(modules[instruction.opB].Globals){
-                                            Unit result = modules[instruction.opB].GetGlobal(instruction.opA) - new_value;
-                                            modules[instruction.opB].SetGlobal(result, instruction.opA);
-                                        }
-                                        break;
-                                    case MULTIPLICATION_ASSIGN:
-                                        lock(modules[instruction.opB].Globals){
-                                            Unit result = modules[instruction.opB].GetGlobal(instruction.opA) * new_value;
-                                            modules[instruction.opB].SetGlobal(result, instruction.opA);
-                                        }
-                                        break;
-                                    case DIVISION_ASSIGN:
-                                        lock(modules[instruction.opB].Globals){
-                                            Unit result = modules[instruction.opB].GetGlobal(instruction.opA) / new_value;
-                                            modules[instruction.opB].SetGlobal(result, instruction.opA);
-                                        }
-                                        break;
-                                    default:
-                                        throw new Exception("Unknown operator");
-                                }
-                            }else{
-                                Unit result;
-                                switch(op){
-                                    case ADDITION_ASSIGN:
-                                        result = modules[instruction.opB].GetGlobal(instruction.opA) + new_value;
-                                        break;
-                                    case SUBTRACTION_ASSIGN:
-                                        result = modules[instruction.opB].GetGlobal(instruction.opA) - new_value;
-                                        break;
-                                    case MULTIPLICATION_ASSIGN:
-                                        result = modules[instruction.opB].GetGlobal(instruction.opA) * new_value;
-                                        break;
-                                    case DIVISION_ASSIGN:
-                                        result = modules[instruction.opB].GetGlobal(instruction.opA) / new_value;
-                                        break;
-                                    default:
-                                        throw new Exception("Unknown operator");
-                                }
-                                modules[instruction.opB].SetGlobal(result, instruction.opA);
-                            }
-                            break;
-                        }
+                        IP++;
+                        modules[instruction.opB].SetOpGlobal(stack.Peek(), instruction.opC, instruction.opA);
+                        break;
                     case OpCode.ASSIGN_UPVALUE:
                         {
                             IP++;
                             Operand address = instruction.opA;
                             Operand op = instruction.opB;
-                            UpValueUnit this_upValue = upValues.GetAt(address);
                             Unit new_value = stack.Peek();
-                            if (op == ASSIGN){
-                                this_upValue.UpValue = new_value;
-                            }else if(parallelVM == true){
+                            if(parallelVM == true){
                                 switch(op){
+                                    case ASSIGN:
+                                        lock(upValues){
+                                            UpValueUnit this_upValue = upValues.GetAt(address);
+                                            lock(this_upValue)
+                                                this_upValue.UpValue = new_value;
+                                        }
+                                        break;
                                     case ADDITION_ASSIGN:
-                                        lock(this_upValue){
-                                            this_upValue.UpValue = this_upValue.UpValue + new_value;
+                                        lock(upValues){
+                                            UpValueUnit this_upValue = upValues.GetAt(address);
+                                            lock(this_upValue)
+                                                this_upValue.UpValue = this_upValue.UpValue + new_value;
                                         }
                                         break;
                                     case SUBTRACTION_ASSIGN:
-                                        lock(this_upValue){
-                                            this_upValue.UpValue = this_upValue.UpValue - new_value;
+                                        lock(upValues){
+                                            UpValueUnit this_upValue = upValues.GetAt(address);
+                                            lock(this_upValue)
+                                                this_upValue.UpValue = this_upValue.UpValue - new_value;
                                         }
                                         break;
                                     case MULTIPLICATION_ASSIGN:
-                                        lock(this_upValue){
-                                            this_upValue.UpValue = this_upValue.UpValue * new_value;
+                                        lock(upValues){
+                                            UpValueUnit this_upValue = upValues.GetAt(address);
+                                            lock(this_upValue)
+                                                this_upValue.UpValue = this_upValue.UpValue * new_value;
                                         }
                                         break;
                                     case DIVISION_ASSIGN:
-                                        lock(this_upValue){
-                                            this_upValue.UpValue = this_upValue.UpValue / new_value;
+                                        lock(upValues){
+                                            UpValueUnit this_upValue = upValues.GetAt(address);
+                                            lock(this_upValue)
+                                                this_upValue.UpValue = this_upValue.UpValue / new_value;
                                         }
                                         break;
                                     default:
                                         throw new Exception("Unknown operator");
                                 }
                             }else{
+                                UpValueUnit this_upValue = upValues.GetAt(address);
                                 switch(op){
+                                    case ASSIGN:
+                                        this_upValue.UpValue = new_value;
+                                        break;
                                     case ADDITION_ASSIGN:
                                         this_upValue.UpValue = this_upValue.UpValue + new_value;
                                         break;
@@ -1085,7 +1066,10 @@ namespace lightning
         }
 
         public int GlobalsCount(){
-            return globals.Count;
+            int value;
+            lock(globals)
+                value = globals.Count;
+            return value;
         }
 
         public int VariablesCount(){
@@ -1097,11 +1081,17 @@ namespace lightning
         }
 
         public int UpValuesCount(){
-            return upValues.Count;
+            int value;
+            lock(upValues)
+                value = upValues.Count;
+            return value;
         }
 
         public int UpValueCapacity(){
-            return upValues.Capacity;
+            int value;
+            lock(upValues)
+                value = upValues.Capacity;
+            return value;
         }
     }
 }
