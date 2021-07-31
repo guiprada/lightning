@@ -4,13 +4,13 @@ using System.Threading;
 
 namespace lightning
 {
-    struct Entry{
+    struct LogEntry{
         public string message;
         public string path;
         public bool isLine;
         public bool append;
 
-        public Entry(string p_message, string p_path, bool p_isLine, bool p_append){
+        public LogEntry(string p_message, string p_path, bool p_isLine, bool p_append){
             message = p_message;
             path = p_path;
             isLine = p_isLine;
@@ -18,13 +18,13 @@ namespace lightning
         }
     }
     public class Logger{
-        private static Queue<Entry> queue;
+        private static Queue<LogEntry> queue;
         private static bool isProcessing;
         private static bool isRunning;
         private static Thread queueProcessing;
 
         static Logger(){
-            queue = new Queue<Entry>();
+            queue = new Queue<LogEntry>();
             isProcessing = false;
             isRunning = true;
             queueProcessing = new Thread(ProcessQueue);
@@ -46,7 +46,7 @@ namespace lightning
                 lock(isProcessing as object)
                     isProcessing = true;
 
-                Entry entry =  default(Entry);
+                LogEntry entry =  default(LogEntry);
                 bool has_entry = false;
                 do{
                     if(has_entry)
@@ -73,7 +73,7 @@ namespace lightning
             }
             Console.WriteLine("FileWriter Stopped!");
         }
-        private static void Add(Entry entry){
+        private static void Add(LogEntry entry){
             lock(queue){
                 queue.Enqueue(entry);
             }
@@ -86,13 +86,13 @@ namespace lightning
         }
 
         public static void LogLine(string p_line, string p_path){
-            Add(new Entry(p_line, p_path, true, true));
+            Add(new LogEntry(p_line, p_path, true, true));
         }
         public static void Log(string p_line, string p_path){
-            Add(new Entry(p_line, p_path, false, true));
+            Add(new LogEntry(p_line, p_path, false, true));
         }
         public static void LogNew(string p_contents, string p_path){
-            Add(new Entry(p_contents, p_path, true, false));
+            Add(new LogEntry(p_contents, p_path, true, false));
         }
     }
 }
