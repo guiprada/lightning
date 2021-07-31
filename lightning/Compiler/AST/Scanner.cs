@@ -64,7 +64,7 @@ namespace lightning
                         }
                     }catch (Exception e){
                         Console.WriteLine("Scanning broke the runtime, check out" + System.IO.Path.DirectorySeparatorChar + Path.ToPath(moduleName) + "_scanner.log!");
-                        FileWriter.New(e.ToString(), Path.ToPath(moduleName) + "_scanner.log");
+                        Logger.LogNew(e.ToString(), Path.ToPath(moduleName) + "_scanner.log");
                         PrintErrors();
                         return null;
                     }

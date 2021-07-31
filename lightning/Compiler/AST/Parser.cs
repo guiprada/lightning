@@ -65,7 +65,7 @@ namespace lightning
                             Path.ToPath(moduleName) +
                             "_parser.log!"
                         );
-                        FileWriter.New(
+                        Logger.LogNew(
                             e.ToString(),
                             Path.ToPath(moduleName) + "_parser.log"
                         );
