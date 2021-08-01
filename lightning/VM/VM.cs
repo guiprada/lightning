@@ -92,12 +92,12 @@ namespace lightning
             Intrinsics = p_chunk.Prelude.intrinsics;
             foreach (IntrinsicUnit v in Intrinsics)
             {
-                lock(globals)
+                // lock(globals)
                     globals.Add(new Unit(v));
             }
             foreach (KeyValuePair<string, TableUnit> entry in p_chunk.Prelude.tables)
             {
-                lock(globals)
+                // lock(globals)
                     globals.Add(new Unit(entry.Value));
             }
             LoadedModules = new Dictionary<string, int>();
@@ -320,14 +320,13 @@ namespace lightning
                 instructions.PushRET((Operand)(main.Body.Count - 1));
                 ClosureUnit this_closure = (ClosureUnit)(p_callable.heapUnitValue);
 
-                lock(upValues)
-                    upValues.PushEnv();
+                upValues.PushEnv();
 
-                lock(upValues)
-                    foreach (UpValueUnit u in this_closure.UpValues)
-                    {
-                        upValues.Add(u);
-                    }
+
+                foreach (UpValueUnit u in this_closure.UpValues)
+                {
+                    upValues.Add(u);
+                }
                 instructions.PushFunction(this_closure.Function, Env, out instructionsCache);
 
                 IP = 0;
@@ -475,7 +474,7 @@ namespace lightning
                         break;
                     case OpCode.DECLARE_GLOBAL:
                         IP++;
-                        lock(globals)
+                        // lock(globals)
                             globals.Add(stack.Pop());
                         break;
                     case OpCode.DECLARE_FUNCTION:
@@ -647,22 +646,16 @@ namespace lightning
                                         this_upValue.UpValue = upValues.GetAt(instruction.opA).UpValue + stack.Peek();
                                     break;
                                 case SUBTRACTION_ASSIGN:
-                                    lock(upValues){
-                                        lock(this_upValue)
-                                            this_upValue.UpValue = upValues.GetAt(instruction.opA).UpValue - stack.Peek();
-                                    }
+                                    lock(this_upValue)
+                                        this_upValue.UpValue = upValues.GetAt(instruction.opA).UpValue - stack.Peek();
                                     break;
                                 case MULTIPLICATION_ASSIGN:
-                                    lock(upValues){
-                                        lock(this_upValue)
-                                            this_upValue.UpValue = upValues.GetAt(instruction.opA).UpValue * stack.Peek();
-                                    }
+                                    lock(this_upValue)
+                                        this_upValue.UpValue = upValues.GetAt(instruction.opA).UpValue * stack.Peek();
                                     break;
                                 case DIVISION_ASSIGN:
-                                    lock(upValues){
-                                        lock(this_upValue)
-                                            this_upValue.UpValue = upValues.GetAt(instruction.opA).UpValue / stack.Peek();
-                                    }
+                                    lock(this_upValue)
+                                        this_upValue.UpValue = upValues.GetAt(instruction.opA).UpValue / stack.Peek();
                                     break;
                                 default:
                                     throw new Exception("Unknown operator");

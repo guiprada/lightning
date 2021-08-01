@@ -65,12 +65,6 @@ namespace lightning
             values[this_base + p_index] = p_new_value;
         }
 
-        public void LockSetAt(T p_new_value, int p_index){
-            int this_index = markers[^1] + p_index;
-            lock(values[this_index])
-                values[this_index] = p_new_value;
-        }
-
         public void Set(T p_new_value, int p_index){
             values[p_index] = p_new_value;
         }
