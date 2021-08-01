@@ -18,7 +18,7 @@ namespace lightning
             column = p_column;
         }
         public override string ToString(){
-            return "(" + line + ", " + column + ")";
+            return "(" + line + "," + column + ")";
         }
     }
     public enum TokenType {
