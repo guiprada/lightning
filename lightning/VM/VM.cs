@@ -285,15 +285,9 @@ namespace lightning
             }
             catch (Exception e)
             {
-                using (System.IO.StreamWriter file = new System.IO.StreamWriter(@"_vm.log", false)){
-                    Console.SetOut(file);
-                    Console.WriteLine(e);
-                    var standardOutput = new StreamWriter(Console.OpenStandardOutput());
-                    standardOutput.AutoFlush = true;
-                    Console.SetOut(standardOutput);
-                }
-
                 Console.WriteLine("VM Busted ... " + ErrorLocation());
+                Logger.LogNew(e.ToString(),@"_vm.log" );
+                Console.WriteLine("Check _vm.log!");
                 System.Environment.Exit(1);
                 return new Unit(UnitType.Null);
             }
@@ -396,14 +390,9 @@ namespace lightning
             }
             catch (Exception e)
             {
-                using (System.IO.StreamWriter file = new System.IO.StreamWriter(@"_vm.log", false)){
-                    Console.SetOut(file);
-                    Console.WriteLine(e);
-                    var standardOutput = new StreamWriter(Console.OpenStandardOutput());
-                    standardOutput.AutoFlush = true;
-                    Console.SetOut(standardOutput);
-                }
                 Console.WriteLine("VM Busted ... " + ErrorLocation());
+                Logger.LogNew(e.ToString(),@"_vm.log" );
+                Console.WriteLine("Check _vm.log!");
                 System.Environment.Exit(1);
                 return new VMResult(VMResultType.ERROR, new Unit(UnitType.Null));
             }
