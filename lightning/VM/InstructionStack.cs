@@ -34,10 +34,10 @@ namespace lightning{
             }
         }
 
-        public InstructionStack(int p_functionDeepness, FunctionUnit p_main, out List<Instruction> p_instructionsCache){
-            functions = new FunctionUnit[p_functionDeepness];
-            returnAddress = new Operand[2 * p_functionDeepness];
-            funCallEnv = new int[p_functionDeepness];
+        public InstructionStack(int p_callStackSize, FunctionUnit p_main, out List<Instruction> p_instructionsCache){
+            functions = new FunctionUnit[p_callStackSize];
+            returnAddress = new Operand[2 * p_callStackSize];
+            funCallEnv = new int[p_callStackSize];
 
             returnAddressTop = 0;
             currentInstructionsIndex = 0;

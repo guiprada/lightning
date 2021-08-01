@@ -772,7 +772,7 @@ namespace lightning
             new_function.Set(
                 arity,
                 chunk.Slice(function_start, instructionCounter),
-                chunk.LineCounter.Slice(function_start, instructionCounter),
+                chunk.ChunkPosition.Slice(function_start, instructionCounter),
                 (Operand)function_start);
             instructionCounter = function_start;
 

@@ -106,7 +106,7 @@ namespace lightning
         public string Name{get; private set;}
         public Operand Arity{get; private set;}
         public List<Instruction> Body{get; private set;}
-        public LineCounter LineCounter{get; private set;}
+        public ChunkPosition ChunkPosition{get; private set;}
         public string Module{get; private set;}
         public Operand OriginalPosition{get; private set;}
 
@@ -122,10 +122,10 @@ namespace lightning
             Module = p_Module;
         }
 
-        public void Set(Operand p_Arity, List<Instruction> p_Body, LineCounter p_LineCounter, Operand p_OriginalPosition){
+        public void Set(Operand p_Arity, List<Instruction> p_Body, ChunkPosition p_ChunkPosition, Operand p_OriginalPosition){
             Arity = p_Arity;
             Body = p_Body;
-            LineCounter = p_LineCounter;
+            ChunkPosition = p_ChunkPosition;
             OriginalPosition = p_OriginalPosition;
         }
         public override string ToString()
@@ -529,33 +529,30 @@ namespace lightning
                 globals[p_index] = p_value;
         }
 
-        const Operand ASSIGN = (Operand)AssignmentOperatorType.ASSIGN;
-        const Operand ADDITION_ASSIGN = (Operand)AssignmentOperatorType.ADDITION_ASSIGN;
-        const Operand SUBTRACTION_ASSIGN = (Operand)AssignmentOperatorType.SUBTRACTION_ASSIGN;
-        const Operand MULTIPLICATION_ASSIGN = (Operand)AssignmentOperatorType.MULTIPLICATION_ASSIGN;
-        const Operand DIVISION_ASSIGN = (Operand)AssignmentOperatorType.DIVISION_ASSIGN;
         public void SetOpGlobal(Unit p_value, Operand op, Operand p_index){
             switch(op){
-                case ASSIGN:
+                case VM.ASSIGN:
                     lock(globals[p_index].heapUnitValue)
                         globals[p_index] = p_value;
                     break;
-                case ADDITION_ASSIGN:
+                case VM.ADDITION_ASSIGN:
                     lock(globals[p_index].heapUnitValue)
                         globals[p_index] += p_value;
                     break;
-                case SUBTRACTION_ASSIGN:
+                case VM.SUBTRACTION_ASSIGN:
                     lock(globals[p_index].heapUnitValue)
                         globals[p_index] -= p_value;
                     break;
-                case MULTIPLICATION_ASSIGN:
+                case VM.MULTIPLICATION_ASSIGN:
                     lock(globals[p_index].heapUnitValue)
                         globals[p_index] *= p_value;
                     break;
-                case DIVISION_ASSIGN:
+                case VM.DIVISION_ASSIGN:
                     lock(globals[p_index].heapUnitValue)
                         globals[p_index] /= p_value;
                     break;
+                default:
+                    throw new Exception("Unknown operator");
             }
         }
 

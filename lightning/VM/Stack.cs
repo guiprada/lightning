@@ -7,11 +7,11 @@ namespace lightning{
         Unit[] stash;
         int stashTop;
 
-        public Stack(int p_functionDeepness)
+        public Stack(int p_callStackSize)
         {
-            values = new Unit[3 * p_functionDeepness];
+            values = new Unit[3 * p_callStackSize];
             top = 0;
-            stash = new Unit[p_functionDeepness];
+            stash = new Unit[p_callStackSize];
             stashTop = 0;
         }
 

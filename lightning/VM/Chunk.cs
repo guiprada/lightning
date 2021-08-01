@@ -6,10 +6,10 @@ using Operand = System.UInt16;
 
 namespace lightning
 {
-    public struct LineCounter{
+    public struct ChunkPosition{
         public List<uint> lines;
 
-        public LineCounter(List<uint> p_lines){
+        public ChunkPosition(List<uint> p_lines){
             lines = p_lines;
         }
         public void AddLine(uint p_line)
@@ -20,13 +20,13 @@ namespace lightning
         {
             return lines[p_instructionAddress];
         }
-        public LineCounter Slice(int p_start, int p_end)
+        public ChunkPosition Slice(int p_start, int p_end)
         {
             int range = p_end - p_start;
             List<uint> linesSlice = lines.GetRange(p_start, range);
             lines.RemoveRange(p_start, range);
 
-            return new LineCounter(linesSlice);
+            return new ChunkPosition(linesSlice);
         }
     }
     public struct Instruction
@@ -192,26 +192,26 @@ namespace lightning
     {
         private List<Instruction> program;
         private List<Unit> data;
-        private LineCounter lineCounter;
+        private ChunkPosition chunkPosition;
 
         public Library Prelude { get; private set; }
         public Operand ExitAddress { get { return (Operand)program.Count; } }
         public List<Instruction> Body { get { return program; } }
         public Operand DataCount { get { return (Operand)data.Count; } }
         public List<Unit> GetData { get{ return data; } }
-        public LineCounter LineCounter { get { return lineCounter; } }
+        public ChunkPosition ChunkPosition { get { return chunkPosition; } }
         public string ModuleName { get; private set; }
         public FunctionUnit MainFunctionUnit(string p_name)
         {
             FunctionUnit this_function_unit = new FunctionUnit(p_name, ModuleName);
-            this_function_unit.Set(0, Body, LineCounter, 0);
+            this_function_unit.Set(0, Body, ChunkPosition, 0);
             return this_function_unit;
         }
 
         public Chunk(string p_moduleName, Library p_prelude)
         {
             program = new List<Instruction>();
-            lineCounter = new LineCounter(new List<uint>());
+            chunkPosition = new ChunkPosition(new List<uint>());
             data = new List<Unit>();
             Prelude = p_prelude;
             ModuleName = p_moduleName;
@@ -246,7 +246,7 @@ namespace lightning
             {
                 Console.Write(i + ": ");
                 PrintInstruction(program[i]);
-                Console.Write(" on line: " + " " + lineCounter.GetLine(i) + '\n');
+                Console.Write(" on line: " + " " + chunkPosition.GetLine(i) + '\n');
             }
             Console.WriteLine();
         }
@@ -271,7 +271,7 @@ namespace lightning
         {
             Instruction this_instruction = new Instruction(p_opCode, p_opA, p_opB, p_opC);
             program.Add(this_instruction);
-            lineCounter.AddLine(p_line);
+            chunkPosition.AddLine(p_line);
         }
 
         public void WriteInstruction(Instruction p_instruction)

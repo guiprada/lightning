@@ -58,18 +58,17 @@ namespace lightning
         public List<Unit> Data{ get {return data;}}
         int Env{ get{ return variables.Env; } }
 
-        const Operand ASSIGN = (Operand)AssignmentOperatorType.ASSIGN;
-        const Operand ADDITION_ASSIGN = (Operand)AssignmentOperatorType.ADDITION_ASSIGN;
-        const Operand SUBTRACTION_ASSIGN = (Operand)AssignmentOperatorType.SUBTRACTION_ASSIGN;
-        const Operand MULTIPLICATION_ASSIGN = (Operand)AssignmentOperatorType.MULTIPLICATION_ASSIGN;
-        const Operand DIVISION_ASSIGN = (Operand)AssignmentOperatorType.DIVISION_ASSIGN;
-
         Stack<VM> vmPool;
-        static int functionDeepness;
+        static int callStackSize;
+        public const Operand ASSIGN = (Operand)AssignmentOperatorType.ASSIGN;
+        public const Operand ADDITION_ASSIGN = (Operand)AssignmentOperatorType.ADDITION_ASSIGN;
+        public const Operand SUBTRACTION_ASSIGN = (Operand)AssignmentOperatorType.SUBTRACTION_ASSIGN;
+        public const Operand MULTIPLICATION_ASSIGN = (Operand)AssignmentOperatorType.MULTIPLICATION_ASSIGN;
+        public const Operand DIVISION_ASSIGN = (Operand)AssignmentOperatorType.DIVISION_ASSIGN;
 
 //////////////////////////////////////////////////// Public
         static VM(){
-            VM.functionDeepness = 30;
+            VM.callStackSize = 30;
         }
         public VM(Chunk p_chunk)
         {
@@ -78,9 +77,9 @@ namespace lightning
 
             main = p_chunk.MainFunctionUnit("main");
 
-            instructions = new InstructionStack(functionDeepness, main, out instructionsCache);
+            instructions = new InstructionStack(callStackSize, main, out instructionsCache);
 
-            stack = new Stack(functionDeepness);
+            stack = new Stack(callStackSize);
 
             variables = new Memory<Unit>();
             upValues = new Memory<UpValueUnit>();
@@ -125,8 +124,8 @@ namespace lightning
             IP = 0;
             parallelVM = p_parallelVM;
 
-            instructions = new InstructionStack(functionDeepness, main, out instructionsCache);
-            stack = new Stack(functionDeepness);
+            instructions = new InstructionStack(callStackSize, main, out instructionsCache);
+            stack = new Stack(callStackSize);
             variables = new Memory<Unit>();
             upValues = new Memory<UpValueUnit>();
             registeredUpValues = new UpValueEnv(variables);
@@ -381,7 +380,7 @@ namespace lightning
         {
             return "Function: " + instructions.ExecutingFunction.Name +
             " from module: " + instructions.ExecutingFunction.Module +
-            " on line: " + instructions.ExecutingFunction.LineCounter.GetLine(IP);
+            " on line: " + instructions.ExecutingFunction.ChunkPosition.GetLine(IP);
         }
 
         public VMResult ProtectedRun(){
