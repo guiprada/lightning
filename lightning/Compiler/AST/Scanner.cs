@@ -38,6 +38,7 @@ namespace lightning
         private char[] source;
         private string moduleName;
         private int line;
+        private int column;
         private int start;
         private int current;
         private List<Token> tokens;
@@ -79,6 +80,7 @@ namespace lightning
             hasScanned = false;
             errors = new List<string>();
             line = 1;
+            column = 0;
             start = 0;
             current = 0;
         }
@@ -101,14 +103,14 @@ namespace lightning
                 ScanToken();
             }
 
-            tokens.Add(new Token(TokenType.EOF, line));
+            tokens.Add(new Token(TokenType.EOF, line, column));
             return tokens;
 
         }
 
         private void ScanToken()
         {
-            char c = Advance();
+            char c = Advance();;
             char[] new_line = Environment.NewLine.ToCharArray();
             switch (c)
             {
@@ -119,67 +121,68 @@ namespace lightning
                     break;
                 case '\n':
                     line++;
+                    column = 0;
                     while (IsWhiteSpace(Peek()) )
                         Advance();
                     if(Peek() == '(')
                         Error("Parentheses can not be used in the beggining of a line!");
                     break;
-                case '(': tokens.Add(new Token(TokenType.LEFT_PAREN, line)); break;
-                case ')': tokens.Add(new Token(TokenType.RIGHT_PAREN, line)); break;
-                case '{': tokens.Add(new Token(TokenType.LEFT_BRACE, line)); break;
-                case '}': tokens.Add(new Token(TokenType.RIGHT_BRACE, line)); break;
-                case '[': tokens.Add(new Token(TokenType.LEFT_BRACKET, line)); break;
-                case ']': tokens.Add(new Token(TokenType.RIGHT_BRACKET, line)); break;
-                case ',': tokens.Add(new Token(TokenType.COMMA, line)); break;
+                case '(': tokens.Add(new Token(TokenType.LEFT_PAREN, line, column)); break;
+                case ')': tokens.Add(new Token(TokenType.RIGHT_PAREN, line, column)); break;
+                case '{': tokens.Add(new Token(TokenType.LEFT_BRACE, line, column)); break;
+                case '}': tokens.Add(new Token(TokenType.RIGHT_BRACE, line, column)); break;
+                case '[': tokens.Add(new Token(TokenType.LEFT_BRACKET, line, column)); break;
+                case ']': tokens.Add(new Token(TokenType.RIGHT_BRACKET, line, column)); break;
+                case ',': tokens.Add(new Token(TokenType.COMMA, line, column)); break;
                 case '-':
                     if (Match('='))
                     {
-                        tokens.Add(new Token(TokenType.MINUS_EQUAL, line));
+                        tokens.Add(new Token(TokenType.MINUS_EQUAL, line, column));
                     }
                     else if (Match('-'))
                     {
-                        tokens.Add(new Token(TokenType.MINUS_MINUS, line));
+                        tokens.Add(new Token(TokenType.MINUS_MINUS, line, column));
                     }
                     else
                     {
-                        tokens.Add(new Token(TokenType.MINUS, line));
+                        tokens.Add(new Token(TokenType.MINUS, line, column));
                     }
                     break;
                 case '+':
                     if (Match('='))
                     {
-                        tokens.Add(new Token(TokenType.PLUS_EQUAL, line));
+                        tokens.Add(new Token(TokenType.PLUS_EQUAL, line, column));
                     }
                     else if (Match('+'))
                     {
-                        tokens.Add(new Token(TokenType.PLUS_PLUS, line));
+                        tokens.Add(new Token(TokenType.PLUS_PLUS, line, column));
                     }
                     else
                     {
-                        tokens.Add(new Token(TokenType.PLUS, line));
+                        tokens.Add(new Token(TokenType.PLUS, line, column));
                     }
                     break;
-                case ';': tokens.Add(new Token(TokenType.SEMICOLON, line)); break;
-                case ':': tokens.Add(new Token(TokenType.COLON, line)); break;
-                case '|': tokens.Add(new Token(TokenType.PIPE, line)); break;
-                case '\\': tokens.Add(new Token(TokenType.FUN, line)); break;
+                case ';': tokens.Add(new Token(TokenType.SEMICOLON, line, column)); break;
+                case ':': tokens.Add(new Token(TokenType.COLON, line, column)); break;
+                case '|': tokens.Add(new Token(TokenType.PIPE, line, column)); break;
+                case '\\': tokens.Add(new Token(TokenType.FUN, line, column)); break;
                 case '*':
-                    tokens.Add(Match('=') ? new Token(TokenType.STAR_EQUAL, line) : new Token(TokenType.STAR, line));
+                    tokens.Add(Match('=') ? new Token(TokenType.STAR_EQUAL, line, column) : new Token(TokenType.STAR, line, column));
                     break;
                 case '.':
-                    tokens.Add(Match('.') ? new Token(TokenType.APPEND, line) : new Token(TokenType.DOT, line));
+                    tokens.Add(Match('.') ? new Token(TokenType.APPEND, line, column) : new Token(TokenType.DOT, line, column));
                     break;
                 case '!':
-                    tokens.Add(Match('=') ? new Token(TokenType.BANG_EQUAL, line) : new Token(TokenType.BANG, line));
+                    tokens.Add(Match('=') ? new Token(TokenType.BANG_EQUAL, line, column) : new Token(TokenType.BANG, line, column));
                     break;
                 case '=':
-                    tokens.Add(Match('=') ? new Token(TokenType.EQUAL_EQUAL, line) : new Token(TokenType.EQUAL, line));
+                    tokens.Add(Match('=') ? new Token(TokenType.EQUAL_EQUAL, line, column) : new Token(TokenType.EQUAL, line, column));
                     break;
                 case '<':
-                    tokens.Add(Match('=') ? new Token(TokenType.LESS_EQUAL, line) : new Token(TokenType.LESS, line));
+                    tokens.Add(Match('=') ? new Token(TokenType.LESS_EQUAL, line, column) : new Token(TokenType.LESS, line, column));
                     break;
                 case '>':
-                    tokens.Add(Match('=') ? new Token(TokenType.GREATER_EQUAL, line) : new Token(TokenType.GREATER, line));
+                    tokens.Add(Match('=') ? new Token(TokenType.GREATER_EQUAL, line, column) : new Token(TokenType.GREATER, line, column));
                     break;
                 case '/':
                     if (Match('/'))
@@ -189,34 +192,34 @@ namespace lightning
                     }
                     else if (Match('='))
                     {
-                        tokens.Add(new Token(TokenType.SLASH_EQUAL, line));
+                        tokens.Add(new Token(TokenType.SLASH_EQUAL, line, column));
                     }
                     else
                     {
-                        tokens.Add( new Token(TokenType.SLASH, line));
+                        tokens.Add( new Token(TokenType.SLASH, line, column));
                     }
                     break;
-                case '"': tokens.Add(new TokenString(TokenType.STRING, line, ReadString('"'))); break;
+                case '"': tokens.Add(new TokenString(TokenType.STRING, line, column, ReadString('"'))); break;
                 case '\'':
-                    tokens.Add(new TokenChar(line, ReadChar()));
+                    tokens.Add(new TokenChar(line, column, ReadChar()));
                     break;
                 case '#':
-                    tokens.Add(new TokenString(TokenType.STRING, line, ReadString('#'))); break;
+                    tokens.Add(new TokenString(TokenType.STRING, line, column, ReadString('#'))); break;
                 default:
                     if (IsDigit(c))
                     {
-                        tokens.Add(new TokenNumber(TokenType.NUMBER, line, ReadNumber()));
+                        tokens.Add(new TokenNumber(TokenType.NUMBER, line, column, ReadNumber()));
                     }
                     else if (IsAlpha(c))
                     {
                         string maybe_identifier = ReadIdentifier();
                         if (keywords.ContainsKey(maybe_identifier))// it is a reserved word
                         {
-                            tokens.Add(new Token(keywords[maybe_identifier], line));
+                            tokens.Add(new Token(keywords[maybe_identifier], line, column));
                         }
                         else
                         {
-                            tokens.Add(new TokenString(TokenType.IDENTIFIER, line, maybe_identifier));
+                            tokens.Add(new TokenString(TokenType.IDENTIFIER, line, column, maybe_identifier));
                         }
                     }
                     else
@@ -230,6 +233,7 @@ namespace lightning
         private char Advance()
         {
             current++;
+            column++;
             return source[current - 1];
         }
 
@@ -239,6 +243,7 @@ namespace lightning
             if (source[current] != p_expected) return false;
 
             current++;
+            column++;
             return true;
         }
 
@@ -329,9 +334,10 @@ namespace lightning
         {
             while (Peek() != p_terminator && !IsAtEnd())
             {
-                if (Peek() == '\n') line++;
-                else if (Peek() == '\\' && PeekNext() == p_terminator) // scaping terminator
-                {
+                if (Peek() == '\n'){
+                    line++;
+                    column = 0;
+                }else if (Peek() == '\\' && PeekNext() == p_terminator){// scaping terminator
                     Advance();
                 }
                 Advance();

@@ -10,7 +10,18 @@
 
 namespace lightning
 {
-   public enum TokenType {
+    public struct PositionData{
+        int line;
+        int column;
+        public PositionData(int p_line, int p_column){
+            line = p_line;
+            column = p_column;
+        }
+        public override string ToString(){
+            return "(" + line + ", " + column + ")";
+        }
+    }
+    public enum TokenType {
         // one character tokens.
         LEFT_PAREN,
         RIGHT_PAREN,
@@ -77,44 +88,44 @@ namespace lightning
     {
         public TokenType Type { get; private set; }
 
-        public int Line { get; private set; }
-        public Token(TokenType p_Type, int p_Line)
+        public PositionData PositionData { get; private set; }
+        public Token(TokenType p_Type, int p_line, int p_column)
         {
             //Console.WriteLine(p_type.ToString() + " " + p_Line);
             Type = p_Type;
-            Line = p_Line;
+            PositionData = new PositionData(p_line, p_column);
         }
 
         public override string ToString()
         {
-            return Type.ToString() + " line: " + Line.ToString();
+            return Type.ToString() + " position: " + PositionData.ToString();
         }
     }
 
     public class TokenString: Token
     {
         public string value;
-        public TokenString(TokenType p_Type, int p_Line, string p_value): base(p_Type, p_Line)
+        public TokenString(TokenType p_Type, int p_line, int p_column, string p_value): base(p_Type, p_line, p_column)
         {
             value = p_value;
         }
         public override string ToString()
         {
-            return Type.ToString() + " string: " + value + " line: " + Line.ToString();
+            return Type.ToString() + " string: " + value + " position: " + PositionData.ToString();
         }
     }
 
     public class TokenChar: Token
     {
         public char value;
-        public TokenChar(int p_Line, char p_value): base(TokenType.CHAR, p_Line)
+        public TokenChar(int p_line, int p_column, char p_value): base(TokenType.CHAR, p_line, p_column)
         {
             value = p_value;
         }
 
         public override string ToString()
         {
-            return Type.ToString() + " char: " + value.ToString() + " line: " + Line.ToString();
+            return Type.ToString() + " char: " + value.ToString() + " position: " + PositionData.ToString();
         }
     }
 
@@ -123,7 +134,7 @@ namespace lightning
         public Float floatValue;
         public Integer integerValue;
         public Type type;
-        public TokenNumber(TokenType p_Type, int p_Line, String p_value): base(p_Type, p_Line)
+        public TokenNumber(TokenType p_Type, int p_line, int p_column, String p_value): base(p_Type, p_line, p_column)
         {
             try {
                 integerValue = Integer.Parse(p_value);
@@ -145,9 +156,9 @@ namespace lightning
         public override string ToString()
         {
             if (type == typeof(Float))
-                return Type.ToString() + " Float: " + floatValue.ToString() + " line: " + Line.ToString();
+                return Type.ToString() + " Float: " + floatValue.ToString() + " position: " + PositionData.ToString();
             else
-                return Type.ToString() + " Integer: " + integerValue.ToString() + " line: " + Line.ToString();
+                return Type.ToString() + " Integer: " + integerValue.ToString() + " position: " + PositionData.ToString();
         }
     }
 }

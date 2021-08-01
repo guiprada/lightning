@@ -120,7 +120,7 @@ namespace lightning
                 statements.Add(Declaration());
             }
 
-            return new ProgramNode(statements, tokens[current].Line);
+            return new ProgramNode(statements, tokens[current].PositionData);
         }
 
         Node Declaration()
@@ -144,11 +144,11 @@ namespace lightning
             Consume(TokenType.IDENTIFIER, "Expected identifier.", true);
             TokenString last_token = Previous() as TokenString;
             string name = last_token.value;
-            int line = last_token.Line;
+            PositionData position_data = last_token.PositionData;
 
             List<IndexNode> indexes = IndexedAccess();
 
-            VariableNode indexed_variable = new VariableNode(name, indexes, line);
+            VariableNode indexed_variable = new VariableNode(name, indexes, position_data);
             Node method_call = MethodAccess(indexed_variable);
 
             return method_call;
@@ -163,7 +163,7 @@ namespace lightning
                     IndexNode index = new IndexNode(
                         Expression(),
                         VarAccessType.BRACKET,
-                        Previous().Line);
+                        Previous().PositionData);
                     indexes.Add(index);
 
                     Consume(
@@ -179,7 +179,7 @@ namespace lightning
                     IndexNode index = new IndexNode(
                         this_name,
                         VarAccessType.DOT,
-                        Previous().Line);
+                        Previous().PositionData);
                     indexes.Add(index);
                 }
             }
@@ -200,7 +200,7 @@ namespace lightning
                 initializer = null;
 
             Elide(TokenType.SEMICOLON);
-            return new VarDeclarationNode(name.value, initializer, name.Line);
+            return new VarDeclarationNode(name.value, initializer, name.PositionData);
         }
 
         List<string> Parameters(){
@@ -258,7 +258,7 @@ namespace lightning
             if ((statements.Count == 0) ||
                 (statements[^1].GetType() != typeof(ReturnNode)))
             {
-                statements.Add(new ReturnNode(null, Previous().Line));
+                statements.Add(new ReturnNode(null, Previous().PositionData));
             }
 
             return new FunctionStruct(parameters, statements);
@@ -276,7 +276,7 @@ namespace lightning
             return new FunctionExpressionNode(
                 this_function.parameters,
                 this_function.statements,
-                function_token.Line
+                function_token.PositionData
             );
         }
 
@@ -288,7 +288,7 @@ namespace lightning
                 name,
                 this_function.parameters,
                 this_function.statements,
-                name.Line
+                name.PositionData
             );
         }
 
@@ -310,15 +310,15 @@ namespace lightning
 
         Node Return()
         {
-            int line = Previous().Line;
+            PositionData position_data = Previous().PositionData;
             Node expr = Expression();
             Elide(TokenType.SEMICOLON);
-            return new ReturnNode(expr, line);
+            return new ReturnNode(expr, position_data);
         }
 
         Node For()
         {
-            int line = Previous().Line;
+            PositionData position_data = Previous().PositionData;
             Consume(TokenType.LEFT_PAREN, "Expected '(' after 'for'.", true);
 
             Node initializer;
@@ -362,12 +362,12 @@ namespace lightning
 
             Node body = Statement();
 
-            return new ForNode(initializer, condition, finalizer, body, line);
+            return new ForNode(initializer, condition, finalizer, body, position_data);
         }
 
         Node While()
         {
-            int line = Previous().Line;
+            PositionData position_data = Previous().PositionData;
             Consume(TokenType.LEFT_PAREN, "Expected '(' after 'while'.", true);
             Node condition = Expression();
             if (condition == null)
@@ -380,12 +380,12 @@ namespace lightning
 
             Node body = Statement();
 
-            return new WhileNode(condition, body, line);
+            return new WhileNode(condition, body, position_data);
         }
 
         Node If()
         {
-            int line = Previous().Line;
+            PositionData position_data = Previous().PositionData;
             Token start = Consume(
                 TokenType.LEFT_PAREN,
                 "Expected '(' after 'if'.",
@@ -407,12 +407,12 @@ namespace lightning
                 else_branch = Statement();
             }
 
-            return new IfNode(condition, then_branch, else_branch, line);
+            return new IfNode(condition, then_branch, else_branch, position_data);
         }
 
         Node Block()
         {
-            int line = Previous().Line;
+            PositionData position_data = Previous().PositionData;
             List<Node> statements = new List<Node>();
 
             while(!Check(TokenType.RIGHT_BRACE) && !IsAtEnd())
@@ -424,7 +424,7 @@ namespace lightning
                 "Expected '}' to terminate 'block'.",
                 true
             );
-            return new BlockNode(statements, line);
+            return new BlockNode(statements, position_data);
         }
 
         Node ExprStmt()
@@ -432,7 +432,7 @@ namespace lightning
             Node expr = Expression();
 
             Elide(TokenType.SEMICOLON);
-            return new StmtExprNode(expr, expr.Line);
+            return new StmtExprNode(expr, expr.PositionData);
         }
 
         Node Expression()
@@ -453,21 +453,21 @@ namespace lightning
                         (VariableNode)assigned,
                         value,
                         AssignmentOperatorType.ADDITION_ASSIGN,
-                        assigned.Line
+                        assigned.PositionData
                     );
                 else
                     Error("Invalid assignment.");
             }
             else if (Match(TokenType.PLUS_PLUS))
             {
-                Node value = new LiteralNode(1, assigned.Line);
+                Node value = new LiteralNode(1, assigned.PositionData);
 
                 if (assigned.Type == NodeType.VARIABLE)
                     return new AssignmentNode(
                         (VariableNode)assigned,
                         value,
                         AssignmentOperatorType.ADDITION_ASSIGN,
-                        assigned.Line
+                        assigned.PositionData
                     );
                 else
                     Error("Invalid assignment.");
@@ -481,20 +481,20 @@ namespace lightning
                         (VariableNode)assigned,
                         value,
                         AssignmentOperatorType.SUBTRACTION_ASSIGN,
-                        assigned.Line
+                        assigned.PositionData
                     );
                 else
                     Error("Invalid assignment.");
             }
             else if (Match(TokenType.MINUS_MINUS))
             {
-                Node value = new LiteralNode(1, assigned.Line);
+                Node value = new LiteralNode(1, assigned.PositionData);
 
                 if (assigned.Type == NodeType.VARIABLE)
                     return new AssignmentNode(
                         (VariableNode)assigned,
                         value, AssignmentOperatorType.SUBTRACTION_ASSIGN,
-                        assigned.Line
+                        assigned.PositionData
                     );
                 else
                     Error("Invalid assignment.");
@@ -508,7 +508,7 @@ namespace lightning
                         (VariableNode)assigned,
                         value,
                         AssignmentOperatorType.MULTIPLICATION_ASSIGN,
-                        assigned.Line
+                        assigned.PositionData
                     );
                 else
                     Error("Invalid assignment.");
@@ -522,7 +522,7 @@ namespace lightning
                         (VariableNode)assigned,
                         value,
                         AssignmentOperatorType.DIVISION_ASSIGN,
-                        assigned.Line
+                        assigned.PositionData
                     );
                 else
                     Error("Invalid assignment.");
@@ -536,7 +536,7 @@ namespace lightning
                         (VariableNode)assigned,
                         value,
                         AssignmentOperatorType.ASSIGN,
-                        assigned.Line
+                        assigned.PositionData
                     );
                 else
                     Error("Invalid assignment.");
@@ -557,7 +557,7 @@ namespace lightning
                     left,
                     OperatorType.OR,
                     right,
-                    left.Line
+                    left.PositionData
                 );
             }
 
@@ -576,7 +576,7 @@ namespace lightning
                     left,
                     OperatorType.AND,
                     right,
-                    left.Line
+                    left.PositionData
                 );
             }
 
@@ -595,7 +595,7 @@ namespace lightning
                     left,
                     OperatorType.XOR,
                     right,
-                    left.Line
+                    left.PositionData
                 );
             }
 
@@ -614,7 +614,7 @@ namespace lightning
                     left,
                     OperatorType.NAND,
                     right,
-                    left.Line
+                    left.PositionData
                 );
             }
 
@@ -633,7 +633,7 @@ namespace lightning
                     left,
                     OperatorType.NOR,
                     right,
-                    left.Line
+                    left.PositionData
                 );
             }
 
@@ -652,7 +652,7 @@ namespace lightning
                     left,
                     OperatorType.XNOR,
                     right,
-                    left.Line
+                    left.PositionData
                 );
             }
 
@@ -674,7 +674,7 @@ namespace lightning
                     this_op = OperatorType.EQUAL;
 
                 Node right = Comparison();
-                left = new BinaryNode(left, this_op, right, op.Line);
+                left = new BinaryNode(left, this_op, right, op.PositionData);
             }
 
             return left;
@@ -702,7 +702,7 @@ namespace lightning
                 else this_op = OperatorType.LESS_EQUAL;
 
                 Node right = Addition();
-                left = new BinaryNode(left, this_op, right, op.Line);
+                left = new BinaryNode(left, this_op, right, op.PositionData);
             }
 
             return left;
@@ -725,7 +725,7 @@ namespace lightning
                     this_op = OperatorType.APPEND;
 
                 Node right = Multiplication();
-                left = new BinaryNode(left, this_op, right, op.Line);
+                left = new BinaryNode(left, this_op, right, op.PositionData);
             }
 
             return left;
@@ -746,7 +746,7 @@ namespace lightning
                     this_op = OperatorType.MULTIPLICATION;
 
                 Node right = Unary();
-                left = new BinaryNode(left, this_op, right, op.Line);
+                left = new BinaryNode(left, this_op, right, op.PositionData);
             }
 
             return left;
@@ -779,7 +779,7 @@ namespace lightning
                 }
 
                 Node right = Unary();
-                return new UnaryNode(this_op, right, op.Line);
+                return new UnaryNode(this_op, right, op.PositionData);
             }
 
             return Call();
@@ -793,7 +793,7 @@ namespace lightning
             {
                 Node function_call_node = new FunctionCallNode(
                     (maybe_func as VariableNode),
-                    maybe_func.Line);
+                    maybe_func.PositionData);
                 function_call_node = CallTail(function_call_node);
                 return function_call_node;
             }
@@ -811,7 +811,7 @@ namespace lightning
                     IndexNode index = new IndexNode(
                         this_name,
                         VarAccessType.COLON,
-                        Previous().Line
+                        Previous().PositionData
                     );
                     (p_node as VariableNode).Indexes.Add(index);
                 }else if(Match(TokenType.STRING)){
@@ -820,7 +820,7 @@ namespace lightning
                     IndexNode index = new IndexNode(
                         this_name,
                         VarAccessType.COLON,
-                        Previous().Line
+                        Previous().PositionData
                     );
                     (p_node as VariableNode).Indexes.Add(index);
                 }else if(Match(TokenType.MINUS)){
@@ -831,17 +831,17 @@ namespace lightning
                         if (this_type == typeof(Integer))
                             this_value = new LiteralNode(
                                 -((TokenNumber)Previous()).integerValue,
-                                Previous().Line
+                                Previous().PositionData
                             );
                         else
                             this_value = new LiteralNode(
                                 -((TokenNumber)Previous()).floatValue,
-                                Previous().Line
+                                Previous().PositionData
                             );
                         IndexNode index = new IndexNode(
                             this_value,
                             VarAccessType.COLON,
-                            Previous().Line
+                            Previous().PositionData
                         );
                         (p_node as VariableNode).Indexes.Add(index);
                     }else{
@@ -854,24 +854,24 @@ namespace lightning
                     if (this_type == typeof(Integer))
                         this_value = new LiteralNode(
                             ((TokenNumber)Previous()).integerValue,
-                            Previous().Line
+                            Previous().PositionData
                         );
                     else
                         this_value = new LiteralNode(
                             ((TokenNumber)Previous()).floatValue,
-                            Previous().Line
+                            Previous().PositionData
                         );
                     IndexNode index = new IndexNode(
                         this_value,
                         VarAccessType.COLON,
-                        Previous().Line
+                        Previous().PositionData
                     );
                     (p_node as VariableNode).Indexes.Add(index);
                 }else if (Match(TokenType.LEFT_BRACKET)) {
                     IndexNode index = new IndexNode(
                         Expression(),
                         VarAccessType.COLON,
-                        Previous().Line
+                        Previous().PositionData
                     );
                     (p_node as VariableNode).Indexes.Add(index);
                     Consume(
@@ -890,13 +890,13 @@ namespace lightning
                 VariableNode variable_node = new VariableNode(
                     p_node,
                     new List<IndexNode>(),
-                    p_node.Line
+                    p_node.PositionData
                 );
                 variable_node = (VariableNode)MethodAccess(variable_node);
 
                 Node function_call_node = new FunctionCallNode(
                     variable_node,
-                    p_node.Line);
+                    p_node.PositionData);
 
                 function_call_node = CallTail(function_call_node);
                 return function_call_node;
@@ -963,7 +963,7 @@ namespace lightning
                     {
                         Node item = new LiteralNode(
                             (Previous() as TokenString).value,
-                            Previous().Line
+                            Previous().PositionData
                         );
 
                         if(Match(TokenType.COLON)){
@@ -1043,13 +1043,13 @@ namespace lightning
 
         Node Table()
         {
-            int line = Previous().Line;
+            PositionData position_data = Previous().PositionData;
 
             if (!Match(TokenType.RIGHT_BRACKET))
             {
                 List<Node> elements = new List<Node>();
                 Dictionary<Node, Node> table = new Dictionary<Node, Node>();
-                TableNode table_node = new TableNode(elements, table, line);
+                TableNode table_node = new TableNode(elements, table, position_data);
 
                 do{
                     table_node = TableEntry(table_node);
@@ -1065,7 +1065,7 @@ namespace lightning
             }
             else
             {
-                return new TableNode(null, null, line);
+                return new TableNode(null, null, position_data);
             }
 
         }
@@ -1075,32 +1075,32 @@ namespace lightning
             if (Match(TokenType.LEFT_BRACKET))
                 return Table();
             else if (Match(TokenType.FALSE))
-                return new LiteralNode(false, Previous().Line);
+                return new LiteralNode(false, Previous().PositionData);
             else if (Match(TokenType.TRUE))
-                return new LiteralNode(true, Previous().Line);
+                return new LiteralNode(true, Previous().PositionData);
             else if (Match(TokenType.NIL))
-                return new LiteralNode(Previous().Line);
+                return new LiteralNode(Previous().PositionData);
             else if (Match(TokenType.NUMBER)){
                 Type this_type = ((TokenNumber)Previous()).type;
                 if (this_type == typeof(Integer))
                     return new LiteralNode(
                         ((TokenNumber)Previous()).integerValue,
-                        Previous().Line
+                        Previous().PositionData
                     );
                 else
                     return new LiteralNode(
                         ((TokenNumber)Previous()).floatValue,
-                        Previous().Line
+                        Previous().PositionData
                     );
             }else if (Match(TokenType.STRING))
                 return new LiteralNode(
                     ((TokenString)Previous()).value,
-                    Previous().Line
+                    Previous().PositionData
                 );
             else if (Match(TokenType.CHAR))
                 return new LiteralNode(
                     ((TokenChar)Previous()).value,
-                    Previous().Line
+                    Previous().PositionData
                 );
             else if (Match(TokenType.LEFT_PAREN)){
                 Node expr = Expression();
@@ -1109,7 +1109,7 @@ namespace lightning
                     "Expected ')' after grouping'",
                     true
                 );
-                return new GroupingNode(expr, expr.Line);
+                return new GroupingNode(expr, expr.PositionData);
             }else if (Check(TokenType.FUN))
                 return FunctionExpr();
             else if (Check(TokenType.IDENTIFIER))
@@ -1120,19 +1120,19 @@ namespace lightning
                     if (this_type == typeof(Integer))
                         return new LiteralNode(
                             -((TokenNumber)Previous()).integerValue,
-                            Previous().Line
+                            Previous().PositionData
                         );
                     else
                         return new LiteralNode(
                             -((TokenNumber)Previous()).floatValue,
-                            Previous().Line
+                            Previous().PositionData
                         );
                 }else{
-                    Error("Number expected after (-)! " + Previous().Line);
-                    return new LiteralNode(Previous().Line);
+                    Error("Number expected after (-)! " + Previous().PositionData);
+                    return new LiteralNode(Previous().PositionData);
                 }
             }else{
-                Error("No match found! " + Peek().Line + " " + Peek());
+                Error("No match found! " + Peek().PositionData + " " + Peek());
                 return null;
             }
         }
@@ -1236,11 +1236,11 @@ namespace lightning
             {
                 if(p_error == true)
                     Error(Peek().ToString() +
-                    " on line: " + Peek().Line +
+                    " on position: " + Peek().PositionData +
                     ", " + p_msg);
                 else
                     Warning(Peek().ToString() +
-                    " on line: " + Peek().Line +
+                    " on position: " + Peek().PositionData +
                     ", " + p_msg);
                 return null;
             }

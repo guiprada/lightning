@@ -380,7 +380,7 @@ namespace lightning
         {
             return "Function: " + instructions.ExecutingFunction.Name +
             " from module: " + instructions.ExecutingFunction.Module +
-            " on line: " + instructions.ExecutingFunction.ChunkPosition.GetLine(IP);
+            " on position: " + instructions.ExecutingFunction.ChunkPosition.GetPosition(IP);
         }
 
         public VMResult ProtectedRun(){

@@ -7,26 +7,26 @@ using Operand = System.UInt16;
 namespace lightning
 {
     public struct ChunkPosition{
-        public List<uint> lines;
+        public List<PositionData> positions;
 
-        public ChunkPosition(List<uint> p_lines){
-            lines = p_lines;
+        public ChunkPosition(List<PositionData> p_positions){
+            positions = p_positions;
         }
-        public void AddLine(uint p_line)
+        public void AddPosition(PositionData p_positionData)
         {
-            lines.Add(p_line);
+            positions.Add(p_positionData);
         }
-        public uint GetLine(int p_instructionAddress)
+        public PositionData GetPosition(int p_instructionAddress)
         {
-            return lines[p_instructionAddress];
+            return positions[p_instructionAddress];
         }
         public ChunkPosition Slice(int p_start, int p_end)
         {
             int range = p_end - p_start;
-            List<uint> linesSlice = lines.GetRange(p_start, range);
-            lines.RemoveRange(p_start, range);
+            List<PositionData> positionSlice = positions.GetRange(p_start, range);
+            positions.RemoveRange(p_start, range);
 
-            return new ChunkPosition(linesSlice);
+            return new ChunkPosition(positionSlice);
         }
     }
     public struct Instruction
@@ -211,7 +211,7 @@ namespace lightning
         public Chunk(string p_moduleName, Library p_prelude)
         {
             program = new List<Instruction>();
-            chunkPosition = new ChunkPosition(new List<uint>());
+            chunkPosition = new ChunkPosition(new List<PositionData>());
             data = new List<Unit>();
             Prelude = p_prelude;
             ModuleName = p_moduleName;
@@ -246,7 +246,7 @@ namespace lightning
             {
                 Console.Write(i + ": ");
                 PrintInstruction(program[i]);
-                Console.Write(" on line: " + " " + chunkPosition.GetLine(i) + '\n');
+                Console.Write(" on position: " + " " + chunkPosition.GetPosition(i) + '\n');
             }
             Console.WriteLine();
         }
@@ -267,11 +267,11 @@ namespace lightning
             return (ushort)(data.Count -1);
         }
 
-        public void WriteInstruction(OpCode p_opCode, Operand p_opA, Operand p_opB, Operand p_opC, uint p_line)
+        public void WriteInstruction(OpCode p_opCode, Operand p_opA, Operand p_opB, Operand p_opC, PositionData p_positionData)
         {
             Instruction this_instruction = new Instruction(p_opCode, p_opA, p_opB, p_opC);
             program.Add(this_instruction);
-            chunkPosition.AddLine(p_line);
+            chunkPosition.AddPosition(p_positionData);
         }
 
         public void WriteInstruction(Instruction p_instruction)

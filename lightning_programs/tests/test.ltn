@@ -70,6 +70,7 @@ errors += require("tests/try.ltn")
     }
     write_line(a_table.hey)
     write_line(a_table["hey"]())
+    var a_table = 1
 }
 {
     var another_table = [1: \(a) return a]

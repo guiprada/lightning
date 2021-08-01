@@ -88,7 +88,7 @@ namespace lightning
                     PrintTable(p_node as TableNode);
                     break;
                 default:
-                    Error("Pretty Printer Received unkown node." + this_type.ToString(), p_node.Line);
+                    Error("Pretty Printer Received unkown node." + this_type.ToString(), p_node.PositionData);
                     break;
             }
         }
@@ -102,7 +102,7 @@ namespace lightning
                     Print(n);
                 IdentMinus();
             }else{
-                Error("Program does not contain any statements!", p_node.Line);
+                Error("Program does not contain any statements!", p_node.PositionData);
             }
             Console.WriteLine("]");
         }
@@ -124,7 +124,7 @@ namespace lightning
             else if (p_node.Op == OperatorType.LESS) Console.Write(" < ");
             else if (p_node.Op == OperatorType.LESS_EQUAL) Console.Write(" <= ");
             else
-                Error("Invalid binary operator.", p_node.Line);
+                Error("Invalid binary operator.", p_node.PositionData);
             Print(p_node.Right);
             Console.Write("]");
         }
@@ -137,7 +137,7 @@ namespace lightning
             else if (p_node.Op == OperatorType.INCREMENT) Console.Write(" ++ ");
             else if (p_node.Op == OperatorType.DECREMENT) Console.Write(" -- ");
             else
-                Error("Invalid unary operator.", p_node.Line);
+                Error("Invalid unary operator.", p_node.PositionData);
             Print(p_node.Right);
             Console.Write("]");
         }
@@ -359,7 +359,7 @@ namespace lightning
             else if (p_node.Op == OperatorType.NOR) Console.Write(" nor ");
             else if (p_node.Op == OperatorType.XNOR) Console.Write(" xnor ");
             else
-                Error("Invalid logical operation.", p_node.Line);
+                Error("Invalid logical operation.", p_node.PositionData);
 
             Print(p_node.Right);
             Console.Write("]");
@@ -484,9 +484,9 @@ namespace lightning
             identString = GenIdentString();
         }
 
-        void Error(string p_msg, int p_line)
+        void Error(string p_msg, PositionData p_positionData)
         {
-            Console.WriteLine("Error: " + p_msg + " on line: " + p_line);
+            Console.WriteLine("Error: " + p_msg + " on position: " + p_positionData);
         }
     }
 }

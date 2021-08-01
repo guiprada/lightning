@@ -99,12 +99,12 @@ namespace lightning
     public abstract class Node
     {
         public NodeType Type { get; private set; }
-        public int Line { get; private set; }
+        public PositionData PositionData { get; private set; }
 
-        public Node(NodeType p_Type, int p_Line)
+        public Node(NodeType p_Type, PositionData p_PositionData)
         {
             Type = p_Type;
-            Line = p_Line;
+            PositionData = p_PositionData;
         }
     }
 
@@ -112,8 +112,8 @@ namespace lightning
     {
         public List<Node> Statements { get; private set; }
 
-        public ProgramNode(List<Node> p_Statements, int p_Line)
-            : base(NodeType.PROGRAM, p_Line)
+        public ProgramNode(List<Node> p_Statements, PositionData p_PositionData)
+            : base(NodeType.PROGRAM, p_PositionData)
         {
             Statements = p_Statements;
         }
@@ -125,8 +125,8 @@ namespace lightning
         public Node Right { get; private set; }
         public OperatorType Op { get; private set; }
 
-        public BinaryNode(Node p_Left, OperatorType p_Op, Node p_Right, int p_Line)
-            : base(NodeType.BINARY, p_Line)
+        public BinaryNode(Node p_Left, OperatorType p_Op, Node p_Right, PositionData p_PositionData)
+            : base(NodeType.BINARY, p_PositionData)
         {
             Left = p_Left;
             Op = p_Op;
@@ -138,8 +138,8 @@ namespace lightning
     {
         public Node Right { get; private set; }
         public OperatorType Op { get; private set; }
-        public UnaryNode(OperatorType p_Op, Node p_Right, int p_Line)
-            : base(NodeType.UNARY, p_Line)
+        public UnaryNode(OperatorType p_Op, Node p_Right, PositionData p_PositionData)
+            : base(NodeType.UNARY, p_PositionData)
         {
             Op = p_Op;
             Right = p_Right;
@@ -150,42 +150,42 @@ namespace lightning
     {
         public object Value { get; private set; }
         public Type ValueType { get; private set; }
-        public LiteralNode(Float p_Value, int p_Line)
-            : base(NodeType.LITERAL, p_Line)
+        public LiteralNode(Float p_Value, PositionData p_PositionData)
+            : base(NodeType.LITERAL, p_PositionData)
         {
             Value = p_Value;
             ValueType = p_Value.GetType();
         }
-        public LiteralNode(Integer p_Value, int p_Line)
-            : base(NodeType.LITERAL, p_Line)
-        {
-            Value = p_Value;
-            ValueType = p_Value.GetType();
-        }
-
-        public LiteralNode(string p_Value, int p_Line)
-            : base(NodeType.LITERAL, p_Line)
+        public LiteralNode(Integer p_Value, PositionData p_PositionData)
+            : base(NodeType.LITERAL, p_PositionData)
         {
             Value = p_Value;
             ValueType = p_Value.GetType();
         }
 
-        public LiteralNode(char p_Value, int p_Line)
-            : base(NodeType.LITERAL, p_Line)
+        public LiteralNode(string p_Value, PositionData p_PositionData)
+            : base(NodeType.LITERAL, p_PositionData)
         {
             Value = p_Value;
             ValueType = p_Value.GetType();
         }
 
-        public LiteralNode(bool p_Value, int p_Line)
-            : base(NodeType.LITERAL, p_Line)
+        public LiteralNode(char p_Value, PositionData p_PositionData)
+            : base(NodeType.LITERAL, p_PositionData)
         {
             Value = p_Value;
             ValueType = p_Value.GetType();
         }
 
-        public LiteralNode(int p_Line)
-            : base(NodeType.LITERAL, p_Line)
+        public LiteralNode(bool p_Value, PositionData p_PositionData)
+            : base(NodeType.LITERAL, p_PositionData)
+        {
+            Value = p_Value;
+            ValueType = p_Value.GetType();
+        }
+
+        public LiteralNode(PositionData p_PositionData)
+            : base(NodeType.LITERAL, p_PositionData)
         {
             Value = null;
             ValueType = null;
@@ -203,8 +203,8 @@ namespace lightning
     {
         public Node Expr { get; private set; }
 
-        public GroupingNode(Node p_Expr, int p_Line)
-            : base(NodeType.GROUPING, p_Line)
+        public GroupingNode(Node p_Expr, PositionData p_PositionData)
+            : base(NodeType.GROUPING, p_PositionData)
         {
             Expr = p_Expr;
         }
@@ -213,8 +213,8 @@ namespace lightning
     public class StmtExprNode : Node
     {
         public Node Expr { get; private set; }
-        public StmtExprNode(Node p_Expr, int p_Line)
-            : base(NodeType.STMT_EXPR, p_Line)
+        public StmtExprNode(Node p_Expr, PositionData p_PositionData)
+            : base(NodeType.STMT_EXPR, p_PositionData)
         {
             Expr = p_Expr;
         }
@@ -227,8 +227,8 @@ namespace lightning
         public Node ElseBranch { get; private set; }
 
 
-        public IfNode(Node p_Condition, Node p_ThenBranch, Node p_ElseBranch, int p_Line)
-            : base(NodeType.IF, p_Line)
+        public IfNode(Node p_Condition, Node p_ThenBranch, Node p_ElseBranch, PositionData p_PositionData)
+            : base(NodeType.IF, p_PositionData)
         {
             Condition = p_Condition;
             ThenBranch = p_ThenBranch;
@@ -243,8 +243,8 @@ namespace lightning
         public Node Finalizer { get; private set; }
         public Node Body { get; private set; }
 
-        public ForNode(Node p_Initializer, Node p_Condition, Node p_Finalizer, Node p_Body, int p_Line)
-            : base(NodeType.FOR, p_Line)
+        public ForNode(Node p_Initializer, Node p_Condition, Node p_Finalizer, Node p_Body, PositionData p_PositionData)
+            : base(NodeType.FOR, p_PositionData)
         {
             Initializer = p_Initializer;
             Condition = p_Condition;
@@ -258,8 +258,8 @@ namespace lightning
         public Node Condition { get; private set; }
         public Node Body { get; private set; }
 
-        public WhileNode(Node p_Condition, Node p_Body, int p_Line)
-            : base(NodeType.WHILE, p_Line)
+        public WhileNode(Node p_Condition, Node p_Body, PositionData p_PositionData)
+            : base(NodeType.WHILE, p_PositionData)
         {
             Condition = p_Condition;
             Body = p_Body;
@@ -271,15 +271,15 @@ namespace lightning
         public Node Expression { get; private set; }
         public bool IsAnonymous { get; private set;}
         public VarAccessType AccessType { get; private set;}
-        public IndexNode(string p_Name, VarAccessType p_AccessType, int p_Line)
-            : base(NodeType.INDEX, p_Line)
+        public IndexNode(string p_Name, VarAccessType p_AccessType, PositionData p_PositionData)
+            : base(NodeType.INDEX, p_PositionData)
         {
             Name = p_Name;
             AccessType = p_AccessType;
             IsAnonymous = false;
         }
-        public IndexNode(Node p_Expression, VarAccessType p_AccessType, int p_Line)
-            : base(NodeType.INDEX, p_Line)
+        public IndexNode(Node p_Expression, VarAccessType p_AccessType, PositionData p_PositionData)
+            : base(NodeType.INDEX, p_PositionData)
         {
             Name = null;
             Expression = p_Expression;
@@ -295,15 +295,15 @@ namespace lightning
         public Node Expression { get; private set; }
         public bool IsAnonymous { get; private set;}
 
-        public VariableNode(string p_Name, List<IndexNode> p_Indexes, int p_Line)
-            : base(NodeType.VARIABLE, p_Line)
+        public VariableNode(string p_Name, List<IndexNode> p_Indexes, PositionData p_PositionData)
+            : base(NodeType.VARIABLE, p_PositionData)
         {
             Name = p_Name;
             Indexes = p_Indexes;
             IsAnonymous = false;
         }
-        public VariableNode(Node p_Expression, List<IndexNode> p_Indexes, int p_Line)
-            : base(NodeType.VARIABLE, p_Line)
+        public VariableNode(Node p_Expression, List<IndexNode> p_Indexes, PositionData p_PositionData)
+            : base(NodeType.VARIABLE, p_PositionData)
         {
             Name = null;
             Expression = p_Expression;
@@ -316,8 +316,8 @@ namespace lightning
     {
         public string Name { get; private set; }
         public Node Initializer { get; private set; }
-        public VarDeclarationNode(string p_Name, Node p_Initializer, int p_Line)
-            : base(NodeType.VAR_DECLARATION, p_Line)
+        public VarDeclarationNode(string p_Name, Node p_Initializer, PositionData p_PositionData)
+            : base(NodeType.VAR_DECLARATION, p_PositionData)
         {
             Name = p_Name;
             Initializer = p_Initializer;
@@ -330,8 +330,8 @@ namespace lightning
         public Node Value { get; private set; }
         public AssignmentOperatorType Op { get; private set; }
 
-        public AssignmentNode(VariableNode p_Assigned, Node p_Value, AssignmentOperatorType p_Op, int p_Line)
-        : base(NodeType.ASSIGMENT_OP, p_Line)
+        public AssignmentNode(VariableNode p_Assigned, Node p_Value, AssignmentOperatorType p_Op, PositionData p_PositionData)
+        : base(NodeType.ASSIGMENT_OP, p_PositionData)
         {
             Assigned = p_Assigned;
             Value = p_Value;
@@ -345,8 +345,8 @@ namespace lightning
         public Node Right { get; private set; }
         public OperatorType Op { get; private set; }
 
-        public LogicalNode(Node p_Left, OperatorType p_Op, Node p_Right, int p_Line)
-            : base(NodeType.LOGICAL, p_Line)
+        public LogicalNode(Node p_Left, OperatorType p_Op, Node p_Right, PositionData p_PositionData)
+            : base(NodeType.LOGICAL, p_PositionData)
         {
             Left = p_Left;
             Right = p_Right;
@@ -358,8 +358,8 @@ namespace lightning
     {
         public List<Node> Statements { get; private set; }
 
-        public BlockNode(List<Node> p_Statements, int p_Line)
-            : base(NodeType.BLOCK, p_Line)
+        public BlockNode(List<Node> p_Statements, PositionData p_PositionData)
+            : base(NodeType.BLOCK, p_PositionData)
         {
             Statements = p_Statements;
         }
@@ -370,8 +370,8 @@ namespace lightning
         public VariableNode Variable { get; private set; }
         public List<CallInfo> Calls { get; private set; }
 
-        public FunctionCallNode(VariableNode p_Name, int p_Line)
-            : base(NodeType.FUNCTION_CALL, p_Line)
+        public FunctionCallNode(VariableNode p_Name, PositionData p_PositionData)
+            : base(NodeType.FUNCTION_CALL, p_PositionData)
         {
             Variable = p_Name;
             Calls = new List<CallInfo>();
@@ -382,8 +382,8 @@ namespace lightning
     {
         public Node Expr { get; private set; }
 
-        public ReturnNode(Node p_Expr, int p_Line)
-            : base(NodeType.RETURN, p_Line)
+        public ReturnNode(Node p_Expr, PositionData p_PositionData)
+            : base(NodeType.RETURN, p_PositionData)
         {
             Expr = p_Expr;
         }
@@ -394,8 +394,8 @@ namespace lightning
         public List<Node> Elements { get; private set; }
         public Dictionary<Node, Node> Table { get; private set; }
 
-        public TableNode(List<Node> p_Elements, Dictionary<Node, Node> p_Table, int p_Line)
-            : base(NodeType.TABLE, p_Line)
+        public TableNode(List<Node> p_Elements, Dictionary<Node, Node> p_Table, PositionData p_PositionData)
+            : base(NodeType.TABLE, p_PositionData)
         {
             Elements = p_Elements;
             Table = p_Table;
@@ -407,8 +407,8 @@ namespace lightning
         public List<string> Parameters { get; private set; }
         public List<Node> Body { get; private set; }
 
-        public FunctionExpressionNode(List<string> p_Parameters, List<Node> p_Body, int p_Line, NodeType p_Type = NodeType.FUNCTION_EXPRESSION)
-            : base(p_Type, p_Line)
+        public FunctionExpressionNode(List<string> p_Parameters, List<Node> p_Body, PositionData p_PositionData, NodeType p_Type = NodeType.FUNCTION_EXPRESSION)
+            : base(p_Type, p_PositionData)
         {
             Parameters = p_Parameters;
             Body = p_Body;
@@ -419,8 +419,8 @@ namespace lightning
     {
         public string Name { get; private set;}
 
-        public MemberFunctionDeclarationNode(String p_Name, List<string> p_Parameters, List<Node> p_Body, int p_Line)
-            : base(p_Parameters, p_Body, p_Line, NodeType.MEMBER_FUNCTION_DECLARATION)
+        public MemberFunctionDeclarationNode(String p_Name, List<string> p_Parameters, List<Node> p_Body, PositionData p_PositionData)
+            : base(p_Parameters, p_Body, p_PositionData, NodeType.MEMBER_FUNCTION_DECLARATION)
         {
             Name = p_Name;
         }
@@ -430,8 +430,8 @@ namespace lightning
     {
         public VariableNode Variable { get; private set;}
 
-        public FunctionDeclarationNode(VariableNode p_Variable, List<string> p_Parameters, List<Node> p_Body, int p_Line)
-            : base(p_Parameters, p_Body, p_Line, NodeType.FUNCTION_DECLARATION)
+        public FunctionDeclarationNode(VariableNode p_Variable, List<string> p_Parameters, List<Node> p_Body, PositionData p_PositionData)
+            : base(p_Parameters, p_Body, p_PositionData, NodeType.FUNCTION_DECLARATION)
         {
             Variable = p_Variable;
         }
