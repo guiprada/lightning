@@ -519,13 +519,13 @@ namespace lightning
 
         public Unit GetGlobal(Operand p_index){
             Unit value;
-            lock(globals)
+            lock(globals[p_index].heapUnitValue)
                 value = globals[p_index];
             return value;
         }
 
         public void SetGlobal(Unit p_value, Operand p_index){
-            lock(globals)
+            lock(globals[p_index].heapUnitValue)
                 globals[p_index] = p_value;
         }
 
@@ -537,23 +537,23 @@ namespace lightning
         public void SetOpGlobal(Unit p_value, Operand op, Operand p_index){
             switch(op){
                 case ASSIGN:
-                    lock(globals)
+                    lock(globals[p_index].heapUnitValue)
                         globals[p_index] = p_value;
                     break;
                 case ADDITION_ASSIGN:
-                    lock(globals)
+                    lock(globals[p_index].heapUnitValue)
                         globals[p_index] += p_value;
                     break;
                 case SUBTRACTION_ASSIGN:
-                    lock(globals)
+                    lock(globals[p_index].heapUnitValue)
                         globals[p_index] -= p_value;
                     break;
                 case MULTIPLICATION_ASSIGN:
-                    lock(globals)
+                    lock(globals[p_index].heapUnitValue)
                         globals[p_index] *= p_value;
                     break;
                 case DIVISION_ASSIGN:
-                    lock(globals)
+                    lock(globals[p_index].heapUnitValue)
                         globals[p_index] /= p_value;
                     break;
             }

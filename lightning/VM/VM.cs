@@ -92,12 +92,12 @@ namespace lightning
             Intrinsics = p_chunk.Prelude.intrinsics;
             foreach (IntrinsicUnit v in Intrinsics)
             {
-                // lock(globals)
+                // lock(globals) // not needed because this vm initialization does not run in parallel
                     globals.Add(new Unit(v));
             }
             foreach (KeyValuePair<string, TableUnit> entry in p_chunk.Prelude.tables)
             {
-                // lock(globals)
+                // lock(globals) // not needed because this vm initialization does not run in parallel
                     globals.Add(new Unit(entry.Value));
             }
             LoadedModules = new Dictionary<string, int>();
@@ -203,7 +203,7 @@ namespace lightning
         public Unit GetGlobal(Operand p_address)
         {
             Unit value;
-            lock(globals)
+            lock(globals) // not needed because require does not run in parallel
                 value = globals.Get(p_address);
             return value;
         }
@@ -436,7 +436,10 @@ namespace lightning
                         break;
                     case OpCode.LOAD_GLOBAL:
                         IP++;
-                        lock(globals)
+                        if(parallelVM == true)
+                            lock(globals.Get(instruction.opA).heapUnitValue) // needed because global may be loaded from parallel functions
+                                stack.Push(globals.Get(instruction.opA));
+                        else
                             stack.Push(globals.Get(instruction.opA));
                         break;
                     case OpCode.LOAD_IMPORTED_GLOBAL:
@@ -449,7 +452,10 @@ namespace lightning
                         break;
                     case OpCode.LOAD_UPVALUE:
                         IP++;
-                        lock(upValues.GetAt(instruction.opA))
+                        if(parallelVM == true)
+                            lock(upValues.GetAt(instruction.opA)) // needed because upvalue may be loaded from parallel functions
+                                stack.Push(upValues.GetAt(instruction.opA).UpValue);
+                        else
                             stack.Push(upValues.GetAt(instruction.opA).UpValue);
                         break;
                     case OpCode.LOAD_NIL:
@@ -474,7 +480,7 @@ namespace lightning
                         break;
                     case OpCode.DECLARE_GLOBAL:
                         IP++;
-                        // lock(globals)
+                        // lock(globals) // not needed because global declaration can not happen inside parallel functions
                             globals.Add(stack.Pop());
                         break;
                     case OpCode.DECLARE_FUNCTION:
@@ -489,7 +495,7 @@ namespace lightning
                                 if (is_function_expression == 0)
                                     if (env == 0)// Global
                                     {
-                                        lock(globals)
+                                        // lock(globals) // not needed because global declaration can not happen inside parallel functions
                                             globals.Add(this_callable);
                                     }
                                     else
@@ -517,7 +523,7 @@ namespace lightning
                                 if (is_function_expression == 0)
                                     if (env == 0)// yes they exist!
                                     {
-                                        lock(globals)
+                                        // lock(globals) // not needed because global declaration can not happen inside parallel functions
                                             globals.Add(new_closure_unit);
                                     }
                                     else
@@ -569,29 +575,29 @@ namespace lightning
                             if(parallelVM == true){
                                 switch(op){
                                     case ASSIGN:
-                                        lock(globals)
+                                        lock(globals.Get(address).heapUnitValue)
                                             globals.Set(new_value, address);
                                         break;
                                     case ADDITION_ASSIGN:
-                                        lock(globals){
+                                        lock(globals.Get(address).heapUnitValue){
                                             Unit result = globals.Get(address) + new_value;
                                             globals.Set(result, address);
                                         }
                                         break;
                                     case SUBTRACTION_ASSIGN:
-                                        lock(globals){
+                                        lock(globals.Get(address).heapUnitValue){
                                             Unit result = globals.Get(address) - new_value;
                                             globals.Set(result, address);
                                         }
                                         break;
                                     case MULTIPLICATION_ASSIGN:
-                                        lock(globals){
+                                        lock(globals.Get(address).heapUnitValue){
                                             Unit result = globals.Get(address) * new_value;
                                             globals.Set(result, address);
                                         }
                                         break;
                                     case DIVISION_ASSIGN:
-                                        lock(globals){
+                                        lock(globals.Get(address).heapUnitValue){
                                             Unit result = globals.Get(address) / new_value;
                                             globals.Set(result, address);
                                         }
@@ -1045,7 +1051,7 @@ namespace lightning
 
         public int GlobalsCount(){
             int value;
-            lock(globals)
+            lock(globals) // I think it is not needed
                 value = globals.Count;
             return value;
         }
@@ -1060,14 +1066,14 @@ namespace lightning
 
         public int UpValuesCount(){
             int value;
-            lock(upValues)
+            // lock(upValues)
                 value = upValues.Count;
             return value;
         }
 
         public int UpValueCapacity(){
             int value;
-            lock(upValues)
+            // lock(upValues)
                 value = upValues.Capacity;
             return value;
         }
