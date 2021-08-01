@@ -13,10 +13,6 @@ use tuples as structs with named access
 
 To be Done
 ----------
-add column info
-    fix eval inconstant naming
-    replace lambda counter with line?
-
 add variable data to chunk
 
 improve function declaration - add method declaration
@@ -179,3 +175,6 @@ Done
     - merge chunk assignment and assignmentOp
     - rename constants data
     - create an indexNode, add index node pretty print
+    - added PositionData
+        fix eval inconstant naming
+        replace lambda counter with moduleName + PositionData
