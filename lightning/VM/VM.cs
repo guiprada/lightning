@@ -533,33 +533,31 @@ namespace lightning
                     case OpCode.ASSIGN_VARIABLE:
                         {
                             IP++;
-                            Operand address = instruction.opA;
-                            Operand n_shift = instruction.opB;
-                            Operand op = instruction.opC;
-                            Unit new_value = stack.Peek();
-                            if (op == ASSIGN){
-                                variables.SetAt(new_value, address, CalculateEnvShift(n_shift));
-                            }else{
-                                Unit old_value = variables.GetAt(address, CalculateEnvShift(n_shift));
-                                Unit result;
-                                switch(op){
-                                    case ADDITION_ASSIGN:
-                                        result = old_value + new_value;
-                                        break;
-                                    case SUBTRACTION_ASSIGN:
-                                        result = old_value - new_value;
-                                        break;
-                                    case MULTIPLICATION_ASSIGN:
-                                        result = old_value * new_value;
-                                        break;
-                                    case DIVISION_ASSIGN:
-                                        result = old_value / new_value;
-                                        break;
-                                    default:
-                                        throw new Exception("Unknown operator");
-                                }
 
-                                variables.SetAt(result, address, CalculateEnvShift(n_shift));
+                            Unit old_value = variables.GetAt(instruction.opA, CalculateEnvShift(instruction.opB));
+                            Unit result;
+                            switch(instruction.opC){
+                                case ASSIGN:
+                                    variables.SetAt(stack.Peek(), instruction.opA, CalculateEnvShift(instruction.opB));
+                                    break;
+                                case ADDITION_ASSIGN:
+                                    result = old_value + stack.Peek();
+                                    variables.SetAt(result, instruction.opA, CalculateEnvShift(instruction.opB));
+                                    break;
+                                case SUBTRACTION_ASSIGN:
+                                    result = old_value - stack.Peek();
+                                    variables.SetAt(result, instruction.opA, CalculateEnvShift(instruction.opB));
+                                    break;
+                                case MULTIPLICATION_ASSIGN:
+                                    result = old_value * stack.Peek();
+                                    variables.SetAt(result, instruction.opA, CalculateEnvShift(instruction.opB));
+                                    break;
+                                case DIVISION_ASSIGN:
+                                    result = old_value / stack.Peek();
+                                    variables.SetAt(result, instruction.opA, CalculateEnvShift(instruction.opB));
+                                    break;
+                                default:
+                                    throw new Exception("Unknown operator");
                             }
                             break;
                         }
