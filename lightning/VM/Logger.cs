@@ -30,11 +30,12 @@ namespace lightning
 
         static void CloseLogger(object sender, EventArgs e){
             if(isProcessing){
-                Console.WriteLine("Waiting for Logger to exit :/");
+                Console.Write("Waiting for Logger to exit :\\ ");
                 while(isProcessing){
                     Console.Write(".");
                     Thread.Sleep(100);
                 }
+                Console.WriteLine();
             }
             Console.WriteLine("Logger has exited :)");
         }

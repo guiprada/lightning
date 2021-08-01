@@ -1,15 +1,15 @@
 cd lightning_programs
-	del *.ast
-	del *.tokens
-	del *.log
-	del *.chunk
-	del *.out
+	if exist *.ast del /q *.ast
+	if exist *.tokens del /q *.tokens
+	if exist *.log del /q *.log
+	if exist *.chunk del /q *.chunk
+	if exist *.out del /q *.out
 
 	cd tests
-		del *.ast
-		del *.tokens
-		del *.log
-		del *.chunk
-		del *.out
+		if exist *.ast del /q *.ast
+		if exist *.tokens del /q *.tokens
+		if exist *.log del /q *.log
+		if exist *.chunk del /q *.chunk
+		if exist *.out del /q *.out
 	cd ..
 cd ..

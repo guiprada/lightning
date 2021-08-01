@@ -442,8 +442,7 @@ namespace lightning
                         break;
                     case OpCode.LOAD_IMPORTED_GLOBAL:
                         IP++;
-                        lock(modules[instruction.opB].Globals)
-                            stack.Push(modules[instruction.opB].GetGlobal(instruction.opA));
+                        stack.Push(modules[instruction.opB].GetGlobal(instruction.opA));
                         break;
                     case OpCode.LOAD_IMPORTED_DATA:
                         IP++;
@@ -451,7 +450,7 @@ namespace lightning
                         break;
                     case OpCode.LOAD_UPVALUE:
                         IP++;
-                        lock(upValues)
+                        lock(upValues.GetAt(instruction.opA))
                             stack.Push(upValues.GetAt(instruction.opA).UpValue);
                         break;
                     case OpCode.LOAD_NIL:
@@ -636,75 +635,63 @@ namespace lightning
                         modules[instruction.opB].SetOpGlobal(stack.Peek(), instruction.opC, instruction.opA);
                         break;
                     case OpCode.ASSIGN_UPVALUE:
-                        {
-                            IP++;
-                            Operand address = instruction.opA;
-                            Operand op = instruction.opB;
-                            Unit new_value = stack.Peek();
-                            if(parallelVM == true){
-                                switch(op){
-                                    case ASSIGN:
-                                        lock(upValues){
-                                            UpValueUnit this_upValue = upValues.GetAt(address);
-                                            lock(this_upValue)
-                                                this_upValue.UpValue = new_value;
-                                        }
-                                        break;
-                                    case ADDITION_ASSIGN:
-                                        lock(upValues){
-                                            UpValueUnit this_upValue = upValues.GetAt(address);
-                                            lock(this_upValue)
-                                                this_upValue.UpValue = this_upValue.UpValue + new_value;
-                                        }
-                                        break;
-                                    case SUBTRACTION_ASSIGN:
-                                        lock(upValues){
-                                            UpValueUnit this_upValue = upValues.GetAt(address);
-                                            lock(this_upValue)
-                                                this_upValue.UpValue = this_upValue.UpValue - new_value;
-                                        }
-                                        break;
-                                    case MULTIPLICATION_ASSIGN:
-                                        lock(upValues){
-                                            UpValueUnit this_upValue = upValues.GetAt(address);
-                                            lock(this_upValue)
-                                                this_upValue.UpValue = this_upValue.UpValue * new_value;
-                                        }
-                                        break;
-                                    case DIVISION_ASSIGN:
-                                        lock(upValues){
-                                            UpValueUnit this_upValue = upValues.GetAt(address);
-                                            lock(this_upValue)
-                                                this_upValue.UpValue = this_upValue.UpValue / new_value;
-                                        }
-                                        break;
-                                    default:
-                                        throw new Exception("Unknown operator");
-                                }
-                            }else{
-                                UpValueUnit this_upValue = upValues.GetAt(address);
-                                switch(op){
-                                    case ASSIGN:
-                                        this_upValue.UpValue = new_value;
-                                        break;
-                                    case ADDITION_ASSIGN:
-                                        this_upValue.UpValue = this_upValue.UpValue + new_value;
-                                        break;
-                                    case SUBTRACTION_ASSIGN:
-                                        this_upValue.UpValue = this_upValue.UpValue - new_value;
-                                        break;
-                                    case MULTIPLICATION_ASSIGN:
-                                        this_upValue.UpValue = this_upValue.UpValue * new_value;
-                                        break;
-                                    case DIVISION_ASSIGN:
-                                        this_upValue.UpValue = this_upValue.UpValue / new_value;
-                                        break;
-                                    default:
-                                        throw new Exception("Unknown operator");
-                                }
+                        IP++;
+                        if(parallelVM == true){
+                            UpValueUnit this_upValue;
+                            this_upValue = upValues.GetAt(instruction.opA);
+                            switch(instruction.opB){
+                                case ASSIGN:
+                                    lock(this_upValue)
+                                        this_upValue.UpValue = stack.Peek();
+                                    break;
+                                case ADDITION_ASSIGN:
+                                    lock(this_upValue)
+                                        this_upValue.UpValue = upValues.GetAt(instruction.opA).UpValue + stack.Peek();
+                                    break;
+                                case SUBTRACTION_ASSIGN:
+                                    lock(upValues){
+                                        lock(this_upValue)
+                                            this_upValue.UpValue = upValues.GetAt(instruction.opA).UpValue - stack.Peek();
+                                    }
+                                    break;
+                                case MULTIPLICATION_ASSIGN:
+                                    lock(upValues){
+                                        lock(this_upValue)
+                                            this_upValue.UpValue = upValues.GetAt(instruction.opA).UpValue * stack.Peek();
+                                    }
+                                    break;
+                                case DIVISION_ASSIGN:
+                                    lock(upValues){
+                                        lock(this_upValue)
+                                            this_upValue.UpValue = upValues.GetAt(instruction.opA).UpValue / stack.Peek();
+                                    }
+                                    break;
+                                default:
+                                    throw new Exception("Unknown operator");
                             }
-                            break;
+                        }else{
+                            UpValueUnit this_upValue = upValues.GetAt(instruction.opA);
+                            switch(instruction.opB){
+                                case ASSIGN:
+                                    this_upValue.UpValue = stack.Peek();
+                                    break;
+                                case ADDITION_ASSIGN:
+                                    this_upValue.UpValue = this_upValue.UpValue + stack.Peek();
+                                    break;
+                                case SUBTRACTION_ASSIGN:
+                                    this_upValue.UpValue = this_upValue.UpValue - stack.Peek();
+                                    break;
+                                case MULTIPLICATION_ASSIGN:
+                                    this_upValue.UpValue = this_upValue.UpValue * stack.Peek();
+                                    break;
+                                case DIVISION_ASSIGN:
+                                    this_upValue.UpValue = this_upValue.UpValue / stack.Peek();
+                                    break;
+                                default:
+                                    throw new Exception("Unknown operator");
+                            }
                         }
+                        break;
                     case OpCode.TABLE_GET:
                         {
                             IP++;

@@ -1,0 +1,4 @@
+Set-ExecutionPolicy RemoteSigned -Scope CurrentUser
+Set-ExecutionPolicy Restricted -Scope CurrentUser
+
+powershell -ExecutionPolicy Bypass -File script.ps1
