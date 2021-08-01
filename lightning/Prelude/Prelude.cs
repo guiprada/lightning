@@ -610,26 +610,30 @@ namespace lightning
             Unit Eval(VM p_vm)
             {
                 string eval_code = p_vm.GetString(0);
-                string eval_name = "eval(" + eval_code.GetHashCode().ToString() + ")";
+                string eval_name = "eval@" + Path.ToLambdaName(p_vm.CurrentInstructionModule())+ p_vm.CurrentInstructionPositionData();
 
                 Scanner scanner = new Scanner(eval_code, eval_name);
                 List<Token> tokens = scanner.Tokens;
-                if(scanner.HasScanned == false){ new Unit(UnitType.Null); }
+                if(scanner.HasScanned == false){
+                    Console.WriteLine("Module " + eval_name + " scanning had errors!");
+                    return new Unit(UnitType.Null);
+                }
 
                 Parser parser = new Parser(tokens, eval_name);
 
                 Node program = parser.ParsedTree;
-                if(parser.HasParsed == false){ new Unit(UnitType.Null); }
+                if(parser.HasParsed == false){
+                    Console.WriteLine("Module " + eval_name + "  parsing had errors!");
+                    return new Unit(UnitType.Null);
+                }
 
                 Chunker chunker = new Chunker(program, eval_name, p_vm.Prelude);
                 Chunk chunk = chunker.Chunk;
-                if (chunker.Errors.Count > 0)
-                {
-                    Console.WriteLine("Code generation had errors:");
-                    foreach (string error in chunker.Errors)
-                        Console.WriteLine(error);
+                if (chunker.HasChunked == false){
+                    Console.WriteLine("Module " + eval_name + "  code generation had errors!");
                     return new Unit(UnitType.Null);
                 }
+
                 if (chunker.HasChunked == true)
                 {
                     VM imported_vm = new VM(chunk);
@@ -665,28 +669,29 @@ namespace lightning
 
                     Scanner scanner = new Scanner(module_code, name);
                     List<Token> tokens = scanner.Tokens;
-                    if(scanner.HasScanned == false){ return new Unit(UnitType.Null); }
-
-                    Parser parser = new Parser(tokens, name);
-                    Node program = parser.ParsedTree;
-                    if(parser.HasParsed == false){ return new Unit(UnitType.Null); }
-
-                    Chunker chunker = new Chunker(program, name, p_vm.Prelude);
-                    Chunk chunk = chunker.Chunk;
-                    if (chunker.Errors.Count > 0)
-                    {
-                        Console.WriteLine("Code generation had errors:");
-                        foreach (string error in chunker.Errors)
-                            Console.WriteLine(error);
+                    if(scanner.HasScanned == false){
+                        Console.WriteLine("Module " + name + " scanning had errors!");
                         return new Unit(UnitType.Null);
                     }
 
-                    if (chunker.HasChunked == true)
-                    {
+                    Parser parser = new Parser(tokens, name);
+                    Node program = parser.ParsedTree;
+                    if(parser.HasParsed == false){
+                        Console.WriteLine("Module " + name + "  parsing had errors!");
+                        return new Unit(UnitType.Null);
+                    }
+
+                    Chunker chunker = new Chunker(program, name, p_vm.Prelude);
+                    Chunk chunk = chunker.Chunk;
+                    if (chunker.HasChunked == false){
+                        Console.WriteLine("Module " + name + "  code generation had errors!");
+                        return new Unit(UnitType.Null);
+                    }
+
+                    if (chunker.HasChunked == true){
                         VM imported_vm = new VM(chunk);
                         VMResult result = imported_vm.ProtectedRun();
-                        if (result.status == VMResultType.OK)
-                        {
+                        if (result.status == VMResultType.OK){
                             MakeModule(result.value, name, p_vm, imported_vm);
                             return result.value;
                         }
@@ -721,7 +726,7 @@ namespace lightning
                     p_vm.RecycleVM(try_vm);
                     return new Unit(true);
                 }catch(Exception e){
-                    Logger.LogLine("-------------------\n" + p_vm.ErrorLocation(), try_log_path);
+                    Logger.LogLine("-------------------\n" + p_vm.CurrentInstructionPositionDataString(), try_log_path);
                     Logger.LogLine(e.ToString(), try_log_path);
                     p_vm.RecycleVM(try_vm);
                     return new Unit(false);

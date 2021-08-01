@@ -61,7 +61,6 @@ namespace lightning
         private List<string> globals;
         private Stack<List<Variable>> upvalueStack;
         private Stack<int> funStartEnv;
-        int lambdaCounter;
         public List<string> Errors { get; private set; }
 
         public Chunk Chunk
@@ -83,7 +82,7 @@ namespace lightning
                     }
                     catch (Exception e)
                     {
-                        Console.WriteLine("Chunking broke the runtime, check" + System.IO.Path.DirectorySeparatorChar + Path.ToPath(moduleName) + "_chunker.log!");
+                        Console.WriteLine("Chunking broke the runtime, check " + System.IO.Path.DirectorySeparatorChar + Path.ToPath(moduleName) + "_chunker.log!");
                         Logger.LogNew(e.ToString(), Path.ToPath(moduleName) + "_chunker.log");
                         PrintErrors();
                         return null;
@@ -107,7 +106,6 @@ namespace lightning
             env = new List<List<string>>();
             env.Add(globals);// set env[0] to globals
             funStartEnv = new Stack<int>();
-            lambdaCounter = 0;
 
             // place prelude functions on data
             foreach (IntrinsicUnit v in p_prelude.intrinsics)
@@ -655,11 +653,9 @@ namespace lightning
             }
             Add(OpCode.RETURN, p_node.PositionData);
         }
-
         private void ChunkFunctionExpression(FunctionExpressionNode p_node)
         {
-            CompileFunction("lambda" + lambdaCounter, p_node, false);
-            lambdaCounter++;
+            CompileFunction(GetLambdaName(p_node), p_node, false);
         }
 
         private void ChunkMemberFunctionDeclaration(MemberFunctionDeclarationNode p_node)
@@ -695,8 +691,7 @@ namespace lightning
                         if(this_index.AccessType == VarAccessType.COLON)
                             Error("Method Declaration is not supported yet!", p_node.PositionData);
                         if(this_index.IsAnonymous){
-                            name += ".lambda" + lambdaCounter;
-                            lambdaCounter++;
+                            name += GetLambdaName(p_node);
                         }else
                             name += "." + this_index.Name;
                     }
@@ -937,6 +932,10 @@ namespace lightning
         {
             chunk.WriteInstruction(p_opcode, p_opA, p_opB, p_opC, p_positionData);
             instructionCounter++;
+        }
+
+        private string GetLambdaName(Node p_node){
+            return "lambda@" + Path.ToLambdaName(moduleName) + p_node.PositionData;
         }
 
         private void Error(string p_msg, PositionData p_positionData)

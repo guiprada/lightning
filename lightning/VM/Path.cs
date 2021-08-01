@@ -10,6 +10,9 @@ namespace lightning
             name = name.Replace('/', '.');
             return name;
         }
+        public static string ToLambdaName(string p_moduleName){
+            return p_moduleName.Replace('.', '_');
+        }
         public static string ToPath(string p_moduleName){
             return p_moduleName.Replace('.', System.IO.Path.DirectorySeparatorChar);
         }

@@ -68,13 +68,12 @@ errors += require("tests/try.ltn")
     function a_table["he" .. "y"] (){
         return 99
     }
-    write_line(a_table.hey)
-    write_line(a_table["hey"]())
-    var a_table = 1
+    assert(a_table["hey"](), 99, "Failed Expression Indexed Member Function Declaration Test 1.")
 }
 {
     var another_table = [1: \(a) return a]
     another_table[1]
+    write_line(another_table[1])
     1+1
 }
 

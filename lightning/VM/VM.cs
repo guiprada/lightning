@@ -284,7 +284,7 @@ namespace lightning
             }
             catch (Exception e)
             {
-                Console.WriteLine("VM Busted ... " + ErrorLocation());
+                Console.WriteLine("VM Busted ... " + CurrentInstructionPositionDataString());
                 Logger.LogNew(e.ToString(),@"_vm.log" );
                 Console.WriteLine("Check _vm.log!");
                 System.Environment.Exit(1);
@@ -376,11 +376,20 @@ namespace lightning
             throw new Exception(p_msg);
         }
 
-        public string ErrorLocation()
+        public string CurrentInstructionPositionDataString()
         {
             return "Function: " + instructions.ExecutingFunction.Name +
             " from module: " + instructions.ExecutingFunction.Module +
             " on position: " + instructions.ExecutingFunction.ChunkPosition.GetPosition(IP);
+        }
+
+        public string CurrentInstructionModule()
+        {
+            return instructions.ExecutingFunction.Module;
+        }
+        public PositionData CurrentInstructionPositionData()
+        {
+            return instructions.ExecutingFunction.ChunkPosition.GetPosition(IP);
         }
 
         public VMResult ProtectedRun(){
@@ -389,7 +398,7 @@ namespace lightning
             }
             catch (Exception e)
             {
-                Console.WriteLine("VM Busted ... " + ErrorLocation());
+                Console.WriteLine("VM Busted ... " + CurrentInstructionPositionDataString());
                 Logger.LogNew(e.ToString(),@"_vm.log" );
                 Console.WriteLine("Check _vm.log!");
                 System.Environment.Exit(1);

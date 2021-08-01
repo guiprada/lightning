@@ -60,7 +60,7 @@ namespace lightning
                         }
                     }catch (Exception e){
                         Console.WriteLine(
-                            "Parsing broke the runtime, check out" +
+                            "Parsing broke the runtime, check out " +
                             System.IO.Path.DirectorySeparatorChar +
                             Path.ToPath(moduleName) +
                             "_parser.log!"
