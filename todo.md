@@ -10,20 +10,17 @@ examine overflows in numeric operations
 method and member function declaration
 use tuples as structs with named access
 
-
 To be Done
 ----------
-add variable data to chunk
-
-improve function declaration - add method declaration
-
-global function override?
-
 rename TableUnit to BucketUnit - separate List and Map
 
 file read and write test
 
 remove DUP and STASH
+
+improve function declaration - add method declaration
+
+global function override?
 
 tuple class
 
@@ -178,3 +175,4 @@ Done
     - added PositionData
         fix eval inconstant naming
         replace lambda counter with moduleName + PositionData
+    - added global variable data to chunk
