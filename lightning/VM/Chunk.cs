@@ -192,8 +192,8 @@ namespace lightning
     {
         private List<Instruction> program;
         private List<Unit> data;
+        private Dictionary<string, Operand> globalVariablesAddresses;
         private ChunkPosition chunkPosition;
-
         public Library Prelude { get; private set; }
         public Operand ExitAddress { get { return (Operand)program.Count; } }
         public List<Instruction> Body { get { return program; } }
@@ -211,8 +211,9 @@ namespace lightning
         public Chunk(string p_moduleName, Library p_prelude)
         {
             program = new List<Instruction>();
-            chunkPosition = new ChunkPosition(new List<PositionData>());
             data = new List<Unit>();
+            globalVariablesAddresses = new Dictionary<string, Operand>();
+            chunkPosition = new ChunkPosition(new List<PositionData>());
             Prelude = p_prelude;
             ModuleName = p_moduleName;
         }
@@ -267,6 +268,10 @@ namespace lightning
             return (ushort)(data.Count -1);
         }
 
+        public void AddGlobalVariableAddress(string p_name, Operand p_address){
+            globalVariablesAddresses.Add(p_name, p_address);
+        }
+
         public void WriteInstruction(OpCode p_opCode, Operand p_opA, Operand p_opB, Operand p_opC, PositionData p_positionData)
         {
             Instruction this_instruction = new Instruction(p_opCode, p_opA, p_opB, p_opC);
@@ -287,6 +292,14 @@ namespace lightning
         public Unit GetDataLiteral(Operand p_address)
         {
             return data[p_address];
+        }
+
+        public Nullable<Operand> GetGlobalVariableAddress(string p_name){
+            Operand maybe_address;
+            if(globalVariablesAddresses.TryGetValue(p_name, out maybe_address))
+                return maybe_address;
+            else
+                return null;
         }
 
         public Unit GetFunction(string p_name)

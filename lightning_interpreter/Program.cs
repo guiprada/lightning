@@ -70,6 +70,11 @@ namespace interpreter
                 // Print memory_use
                 Unit machine_memory_use = chunk.GetUnitFromTable("machine", "memory_use");
                 Console.WriteLine(vm.ProtectedCallFunction(machine_memory_use, null));
+
+                // Print Global variable errors
+                Unit errors_unit = vm.GetGlobal(chunk, "errors");
+                if(errors_unit.Type == UnitType.Integer)
+                    Console.WriteLine("Total errors in test: " + errors_unit.integerValue);
             }
             return 0;
         }

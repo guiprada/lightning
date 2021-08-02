@@ -849,6 +849,7 @@ namespace lightning
         {
             if (!globals.Contains(p_name)){
                 globals.Add(p_name);
+                chunk.AddGlobalVariableAddress(p_name, (Operand)globals.IndexOf(p_name));
                 return new Variable(p_name, globals.IndexOf(p_name), 0, ValueType.Global);
             }
 

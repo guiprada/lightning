@@ -207,6 +207,14 @@ namespace lightning
             return value;
         }
 
+        public Unit GetGlobal(Chunk p_chunk, string p_name){
+            Nullable<Operand> maybe_address = p_chunk.GetGlobalVariableAddress(p_name);
+            if(maybe_address.HasValue)
+                return GetGlobal(maybe_address.Value);
+            else
+                return new Unit(UnitType.Null);
+        }
+
 //////////////////////////// Accessors
         public Unit GetUnit(int p_n){
             return stack.Peek(p_n);
