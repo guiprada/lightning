@@ -634,7 +634,6 @@ namespace lightning
     public class WrapperUnit<T> : HeapUnit
     {
         public object content;
-        public Dictionary<Unit, Unit> Table{get; private set;}
         public TableUnit SuperTable{get; private set;}
         public override UnitType Type{
             get{
@@ -644,22 +643,16 @@ namespace lightning
         public WrapperUnit(object p_content, TableUnit p_SuperTable = null)
         {
             content = p_content;
-            Table = new Dictionary<Unit, Unit>();
             SuperTable = p_SuperTable;
         }
 
         public override void Set(Unit index, Unit value)
         {
-            Table[index] = value;
+            throw new Exception("Trying to Set a Table value of WrapperUnit. If you want to extend it you should use its SuperTable");
         }
 
         public override Unit Get(Unit p_key){
-            Unit this_unit;
-            if(Table.TryGetValue(p_key, out this_unit))
-                return this_unit;
-            else if(SuperTable != null)
-                return SuperTable.Get(p_key);
-            throw new Exception("Wrapper<" + typeof(T) +"> Super Table does not contain index: " + p_key.ToString());
+            return SuperTable.Get(p_key);
         }
 
         public override string ToString()

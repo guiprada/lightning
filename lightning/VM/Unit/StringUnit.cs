@@ -14,7 +14,6 @@ namespace lightning
 	public class StringUnit : HeapUnit
     {
         public string content;
-        public Dictionary<Unit, Unit> Table{get; private set;}
         public override UnitType Type{
             get{
                 return UnitType.String;
@@ -23,7 +22,6 @@ namespace lightning
         public StringUnit(string p_value)
         {
             content = p_value;
-            Table = new Dictionary<Unit, Unit>();
         }
         public override string ToString()
         {
@@ -55,16 +53,11 @@ namespace lightning
 
         public override void Set(Unit index, Unit value)
         {
-            Table[index] = value;
+            throw new Exception("Trying to Set a Table value of StringUnit. If you want to extend it you should use its SuperTable");
         }
 
         public override Unit Get(Unit p_key){
-            Unit this_unit;
-            if(Table.TryGetValue(p_key, out this_unit))
-                return this_unit;
-            else if(superTable != null)
-                return superTable.Get(p_key);
-            throw new Exception("String Table or Super Table does not contain index: " + p_key.ToString());
+            return superTable.Get(p_key);
         }
 
         public override int GetHashCode()
@@ -101,11 +94,20 @@ namespace lightning
 
         ////////////////////////////////////////////////////////////////////////////////////////////////////////////
         ///////////////////////////////////////////////////////////////////////////////////////////////////// String
-        private static TableUnit superTable = new TableUnit(null, null);
+        private readonly static TableUnit superTable = new TableUnit(null, null);
         static StringUnit(){
             initSuperTable();
         }
         private static void initSuperTable(){
+            //////////////////////////////////////////////////////
+            Unit GetSuperTable(VM vm)
+            {
+                vm.GetStringUnit(0);
+                return new Unit(superTable);
+            }
+            superTable.Set("get_super_table", new IntrinsicUnit("get_super_table", GetSuperTable, 1));
+
+            //////////////////////////////////////////////////////
             Unit StringSlice(VM vm)
             {
                 string input_string = vm.GetString(0);

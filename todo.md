@@ -12,6 +12,8 @@ use tuples as structs with named access
 
 To be Done
 ----------
+add methods to manipulate superTable
+add methods to get and set WrapperUnit and StringUnit supertable
 rename TableUnit to BucketUnit - separate List and Map
 
 file read and write test
