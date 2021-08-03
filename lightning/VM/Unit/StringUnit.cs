@@ -80,6 +80,7 @@ namespace lightning
                 case UnitType.Boolean:
                     return 1;
                 case UnitType.Table:
+                case UnitType.List:
                 case UnitType.Function:
                 case UnitType.Intrinsic:
                 case UnitType.Closure:

@@ -50,7 +50,7 @@ namespace lightning
             SuperTable = p_superTable;
         }
 
-        public void Set(Unit p_value){
+        public void Add(Unit p_value){
             ElementAdd(p_value);
         }
         public void Set(string p_key, Unit p_value){
@@ -106,7 +106,7 @@ namespace lightning
                     return GetTable(p_key);
             }
         }
-        Unit GetTable(Unit p_key){
+        public Unit GetTable(Unit p_key){
             Unit this_unit;
             if(Table.TryGetValue(p_key, out this_unit))
                 return this_unit;
@@ -192,7 +192,7 @@ namespace lightning
 
         public override bool ToBool()
         {
-            throw new Exception("Can not convert List to Bool.");
+            throw new Exception("Can not convert Table to Bool.");
         }
 
         public override bool Equals(object other)
@@ -231,6 +231,7 @@ namespace lightning
                 case UnitType.Null:
                 case UnitType.Boolean:
                 case UnitType.String:
+                case UnitType.List:
                     return 1;
                 case UnitType.Function:
                 case UnitType.Intrinsic:

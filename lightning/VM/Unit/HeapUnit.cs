@@ -191,6 +191,7 @@ namespace lightning
                 case UnitType.Boolean:
                 case UnitType.String:
                 case UnitType.Table:
+                case UnitType.List:
                     return 1;
                 case UnitType.Intrinsic:
                 case UnitType.Closure:
@@ -278,6 +279,7 @@ namespace lightning
                 case UnitType.Boolean:
                 case UnitType.String:
                 case UnitType.Table:
+                case UnitType.List:
                 case UnitType.Function:
                     return 1;
                 case UnitType.Closure:
@@ -362,6 +364,7 @@ namespace lightning
                 case UnitType.Boolean:
                 case UnitType.String:
                 case UnitType.Table:
+                case UnitType.List:
                 case UnitType.Function:
                 case UnitType.Intrinsic:
                     return 1;
@@ -483,6 +486,7 @@ namespace lightning
                 case UnitType.Boolean:
                 case UnitType.String:
                 case UnitType.Table:
+                case UnitType.List:
                 case UnitType.Function:
                 case UnitType.Intrinsic:
                 case UnitType.Closure:
@@ -619,6 +623,7 @@ namespace lightning
                 case UnitType.Boolean:
                 case UnitType.String:
                 case UnitType.Table:
+                case UnitType.List:
                 case UnitType.Function:
                 case UnitType.Intrinsic:
                 case UnitType.Closure:
@@ -718,6 +723,7 @@ namespace lightning
                 case UnitType.Boolean:
                 case UnitType.String:
                 case UnitType.Table:
+                case UnitType.List:
                 case UnitType.Function:
                 case UnitType.Intrinsic:
                 case UnitType.Closure:

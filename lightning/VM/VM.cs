@@ -255,6 +255,12 @@ namespace lightning
             return (TableUnit)(stack.Peek(p_n).heapUnitValue);
         }
 
+        public ListUnit GetList(int p_n){
+            if(stack.Peek(p_n).Type != UnitType.List)
+                throw new Exception("Expected a List.");
+            return (ListUnit)(stack.Peek(p_n).heapUnitValue);
+        }
+
         public T GetWrappedContent<T>(int p_n){
             if(stack.Peek(p_n).Type != UnitType.Wrapper)
                 throw new Exception("Expected a Wrapper.");

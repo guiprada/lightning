@@ -396,6 +396,7 @@ namespace lightning
                     }
                 case UnitType.String:
                 case UnitType.Table:
+                case UnitType.List:
                 case UnitType.Function:
                 case UnitType.Intrinsic:
                 case UnitType.Closure:
