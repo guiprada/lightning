@@ -31,7 +31,7 @@ namespace lightning
 
         static void CloseLogger(object sender, EventArgs e){
             if(isProcessing || queue.Count > 0){
-                if(queueProcessing != null){
+                if(queueProcessing != null){// not needed
                     Console.WriteLine("Waiting for Logger to exit :\\ ");
                     queueProcessing.Wait();
                 }

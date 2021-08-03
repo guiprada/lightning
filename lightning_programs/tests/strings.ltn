@@ -45,7 +45,5 @@ var assert_not = assert_counter.assert_not
     }
     assert(a_string:teste(), "oba", "Failed Adding Methods to String Test 1.")
     assert("another_string":teste(), "another_string", "Failed Adding Methods to String Test 2.")
-
-    another_table.zzz
 }
 return assert_counter.get_error_counter()

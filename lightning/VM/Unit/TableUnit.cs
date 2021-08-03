@@ -409,6 +409,108 @@ namespace lightning
                 }
                 superTable.Set("map_to_string", new IntrinsicUnit("map_to_string", MapToString, 1));
 
+                Unit ListMakeIndexesIterator(VM vm)
+                {
+                    TableUnit this_table = vm.GetTable(0);
+                    int i = -1;
+
+                    TableUnit iterator = new TableUnit(null, null);
+                    Unit next(VM vm)
+                    {
+                        if (i < (this_table.ECount - 1))
+                        {
+                            i++;
+                            iterator.Set("key", i);
+                            iterator.Set("value", this_table.Elements[i]);
+                            return new Unit(true);
+                        }
+                        return new Unit(false);
+                    };
+                    iterator.Set("next", new IntrinsicUnit("list_index_iterator_next", next, 0));
+                    return new Unit(iterator);
+                }
+                superTable.Set("list_index_iterator", new IntrinsicUnit("list_index_iterator", ListMakeIndexesIterator, 1));
+
+                //////////////////////////////////////////////////////
+                Unit ListMakeIterator(VM vm)
+                {
+                    TableUnit this_table = vm.GetTable(0);
+                    int i = -1;
+                    Unit value = new Unit(UnitType.Null);
+
+                    TableUnit iterator = new TableUnit(null, null);
+                    Unit next(VM vm)
+                    {
+                        if (i < (this_table.ECount - 1))
+                        {
+                            i++;
+                            iterator.Set("value", this_table.Elements[i]);
+                            return new Unit(true);
+                        }
+                        return new Unit(false);
+                    };
+                    iterator.Set("next", new IntrinsicUnit("list_iterator_next", next, 0));
+                    return new Unit(iterator);
+                }
+                superTable.Set("list_iterator", new IntrinsicUnit("list_iterator", ListMakeIterator, 1));
+
+                //////////////////////////////////////////////////////
+                Unit MapMakeIterator(VM vm)
+                {
+                    TableUnit this_table = vm.GetTable(0);
+                    System.Collections.IDictionaryEnumerator enumerator = this_table.Table.GetEnumerator();
+
+                    TableUnit iterator = new TableUnit(null, null);
+                    iterator.Set("key", new Unit(UnitType.Null));
+                    iterator.Set("value", new Unit(UnitType.Null));
+
+                    Unit next(VM vm)
+                    {
+                        if (enumerator.MoveNext())
+                        {
+                            iterator.Set("key", (Unit)(enumerator.Key));
+                            iterator.Set("value", (Unit)(enumerator.Value));
+                            return new Unit(true);
+                        }
+                        return new Unit(false);
+                    };
+
+                    iterator.Set("next", new IntrinsicUnit("map_iterator_next", next, 0));
+                    return new Unit(iterator);
+                }
+                superTable.Set("map_iterator", new IntrinsicUnit("map_iterator", MapMakeIterator, 1));
+
+                //////////////////////////////////////////////////////
+                Unit MapMakeNumericIterator(VM vm)
+                {
+                    TableUnit this_table = vm.GetTable(0);
+                    System.Collections.IDictionaryEnumerator enumerator = this_table.Table.GetEnumerator();
+
+                    TableUnit iterator = new TableUnit(null, null);
+                    iterator.Set("key", new Unit(UnitType.Null));
+                    iterator.Set("value", new Unit(UnitType.Null));
+
+                    Unit next(VM vm)
+                    {
+                        while (true)
+                        {
+                            if(enumerator.MoveNext()){
+                                if(Unit.IsNumeric((Unit)enumerator.Key)){
+                                    iterator.Set("key", (Unit)(enumerator.Key));
+                                    iterator.Set("value", (Unit)(enumerator.Value));
+                                    return new Unit(true);
+                                }
+                            }else{
+                                return new Unit(false);
+                            }
+                        }
+                    };
+
+                    iterator.Set("next", new IntrinsicUnit("map_iterator_next", next, 0));
+                    return new Unit(iterator);
+                }
+                superTable.Set("map_numeric_iterator", new IntrinsicUnit("map_numeric_iterator", MapMakeNumericIterator, 1));
+
                 //////////////////////////////////////////////////////
                 Unit ListInit(VM vm)
                 {
@@ -523,50 +625,6 @@ namespace lightning
                 superTable.Set("list_shuffle", new IntrinsicUnit("list_shuffle", ListShuffle, 1));
 
                 //////////////////////////////////////////////////////
-                Unit ListMakeIndexesIterator(VM vm)
-                {
-                    TableUnit this_table = vm.GetTable(0);
-                    int i = -1;
-
-                    TableUnit iterator = new TableUnit(null, null);
-                    Unit next(VM vm)
-                    {
-                        if (i < (this_table.ECount - 1))
-                        {
-                            i++;
-                            iterator.Set("key", i);
-                            iterator.Set("value", this_table.Elements[i]);
-                            return new Unit(true);
-                        }
-                        return new Unit(false);
-                    };
-                    iterator.Set("next", new IntrinsicUnit("list_index_iterator_next", next, 0));
-                    return new Unit(iterator);
-                }
-                superTable.Set("list_index_iterator", new IntrinsicUnit("list_index_iterator", ListMakeIndexesIterator, 1));
-
-                //////////////////////////////////////////////////////
-                Unit ListMakeIterator(VM vm)
-                {
-                    TableUnit this_table = vm.GetTable(0);
-                    int i = -1;
-                    Unit value = new Unit(UnitType.Null);
-
-                    TableUnit iterator = new TableUnit(null, null);
-                    Unit next(VM vm)
-                    {
-                        if (i < (this_table.ECount - 1))
-                        {
-                            i++;
-                            iterator.Set("value", this_table.Elements[i]);
-                            return new Unit(true);
-                        }
-                        return new Unit(false);
-                    };
-                    iterator.Set("next", new IntrinsicUnit("list_iterator_next", next, 0));
-                    return new Unit(iterator);
-                }
-                superTable.Set("list_iterator", new IntrinsicUnit("list_iterator", ListMakeIterator, 1));
 
                 //////////////////////////////////////////////////////
                 Unit MapIndexes(VM vm)
@@ -600,63 +658,6 @@ namespace lightning
                 superTable.Set("map_numeric_indexes", new IntrinsicUnit("map_numeric_indexes", MapNumericIndexes, 1));
 
                 //////////////////////////////////////////////////////
-                Unit MapMakeIterator(VM vm)
-                {
-                    TableUnit this_table = vm.GetTable(0);
-                    System.Collections.IDictionaryEnumerator enumerator = this_table.Table.GetEnumerator();
-
-                    TableUnit iterator = new TableUnit(null, null);
-                    iterator.Set("key", new Unit(UnitType.Null));
-                    iterator.Set("value", new Unit(UnitType.Null));
-
-                    Unit next(VM vm)
-                    {
-                        if (enumerator.MoveNext())
-                        {
-                            iterator.Set("key", (Unit)(enumerator.Key));
-                            iterator.Set("value", (Unit)(enumerator.Value));
-                            return new Unit(true);
-                        }
-                        return new Unit(false);
-                    };
-
-                    iterator.Set("next", new IntrinsicUnit("map_iterator_next", next, 0));
-                    return new Unit(iterator);
-                }
-                superTable.Set("map_iterator", new IntrinsicUnit("map_iterator", MapMakeIterator, 1));
-
-                //////////////////////////////////////////////////////
-                Unit MapMakeNumericIterator(VM vm)
-                {
-                    TableUnit this_table = vm.GetTable(0);
-                    System.Collections.IDictionaryEnumerator enumerator = this_table.Table.GetEnumerator();
-
-                    TableUnit iterator = new TableUnit(null, null);
-                    iterator.Set("key", new Unit(UnitType.Null));
-                    iterator.Set("value", new Unit(UnitType.Null));
-
-                    Unit next(VM vm)
-                    {
-                        while (true)
-                        {
-                            if(enumerator.MoveNext()){
-                                if(Unit.IsNumeric((Unit)enumerator.Key)){
-                                    iterator.Set("key", (Unit)(enumerator.Key));
-                                    iterator.Set("value", (Unit)(enumerator.Value));
-                                    return new Unit(true);
-                                }
-                            }else{
-                                return new Unit(false);
-                            }
-                        }
-                    };
-
-                    iterator.Set("next", new IntrinsicUnit("map_iterator_next", next, 0));
-                    return new Unit(iterator);
-                }
-                superTable.Set("map_numeric_iterator", new IntrinsicUnit("map_numeric_iterator", MapMakeNumericIterator, 1));
-
-                //////////////////////////////////////////////////////
                 Unit SetSuperTable(VM vm)
                 {
                     TableUnit this_table = vm.GetTable(0);
@@ -687,7 +688,7 @@ namespace lightning
                 superTable.Set("get_super_table", new IntrinsicUnit("get_super_table", GetSuperTable, 1));
 
                 //////////////////////////////////////////////////////
-                Unit Map(VM vm)
+                Unit ListMap(VM vm)
                 {
                     TableUnit table = vm.GetTable(0);
                     Unit func = vm.GetUnit(1);
@@ -702,10 +703,10 @@ namespace lightning
                     return new Unit(UnitType.Null);
                 }
 
-                superTable.Set("list_map", new IntrinsicUnit("list_map", Map, 2));
+                superTable.Set("list_map", new IntrinsicUnit("list_map", ListMap, 2));
 
                 //////////////////////////////////////////////////////
-                Unit ParallelMap(VM vm)
+                Unit ListParallelMap(VM vm)
                 {
                     TableUnit table = vm.GetTable(0);
                     Unit func = vm.GetUnit(1);
@@ -731,10 +732,10 @@ namespace lightning
                     return new Unit(UnitType.Null);
                 }
 
-                superTable.Set("list_pmap", new IntrinsicUnit("list_pmap", ParallelMap, 2));
+                superTable.Set("list_pmap", new IntrinsicUnit("list_pmap", ListParallelMap, 2));
 
                 //////////////////////////////////////////////////////
-                Unit RangeMap(VM vm)
+                Unit ListRangeMap(VM vm)
                 {
                     TableUnit table = vm.GetTable(0);
                     Integer n_tasks = vm.GetInteger(1);
@@ -773,9 +774,10 @@ namespace lightning
                     return new Unit(UnitType.Null);
                 }
 
-                superTable.Set("list_rmap", new IntrinsicUnit("list_rmap", RangeMap, 3));
+                superTable.Set("list_rmap", new IntrinsicUnit("list_rmap", ListRangeMap, 3));
+
                 //////////////////////////////////////////////////////
-                Unit Reduce(VM vm)
+                Unit ListReduce(VM vm)
                 {
                     TableUnit table = vm.GetTable(0);
                     Unit func = vm.GetUnit(1);
@@ -792,7 +794,7 @@ namespace lightning
                     return accumulator;
                 }
 
-                superTable.Set("list_reduce", new IntrinsicUnit("list_reduce", Reduce, 2));
+                superTable.Set("list_reduce", new IntrinsicUnit("list_reduce", ListReduce, 2));
             }
         }
     }
