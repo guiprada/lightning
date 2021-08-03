@@ -25,6 +25,7 @@ namespace lightning
         Closure,
         UpValue,
         Table,
+        List,
         Module,
         Wrapper
     }

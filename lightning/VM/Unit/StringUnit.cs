@@ -95,18 +95,19 @@ namespace lightning
         ////////////////////////////////////////////////////////////////////////////////////////////////////////////
         ///////////////////////////////////////////////////////////////////////////////////////////////////// String
         private readonly static TableUnit superTable = new TableUnit(null, null);
+        public static TableUnit ExtensionSuperTable {
+            get
+            {
+                if(superTable.SuperTable == null)
+                    superTable.SuperTable = new TableUnit(null, null);
+                return superTable.SuperTable;
+            }
+        }
+
         static StringUnit(){
             initSuperTable();
         }
         private static void initSuperTable(){
-            //////////////////////////////////////////////////////
-            Unit GetSuperTable(VM vm)
-            {
-                vm.GetStringUnit(0);
-                return new Unit(superTable);
-            }
-            superTable.Set("get_super_table", new IntrinsicUnit("get_super_table", GetSuperTable, 1));
-
             //////////////////////////////////////////////////////
             Unit StringSlice(VM vm)
             {

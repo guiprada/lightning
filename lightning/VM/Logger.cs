@@ -10,7 +10,6 @@ namespace lightning
         public string path;
         public bool isLine;
         public bool append;
-
         public LogEntry(string p_message, string p_path, bool p_isLine, bool p_append){
             message = p_message;
             path = p_path;
@@ -21,46 +20,48 @@ namespace lightning
     public class Logger{
         private static ConcurrentQueue<LogEntry> queue;
         private static volatile bool isProcessing;
+        private static Task queueProcessing;
 
         static Logger(){
             queue = new ConcurrentQueue<LogEntry>();
-            isProcessing = false;
             AppDomain.CurrentDomain.ProcessExit += new EventHandler(CloseLogger);
+            isProcessing = false;
+            queueProcessing = null;
         }
 
         static void CloseLogger(object sender, EventArgs e){
-            if(isProcessing){
-                Console.Write("Waiting for Logger to exit :\\ ");
-                while(isProcessing){
-                    Console.Write(".");
-                    Thread.Sleep(100);
+            if(isProcessing || queue.Count > 0){
+                if(queueProcessing != null){
+                    Console.WriteLine("Waiting for Logger to exit :\\ ");
+                    queueProcessing.Wait();
                 }
-                Console.WriteLine();
             }
             Console.WriteLine("Logger has exited :)");
         }
 
-        static async Task ProcessQueue(){
-            isProcessing = true;
-            LogEntry entry =  default(LogEntry);
-            bool has_entry = false;
+        static void ProcessQueue(){
+            LogEntry entry;
+            bool has_entry;
             do{
-                if(has_entry)
+                if(queue.Count == 0)
+                    isProcessing = false;
+                else
+                    isProcessing = true;
+                has_entry = queue.TryDequeue(out entry);
+                if(has_entry){
                     using (System.IO.StreamWriter file = new System.IO.StreamWriter(entry.path, entry.append)){
                         if(entry.isLine)
-                            await file.WriteLineAsync(entry.message);
+                            file.WriteLine(entry.message);
                         else
-                            await file.WriteAsync(entry.message);
+                            file.Write(entry.message);
                     }
-                has_entry = queue.TryDequeue(out entry);
-            }while(has_entry);
-            isProcessing = false;
+                }
+            }while(isProcessing);
         }
         private static void Add(LogEntry entry){
             queue.Enqueue(entry);
-            if(isProcessing == false){
-                Task.Run(ProcessQueue);
-            }
+            if(isProcessing == false)
+                queueProcessing = Task.Run(ProcessQueue);
         }
 
         public static void LogLine(string p_line, string p_path){

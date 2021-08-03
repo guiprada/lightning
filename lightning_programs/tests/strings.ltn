@@ -39,12 +39,13 @@ var assert_not = assert_counter.assert_not
 {
     // Test adding methods to String
     var a_string = "oba"
-    var string_super_table = a_string:get_super_table()
+    var string_super_table = get_string_extension_super_table()
     string_super_table.teste = \(self){
         return self
     }
     assert(a_string:teste(), "oba", "Failed Adding Methods to String Test 1.")
     assert("another_string":teste(), "another_string", "Failed Adding Methods to String Test 2.")
 
+    another_table.zzz
 }
 return assert_counter.get_error_counter()

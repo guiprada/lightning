@@ -293,8 +293,8 @@ namespace lightning
             catch (Exception e)
             {
                 Console.WriteLine("VM Busted ... " + CurrentInstructionPositionDataString());
-                Logger.LogNew(e.ToString(),@"_vm.log" );
-                Console.WriteLine("Check _vm.log!");
+                Logger.LogNew(e.ToString(),"vm.log" );
+                Console.WriteLine("Check vm.log!");
                 System.Environment.Exit(1);
                 return new Unit(UnitType.Null);
             }
@@ -407,8 +407,8 @@ namespace lightning
             catch (Exception e)
             {
                 Console.WriteLine("VM Busted ... " + CurrentInstructionPositionDataString());
-                Logger.LogNew(e.ToString(),@"_vm.log" );
-                Console.WriteLine("Check _vm.log!");
+                Logger.LogNew(e.ToString(), "vm.log");
+                Console.WriteLine("Check vm.log!");
                 System.Environment.Exit(1);
                 return new VMResult(VMResultType.ERROR, new Unit(UnitType.Null));
             }
