@@ -31,21 +31,21 @@ var assert_not = assert_counter.assert_not
 {
     // Testing iterators
     var table1 = [brazil:"Brasilia", eua:"Washington", australia:"Canberra"]
-    var indexes_table1 = table1:map_indexes()
+    var indexes_table1 = table1:indexes()
     var counter = 0
-    for (var it = table1:map_iterator(); it.next())
+    for (var it = table1:iterator(); it.next())
     {
         assert(it.key, indexes_table1[counter], "Failed iterator key Test 1, iteration: " .. counter)
         assert(it.value, table1[it.key], "Failed iterator value Test 1, iteration: " .. counter)
         counter++
     }
-    assert(table1:map_indexes():list_to_string(), "australia, eua, brazil", "Failed iterator Test 2")
-    assert(table1:map_to_string(), "australia : Canberra, eua : Washington, brazil : Brasilia", "Failed iterator Test 3")
+    assert(table1:indexes():to_string(), "australia, eua, brazil", "Failed iterator Test 2")
+    assert(table1:to_string(), "australia : Canberra, eua : Washington, brazil : Brasilia", "Failed iterator Test 3")
 
     ///////////////////////////////
     var list1 = [0, 1, 2, 3, 4, 5]
     counter = 0
-    for (var it = list1:list_iterator(); it.next())
+    for (var it = list1:iterator(); it.next())
     {
         assert(it.value, list1[counter], "Failed iterator value Test 4, iteration: " .. counter)
         counter++
@@ -53,7 +53,7 @@ var assert_not = assert_counter.assert_not
 
     ///////////////////////////////
     counter = 0
-    for (var it = list1:list_index_iterator(); it.next())
+    for (var it = list1:index_iterator(); it.next())
     {
         assert(it.key, counter, "Failed iterator key Test 5, iteration: " .. counter)
         assert(it.value, list1[counter], "Failed iterator value Test 5, iteration: " .. counter)
@@ -62,7 +62,7 @@ var assert_not = assert_counter.assert_not
 
     var sparse_array = [5:5, 10:10, 15:15]
     counter = 0
-    for(var it=sparse_array:map_numeric_iterator(); it.next()){
+    for(var it=sparse_array:numeric_iterator(); it.next()){
         assert(sparse_array[it.key], it.value, "Failed iterator value Test 6, iteration: " .. counter)
         counter++
     }

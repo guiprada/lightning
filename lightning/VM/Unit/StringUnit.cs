@@ -172,7 +172,7 @@ namespace lightning
                 foreach(char c in val_input_string.ToCharArray()){
                     string_list.Add(new Unit(c));
                 }
-                return new Unit(new TableUnit(string_list, null));
+                return new Unit(new ListUnit(string_list));
             }
             superTable.Set("to_list", new IntrinsicUnit("string_to_list", ToList, 1));
 

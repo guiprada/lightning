@@ -192,6 +192,9 @@ namespace lightning
                 case NodeType.TABLE:
                     ChunkTable(p_node as TableNode);
                     break;
+                case NodeType.LIST:
+                    ChunkList(p_node as ListNode);
+                    break;
                 default:
                     Error("Received unkown node." + this_type.ToString(), p_node.PositionData);
                     break;
@@ -295,25 +298,28 @@ namespace lightning
 
         private void ChunkTable(TableNode p_node)
         {
-            int n_elements = 0;
-            if (p_node.Elements != null)
-            {
-                n_elements = p_node.Elements.Count;
-                for(int i=p_node.Elements.Count-1; i>=0; i--)
-                    ChunkIt(p_node.Elements[i]);
-            }
-
             int n_table = 0;
-            if (p_node.Table != null)
-            {
-                n_table = p_node.Table.Count;
-                foreach (KeyValuePair<Node, Node> entry in p_node.Table)
+            if (p_node.Map != null){
+                n_table = p_node.Map.Count;
+                foreach (KeyValuePair<Node, Node> entry in p_node.Map)
                 {
                     ChunkIt(entry.Key);
                     ChunkIt(entry.Value);
                 }
             }
-            Add(OpCode.NEW_TABLE, (Operand)n_elements, (Operand)n_table, p_node.PositionData);
+
+            Add(OpCode.NEW_TABLE,(Operand)n_table, p_node.PositionData);
+        }
+
+        private void ChunkList(ListNode p_node)
+        {
+            int n_elements = 0;
+            if (p_node.Elements != null){
+                n_elements = p_node.Elements.Count;
+                for(int i=p_node.Elements.Count-1; i>=0; i--)
+                    ChunkIt(p_node.Elements[i]);
+            }
+            Add(OpCode.NEW_LIST, (Operand)n_elements, p_node.PositionData);
         }
 
         private void ChunkLiteral(LiteralNode p_node)
@@ -474,7 +480,7 @@ namespace lightning
 
                 if (p_node.Indexes.Count > 0){// it is a compoundVar
                     LoadIndexes(p_node.Indexes);
-                    Add(OpCode.TABLE_GET, (Operand)p_node.Indexes.Count, p_node.PositionData);
+                    Add(OpCode.GET, (Operand)p_node.Indexes.Count, p_node.PositionData);
                 }
             }
         }
@@ -523,7 +529,7 @@ namespace lightning
                 }else{//  it is a compoundVar
                     LoadVariable(this_var, p_node.PositionData);
                     LoadIndexes(p_node.Assigned.Indexes);
-                    Add(OpCode.TABLE_SET, (Operand)p_node.Assigned.Indexes.Count, op, p_node.PositionData);
+                    Add(OpCode.SET, (Operand)p_node.Assigned.Indexes.Count, op, p_node.PositionData);
                 }
             }else{
                 Error("assignment to non existing variable!", p_node.PositionData);
@@ -606,14 +612,14 @@ namespace lightning
                         LoadIndex(p_node.Variable.Indexes[i]);
                     }
 
-                    Add(OpCode.TABLE_GET, (Operand)(p_node.Variable.Indexes.Count - 1), p_node.PositionData);
+                    Add(OpCode.GET, (Operand)(p_node.Variable.Indexes.Count - 1), p_node.PositionData);
                     Add(OpCode.POP_STASH, p_node.PositionData);
                 }else{
                     LoadVariable(this_called, p_node.PositionData);
                 }
 
                 LoadIndexes(p_node.Variable.Indexes);
-                Add(OpCode.TABLE_GET, (Operand)p_node.Variable.Indexes.Count, p_node.PositionData);
+                Add(OpCode.GET, (Operand)p_node.Variable.Indexes.Count, p_node.PositionData);
             }
 
             // Call
@@ -622,7 +628,7 @@ namespace lightning
             if (p_node.Calls[0].Indexes != null)
             {
                 LoadIndexes(p_node.Calls[0].Indexes);
-                Add(OpCode.TABLE_GET, (Operand)p_node.Calls[0].Indexes.Count, p_node.PositionData);
+                Add(OpCode.GET, (Operand)p_node.Calls[0].Indexes.Count, p_node.PositionData);
             }
 
             // Is it a compound call?
@@ -639,7 +645,7 @@ namespace lightning
                 if (p_node.Calls[i].Indexes != null)
                 {
                     LoadIndexes(p_node.Calls[i].Indexes);
-                    Add(OpCode.TABLE_GET, (Operand)p_node.Calls[i].Indexes.Count, p_node.PositionData);
+                    Add(OpCode.GET, (Operand)p_node.Calls[i].Indexes.Count, p_node.PositionData);
                 }
             }
         }

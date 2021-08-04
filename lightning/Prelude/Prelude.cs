@@ -208,19 +208,18 @@ namespace lightning
                 nuple.Set("new", new IntrinsicUnit("tuple_new", NupleNew, 1));
 
                 //////////////////////////////////////////////////////
-
-                Unit NupleFromTable(VM p_vm)
+                Unit NupleFromList(VM p_vm)
                 {
-                    TableUnit table = p_vm.GetTable(0);
-                    int size = table.ECount;
+                    ListUnit this_list = p_vm.GetList(0);
+                    int size = this_list.Count;
                     Unit[] new_nuple = new Unit[size];
                     for(int i = 0; i < size; i++)
-                        new_nuple[i] = table.Elements[i];
+                        new_nuple[i] = this_list.Elements[i];
                     WrapperUnit<Unit[]> new_nuple_object = new WrapperUnit<Unit[]>(new_nuple, nupleMethods);
 
                     return new Unit(new_nuple_object);
                 }
-                nuple.Set("from_table", new IntrinsicUnit("tuple_from_table", NupleFromTable, 1));
+                nuple.Set("from_list", new IntrinsicUnit("tuple_from_list", NupleFromList, 1));
 
                 //////////////////////////////////////////////////////
                 Unit NupleGet(VM p_vm)
@@ -717,8 +716,8 @@ namespace lightning
                 Unit this_callable = p_vm.GetUnit(0);
                 Unit this_unit = p_vm.GetUnit(1);
                 List<Unit> this_arguments = null;
-                if(this_unit.Type == UnitType.Table)
-                    this_arguments = ((TableUnit)this_unit.heapUnitValue).Elements;
+                if(this_unit.Type == UnitType.List)
+                    this_arguments = ((ListUnit)this_unit.heapUnitValue).Elements;
 
                 VM try_vm = p_vm.GetVM();
                 try{
@@ -851,7 +850,7 @@ namespace lightning
             //////////////////////////////////////////////////////
             Unit TableNew(VM p_vm)
             {
-                TableUnit new_table = new TableUnit(null, null);
+                TableUnit new_table = new TableUnit(null);
 
                 return new Unit(new_table);
             }
@@ -861,11 +860,11 @@ namespace lightning
             Unit ListNew(VM p_vm)
             {
                 Integer size = p_vm.GetInteger(0);
-                TableUnit list = new TableUnit(null, null);
+                ListUnit new_list = new ListUnit(null);
                 for(int i=0; i<size; i++)
-                    list.Elements.Add(new Unit(UnitType.Null));
+                    new_list.Elements.Add(new Unit(UnitType.Null));
 
-                return new Unit(list);
+                return new Unit(new_list);
             }
             functions.Add(new IntrinsicUnit("List", ListNew, 1));
 
@@ -1019,7 +1018,7 @@ namespace lightning
             if (!relocationInfo.relocatedTables.Contains(table.GetHashCode()))
             {
                 relocationInfo.relocatedTables.Add(table.GetHashCode());
-                foreach (KeyValuePair<Unit, Unit> entry in table.Table)
+                foreach (KeyValuePair<Unit, Unit> entry in table.Map)
                 {
                     if (entry.Value.Type == UnitType.Function)
                         RelocateFunction((FunctionUnit)entry.Value.heapUnitValue, relocationInfo);

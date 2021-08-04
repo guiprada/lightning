@@ -700,7 +700,7 @@ namespace lightning
                             }
                         }
                         break;
-                    case OpCode.TABLE_GET:
+                    case OpCode.GET:
                         {
                             IP++;
                             Operand indexes_counter = instruction.opA;
@@ -718,7 +718,7 @@ namespace lightning
                             break;
                         }
 
-                    case OpCode.TABLE_SET:
+                    case OpCode.SET:
                         {
                             IP++;
                             Operand indexes_counter = instruction.opA;
@@ -971,24 +971,33 @@ namespace lightning
                         {
                             IP++;
 
-                            TableUnit new_table = new TableUnit(null, null);
+                            TableUnit new_table = new TableUnit(null);
 
-                            int n_table = instruction.opB;
+                            int n_table = instruction.opA;
                             for (int i = 0; i < n_table; i++)
                             {
                                 Unit val = stack.Pop();
                                 Unit key = stack.Pop();
-                                new_table.Table.Add(key, val);
-                            }
-
-                            int n_elements = instruction.opA;
-                            for (int i = 0; i < n_elements; i++)
-                            {
-                                Unit new_value = stack.Pop();
-                                new_table.Elements.Add(new_value);
+                                new_table.Map.Add(key, val);
                             }
 
                             stack.Push(new Unit(new_table));
+                            break;
+                        }
+                    case OpCode.NEW_LIST:
+                        {
+                            IP++;
+
+                            ListUnit new_list = new ListUnit(null);
+
+                            int n_table = instruction.opA;
+                            for (int i = 0; i < n_table; i++)
+                            {
+                                Unit val = stack.Pop();
+                                new_list.Elements.Add(val);
+                            }
+
+                            stack.Push(new Unit(new_list));
                             break;
                         }
                     case OpCode.CALL:

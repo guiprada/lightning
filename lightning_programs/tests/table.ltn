@@ -3,47 +3,45 @@ var assert = assert_counter.assert
 var assert_not = assert_counter.assert_not
 {
     // Table test
-    var this_list = []
-    this_list.a = "a"
-    this_list.b = "b"
-    var this_list_alias = this_list
-    assert(this_list_alias, this_list, "Failed Table test 1.")
-    assert_not([a:"a",b:"b",], this_list, "Failed Table test 2.")
-    assert_not([a:"b",b:"b"], this_list, "Failed Table test 3.")
-    assert_not([], this_list, "Failed Table test 4.")
-    assert(this_list:count(), 2, "Failed Table test 5")
-    assert(this_list:map_count(), 2, "Failed Table test 6")
-    assert(this_list:list_count(), 0, "Failed Table test 7")
+    var this_table = Table()
+    this_table.a = "a"
+    this_table.b = "b"
+    var this_table_alias = this_table
+    assert(this_table_alias, this_table, "Failed Table test 1.")
+    assert_not([a:"a",b:"b",], this_table, "Failed Table test 2.")
+    assert_not([a:"b",b:"b"], this_table, "Failed Table test 3.")
+    assert_not([], this_table, "Failed Table test 4.")
+    assert(this_table:count(), 2, "Failed Table test 5")
+    assert(this_table:count(), 2, "Failed Table test 6")
 
-    var this_array = this_list
+    var this_array = this_table
     this_array[0] = 100
     this_array[1] = null
     this_array[99] = 0
     assert(this_array[0], 100, "Failed Array test 1.")
     assert(this_array[1], null, "Failed Array test 2.")
     assert(this_array[99], 0, "Failed Array test 3.")
-    assert(this_list:count(), 5, "Failed Array test 4")
-    assert(this_array:list_count(), 2, "Failed Array test 5.")
-    assert(this_list:map_count(), 3, "Failed Array test 6.")
+    assert(this_table:count(), 5, "Failed Array test 4")
+    assert(this_array:count(), 5, "Failed Array test 5.")
 
-    var table_negative = []
+    var table_negative = [:]
     table_negative[-1] = 5
     assert(table_negative[-1], 5, "Failed Table Negative Index Test 1.")
 }
 {
     // Table literal test
-    var this_table = [null, null, null, null, null, 5:"hello"]
+    var this_list = [null, null, null, null, null, "hello"]
     for(var i = 0; i<5; i++){
-        assert(this_table[i], null, "Failed Table Literal test " .. (i+1) .. ".")
+        assert(this_list[i], null, "Failed Table Literal test " .. (i+1) .. ".")
     }
-    assert(this_table[5], "hello", "Failed Table Literal test 6.")
+    assert(this_list[5], "hello", "Failed Table Literal test 6.")
 
     var another_table = [ "brazil":"Brasilia", eua:"Washington", australia:"Canberra",]
     assert(another_table.brazil, "Brasilia", "Failed Table Literal test 7.")
     assert(another_table.australia, "Canberra", "Failed Super Table Test 3.")
 
     // Testing Table negative
-    var table_teste = [5:0, -11, -1:2]
+    var table_teste = [5:0, 0:-11, -1:2]
     assert(table_teste[0], -11, "Failed Table Literal Negative Value Test 1.")
     assert(table_teste[-1], 2, "Failde Table Literal Negatiev Index Test 1.")
 }
@@ -112,57 +110,53 @@ var assert_not = assert_counter.assert_not
     assert(new_list[1], 2, "Failed List test 2.")
     assert(new_list[2], 1, "Failed List test 3.")
 
-    var list_copy = new_list:list_copy()
+    var list_copy = new_list:clone()
     assert_not(list_copy, new_list, "Failed List test 4.")
     new_list:pop()
     new_list:pop()
     new_list:pop()
-    assert(new_list:list_count(), 0, "Failed List test 5.")
-    assert(list_copy:list_count(), 3, "Failed List test 6.")
+    assert(new_list:count(), 0, "Failed List test 5.")
+    assert(list_copy:count(), 3, "Failed List test 6.")
 
-    list_copy.hey = "hey"
-    list_copy:list_clear()
-    assert(list_copy:list_count(), 0, "Failed List test 7.")
-    assert(list_copy:map_count(), 1, "Failed List test 8.")
-    list_copy:push(1)
-    list_copy:map_clear()
-    assert(list_copy:list_count(), 1, "Failed List test 9.")
-    assert(list_copy:map_count(), 0, "Failed List test 10.")
-    list_copy.hey = "hey"
+    list_copy[3] = "hey"
     list_copy:clear()
-    assert(list_copy:list_count(), 0, "Failed List test 9.")
-    assert(list_copy:map_count(), 0, "Failed List test 10.")
-    assert(list_copy:count(), 0, "Failed List test 11.")
+    assert(list_copy:count(), 0, "Failed List test 7.")
+    list_copy:push(1)
+    list_copy:clear()
+    assert(list_copy:count(), 0, "Failed List test 8.")
+    list_copy:push("hey")
+    list_copy:clear()
+    assert(list_copy:count(), 0, "Failed List test 9.")
 }
 {
     // Testing Table Class
-    var testTable = Table();
+    var testTable = [:];
     testTable[-1] = -1
 
     assert(testTable:count(), 1, "Failed Table Class Test 1.")
-    assert(testTable:map_count(), 1, "Failed Table Class Test 2.")
-    assert(testTable:list_count(), 0, "Failed Table Class Test 3.")
 
     var testTableClone = testTable:clone()
-    assert(testTableClone:count(), 1, "Failed Table Class Test 4.")
-    assert(testTableClone:map_count(), 1, "Failed Table Class Test 5.")
-    assert(testTableClone:list_count(), 0, "Failed Table Class Test 6.")
+    assert(testTableClone:count(), 1, "Failed Table Class Test 2.")
 }
 {
     // Testing List sort
-    var this_list = [3, "string", 1, false, 2, 'a', null, 0, '0']
-    var ordered_list = [null, false, '0', 'a', 0, 1, 2, 3, "string"]
-    this_list:list_sort()
+    var a_list = []
+    var a_table = [:]
+    var this_list = [3, "string", 1, false, 2, 'a', null, 0, '0', a_list, a_table]
+    var ordered_list = [null, false, '0', 'a', 0, 1, 2, 3, "string", a_list, a_table]
+    this_list:sort()
 
-    for(var i=0; i<(this_list:list_count()); i++){
+    for(var i=0; i<this_list:count(); i++){
         assert(this_list[i], ordered_list[i], "Failed List Sort Test 1, iteration: " .. (i+1) ..".")
+        this_list:shuffle()
+        this_list:sort()
     }
 
     this_list = ["a", "ab", "b", "aaa", "aba", "aca", "bb", 2, 3]
     ordered_list = [2, 3, "a", "aaa", "ab", "aba", "aca", "b", "bb"]
-    this_list:list_sort()
+    this_list:sort()
 
-    for(var i=0; i<(this_list:list_count()); i++){
+    for(var i=0; i<this_list:count(); i++){
         assert(this_list[i], ordered_list[i], "Failed List Sort Test 2 iteration: " .. (i+1) ..".")
     }
 
@@ -170,19 +164,19 @@ var assert_not = assert_counter.assert_not
     var a_intrinsic = write_line
     var a = 1
     var a_closure = \{return a}
-    var a_table = [1,1]
+    a_table = [1:1]
+    a_list = [1]
     var a_module = require("assert.ltn")
     var a_wrapper = time.now()
 
-    this_list = [1, 1.5, null, true, "a_string", 'A', a_function, a_intrinsic, a_closure, a_table, a_module, a_wrapper]
-
-    this_list:list_sort()
+    this_list = [1, 1.5, null, true, "a_string", 'A', a_function, a_intrinsic, a_closure, a_list, a_table, a_module, a_wrapper]
+    this_list:sort()
     var sorted_list  = this_list:clone()
 
     for(var i=1; i<=10; i++){
-        this_list:list_shuffle()
-        this_list:list_sort()
-        for(var j=0; j<this_list:list_count(); j++){
+        this_list:shuffle()
+        this_list:sort()
+        for(var j=0; j<this_list:count(); j++){
             assert(this_list[j], sorted_list[j], "Failed List Sort Test 3 iteration " .. i )
         }
     }

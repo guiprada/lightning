@@ -97,7 +97,9 @@ namespace lightning
                 case OpCode.JUMP_IF_NOT_TRUE:
                 case OpCode.JUMP_BACK:
                 case OpCode.RETURN_SET:
-                case OpCode.TABLE_GET:
+                case OpCode.GET:
+                case OpCode.NEW_TABLE:
+                case OpCode.NEW_LIST:
                     return op.ToString() + " " + this.opA;
                 // 2 op
                 case OpCode.ASSIGN_GLOBAL:
@@ -105,8 +107,7 @@ namespace lightning
                 case OpCode.LOAD_VARIABLE:
                 case OpCode.LOAD_IMPORTED_GLOBAL:
                 case OpCode.LOAD_IMPORTED_DATA:
-                case OpCode.NEW_TABLE:
-                case OpCode.TABLE_SET:
+                case OpCode.SET:
                     return op.ToString() + " " + this.opA + " " + this.opB;
                 // 3 op
                 case OpCode.ASSIGN_VARIABLE:
@@ -138,8 +139,8 @@ namespace lightning
         ASSIGN_GLOBAL,
         ASSIGN_IMPORTED_GLOBAL,
         ASSIGN_UPVALUE,
-        TABLE_GET,
-        TABLE_SET,
+        GET,
+        SET,
 
         POP,
         DUP,
@@ -180,6 +181,7 @@ namespace lightning
         LESS,
 
         NEW_TABLE, // Creates a new table
+        NEW_LIST,
 
         CALL,
         CLOSE_CLOSURE,

@@ -4,7 +4,7 @@ var assert_not = assert_counter.assert_not
 {
     // Testing Eval
     var my_prog1 = #
-        var table1 = []
+        var table1 = [:]
         var str_global = "global"
         {
             var str_upvalue = "up"

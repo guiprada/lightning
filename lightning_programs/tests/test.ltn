@@ -64,7 +64,7 @@ errors += require("tests/try.ltn")
 
 //////////////////////////////// scratch
 {
-    var a_table = []
+    var a_table = [:]
     function a_table["he" .. "y"] (){
         return 99
     }
@@ -72,7 +72,6 @@ errors += require("tests/try.ltn")
 }
 {
     var another_table = [1: \(a) return a]
-    another_table[1]
     write_line(another_table[1])
     1+1
 }

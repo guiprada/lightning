@@ -48,7 +48,7 @@ var assert_not = assert_counter.assert_not
     // Testing "hidden properties"
     function make_player()
     {
-        var player = []
+        var player = [:]
         var x = 0
         var y = 0
 
@@ -72,7 +72,7 @@ var assert_not = assert_counter.assert_not
     // Testing "hidden properties" 2
     function make_player()
     {
-        var player = []
+        var player = [:]
         var x = 0
         var y = 0
 

@@ -9,13 +9,14 @@ var assert_not = assert_counter.assert_not
 
     function many(index, collection, accumulator)
     {
-		var this = collection[index] = []
+		var this = collection[index] = Table()
         this.x = 1
 		accumulator.value += this.x
     }
 
-	var accumulator = [value:0];
-    table1:list_reduce(many, accumulator)
+	var accumulator = Table()
+    accumulator.value = 0
+    table1:reduce(many, accumulator)
     for (var i = 0; i<n; i++)
     {
         assert(table1[i].x, 1, "Failed reduce Test 1, iteration:" .. i .. ".")

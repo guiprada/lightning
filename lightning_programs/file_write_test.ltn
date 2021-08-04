@@ -5,7 +5,7 @@
                 return str_global .. value1 .. value2 .. value3 .. str_upvalue
             }
     
-        var table1 = []
+        var table1 = [:]
         var str_global = "global"
         {
             var str_upvalue = "up"

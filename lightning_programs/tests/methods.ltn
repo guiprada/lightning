@@ -6,8 +6,8 @@ var assert_not = assert_counter.assert_not
 
     function make_player()
     {
-        var player = []
-        player.position = [];
+        var player = [:]
+        player.position = [:];
         player.position["x"] = 0
         player.position["y"] = 0
 

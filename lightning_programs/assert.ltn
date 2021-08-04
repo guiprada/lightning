@@ -1,4 +1,4 @@
-var lib = []
+var lib = Table()
 
 lib.assert = function(value1, value2, msg)
 {

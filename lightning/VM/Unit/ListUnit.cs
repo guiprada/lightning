@@ -50,8 +50,6 @@ namespace lightning
             Integer index = p_key.integerValue;
             switch(key_type){
                 case UnitType.Integer:
-                    if((index > Count - 1) || (index < 0))
-                        throw new Exception("List index is out of bounds: " + p_key.ToString());
                     return GetElement(p_key);
                 default:
                     return GetTable(p_key);
@@ -173,6 +171,7 @@ namespace lightning
                         new_list_elements.Add(v);
                     }
                     ListUnit new_list = new ListUnit(new_list_elements);
+                    new_list.SuperTable = this_list.SuperTable;
 
                     return new Unit(new_list);
                 }
@@ -319,7 +318,7 @@ namespace lightning
                     int range_init = (int)vm.GetInteger(1);
                     List<Unit> new_list_elements = this_list.Elements.GetRange(range_init, this_list.Elements.Count - range_init);
                     this_list.Elements.RemoveRange(range_init, this_list.Elements.Count - range_init);
-                    TableUnit new_list = new TableUnit(new_list_elements, null);
+                    ListUnit new_list = new ListUnit(new_list_elements);
 
                     return new Unit(new_list);
                 }
@@ -334,7 +333,7 @@ namespace lightning
 
                     List<Unit> new_list_elements = this_list.Elements.GetRange(range_init, range_end - range_init + 1);
                     this_list.Elements.RemoveRange(range_init, range_end - range_init + 1);
-                    TableUnit new_list = new TableUnit(new_list_elements, null);
+                    ListUnit new_list = new ListUnit(new_list_elements);
 
                     return new Unit(new_list);
                 }
@@ -389,6 +388,17 @@ namespace lightning
                 superTable.Set("set_super_table", new IntrinsicUnit("list_set_super_table", SetSuperTable, 2));
 
                 //////////////////////////////////////////////////////
+                Unit SetExtendSuperTable(VM vm)
+                {
+                    ListUnit this_list = vm.GetList(0);
+                    TableUnit super_table = vm.GetTable(1);
+                    this_list.SuperTable.SuperTable = super_table;
+
+                    return new Unit(UnitType.Null);
+                }
+                superTable.Set("set_extend_super_table", new IntrinsicUnit("list_set_super_table", SetExtendSuperTable, 2));
+
+                //////////////////////////////////////////////////////
                 Unit UnsetSuperTable(VM vm)
                 {
                     ListUnit this_list = vm.GetList(0);
@@ -401,9 +411,13 @@ namespace lightning
                 //////////////////////////////////////////////////////
                 Unit GetSuperTable(VM vm)
                 {
-                    ListUnit this_list = vm.GetList(0);
-
-                    return new Unit(this_list.SuperTable);
+                    Unit this_unit = vm.GetUnit(0);
+                    if(this_unit.Type == UnitType.List)
+                        return new Unit(((ListUnit)this_unit.heapUnitValue).SuperTable);
+                    else if (this_unit.Type == UnitType.Table)
+                        return new Unit(((TableUnit)this_unit.heapUnitValue).SuperTable);
+                    else
+                        return new Unit(UnitType.Null);
                 }
                 superTable.Set("get_super_table", new IntrinsicUnit("list_get_super_table", GetSuperTable, 1));
 

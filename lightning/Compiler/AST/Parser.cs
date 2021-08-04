@@ -948,96 +948,89 @@ namespace lightning
             return arguments;
         }
 
+        ListNode ListEntry(ListNode p_listNode)
+        {
+            List<Node> elements = p_listNode.Elements;
+
+            bool is_negative = false;
+            if(Match(TokenType.MINUS))
+                is_negative = true;
+
+            Node item = Primary();
+            bool minus_error = false;
+            if(is_negative){
+                if(item.Type == NodeType.LITERAL){
+                    LiteralNode literal_node = (LiteralNode)item;
+                    if(literal_node.ValueType == typeof(Integer) ||
+                        literal_node.ValueType == typeof(Float))
+                        ((LiteralNode)item).SetNegative();
+                    else
+                        minus_error = true;
+                }else
+                    minus_error = true;
+            }
+            if(minus_error == true)
+                Error("Minus Sign should only be used by Numeric" +
+                    "Types in List Declaration.");
+            elements.Add(item);
+
+            return p_listNode;
+        }
+
         TableNode TableEntry(TableNode p_tableNode)
         {
-            List<Node> elements = p_tableNode.Elements;
-            Dictionary<Node, Node> table = p_tableNode.Table;
+            Dictionary<Node, Node> table = p_tableNode.Map;
 
             bool is_negative = false;
             if(Match(TokenType.MINUS))
                 is_negative = true;
 
             if(!Check(TokenType.RIGHT_BRACKET)){
-                if((Peek2() != null) && (Peek2().Type == TokenType.COLON)){
-                    if (Match(TokenType.IDENTIFIER))
-                    {
-                        Node item = new LiteralNode(
-                            (Previous() as TokenString).value,
-                            Previous().PositionData
-                        );
-
-                        if(Match(TokenType.COLON)){
-                            Node value = Primary();
-                            table.Add(item, value);
-                        }else
-                            elements.Add(item);
-                    }
-                    else
-                    {
-                        Node item = Primary();
-                        Consume(
-                            TokenType.COLON,
-                            "Expected ':' separating key:values" +
-                            "in table constructor",
-                            true
-                        );
-                        if(((LiteralNode)item).ValueType == typeof(Float)){
-                            LiteralNode number_value = (LiteralNode)item;
-                            if(!is_negative){
-                                if((Float)(number_value.Value)
-                                    == elements.Count)
-                                    elements.Add(Primary());
-                                else
-                                    table.Add(number_value, Primary());
-                            }else{
-                                number_value.SetNegative();
-                                table.Add(number_value, Primary());
-                            }
-                        }else if(((LiteralNode)item).ValueType
-                            == typeof(Integer)){
-                            LiteralNode number_value = (LiteralNode)item;
-                            if(!is_negative){
-                                if((Integer)(number_value.Value)
-                                    == elements.Count)
-                                    elements.Add(Primary());
-                                else
-                                    table.Add(number_value, Primary());
-                            }else{
-                                number_value.SetNegative();
-                                table.Add(number_value, Primary());
-                            }
-                        }else if(((LiteralNode)item).ValueType
-                            == typeof(string)){
-                            if(is_negative)
-                                Error("Minus Sign should only be used" +
-                                    "by Numeric Types in List Declaration.");
-                            LiteralNode string_value = (LiteralNode)item;
-                            table.Add(string_value, Primary());
-                        }
-                    }
+                if (Match(TokenType.IDENTIFIER))
+                {
+                    Node item = new LiteralNode(
+                        (Previous() as TokenString).value,
+                        Previous().PositionData
+                    );
+                    Match(TokenType.COLON);
+                    Node value = Primary();
+                    table.Add(item, value);
                 }
                 else
                 {
                     Node item = Primary();
-                    bool minus_error = false;
-                    if(is_negative){
-                        if(item.Type == NodeType.LITERAL){
-                            LiteralNode literal_node = (LiteralNode)item;
-                            if(literal_node.ValueType == typeof(Integer) ||
-                                literal_node.ValueType == typeof(Float))
-                                ((LiteralNode)item).SetNegative();
-                            else
-                                minus_error = true;
-                        }else
-                            minus_error = true;
+                    Consume(
+                        TokenType.COLON,
+                        "Expected ':' separating key:values" +
+                        "in table constructor",
+                        true
+                    );
+                    if(((LiteralNode)item).ValueType == typeof(Float)){
+                        LiteralNode number_value = (LiteralNode)item;
+                        if(!is_negative){
+                            table.Add(number_value, Primary());
+                        }else{
+                            number_value.SetNegative();
+                            table.Add(number_value, Primary());
+                        }
+                    }else if(((LiteralNode)item).ValueType
+                        == typeof(Integer)){
+                        LiteralNode number_value = (LiteralNode)item;
+                        if(!is_negative){
+                            table.Add(number_value, Primary());
+                        }else{
+                            number_value.SetNegative();
+                            table.Add(number_value, Primary());
+                        }
+                    }else if(((LiteralNode)item).ValueType == typeof(string)){
+                        if(is_negative)
+                            Error("Minus Sign should only be used" +
+                                "by Numeric Types in List Declaration.");
+                        LiteralNode string_value = (LiteralNode)item;
+                        table.Add(string_value, Primary());
                     }
-                    if(minus_error == true)
-                        Error("Minus Sign should only be used by Numeric" +
-                            "Types in List Declaration.");
-                    elements.Add(item);
                 }
             }
-
             return p_tableNode;
         }
 
@@ -1045,29 +1038,44 @@ namespace lightning
         {
             PositionData position_data = Previous().PositionData;
 
-            if (!Match(TokenType.RIGHT_BRACKET))
-            {
-                List<Node> elements = new List<Node>();
-                Dictionary<Node, Node> table = new Dictionary<Node, Node>();
-                TableNode table_node = new TableNode(elements, table, position_data);
+            if (Match(TokenType.COLON)){// empty table
+                if (Match(TokenType.RIGHT_BRACKET))
+                    return new TableNode(null, position_data);
+                else
+                    Error("Invalid Table declaration");
+                    return null;
+            }else if (!Match(TokenType.RIGHT_BRACKET)){
+                Node table_or_list;
+                if((Peek2() != null) && (Peek2().Type == TokenType.COLON)){// new table
+                    Dictionary<Node, Node> map = new Dictionary<Node, Node>();
+                    TableNode table_node = new TableNode(map, position_data);
 
-                do{
-                    table_node = TableEntry(table_node);
-                }while(Match(TokenType.COMMA));
+                    do{
+                        table_node = TableEntry(table_node);
+                    }while(Match(TokenType.COMMA));
 
+                    table_or_list = table_node;
+                }else{// new list
+                    List<Node> elements = new List<Node>();
+                    ListNode list_node = new ListNode(elements, position_data);
+
+                    do{
+                        list_node = ListEntry(list_node);
+                    }while(Match(TokenType.COMMA));
+
+                    table_or_list = list_node;
+                }
                 Consume(
                     TokenType.RIGHT_BRACKET,
                     "Expected ']' to close 'table'",
                     true
                 );
 
-                return table_node;
-            }
-            else
-            {
-                return new TableNode(null, null, position_data);
-            }
+                return table_or_list;
 
+            }else{  // empty list
+                return new ListNode(null, position_data);
+            }
         }
 
         Node Primary()

@@ -20,9 +20,9 @@ var assert_not = assert_counter.assert_not
     assert(func1()["another_function"]("viva"), "viva", "Failed compound calls test 2.")
 
     assert(return_table_with_function()().another_function("viva"), "viva", "Failed compound calls test 3.")
-    var table1 = []
+    var table1 = [:]
     {
-        table1.inner_table = []
+        table1.inner_table = [:]
         table1.inner_table.x = 1
         table1.inner_table.closure =
         function (self)
@@ -32,7 +32,7 @@ var assert_not = assert_counter.assert_not
     }
     assert(table1.inner_table:closure().x, 1, "Failed compound calls test 4.")
 
-    var table2 = []
+    var table2 = [:]
     table2.value = 99
     table2.return_function = \(self){
         return \{

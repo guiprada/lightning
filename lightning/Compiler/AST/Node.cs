@@ -19,6 +19,7 @@ namespace lightning
 
         LITERAL,
         TABLE,
+        LIST,
         VARIABLE,
         INDEX,
         GROUPING,
@@ -391,14 +392,23 @@ namespace lightning
 
     public class TableNode : Node
     {
-        public List<Node> Elements { get; private set; }
-        public Dictionary<Node, Node> Table { get; private set; }
+        public Dictionary<Node, Node> Map { get; private set; }
 
-        public TableNode(List<Node> p_Elements, Dictionary<Node, Node> p_Table, PositionData p_PositionData)
+        public TableNode(Dictionary<Node, Node> p_Map, PositionData p_PositionData)
             : base(NodeType.TABLE, p_PositionData)
         {
+            Map = p_Map;
+        }
+    }
+
+    public class ListNode : Node
+    {
+        public List<Node> Elements { get; private set; }
+
+        public ListNode(List<Node> p_Elements, PositionData p_PositionData)
+            : base(NodeType.LIST, p_PositionData)
+        {
             Elements = p_Elements;
-            Table = p_Table;
         }
     }
 

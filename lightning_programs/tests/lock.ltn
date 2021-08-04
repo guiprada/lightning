@@ -22,7 +22,7 @@ var global_lock_test_counter = 5
     {
         upvalue_lock_test_counter++;
     }
-    this_list:list_rmap(n, many)
+    this_list:rmap(n, many)
     assert(upvalue_lock_test_counter, n + 5, "Failed UpValue Lock Test 1.")
 }
 return assert_counter.get_error_counter()

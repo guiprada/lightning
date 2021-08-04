@@ -87,6 +87,9 @@ namespace lightning
                 case NodeType.TABLE:
                     PrintTable(p_node as TableNode);
                     break;
+                case NodeType.LIST:
+                    PrintList(p_node as ListNode);
+                    break;
                 default:
                     Error("Pretty Printer Received unkown node." + this_type.ToString(), p_node.PositionData);
                     break;
@@ -156,11 +159,34 @@ namespace lightning
 
         private void PrintTable(TableNode p_node)
         {
-            Console.Write("[TABLE ");
-            if (p_node.Elements != null){
-                bool first = true;
+            Console.Write("[TABLE");
+            bool first = true;
+            if(p_node.Map != null)
+                foreach(KeyValuePair<Node,Node> entry in p_node.Map){
+                    if (first){
+                        Console.Write(" ");
+                        Print(entry.Key);
+                        Console.Write(" : ");
+                        Print(entry.Value);
+                        first = false;
+                    }else{
+                        Console.Write(", ");
+                        Print(entry.Key);
+                        Console.Write(" : ");
+                        Print(entry.Value);
+                    }
+                }
+            Console.Write("]");
+        }
+
+        private void PrintList(ListNode p_node)
+        {
+            Console.Write("[LIST");
+            bool first = true;
+            if(p_node.Elements != null)
                 foreach(Node n in p_node.Elements){
                     if (first){
+                        Console.Write(" ");
                         Print(n);
                         first = false;
                     }else{
@@ -168,20 +194,7 @@ namespace lightning
                         Print(n);
                     }
                 }
-                foreach(KeyValuePair<Node,Node> entry in p_node.Table){
-                    if (first){
-                        Print(entry.Key);
-                        Console.Write(" : ");
-                        Print(entry.Value);
-                        first = false;
-                    }else{
-                        Console.Write(", ");
-                        Print(entry.Key);
-                        Console.Write(" : ");
-                        Print(entry.Value);
-                    }
-                }
-            }
+            Console.Write("]");
         }
 
         private void PrintGrouping(GroupingNode p_node)

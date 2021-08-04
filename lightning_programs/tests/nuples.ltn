@@ -14,7 +14,7 @@ var assert_not = assert_counter.assert_not
 }
 {
     // Testing nuples
-    var nuple1 = nuple.from_table([1, "hello"])
+    var nuple1 = nuple.from_list([1, "hello"])
     assert(nuple1:get(0), 1, "Failed Nuples Test 1.")
     assert(nuple1:get(1), "hello", "Failed Nuples Test 2.")
 

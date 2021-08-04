@@ -12,7 +12,7 @@ use tuples as structs with named access
 
 To be Done
 ----------
-fix vm log
+make a queue
 separate List and Map
 
 file read and write test

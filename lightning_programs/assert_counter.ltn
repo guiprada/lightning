@@ -1,6 +1,6 @@
 var assert = require("assert.ltn")
 
-var assert_counter = []
+var assert_counter = Table()
 
 var errors = 0
 
