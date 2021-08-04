@@ -12,6 +12,7 @@ use tuples as structs with named access
 
 To be Done
 ----------
+review superTable and its manipulation methods(add table merge method)
 make a queue
 separate List and Map
 
