@@ -96,7 +96,7 @@ namespace lightning
         ////////////////////////////////////////////////////////////////////////////////////////////////////////////
         ///////////////////////////////////////////////////////////////////////////////////////////////////// String
         private readonly static TableUnit superTable = new TableUnit(null, null);
-        public static TableUnit ExtensionSuperTable {
+        private static TableUnit ExtensionSuperTable {
             get
             {
                 if(superTable.SuperTable == null)
@@ -216,7 +216,7 @@ namespace lightning
                 string input_string = vm.GetString(0);
                 return new Unit(System.Text.RegularExpressions.Regex.Escape(input_string));
             }
-            superTable.Set("escape", new IntrinsicUnit("escape", Escape, 1));
+            superTable.Set("escape", new IntrinsicUnit("string_escape", Escape, 1));
 
             //////////////////////////////////////////////////////
             Unit Unescape(VM vm)
@@ -224,8 +224,15 @@ namespace lightning
                 string input_string = vm.GetString(0);
                 return new Unit(System.Text.RegularExpressions.Regex.Unescape(input_string));
             }
-            superTable.Set("unescape", new IntrinsicUnit("unescape", Unescape, 1));
+            superTable.Set("unescape", new IntrinsicUnit("string_unescape", Unescape, 1));
 
+            //////////////////////////////////////////////////////
+            Unit GetExtensionTable(VM vm)
+            {
+                vm.GetString(0);
+                return new Unit(ExtensionSuperTable);
+            }
+            superTable.Set("get_extension_table", new IntrinsicUnit("string_get_extension_table", GetExtensionTable, 1));
         }
     }
 }

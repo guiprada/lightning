@@ -12,14 +12,8 @@ use tuples as structs with named access
 
 To be Done
 ----------
-Create a supertable class to host set meta table, merge and merge over methods.
-Tableunit should have a get and set metatable
-Listunit should have a a get and set metatable and get and set extended metatable
-string metatable should have metatable class
-
-metatable class is a bas idea
-it is redundant because it would be a subset od tableunit
-set and get extended metaable shou be replaced by push metatable
+set and get extended metable should be replaced by push metatable
+metatable merge method
 
 create an integer method "5.0":int
 

@@ -159,6 +159,14 @@ namespace lightning
         static ListUnit(){
             initSuperTable();
         }
+        private TableUnit ExtensionSuperTable {
+            get
+            {
+                if(superTable.SuperTable == null)
+                    superTable.SuperTable = new TableUnit(null, null);
+                return superTable.SuperTable;
+            }
+        }
         private static void initSuperTable(){
             {
                 //////////////////////////////////////////////////////
@@ -388,15 +396,13 @@ namespace lightning
                 superTable.Set("set_super_table", new IntrinsicUnit("list_set_super_table", SetSuperTable, 2));
 
                 //////////////////////////////////////////////////////
-                Unit SetExtendSuperTable(VM vm)
+                Unit GetExtensionSuperTable(VM vm)
                 {
                     ListUnit this_list = vm.GetList(0);
-                    TableUnit super_table = vm.GetTable(1);
-                    this_list.SuperTable.SuperTable = super_table;
 
-                    return new Unit(UnitType.Null);
+                    return new Unit(this_list.ExtensionSuperTable);
                 }
-                superTable.Set("set_extend_super_table", new IntrinsicUnit("list_set_super_table", SetExtendSuperTable, 2));
+                superTable.Set("get_extension_super_table", new IntrinsicUnit("list_get_extension_super_table", GetExtensionSuperTable, 1));
 
                 //////////////////////////////////////////////////////
                 Unit UnsetSuperTable(VM vm)

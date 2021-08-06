@@ -732,12 +732,6 @@ namespace lightning
                 }
             }
             functions.Add(new IntrinsicUnit("try", Try, 2));
-            //////////////////////////////////////////////////////
-            Unit GetStringExtensionSuperTable(VM vm)
-            {
-                return new Unit(StringUnit.ExtensionSuperTable);
-            }
-            functions.Add(new IntrinsicUnit("get_string_extension_super_table", GetStringExtensionSuperTable, 0));
 
             //////////////////////////////////////////////////////
             Unit WriteLine(VM p_vm)

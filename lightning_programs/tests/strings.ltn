@@ -37,13 +37,22 @@ var assert_not = assert_counter.assert_not
     assert(hello_world_string:contains_char('g'), false, "Failed String Contains Test 8.")
 }
 {
-    // Test adding methods to String
+    Test adding methods to String
     var a_string = "oba"
-    var string_super_table = get_string_extension_super_table()
-    string_super_table.teste = \(self){
-        return self
-    }
-    assert(a_string:teste(), "oba", "Failed Adding Methods to String Test 1.")
-    assert("another_string":teste(), "another_string", "Failed Adding Methods to String Test 2.")
+    var string_super_table = a_string:get_extension_table()
+    string_super_table.teste1 : \(self){ return self }]
+    string_super_table:set_super_table(extending_super_table)
+    assert(a_string:teste1(), "oba", "Failed Adding Methods to String Test 1.")
+    assert("another_string":teste1(), "another_string", "Failed Adding Methods to String Test 2.")
+    assert(a_string:get_super_table():get_super_table(), extending_super_table, "Failed Adding Methods to String Test 3.")
+
+    // var extending_extending_super_table = [teste2 : \(self){ return self .. "oba" }]
+    // var another_string = "eba"
+    // another_string:extend_super_table(extending_extending_super_table)
+    // // assert(another_string:teste2(), "ebaoba", "Failed Adding Methods to String Test 4.")
+    // // assert("yet another string":teste2(), "yen another stringoba", "Failed Adding Methods to String Test 5.")
+    // // assert(another_string:get_super_table():get_super_table(), extending_super_table, "Failed Adding Methods to String Test 6.")
+
+
 }
 return assert_counter.get_error_counter()
