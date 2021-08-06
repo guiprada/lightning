@@ -12,6 +12,7 @@ use tuples as structs with named access
 
 To be Done
 ----------
+try should work better with methods
 set and get extended metable should be replaced by push metatable
 metatable merge method
 

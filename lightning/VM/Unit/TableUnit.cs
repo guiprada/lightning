@@ -14,8 +14,7 @@ namespace lightning
 	public class TableUnit : HeapUnit
     {
         public Dictionary<Unit, Unit> Map{get; private set;}
-        public TableUnit SuperTable{get; set;}
-
+        public TableUnit ExtensionTable{get; set;}
         public override UnitType Type{
             get{
                 return UnitType.Table;
@@ -29,14 +28,8 @@ namespace lightning
         public TableUnit(Dictionary<Unit, Unit> p_map)
         {
             Map = p_map ??= new Dictionary<Unit, Unit>();
-            SuperTable = superTable;
+            ExtensionTable = null;
         }
-        public TableUnit(Dictionary<Unit, Unit> p_map, TableUnit p_superTable)
-        {
-            Map = p_map ??= new Dictionary<Unit, Unit>();
-            SuperTable = p_superTable;
-        }
-
         public void Set(string p_key, Unit p_value){
             Set(new Unit(p_key), p_value);
         }
@@ -74,15 +67,15 @@ namespace lightning
             Map[p_key] = p_value;
         }
         public override Unit Get(Unit p_key){
-            return GetTable(p_key);
-        }
-        public Unit GetTable(Unit p_key){
             Unit this_unit;
-            if(Map.TryGetValue(p_key, out this_unit))
+            if (Map.TryGetValue(p_key, out this_unit))
                 return this_unit;
-            else if(SuperTable != null)
-                return SuperTable.GetTable(p_key);
-            throw new Exception("Table or Super Table does not contain index: " + p_key.ToString());
+            else if ((ExtensionTable!=null) && ExtensionTable.Map.TryGetValue(p_key, out this_unit))
+                return this_unit;
+            else if (methodTable.Map.TryGetValue(p_key, out this_unit))
+                return this_unit;
+            else
+                throw new Exception("Table does not contain index: " + p_key.ToString());
         }
 
         public override string ToString()
@@ -131,6 +124,18 @@ namespace lightning
             return Map.GetHashCode();
         }
 
+        public override void SetExtensionTable(TableUnit p_ExtensionTable){
+            ExtensionTable = p_ExtensionTable;
+        }
+
+        public override void UnsetExtensionTable(){
+            ExtensionTable = null;
+        }
+
+        public override TableUnit GetExtensionTable(){
+            return ExtensionTable;
+        }
+
         public override int CompareTo(object compareTo){
             if(compareTo.GetType() != typeof(Unit))
                 throw new Exception("Trying to compare a TableUnit to non Unit type");
@@ -161,11 +166,11 @@ namespace lightning
 
         ////////////////////////////////////////////////////////////////////////////////////////////////////////////
         ////////////////////////////////////////////////////////////////////////////////////////////////////// Table
-        private static TableUnit superTable = new TableUnit(null, null);
+        private static TableUnit methodTable = new TableUnit(null);
         static TableUnit(){
-            initSuperTable();
+            initMethodTable();
         }
-        private static void initSuperTable(){
+        private static void initMethodTable(){
             {
                 Unit Clone(VM vm)
                 {
@@ -176,11 +181,12 @@ namespace lightning
                         table_copy.Add(entry.Key, entry.Value);
                     }
 
-                    TableUnit copy = new TableUnit(table_copy, this_table.SuperTable);
+                    TableUnit copy = new TableUnit(table_copy);
+                    copy.ExtensionTable = this_table.ExtensionTable;
 
                     return new Unit(copy);
                 }
-                superTable.Set("clone", new IntrinsicUnit("table_clone", Clone, 1));
+                methodTable.Set("clone", new IntrinsicUnit("table_clone", Clone, 1));
 
                 //////////////////////////////////////////////////////
                 Unit Count(VM vm)
@@ -189,7 +195,7 @@ namespace lightning
                     int count = this_table.Count;
                     return new Unit(count);
                 }
-                superTable.Set("count", new IntrinsicUnit("table_count", Count, 1));
+                methodTable.Set("count", new IntrinsicUnit("table_count", Count, 1));
 
                 //////////////////////////////////////////////////////
                 Unit Clear(VM vm)
@@ -198,7 +204,7 @@ namespace lightning
                     this_table.Map.Clear();
                     return new Unit(UnitType.Null);
                 }
-                superTable.Set("clear", new IntrinsicUnit("table_clear", Clear, 1));
+                methodTable.Set("clear", new IntrinsicUnit("table_clear", Clear, 1));
 
                 //////////////////////////////////////////////////////
                 Unit ToString(VM vm)
@@ -225,7 +231,7 @@ namespace lightning
                     }
                     return new Unit(value);
                 }
-                superTable.Set("to_string", new IntrinsicUnit("table_to_string", ToString, 1));
+                methodTable.Set("to_string", new IntrinsicUnit("table_to_string", ToString, 1));
 
                 //////////////////////////////////////////////////////
                 Unit MakeIterator(VM vm)
@@ -233,7 +239,7 @@ namespace lightning
                     TableUnit this_table = vm.GetTable(0);
                     System.Collections.IDictionaryEnumerator enumerator = this_table.Map.GetEnumerator();
 
-                    TableUnit iterator = new TableUnit(null, null);
+                    TableUnit iterator = new TableUnit(null);
                     iterator.Set("key", new Unit(UnitType.Null));
                     iterator.Set("value", new Unit(UnitType.Null));
 
@@ -251,7 +257,7 @@ namespace lightning
                     iterator.Set("next", new IntrinsicUnit("table_iterator_next", next, 0));
                     return new Unit(iterator);
                 }
-                superTable.Set("iterator", new IntrinsicUnit("table_iterator", MakeIterator, 1));
+                methodTable.Set("iterator", new IntrinsicUnit("table_iterator", MakeIterator, 1));
 
                 //////////////////////////////////////////////////////
                 Unit MakeNumericIterator(VM vm)
@@ -259,7 +265,7 @@ namespace lightning
                     TableUnit this_table = vm.GetTable(0);
                     System.Collections.IDictionaryEnumerator enumerator = this_table.Map.GetEnumerator();
 
-                    TableUnit iterator = new TableUnit(null, null);
+                    TableUnit iterator = new TableUnit(null);
                     iterator.Set("key", new Unit(UnitType.Null));
                     iterator.Set("value", new Unit(UnitType.Null));
 
@@ -282,7 +288,7 @@ namespace lightning
                     iterator.Set("next", new IntrinsicUnit("table_iterator_next", next, 0));
                     return new Unit(iterator);
                 }
-                superTable.Set("numeric_iterator", new IntrinsicUnit("table_numeric_iterator", MakeNumericIterator, 1));
+                methodTable.Set("numeric_iterator", new IntrinsicUnit("table_numeric_iterator", MakeNumericIterator, 1));
 
                 //////////////////////////////////////////////////////
                 Unit Indexes(VM vm)
@@ -297,7 +303,7 @@ namespace lightning
 
                     return new Unit(indexes);
                 }
-                superTable.Set("indexes", new IntrinsicUnit("table_indexes", Indexes, 1));
+                methodTable.Set("indexes", new IntrinsicUnit("table_indexes", Indexes, 1));
 
                 //////////////////////////////////////////////////////
                 Unit NumericIndexes(VM vm)
@@ -313,37 +319,46 @@ namespace lightning
 
                     return new Unit(indexes);
                 }
-                superTable.Set("numeric_indexes", new IntrinsicUnit("table_numeric_indexes", NumericIndexes, 1));
+                methodTable.Set("numeric_indexes", new IntrinsicUnit("table_numeric_indexes", NumericIndexes, 1));
 
                 //////////////////////////////////////////////////////
-                Unit SetSuperTable(VM vm)
+                Unit SetExtensionTable(VM vm)
                 {
-                    TableUnit this_table = vm.GetTable(0);
-                    TableUnit super_table = vm.GetTable(1);
-                    this_table.SuperTable = super_table;
+                    Unit this_unit = vm.GetUnit(0);
+                    TableUnit extension_table = vm.GetTable(1);
+
+                    if(extension_table.GetExtensionTable() != null)
+                        throw new Exception("Extension Table has an Extention Table!");
+                    if(this_unit.heapUnitValue.GetExtensionTable() != null)
+                        throw new Exception("Table already has an Extention Table!");
+
+                    this_unit.heapUnitValue.SetExtensionTable(extension_table);
 
                     return new Unit(UnitType.Null);
                 }
-                superTable.Set("set_super_table", new IntrinsicUnit("table_set_super_table", SetSuperTable, 2));
+                methodTable.Set("set_extension_table", new IntrinsicUnit("table_set_extension_table", SetExtensionTable, 2));
 
                 //////////////////////////////////////////////////////
-                Unit UnsetSuperTable(VM vm)
+                Unit UnsetExtensionTable(VM vm)
                 {
-                    TableUnit this_table = vm.GetTable(0);
-                    this_table.SuperTable = null;
+                    Unit this_unit = vm.GetUnit(0);
+                    this_unit.heapUnitValue.UnsetExtensionTable();
 
                     return new Unit(UnitType.Null);
                 }
-                superTable.Set("unset_super_table", new IntrinsicUnit("table_unset_super_table", UnsetSuperTable, 1));
+                methodTable.Set("unset_extension_table", new IntrinsicUnit("table_unset_extension_table", UnsetExtensionTable, 1));
 
                 //////////////////////////////////////////////////////
-                Unit GetSuperTable(VM vm)
+                Unit GetExtensionTable(VM vm)
                 {
-                    TableUnit this_table = vm.GetTable(0);
+                    Unit this_unit = vm.GetUnit(0);
+                    TableUnit extension_table = this_unit.heapUnitValue.GetExtensionTable();
+                    if (extension_table == null)
+                        return new Unit(UnitType.Null);
 
-                    return new Unit(this_table.SuperTable);
+                    return new Unit(extension_table);
                 }
-                superTable.Set("get_super_table", new IntrinsicUnit("table_get_super_table", GetSuperTable, 1));
+                methodTable.Set("get_extension_table", new IntrinsicUnit("table_get_extension_table", GetExtensionTable, 1));
             }
         }
     }

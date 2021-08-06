@@ -70,11 +70,6 @@ errors += require("tests/try.ltn")
     }
     assert(a_table["hey"](), 99, "Failed Expression Indexed Member Function Declaration Test 1.")
 }
-{
-    var another_table = [1: \(a) return a]
-    write_line(another_table[1])
-    1+1
-}
 
 //////////////////////////////// end scratch
 machine.trim()

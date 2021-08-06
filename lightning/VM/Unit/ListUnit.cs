@@ -14,7 +14,7 @@ namespace lightning
     public class ListUnit : HeapUnit
     {
         public List<Unit> Elements{get; private set;}
-        public TableUnit SuperTable{get; set;}
+        public TableUnit MethodTable{get; set;}
 
         public override UnitType Type{
             get{
@@ -29,7 +29,7 @@ namespace lightning
         public ListUnit(List<Unit> p_elements)
         {
             Elements = p_elements ??= new List<Unit>();
-            SuperTable = superTable;
+            MethodTable = methodTable;
         }
 
         void ElementAdd(Unit value)
@@ -56,9 +56,9 @@ namespace lightning
             }
         }
         Unit GetTable(Unit p_key){
-            if(SuperTable != null)
-                return SuperTable.GetTable(p_key);
-            throw new Exception("List or Super Table does not contain index: " + p_key.ToString());
+            if(MethodTable != null)
+                return MethodTable.Get(p_key);
+            throw new Exception("List does not contain a Method Table: " + p_key.ToString());
         }
 
         Unit GetElement(Unit p_key){
@@ -125,6 +125,18 @@ namespace lightning
             return Elements.GetHashCode() + Elements.GetHashCode();
         }
 
+        public override void SetExtensionTable(TableUnit p_ExtensionTable){
+            MethodTable.ExtensionTable = p_ExtensionTable;
+        }
+
+        public override void UnsetExtensionTable(){
+            MethodTable.ExtensionTable = null;
+        }
+
+        public override TableUnit GetExtensionTable(){
+            return MethodTable.ExtensionTable;
+        }
+
         public override int CompareTo(object compareTo){
             if(compareTo.GetType() != typeof(Unit))
                 throw new Exception("Trying to compare a ListUnit to non Unit type");
@@ -155,19 +167,11 @@ namespace lightning
 
         ////////////////////////////////////////////////////////////////////////////////////////////////////////////
         ////////////////////////////////////////////////////////////////////////////////////////////////////// Table
-        private static TableUnit superTable = new TableUnit(null, null);
+        private static TableUnit methodTable = new TableUnit(null);
         static ListUnit(){
-            initSuperTable();
+            initMethodTable();
         }
-        private TableUnit ExtensionSuperTable {
-            get
-            {
-                if(superTable.SuperTable == null)
-                    superTable.SuperTable = new TableUnit(null, null);
-                return superTable.SuperTable;
-            }
-        }
-        private static void initSuperTable(){
+        private static void initMethodTable(){
             {
                 //////////////////////////////////////////////////////
                 Unit Clone(VM vm)
@@ -179,11 +183,11 @@ namespace lightning
                         new_list_elements.Add(v);
                     }
                     ListUnit new_list = new ListUnit(new_list_elements);
-                    new_list.SuperTable = this_list.SuperTable;
+                    new_list.MethodTable = this_list.MethodTable;
 
                     return new Unit(new_list);
                 }
-                superTable.Set("clone", new IntrinsicUnit("list_clone", Clone, 1));
+                methodTable.Set("clone", new IntrinsicUnit("list_clone", Clone, 1));
 
                 //////////////////////////////////////////////////////
                 Unit Count(VM vm)
@@ -192,7 +196,7 @@ namespace lightning
                     int count = this_list.Count;
                     return new Unit(count);
                 }
-                superTable.Set("count", new IntrinsicUnit("list_count", Count, 1));
+                methodTable.Set("count", new IntrinsicUnit("list_count", Count, 1));
 
                 //////////////////////////////////////////////////////
                 Unit Clear(VM vm)
@@ -201,7 +205,7 @@ namespace lightning
                     this_list.Elements.Clear();
                     return new Unit(UnitType.Null);
                 }
-                superTable.Set("clear", new IntrinsicUnit("list_clear", Clear, 1));
+                methodTable.Set("clear", new IntrinsicUnit("list_clear", Clear, 1));
 
                 //////////////////////////////////////////////////////
                 Unit ToString(VM vm)
@@ -223,7 +227,7 @@ namespace lightning
                     }
                     return new Unit(value);
                 }
-                superTable.Set("to_string", new IntrinsicUnit("list_to_string", ToString, 1));
+                methodTable.Set("to_string", new IntrinsicUnit("list_to_string", ToString, 1));
 
                 //////////////////////////////////////////////////////
                 Unit MakeIndexesIterator(VM vm)
@@ -231,7 +235,7 @@ namespace lightning
                     ListUnit this_list = vm.GetList(0);
                     int i = -1;
 
-                    TableUnit iterator = new TableUnit(null, null);
+                    TableUnit iterator = new TableUnit(null);
                     Unit next(VM vm)
                     {
                         if (i < (this_list.Count - 1))
@@ -246,7 +250,7 @@ namespace lightning
                     iterator.Set("next", new IntrinsicUnit("list_index_iterator_next", next, 0));
                     return new Unit(iterator);
                 }
-                superTable.Set("index_iterator", new IntrinsicUnit("list_index_iterator", MakeIndexesIterator, 1));
+                methodTable.Set("index_iterator", new IntrinsicUnit("list_index_iterator", MakeIndexesIterator, 1));
 
                 //////////////////////////////////////////////////////
                 Unit MakeIterator(VM vm)
@@ -255,7 +259,7 @@ namespace lightning
                     int i = -1;
                     Unit value = new Unit(UnitType.Null);
 
-                    TableUnit iterator = new TableUnit(null, null);
+                    TableUnit iterator = new TableUnit(null);
                     Unit next(VM vm)
                     {
                         if (i < (this_list.Count - 1))
@@ -269,7 +273,7 @@ namespace lightning
                     iterator.Set("next", new IntrinsicUnit("list_iterator_next", next, 0));
                     return new Unit(iterator);
                 }
-                superTable.Set("iterator", new IntrinsicUnit("list_iterator", MakeIterator, 1));
+                methodTable.Set("iterator", new IntrinsicUnit("list_iterator", MakeIterator, 1));
 
                 //////////////////////////////////////////////////////
                 Unit Init(VM vm)
@@ -283,7 +287,7 @@ namespace lightning
 
                     return new Unit(UnitType.Null);
                 }
-                superTable.Set("init", new IntrinsicUnit("list_init", Init, 2));
+                methodTable.Set("init", new IntrinsicUnit("list_init", Init, 2));
 
                 //////////////////////////////////////////////////////
                 Unit Push(VM vm)
@@ -294,7 +298,7 @@ namespace lightning
 
                     return new Unit(UnitType.Null);
                 }
-                superTable.Set("push", new IntrinsicUnit("list_push", Push, 2));
+                methodTable.Set("push", new IntrinsicUnit("list_push", Push, 2));
 
                 //////////////////////////////////////////////////////
                 Unit Pop(VM vm)
@@ -305,7 +309,7 @@ namespace lightning
 
                     return new Unit(value);
                 }
-                superTable.Set("pop", new IntrinsicUnit("list_pop", Pop, 1));
+                methodTable.Set("pop", new IntrinsicUnit("list_pop", Pop, 1));
 
                 //////////////////////////////////////////////////////
                 Unit RemoveRange(VM vm)
@@ -317,7 +321,7 @@ namespace lightning
 
                     return new Unit(UnitType.Null);
                 }
-                superTable.Set("remove", new IntrinsicUnit("list_remove", RemoveRange, 3));
+                methodTable.Set("remove", new IntrinsicUnit("list_remove", RemoveRange, 3));
 
                 //////////////////////////////////////////////////////
                 Unit Split(VM vm)
@@ -330,7 +334,7 @@ namespace lightning
 
                     return new Unit(new_list);
                 }
-                superTable.Set("split", new IntrinsicUnit("list_split", Split, 2));
+                methodTable.Set("split", new IntrinsicUnit("list_split", Split, 2));
 
                 //////////////////////////////////////////////////////
                 Unit Slice(VM vm)
@@ -345,7 +349,7 @@ namespace lightning
 
                     return new Unit(new_list);
                 }
-                superTable.Set("slice", new IntrinsicUnit("list_slice", Slice, 3));
+                methodTable.Set("slice", new IntrinsicUnit("list_slice", Slice, 3));
                 //////////////////////////////////////////////////////
                 Unit Reverse(VM vm)
                 {
@@ -354,7 +358,7 @@ namespace lightning
 
                     return new Unit(UnitType.Null);
                 }
-                superTable.Set("reverse", new IntrinsicUnit("list_reverse", Reverse, 1));
+                methodTable.Set("reverse", new IntrinsicUnit("list_reverse", Reverse, 1));
 
                 //////////////////////////////////////////////////////
                 Unit Sort(VM vm)
@@ -364,7 +368,7 @@ namespace lightning
 
                     return new Unit(UnitType.Null);
                 }
-                superTable.Set("sort", new IntrinsicUnit("list_sort", Sort, 1));
+                methodTable.Set("sort", new IntrinsicUnit("list_sort", Sort, 1));
 
                 //////////////////////////////////////////////////////
                 var rng = new Random();
@@ -382,50 +386,7 @@ namespace lightning
 
                     return new Unit(UnitType.Null);
                 }
-                superTable.Set("shuffle", new IntrinsicUnit("list_shuffle", Shuffle, 1));
-
-                //////////////////////////////////////////////////////
-                Unit SetSuperTable(VM vm)
-                {
-                    ListUnit this_list = vm.GetList(0);
-                    TableUnit super_table = vm.GetTable(1);
-                    this_list.SuperTable = super_table;
-
-                    return new Unit(UnitType.Null);
-                }
-                superTable.Set("set_super_table", new IntrinsicUnit("list_set_super_table", SetSuperTable, 2));
-
-                //////////////////////////////////////////////////////
-                Unit GetExtensionSuperTable(VM vm)
-                {
-                    ListUnit this_list = vm.GetList(0);
-
-                    return new Unit(this_list.ExtensionSuperTable);
-                }
-                superTable.Set("get_extension_super_table", new IntrinsicUnit("list_get_extension_super_table", GetExtensionSuperTable, 1));
-
-                //////////////////////////////////////////////////////
-                Unit UnsetSuperTable(VM vm)
-                {
-                    ListUnit this_list = vm.GetList(0);
-                    this_list.SuperTable = null;
-
-                    return new Unit(UnitType.Null);
-                }
-                superTable.Set("unset_super_table", new IntrinsicUnit("list_unset_super_table", UnsetSuperTable, 1));
-
-                //////////////////////////////////////////////////////
-                Unit GetSuperTable(VM vm)
-                {
-                    Unit this_unit = vm.GetUnit(0);
-                    if(this_unit.Type == UnitType.List)
-                        return new Unit(((ListUnit)this_unit.heapUnitValue).SuperTable);
-                    else if (this_unit.Type == UnitType.Table)
-                        return new Unit(((TableUnit)this_unit.heapUnitValue).SuperTable);
-                    else
-                        return new Unit(UnitType.Null);
-                }
-                superTable.Set("get_super_table", new IntrinsicUnit("list_get_super_table", GetSuperTable, 1));
+                methodTable.Set("shuffle", new IntrinsicUnit("list_shuffle", Shuffle, 1));
 
                 //////////////////////////////////////////////////////
                 Unit Map(VM vm)
@@ -443,7 +404,7 @@ namespace lightning
                     return new Unit(UnitType.Null);
                 }
 
-                superTable.Set("map", new IntrinsicUnit("list_map", Map, 2));
+                methodTable.Set("map", new IntrinsicUnit("list_map", Map, 2));
 
                 //////////////////////////////////////////////////////
                 Unit ParallelMap(VM vm)
@@ -472,7 +433,7 @@ namespace lightning
                     return new Unit(UnitType.Null);
                 }
 
-                superTable.Set("pmap", new IntrinsicUnit("list_pmap", ParallelMap, 2));
+                methodTable.Set("pmap", new IntrinsicUnit("list_pmap", ParallelMap, 2));
 
                 //////////////////////////////////////////////////////
                 Unit RangeMap(VM vm)
@@ -514,7 +475,7 @@ namespace lightning
                     return new Unit(UnitType.Null);
                 }
 
-                superTable.Set("rmap", new IntrinsicUnit("list_rmap", RangeMap, 3));
+                methodTable.Set("rmap", new IntrinsicUnit("list_rmap", RangeMap, 3));
 
                 //////////////////////////////////////////////////////
                 Unit Reduce(VM vm)
@@ -534,7 +495,7 @@ namespace lightning
                     return accumulator;
                 }
 
-                superTable.Set("reduce", new IntrinsicUnit("list_reduce", Reduce, 2));
+                methodTable.Set("reduce", new IntrinsicUnit("list_reduce", Reduce, 2));
             }
         }
     }

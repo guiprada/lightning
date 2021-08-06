@@ -57,12 +57,24 @@ namespace lightning
         }
 
         public override Unit Get(Unit p_key){
-            return superTable.Get(p_key);
+            return methodTable.Get(p_key);
         }
 
         public override int GetHashCode()
         {
             return content.GetHashCode();
+        }
+
+        public override void SetExtensionTable(TableUnit p_ExtensionTable){
+            methodTable.ExtensionTable = p_ExtensionTable;
+        }
+
+        public override void UnsetExtensionTable(){
+            methodTable.ExtensionTable = null;
+        }
+
+        public override TableUnit GetExtensionTable(){
+            return methodTable.ExtensionTable;
         }
 
         public override int CompareTo(object p_compareTo){
@@ -95,16 +107,7 @@ namespace lightning
 
         ////////////////////////////////////////////////////////////////////////////////////////////////////////////
         ///////////////////////////////////////////////////////////////////////////////////////////////////// String
-        private readonly static TableUnit superTable = new TableUnit(null, null);
-        private static TableUnit ExtensionSuperTable {
-            get
-            {
-                if(superTable.SuperTable == null)
-                    superTable.SuperTable = new TableUnit(null, null);
-                return superTable.SuperTable;
-            }
-        }
-
+        private readonly static TableUnit methodTable = new TableUnit(null);
         static StringUnit(){
             initSuperTable();
         }
@@ -123,7 +126,7 @@ namespace lightning
                 }
                 return new Unit(UnitType.Null);
             }
-            superTable.Set("slice", new IntrinsicUnit("string_slice", StringSlice, 3));
+            methodTable.Set("slice", new IntrinsicUnit("string_slice", StringSlice, 3));
 
             //////////////////////////////////////////////////////
 
@@ -141,7 +144,7 @@ namespace lightning
                 }
                 return new Unit(UnitType.Null);
             }
-            superTable.Set("split", new IntrinsicUnit("string_split", StringSplit, 2));
+            methodTable.Set("split", new IntrinsicUnit("string_split", StringSplit, 2));
 
             //////////////////////////////////////////////////////
 
@@ -150,7 +153,7 @@ namespace lightning
                 StringUnit val_input_string = vm.GetStringUnit(0);
                 return new Unit(val_input_string.content.Length);
             }
-            superTable.Set("length", new IntrinsicUnit("string_length", StringLength, 1));
+            methodTable.Set("length", new IntrinsicUnit("string_length", StringLength, 1));
 
             //////////////////////////////////////////////////////
 
@@ -162,7 +165,7 @@ namespace lightning
                 else
                     return new Unit(UnitType.Null);
             }
-            superTable.Set("copy", new IntrinsicUnit("string_copy", StringCopy, 1));
+            methodTable.Set("copy", new IntrinsicUnit("string_copy", StringCopy, 1));
 
             //////////////////////////////////////////////////////
             Unit ToList(VM vm)
@@ -174,7 +177,7 @@ namespace lightning
                 }
                 return new Unit(new ListUnit(string_list));
             }
-            superTable.Set("to_list", new IntrinsicUnit("string_to_list", ToList, 1));
+            methodTable.Set("to_list", new IntrinsicUnit("string_to_list", ToList, 1));
 
             //////////////////////////////////////////////////////
             Unit CharAt(VM vm)
@@ -188,7 +191,7 @@ namespace lightning
                 }
                 return new Unit(UnitType.Null);
             }
-            superTable.Set("char_at", new IntrinsicUnit("string_char_at", CharAt, 2));
+            methodTable.Set("char_at", new IntrinsicUnit("string_char_at", CharAt, 2));
 
             //////////////////////////////////////////////////////
             Unit Contains(VM vm)
@@ -198,7 +201,7 @@ namespace lightning
 
                 return new Unit(input_string.Contains(contained_string));
             }
-            superTable.Set("contains", new IntrinsicUnit("string_contains", Contains, 2));
+            methodTable.Set("contains", new IntrinsicUnit("string_contains", Contains, 2));
 
             //////////////////////////////////////////////////////
             Unit ContainsChar(VM vm)
@@ -208,7 +211,7 @@ namespace lightning
 
                 return new Unit(input_string.Contains(contained_char));
             }
-            superTable.Set("contains_char", new IntrinsicUnit("string_contains_char", ContainsChar, 2));
+            methodTable.Set("contains_char", new IntrinsicUnit("string_contains_char", ContainsChar, 2));
 
             //////////////////////////////////////////////////////
             Unit Escape(VM vm)
@@ -216,7 +219,7 @@ namespace lightning
                 string input_string = vm.GetString(0);
                 return new Unit(System.Text.RegularExpressions.Regex.Escape(input_string));
             }
-            superTable.Set("escape", new IntrinsicUnit("string_escape", Escape, 1));
+            methodTable.Set("escape", new IntrinsicUnit("string_escape", Escape, 1));
 
             //////////////////////////////////////////////////////
             Unit Unescape(VM vm)
@@ -224,15 +227,7 @@ namespace lightning
                 string input_string = vm.GetString(0);
                 return new Unit(System.Text.RegularExpressions.Regex.Unescape(input_string));
             }
-            superTable.Set("unescape", new IntrinsicUnit("string_unescape", Unescape, 1));
-
-            //////////////////////////////////////////////////////
-            Unit GetExtensionTable(VM vm)
-            {
-                vm.GetString(0);
-                return new Unit(ExtensionSuperTable);
-            }
-            superTable.Set("get_extension_table", new IntrinsicUnit("string_get_extension_table", GetExtensionTable, 1));
+            methodTable.Set("unescape", new IntrinsicUnit("string_unescape", Unescape, 1));
         }
     }
 }

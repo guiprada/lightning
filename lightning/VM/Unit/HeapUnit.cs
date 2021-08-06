@@ -39,7 +39,15 @@ namespace lightning
         public abstract override int GetHashCode();
         public abstract Unit Get(Unit p_key);
         public abstract void Set(Unit p_key, Unit p_value);
-
+        public virtual void SetExtensionTable(TableUnit p_ExtensionTable){
+            throw new Exception("Trying to set a Extension Table of a " + Type);
+        }
+        public virtual void UnsetExtensionTable(){
+            throw new Exception("Trying to unset a Extension Table of a " + Type);
+        }
+        public virtual TableUnit GetExtensionTable(){
+            throw new Exception("Trying to get a Extension Table of a " + Type);
+        }
         public abstract int CompareTo(object compareTo);
     }
 
@@ -640,16 +648,16 @@ namespace lightning
     public class WrapperUnit<T> : HeapUnit
     {
         public object content;
-        public TableUnit SuperTable{get; private set;}
+        public TableUnit ExtensionTable{get; private set;}
         public override UnitType Type{
             get{
                 return UnitType.Wrapper;
             }
         }
-        public WrapperUnit(object p_content, TableUnit p_SuperTable = null)
+        public WrapperUnit(object p_content, TableUnit p_ExtentionTable = null)
         {
             content = p_content;
-            SuperTable = p_SuperTable;
+            ExtensionTable = p_ExtentionTable;
         }
 
         public override void Set(Unit index, Unit value)
@@ -658,7 +666,7 @@ namespace lightning
         }
 
         public override Unit Get(Unit p_key){
-            return SuperTable.Get(p_key);
+            return ExtensionTable.Get(p_key);
         }
 
         public override string ToString()
@@ -706,6 +714,18 @@ namespace lightning
             {
                 throw new Exception("UnWrapp<" + typeof(T) +">() type Error!");
             }
+        }
+
+        public override void SetExtensionTable(TableUnit p_ExtensionTable){
+            ExtensionTable = p_ExtensionTable;
+        }
+
+        public override void UnsetExtensionTable(){
+            ExtensionTable = null;
+        }
+
+        public override TableUnit GetExtensionTable(){
+            return ExtensionTable;
         }
 
         public override int CompareTo(object p_compareTo){

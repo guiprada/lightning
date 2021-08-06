@@ -55,10 +55,10 @@ namespace lightning
             ////////////////////////////////////////////////////////////////////////////////////////////////////////////
             //////////////////////////////////////////////////////////////////////////////////////////////////// machine
             {
-                TableUnit machine = new TableUnit(null, null);
+                TableUnit machine = new TableUnit(null);
 
                 Unit MemoryUse(VM p_vm){
-                    TableUnit mem_use = new TableUnit(null, null);
+                    TableUnit mem_use = new TableUnit(null);
                     mem_use.Set("stack_count", p_vm.StackCount());
                     mem_use.Set("globals_count", p_vm.GlobalsCount());
                     mem_use.Set("variables_count", p_vm.VariablesCount());
@@ -135,8 +135,8 @@ namespace lightning
             ////////////////////////////////////////////////////////////////////////////////////////////////////////////
             ////////////////////////////////////////////////////////////////////////////////////////////////////// tuple
             {
-                TableUnit tuple = new TableUnit(null, null);
-                TableUnit tupleMethods = new TableUnit(null, null);
+                TableUnit tuple = new TableUnit(null);
+                TableUnit tupleMethods = new TableUnit(null);
 
                 Unit TupleNew(VM p_vm)
                 {
@@ -192,8 +192,8 @@ namespace lightning
             ////////////////////////////////////////////////////////////////////////////////////////////////////////////
             ////////////////////////////////////////////////////////////////////////////////////////////////////// nuple
             {
-                TableUnit nuple = new TableUnit(null, null);
-                TableUnit nupleMethods = new TableUnit(null, null);
+                TableUnit nuple = new TableUnit(null);
+                TableUnit nupleMethods = new TableUnit(null);
 
                 Unit NupleNew(VM p_vm)
                 {
@@ -253,7 +253,7 @@ namespace lightning
             ////////////////////////////////////////////////////////////////////////////////////////////////////////////
             ////////////////////////////////////////////////////////////////////////////////////////////////// intrinsic
             {
-                TableUnit intrinsic = new TableUnit(null, null);
+                TableUnit intrinsic = new TableUnit(null);
 #if ROSLYN
                 Unit CreateIntrinsic(VM p_vm)
                 {
@@ -279,7 +279,7 @@ namespace lightning
             /////////////////////////////////////////////////////////////////////////////////////////////////////// rand
 
             {
-                TableUnit rand = new TableUnit(null, null);
+                TableUnit rand = new TableUnit(null);
 
                 var rng = new Random();
 
@@ -303,7 +303,7 @@ namespace lightning
             /////////////////////////////////////////////////////////////////////////////////////////////////////// math
 
             {
-                TableUnit math = new TableUnit(null, null);
+                TableUnit math = new TableUnit(null);
                 math.Set("pi", (Float)Math.PI);
                 math.Set("e", (Float)Math.E);
 #if DOUBLE
@@ -478,8 +478,8 @@ namespace lightning
             ////////////////////////////////////////////////////////////////////////////////////////////////////////////
             /////////////////////////////////////////////////////////////////////////////////////////////////////// time
             {
-                TableUnit time = new TableUnit(null, null);
-                TableUnit timeMethods = new TableUnit(null, null);
+                TableUnit time = new TableUnit(null);
+                TableUnit timeMethods = new TableUnit(null);
 
                 Unit TimeNow(VM p_vm)
                 {
@@ -511,7 +511,7 @@ namespace lightning
             ////////////////////////////////////////////////////////////////////////////////////////////////////////////
             /////////////////////////////////////////////////////////////////////////////////////////////////////// char
             {
-                TableUnit char_table = new TableUnit(null, null);
+                TableUnit char_table = new TableUnit(null);
 
                 //////////////////////////////////////////////////////
 
@@ -554,7 +554,7 @@ namespace lightning
             ////////////////////////////////////////////////////////////////////////////////////////////////////////////
             /////////////////////////////////////////////////////////////////////////////////////////////////////// file
             {
-                TableUnit file = new TableUnit(null, null);
+                TableUnit file = new TableUnit(null);
                 Unit LoadFile(VM p_vm)
                 {
                     string path = p_vm.GetString(0);
