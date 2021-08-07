@@ -98,11 +98,6 @@ namespace lightning
             return this_string;
         }
 
-        public override bool ToBool()
-        {
-            throw new Exception("Can not convert List to Bool.");
-        }
-
         public override bool Equals(object other)
         {
             Type other_type = other.GetType();
@@ -168,6 +163,7 @@ namespace lightning
         ////////////////////////////////////////////////////////////////////////////////////////////////////////////
         ////////////////////////////////////////////////////////////////////////////////////////////////////// Table
         private static TableUnit methodTable = new TableUnit(null);
+        public static TableUnit ClassMethodTable { get{ return methodTable; } }
         static ListUnit(){
             initMethodTable();
         }
@@ -396,9 +392,12 @@ namespace lightning
 
                     for(int index=0; index<this_list.Count; index++){
                         List<Unit> args = new List<Unit>();
-                        args.Add(new Unit(index));
-                        args.Add(new Unit(this_list));
-                        vm.ProtectedCallFunction(func, args);
+
+                        Unit index_unit = new Unit(index);
+                        args.Add(this_list.GetElement(index_unit));
+                        args.Add(index_unit);
+                        Unit result = vm.ProtectedCallFunction(func, args);
+                        this_list.ElementSet(index_unit, result);
                     }
 
                     return new Unit(UnitType.Null);
@@ -422,9 +421,11 @@ namespace lightning
                     System.Threading.Tasks.Parallel.For(init, end, (index) =>
                     {
                         List<Unit> args = new List<Unit>();
-                        args.Add(new Unit(index));
-                        args.Add(new Unit(this_list));
-                        vms[index].ProtectedCallFunction(func, args);
+                        Unit index_unit = new Unit(index);
+                        args.Add(this_list.GetElement(index_unit));
+                        args.Add(index_unit);
+                        Unit result = vms[index].ProtectedCallFunction(func, args);
+                        this_list.ElementSet(index_unit, result);
                     });
                     for (int i = init; i < end; i++)
                     {
@@ -463,9 +464,11 @@ namespace lightning
 
                         for(int i = range_start; i<range_end; i++){
                             args.Clear();
-                            args.Add(new Unit((Integer)i));
-                            args.Add(new Unit(this_list));
-                            vms[index].ProtectedCallFunction(func, args);
+                            Unit index_unit = new Unit((Integer)i);
+                            args.Add(this_list.GetElement(index_unit));
+                            args.Add(index_unit);
+                            Unit result = vms[index].ProtectedCallFunction(func, args);
+                            this_list.ElementSet(index_unit, result);
                         }
                     });
                     for (int i = 0; i < end; i++)
@@ -486,8 +489,9 @@ namespace lightning
 
                     for(int index=0; index<this_list.Count; index++){
                         List<Unit> args = new List<Unit>();
-                        args.Add(new Unit(index));
-                        args.Add(new Unit(this_list));
+                        Unit index_unit = new Unit(index);
+                        args.Add(this_list.GetElement(index_unit));
+                        args.Add(index_unit);
                         args.Add(accumulator);
                         vm.ProtectedCallFunction(func, args);
                     }

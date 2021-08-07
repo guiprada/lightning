@@ -28,11 +28,6 @@ namespace lightning
             return content;
         }
 
-        public override bool ToBool()
-        {
-            throw new Exception("Can not convert String to Bool.");
-        }
-
         public override bool Equals(object p_other)
         {
             Type other_type = p_other.GetType();
@@ -49,11 +44,6 @@ namespace lightning
             }
 
             return false;
-        }
-
-        public override void Set(Unit index, Unit value)
-        {
-            throw new Exception("Trying to Set a Table value of StringUnit. If you want to extend it you should use its SuperTable");
         }
 
         public override Unit Get(Unit p_key){
@@ -107,7 +97,8 @@ namespace lightning
 
         ////////////////////////////////////////////////////////////////////////////////////////////////////////////
         ///////////////////////////////////////////////////////////////////////////////////////////////////// String
-        private readonly static TableUnit methodTable = new TableUnit(null);
+        private static TableUnit methodTable = new TableUnit(null);
+        public static TableUnit ClassMethodTable { get{ return methodTable; } }
         static StringUnit(){
             initSuperTable();
         }

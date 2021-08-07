@@ -58,7 +58,7 @@ namespace lightning
         public List<Unit> Data{ get {return data;}}
         int Env{ get{ return variables.Env; } }
 
-        Stack<VM> vmPool;
+        static Stack<VM> vmPool;
         static int callStackSize;
         public const Operand ASSIGN = (Operand)AssignmentOperatorType.ASSIGN;
         public const Operand ADDITION_ASSIGN = (Operand)AssignmentOperatorType.ADDITION_ASSIGN;
@@ -112,6 +112,7 @@ namespace lightning
             Library p_Prelude,
             Dictionary<string,int> p_LoadedModules,
             List<ModuleUnit> p_modules,
+            Stack<VM> p_vmPool,
             bool p_parallelVM)
         {
             main = p_main;
@@ -120,6 +121,7 @@ namespace lightning
             Prelude = p_Prelude;
             LoadedModules = p_LoadedModules;
             modules = p_modules;
+            vmPool = p_vmPool;
 
             IP = 0;
             parallelVM = p_parallelVM;
@@ -174,7 +176,6 @@ namespace lightning
         }
         private VM GetVM(bool p_parallelVM)
         {
-
             if (vmPool.Count > 0)
             {
                 VM new_vm = vmPool.Pop();
@@ -183,7 +184,7 @@ namespace lightning
             }
             else
             {
-                VM new_vm = new VM(main, data, globals, Prelude, LoadedModules, modules, p_parallelVM);
+                VM new_vm = new VM(main, data, globals, Prelude, LoadedModules, modules, vmPool, p_parallelVM);
                 return new_vm;
             }
         }
@@ -343,8 +344,9 @@ namespace lightning
                 IntrinsicUnit this_intrinsic = (IntrinsicUnit)(p_callable.heapUnitValue);
                 Unit intrinsic_result = this_intrinsic.Function(this);
                 stack.top -= this_intrinsic.Arity;
-                stack.Push(intrinsic_result);
+                return intrinsic_result;
             }
+
             VMResult result = Run();
             IP = before_call_IP;
             if (result.status == VMResultType.OK)

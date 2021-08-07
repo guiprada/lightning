@@ -30,7 +30,32 @@ var assert_not = assert_counter.assert_not
 var count_errors = assert_counter.get_error_counter
 var clear_errors = assert_counter.reset_error_counter
 
+//////////////////////////////// scratch
+{
+    var a_table = [:]
+    function a_table["he" .. "y"] (){
+        return 99
+    }
+    assert(a_table["hey"](), 99, "Failed Expression Indexed Member Function Declaration Test 1.")
+}
+{
+    var a_list = []
+    try(
+        list.init,
+        [a_list, 5]
+    )
+    var a_table = [:]
+    var common_table = [hey: "oba"]
+    assert(try(
+        table.set_extension_table,
+        [a_table, common_table]
+    ), true, "Failed")
+}
+
+//////////////////////////////// end scratch
+
 var errors = 0
+
 errors += require("tests/assert.ltn")
 errors += require("tests/numbers.ltn")
 errors += require("tests/strings.ltn")
@@ -62,16 +87,6 @@ errors += require("tests/integers.ltn")
 errors += require("tests/anonymous_call.ltn")
 errors += require("tests/try.ltn")
 
-//////////////////////////////// scratch
-{
-    var a_table = [:]
-    function a_table["he" .. "y"] (){
-        return 99
-    }
-    assert(a_table["hey"](), 99, "Failed Expression Indexed Member Function Declaration Test 1.")
-}
-
-//////////////////////////////// end scratch
 machine.trim()
 
 if (errors == 0){

@@ -31,11 +31,11 @@ var assert_not = assert_counter.assert_not
     this_list:push(100)
 
     // this is not going to work, check try log
-    assert(try(\(a_table, common_table){a_table:set_extension_table(common_table)}, [a_table, common_table]), false, "Failed Super Table Test 8.")
+    assert(try(table.set_extension_table, [a_table, common_table]), false, "Failed Super Table Test 8.")
 
     common_table:unset_extension_table()
     // now it works
-    assert(try(\(a_table, common_table){a_table:set_extension_table(common_table)}, [a_table, common_table]), true, "Failed Super Table Test 9.")
+    assert(try(table.set_extension_table, [a_table, common_table]), true, "Failed Super Table Test 9.")
 
     assert(this_list:count(), 2, "Failed Super Table Test 10.")
     assert(this_list:a_function(), 99, "Failed Super Table Test 11.")

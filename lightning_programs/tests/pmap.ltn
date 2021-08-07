@@ -6,10 +6,11 @@ var assert_not = assert_counter.assert_not
     var n = 100
     var table1 = List(n)
 
-    function init(index, collection)
+    function init(item, index)
     {
-        collection[index] = Table()
-        collection[index].x = index
+        var new_item = Table()
+        new_item.x = index
+        return new_item
     }
     table1:pmap(init)
     for (var i = 0; i<n; i++)
@@ -18,9 +19,9 @@ var assert_not = assert_counter.assert_not
     }
 
     table1 = List(n)
-    function init_number(index, collection)
+    function init_number(item, index)
     {
-        collection[index] = 1
+        return 1
     }
     table1:pmap(init_number)
     for (var i = 0; i<n; i++)
@@ -29,9 +30,9 @@ var assert_not = assert_counter.assert_not
     }
 
     table1 = List(n)
-    table1:pmap(function(index, collection)
+    table1:pmap(function(item, index)
     {
-        collection[index] = 100 - index
+        return 100 - index
     })
     for (var i = 0; i<n; i++)
     {

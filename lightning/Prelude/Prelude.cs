@@ -51,6 +51,9 @@ namespace lightning
         public static Library GetPrelude()
         {
             Dictionary<string, TableUnit> tables = new Dictionary<string, TableUnit>();
+            tables.Add("string", StringUnit.ClassMethodTable);
+            tables.Add("list", ListUnit.ClassMethodTable);
+            tables.Add("table", TableUnit.ClassMethodTable);
 
             ////////////////////////////////////////////////////////////////////////////////////////////////////////////
             //////////////////////////////////////////////////////////////////////////////////////////////////// machine

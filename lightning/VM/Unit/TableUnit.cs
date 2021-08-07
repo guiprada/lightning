@@ -97,11 +97,6 @@ namespace lightning
             return this_string;
         }
 
-        public override bool ToBool()
-        {
-            throw new Exception("Can not convert Table to Bool.");
-        }
-
         public override bool Equals(object other)
         {
             Type other_type = other.GetType();
@@ -167,6 +162,7 @@ namespace lightning
         ////////////////////////////////////////////////////////////////////////////////////////////////////////////
         ////////////////////////////////////////////////////////////////////////////////////////////////////// Table
         private static TableUnit methodTable = new TableUnit(null);
+        public static TableUnit ClassMethodTable { get{ return methodTable; } }
         static TableUnit(){
             initMethodTable();
         }

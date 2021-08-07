@@ -5,9 +5,9 @@ var assert_not = assert_counter.assert_not
     // Testing rmap
     var n = 100
     var this_list = List(n)
-    function init_in_range (index, this_table)
+    function init_in_range (item, index)
     {
-        this_table[index] = index
+        return index
     }
     this_list:rmap(6, init_in_range)
     for (var i = 0; i<n; i++)

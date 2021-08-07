@@ -34,11 +34,19 @@ namespace lightning
     {
         public abstract UnitType Type{get;}
         public abstract override string ToString();
-        public abstract bool ToBool();
+        public virtual bool ToBool()
+        {
+            throw new Exception("Can not convert " + Type + " to Bool.");
+        }
         public abstract override bool Equals(object other);
         public abstract override int GetHashCode();
-        public abstract Unit Get(Unit p_key);
-        public abstract void Set(Unit p_key, Unit p_value);
+        public virtual Unit Get(Unit p_key){
+            throw new Exception("Trying to Get a Table value of " + Type);
+        }
+        public virtual void Set(Unit index, Unit value)
+        {
+            throw new Exception("Trying to Set a Table value of " + Type);
+        }
         public virtual void SetExtensionTable(TableUnit p_ExtensionTable){
             throw new Exception("Trying to set a Extension Table of a " + Type);
         }
@@ -48,7 +56,9 @@ namespace lightning
         public virtual TableUnit GetExtensionTable(){
             throw new Exception("Trying to get a Extension Table of a " + Type);
         }
-        public abstract int CompareTo(object compareTo);
+        public virtual int CompareTo(object p_compareTo){
+            throw new Exception("Trying to compare a " + Type);
+        }
     }
 
     public class TypeUnit : HeapUnit{
@@ -84,9 +94,6 @@ namespace lightning
             else
                 return "Unknown UnitType";
         }
-        public override bool ToBool(){
-            throw new Exception("Trying to get a boolean value of TypeUnit.");
-        }
 
         public override bool Equals(object p_other){
             if(p_other.GetType() == typeof(TypeUnit))
@@ -95,18 +102,6 @@ namespace lightning
         }
         public override int GetHashCode(){
             return this.type.GetHashCode();
-        }
-
-        public override Unit Get(Unit p_key){
-            throw new Exception("Trying to Get a Table value of TypeUnit.");
-        }
-
-        public override void Set(Unit p_key, Unit p_value){
-            throw new Exception("Trying to Set a Table value of TypeUnit.");
-        }
-
-        public override int CompareTo(object p_compareTo){
-            throw new Exception("Trying to compare a TypeUnit.");
         }
     }
 
@@ -147,11 +142,6 @@ namespace lightning
             return str;
         }
 
-        public override bool ToBool()
-        {
-            throw new Exception("Can not convert Function to Bool.");
-        }
-
         public override bool Equals(object p_other)
         {
             Type other_type = p_other.GetType();
@@ -174,14 +164,6 @@ namespace lightning
         public override int GetHashCode()
         {
             return Name.GetHashCode() + Module.GetHashCode();
-        }
-
-        public override Unit Get(Unit p_key){
-            throw new Exception("Trying to Get a Table value of FunctionUnit.");
-        }
-
-        public override void Set(Unit p_key, Unit p_value){
-            throw new Exception("Trying to Set a Table value of FunctionUnit.");
         }
 
         public override int CompareTo(object p_compareTo){
@@ -237,11 +219,6 @@ namespace lightning
             return new string("Intrinsic " + Name + "(" + Arity + ")");
         }
 
-        public override bool ToBool()
-        {
-            throw new Exception("Can not convert Intrinsic to Bool.");
-        }
-
         public override bool Equals(object p_other)
         {
             Type other_type = p_other.GetType();
@@ -262,14 +239,6 @@ namespace lightning
         public override int GetHashCode()
         {
             return Name.GetHashCode();
-        }
-
-        public override Unit Get(Unit p_key){
-            throw new Exception("Trying to Get a Table value of IntrinsicUnit.");
-        }
-
-        public override void Set(Unit p_key, Unit p_value){
-            throw new Exception("Trying to Set a Table value of IntrinsicUnit.");
         }
 
         public override int CompareTo(object p_compareTo){
@@ -322,11 +291,6 @@ namespace lightning
             return new string("Closure of " + Function.ToString());
         }
 
-        public override bool ToBool()
-        {
-            throw new Exception("Can not convert Clojure to Bool.");
-        }
-
         public override bool Equals(object p_other)
         {
             Type other_type = p_other.GetType();
@@ -347,14 +311,6 @@ namespace lightning
         public override int GetHashCode()
         {
             return UpValues.GetHashCode() + Function.GetHashCode();
-        }
-
-        public override Unit Get(Unit p_key){
-            throw new Exception("Trying to Get a Table value of ClosureUnit.");
-        }
-
-        public override void Set(Unit p_key, Unit p_value){
-            throw new Exception("Trying to Set a Table value of ClosureUnit.");
         }
 
         public override int CompareTo(object p_compareTo){
@@ -471,14 +427,6 @@ namespace lightning
             return UpValue.GetHashCode();
         }
 
-        public override Unit Get(Unit p_key){
-            throw new Exception("Trying to Get a Table value of UpValueUnit.");
-        }
-
-        public override void Set(Unit p_key, Unit p_value){
-            throw new Exception("Trying to Set a Table value of UpValueUnit.");
-        }
-
         public override int CompareTo(object p_compareTo){
             if(p_compareTo.GetType() != typeof(Unit))
                 throw new Exception("Trying to compare a UpValueUnit to non Unit type");
@@ -573,11 +521,6 @@ namespace lightning
             return Data[p_index];
         }
 
-        public override bool ToBool()
-        {
-            throw new Exception("Can not convert Module to Bool.");
-        }
-
         public override bool Equals(object p_other)
         {
             Type other_type = p_other.GetType();
@@ -660,11 +603,6 @@ namespace lightning
             ExtensionTable = p_ExtentionTable;
         }
 
-        public override void Set(Unit index, Unit value)
-        {
-            throw new Exception("Trying to Set a Table value of WrapperUnit. If you want to extend it you should use its SuperTable");
-        }
-
         public override Unit Get(Unit p_key){
             return ExtensionTable.Get(p_key);
         }
@@ -698,12 +636,6 @@ namespace lightning
         {
             return content.GetHashCode();
         }
-
-        public override bool ToBool()
-        {
-            throw new Exception("Can not convert a Wrapper<" + typeof(T) +"> to Bool.");
-        }
-
         public T UnWrapp()
         {
             if (this.content.GetType() == typeof(T))
