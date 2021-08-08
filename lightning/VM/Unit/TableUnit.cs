@@ -355,6 +355,21 @@ namespace lightning
                     return new Unit(extension_table);
                 }
                 methodTable.Set("get_extension_table", new IntrinsicUnit("table_get_extension_table", GetExtensionTable, 1));
+
+                //////////////////////////////////////////////////////
+                Unit Merge(VM vm)
+                {
+                    TableUnit this_table = vm.GetTable(0);
+                    TableUnit merging_table = vm.GetTable(1);
+
+                    foreach(KeyValuePair<Unit,Unit> u in merging_table.Map){
+                        if(!this_table.Map.ContainsKey(u.Key))
+                            this_table.Map.Add(u.Key, u.Value);
+                    }
+                    return new Unit(UnitType.Null);
+                }
+                methodTable.Set("merge", new IntrinsicUnit("merge", Merge, 2));
+
             }
         }
     }

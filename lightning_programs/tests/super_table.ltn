@@ -33,18 +33,21 @@ var assert_not = assert_counter.assert_not
     // this is not going to work, check try log
     assert(try(table.set_extension_table, [a_table, common_table]), false, "Failed Super Table Test 8.")
 
+    common_table:merge(common_table:get_extension_table())
     common_table:unset_extension_table()
     // now it works
     assert(try(table.set_extension_table, [a_table, common_table]), true, "Failed Super Table Test 9.")
+    assert(a_table.eua, "Washington", "Failed Super Table Test 10.")
+    assert(a_table.brazil, "hello", "Failed Super Table Test 11.")
 
-    assert(this_list:count(), 2, "Failed Super Table Test 10.")
-    assert(this_list:a_function(), 99, "Failed Super Table Test 11.")
+    assert(this_list:count(), 2, "Failed Super Table Test 12.")
+    assert(this_list:a_function(), 99, "Failed Super Table Test 13.")
 
-    assert(this_list:get_extension_table(), a_table, "Failed Super Table Test 12.")
-    assert(a_table:get_extension_table():get_extension_table(), null, "Failed Super Table Test 13.")
+    assert(this_list:get_extension_table(), a_table, "Failed Super Table Test 14.")
+    assert(a_table:get_extension_table():get_extension_table(), null, "Failed Super Table Test 15.")
     assert(
         a_table:get_extension_table():get_extension_table(),
         common_table:get_extension_table(),
-        "Failed Super Table Test 14.")
+        "Failed Super Table Test 16.")
 }
 return assert_counter.get_error_counter()
