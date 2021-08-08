@@ -3,33 +3,26 @@
 
 To Think
 --------
-rethink typing system
-strong typed dynamic language
-add typing tests
-examine overflows in numeric operations
-method and member function declaration
+add typing tests, don allow variables to change type
 use tuples as structs with named access
 
 To be Done
 ----------
+add table.flatten => merge with extension table and unset extension table
+    add table.flatten_under => merge extension table with table and unset extension table
 rreduce for list
-mapping and reducing functions for Table
 
-try should work better with methods
-set and get extended metable should be replaced by push metatable
-metatable merge method
+mapping and reducing functions for Table
 
 create an integer method "5.0":int
 
-review superTable and its manipulation methods(add table merge method)
 make a queue
-separate List and Map
 
 file read and write test
 
 remove DUP and STASH
 
-improve function declaration - add method declaration
+improve function declaration - add method declaration?
 
 global function override?
 
