@@ -17,6 +17,8 @@
 }
 if (intrinsic.create == null)
     write_line("No inline intrinsic support!")
+else
+    write_line("Inline intrinsic support! :)")
 
 write_line("-- Starting tests --")
 var start_time = time.now()

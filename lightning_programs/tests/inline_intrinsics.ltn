@@ -8,7 +8,7 @@ var assert_not = assert_counter.assert_not
         using Number = System.Double;
         using System;
 
-        (vm) =>{
+        (vm) => {
             Number opA = vm.GetNumber(0);
             Number opB = vm.GetNumber(1);
 
