@@ -3,30 +3,30 @@ var assert = assert_counter.assert
 var assert_not = assert_counter.assert_not
 
 {
-    // Testing reduce
-    function init(item, index)
-    {
+	// Testing reduce
+	function init(item, index)
+	{
 		var new_item = Table()
-        new_item.x = 1
-        return new_item
-    }
+		new_item.x = 1
+		return new_item
+	}
 
-    var n = 100
-    var table1 = List(n)
-    table1:rmap(16, init)
+	var n = 100
+	var table1 = List(n)
+	table1:rmap(16, init)
 
-    function reducing_function(item, index, accumulator)
-    {
+	function reducing_function(item, index, accumulator)
+	{
 		accumulator.value += item.x
-    }
+	}
 
 	var accumulator = Table()
-    accumulator.value = 0
-    table1:reduce(reducing_function, accumulator)
-    for (var i = 0; i<n; i++)
-    {
-        assert(table1[i].x, 1, "Failed reduce Test 1, iteration:" .. i .. ".")
-    }
+	accumulator.value = 0
+	table1:reduce(reducing_function, accumulator)
+	for (var i = 0; i<n; i++)
+	{
+		assert(table1[i].x, 1, "Failed reduce Test 1, iteration:" .. i .. ".")
+	}
 	assert(accumulator.value, 100, "Failed reduce Test 2.")
 }
 

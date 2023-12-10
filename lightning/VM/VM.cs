@@ -301,6 +301,7 @@ namespace lightning
 			{
 				Console.WriteLine("VM Busted ... " + CurrentInstructionPositionDataString());
 				Logger.LogNew(e.ToString(),"vm.log" );
+				Console.WriteLine(e.ToString());
 				Console.WriteLine("Check vm.log!");
 				System.Environment.Exit(1);
 				return new Unit(UnitType.Null);
@@ -416,6 +417,7 @@ namespace lightning
 			{
 				Console.WriteLine("VM Busted ... " + CurrentInstructionPositionDataString());
 				Logger.LogNew(e.ToString(), "vm.log");
+				Console.WriteLine(e.ToString());
 				Console.WriteLine("Check vm.log!");
 				System.Environment.Exit(1);
 				return new VMResult(VMResultType.ERROR, new Unit(UnitType.Null));

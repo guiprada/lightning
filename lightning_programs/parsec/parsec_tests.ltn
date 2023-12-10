@@ -13,14 +13,14 @@ parsing_text.nodes = []
 //write_line(lightning_parser.number_parser(parsing_text))
 
 write_line(parsec.apply(lightning_parser.number_parser(parsing_text),
-    function(input)
-    {
-        var new_node = []
-        new_node.value = input.match
-        new_node.type = "Number"
-        list.push(input.nodes, new_node)
-        input.match = nil
-    }))
+	function(input)
+	{
+		var new_node = []
+		new_node.value = input.match
+		new_node.type = "Number"
+		list.push(input.nodes, new_node)
+		input.match = nil
+	}))
 
 
 // var parsing_text = []
@@ -33,7 +33,7 @@ write_line(parsec.apply(lightning_parser.number_parser(parsing_text),
 //         new_node.value = input.match
 //         new_node.type = "char"
 //         list.push(input.nodes, new_node)
-//         input.match = nil        
+//         input.match = nil
 //     }))
 // write_line(parsec.apply(parsec.alpha(parsing_text),
 //     function(input){
@@ -41,7 +41,7 @@ write_line(parsec.apply(lightning_parser.number_parser(parsing_text),
 //         new_node.value = input.match
 //         new_node.type = "char"
 //         list.push(input.nodes, new_node)
-//         input.match = nil        
+//         input.match = nil
 //     }))
 // write_line(parsec.apply(parsec.digit(parsing_text),
 //     function(input){
@@ -49,7 +49,7 @@ write_line(parsec.apply(lightning_parser.number_parser(parsing_text),
 //         new_node.value = input.match
 //         new_node.type = "digit"
 //         list.push(input.nodes, new_node)
-//         input.match = nil        
+//         input.match = nil
 //     }))
 
 // var match_func = parsec.make_string_parser("func")
@@ -60,7 +60,7 @@ write_line(parsec.apply(lightning_parser.number_parser(parsing_text),
 //         new_node.value = input.match
 //         new_node.type = "function"
 //         list.push(input.nodes, new_node)
-//         input.match = nil        
+//         input.match = nil
 //     }))
 
 // var parser_A = parsec.make_string_parser("A")
@@ -72,7 +72,7 @@ write_line(parsec.apply(lightning_parser.number_parser(parsing_text),
 //         new_node.value = input.match
 //         new_node.type = "A_Or_B"
 //         list.push(input.nodes, new_node)
-//         input.match = nil        
+//         input.match = nil
 //     }))
 // write_line(parsec.apply(parser_A_Or_B(parsing_text),
 //     function(input){
@@ -80,7 +80,7 @@ write_line(parsec.apply(lightning_parser.number_parser(parsing_text),
 //         new_node.value = input.match
 //         new_node.type = "A_Or_B"
 //         list.push(input.nodes, new_node)
-//         input.match = nil        
+//         input.match = nil
 //     }))
 
 
@@ -91,7 +91,7 @@ write_line(parsec.apply(lightning_parser.number_parser(parsing_text),
 //         new_node.value = input.match
 //         new_node.type = "A_And_B"
 //         list.push(input.nodes, new_node)
-//         input.match = nil        
+//         input.match = nil
 //     }))
 
 // write_line(parsec.apply(parser_A_And_B(parsing_text),
@@ -100,7 +100,7 @@ write_line(parsec.apply(lightning_parser.number_parser(parsing_text),
 //         new_node.value = input.match
 //         new_node.type = "A_And_B"
 //         list.push(input.nodes, new_node)
-//         input.match = nil        
+//         input.match = nil
 //     }))
 
 // var parser_many_A = parsec.Many(parser_A)
@@ -110,7 +110,7 @@ write_line(parsec.apply(lightning_parser.number_parser(parsing_text),
 //         new_node.value = input.match
 //         new_node.type = "A*"
 //         list.push(input.nodes, new_node)
-//         input.match = nil        
+//         input.match = nil
 //     }))
 
 // write_line("reset")
@@ -122,7 +122,7 @@ write_line(parsec.apply(lightning_parser.number_parser(parsing_text),
 //         new_node.value = input.match
 //         new_node.type = "A+"
 //         list.push(input.nodes, new_node)
-//         input.match = nil        
+//         input.match = nil
 //     }))
 
 // write_line("reset")
@@ -134,7 +134,7 @@ write_line(parsec.apply(lightning_parser.number_parser(parsing_text),
 //         new_node.value = input.match
 //         new_node.type = "A?"
 //         list.push(input.nodes, new_node)
-//         input.match = nil        
+//         input.match = nil
 //     }))
 
 // write_line("reset")
@@ -152,7 +152,7 @@ write_line(parsec.apply(lightning_parser.number_parser(parsing_text),
 //         new_node.value = input.match
 //         new_node.type = "Any"
 //         list.push(input.nodes, new_node)
-//         input.match = nil        
+//         input.match = nil
 //     }))
 
 

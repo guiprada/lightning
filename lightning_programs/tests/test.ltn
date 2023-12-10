@@ -1,24 +1,24 @@
 ﻿write_line("*** Welcome to lightning test suite Zzz :) ***")
 {
-    var os_string = get_os()
-    var os = "Unknown"
-    if (os_string:contains("Windows"))
-        os = "Windows"
-    else if (os_string:contains("Unix"))
-        os = "Unix"
+	var os_string = get_os()
+	var os = "Unknown"
+	if (os_string:contains("Windows"))
+		os = "Windows"
+	else if (os_string:contains("Unix"))
+		os = "Unix"
 
-    write_line(get_os())
+	write_line(get_os())
 
-    var processor_count = machine.processor_count()
-    if (processor_count > 1)
-        write_line("Running on " .. processor_count .. " processors" )
-    else
-        write_line("Running Humbly on " .. processor_count .. " processor" )
+	var processor_count = machine.processor_count()
+	if (processor_count > 1)
+		write_line("Running on " .. processor_count .. " processors" )
+	else
+		write_line("Running Humbly on " .. processor_count .. " processor" )
 }
 if (intrinsic.create == null)
-    write_line("No inline intrinsic support!")
+	write_line("No inline intrinsic support!")
 else
-    write_line("Inline intrinsic support! :)")
+	write_line("Inline intrinsic support! :)")
 
 write_line("-- Starting tests --")
 var start_time = time.now()
@@ -34,24 +34,24 @@ var clear_errors = assert_counter.reset_error_counter
 
 //////////////////////////////// scratch
 {
-    var a_table = [:]
-    function a_table["he" .. "y"] (){
-        return 99
-    }
-    assert(a_table["hey"](), 99, "Failed Expression Indexed Member Function Declaration Test 1.")
+	var a_table = [:]
+	function a_table["he" .. "y"] (){
+		return 99
+	}
+	assert(a_table["hey"](), 99, "Failed Expression Indexed Member Function Declaration Test 1.")
 }
 {
-    var a_list = []
-    try(
-        list.init,
-        [a_list, 5]
-    )
-    var a_table = [:]
-    var common_table = [hey: "oba"]
-    assert(try(
-        table.set_extension_table,
-        [a_table, common_table]
-    ), true, "Failed")
+	var a_list = []
+	try(
+		list.init,
+		[a_list, 5]
+	)
+	var a_table = [:]
+	var common_table = [hey: "oba"]
+	assert(try(
+		table.set_extension_table,
+		[a_table, common_table]
+	), true, "Failed")
 }
 
 //////////////////////////////// end scratch
@@ -92,11 +92,11 @@ errors += require("tests/try.ltn")
 machine.trim()
 
 if (errors == 0){
-    write_line("No errors found! :)")
+	write_line("No errors found! :)")
 }
 else{
-    write(new_line())
-    write_line(":( " .. errors .. " errors found!")
+	write(new_line())
+	write_line(":( " .. errors .. " errors found!")
 }
 write_line("-- Finished tests! --")
 write_line("Elapsed time: " .. start_time:elapsed() .. " ms")

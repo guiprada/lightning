@@ -75,6 +75,7 @@ namespace lightning
 			else if (methodTable.Map.TryGetValue(p_key, out this_unit))
 				return this_unit;
 			else
+				// return  new Unit(TypeUnit.Null);
 				throw new Exception("Table does not contain index: " + p_key.ToString());
 		}
 

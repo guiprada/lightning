@@ -2,13 +2,13 @@ var assert_counter = require("assert_counter.ltn")
 var assert = assert_counter.assert
 var assert_not = assert_counter.assert_not
 {
-    // Numbers Comparisson
-    var num1 = 1
-    var num2 = 2
-    assert(num1, 1, "Failed numbers comparisson test 1.")
-    assert_not(num1, 2, "Failed numbers comparisson test 2.")
-    assert_not(num1, num2, "Failed numbers comparisson test 3.")
-    num2 = 1
-    assert(num1, num2, "Failed numbers comparisson test 4.")
+	// Numbers Comparisson
+	var num1 = 1
+	var num2 = 2
+	assert(num1, 1, "Failed numbers comparisson test 1.")
+	assert_not(num1, 2, "Failed numbers comparisson test 2.")
+	assert_not(num1, num2, "Failed numbers comparisson test 3.")
+	num2 = 1
+	assert(num1, num2, "Failed numbers comparisson test 4.")
 }
 return assert_counter.get_error_counter()

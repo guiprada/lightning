@@ -2,42 +2,42 @@ var assert_counter = require("assert_counter.ltn")
 var assert = assert_counter.assert
 var assert_not = assert_counter.assert_not
 {
-    // Testing map
-    var n = 100
-    var table1 = List(n)
+	// Testing map
+	var n = 100
+	var table1 = List(n)
 
-    function init(item, index)
-    {
+	function init(item, index)
+	{
 		var new_table = Table()
-        new_table.x = 1
-        return new_table
-    }
+		new_table.x = 1
+		return new_table
+	}
 
-    table1:map(init)
-    for (var i = 0; i<n; i++)
-    {
-        assert(table1[i].x, 1, "Failed map Test 1, iteration:" .. i .. ".")
-    }
+	table1:map(init)
+	for (var i = 0; i<n; i++)
+	{
+		assert(table1[i].x, 1, "Failed map Test 1, iteration:" .. i .. ".")
+	}
 
-    table1 = List(n)
-    function init_number(item, index)
-    {
-        return 1
-    }
-    table1:map(init_number)
-    for (var i = 0; i<n; i++)
-    {
-        assert(table1[i], 1, "Failed map Test 2, iteration: " .. i .. ".")
-    }
+	table1 = List(n)
+	function init_number(item, index)
+	{
+		return 1
+	}
+	table1:map(init_number)
+	for (var i = 0; i<n; i++)
+	{
+		assert(table1[i], 1, "Failed map Test 2, iteration: " .. i .. ".")
+	}
 
-    table1 = List(n)
-    table1:map(function(item, index)
-    {
-        return 100 - index
-    })
-    for (var i = 0; i<n; i++)
-    {
-        assert(table1[i], n - i, "Failed map Test 3, iteration: " .. i .. ".")
-    }
+	table1 = List(n)
+	table1:map(function(item, index)
+	{
+		return 100 - index
+	})
+	for (var i = 0; i<n; i++)
+	{
+		assert(table1[i], n - i, "Failed map Test 3, iteration: " .. i .. ".")
+	}
 }
 return assert_counter.get_error_counter()

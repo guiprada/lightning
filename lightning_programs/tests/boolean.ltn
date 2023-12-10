@@ -2,45 +2,45 @@ var assert_counter = require("assert_counter.ltn")
 var assert = assert_counter.assert
 var assert_not = assert_counter.assert_not
 {
-    // Testing boolean operations
-    //AND
-    assert(false, (false and false), "Failed AND test 1.");
-    assert(false, (false and true), "Failed AND test 2.");
-    assert(false, (true and false), "Failed AND test 3.");
-    assert(true, (true and true), "Failed AND test 4.");
+	// Testing boolean operations
+	//AND
+	assert(false, (false and false), "Failed AND test 1.");
+	assert(false, (false and true), "Failed AND test 2.");
+	assert(false, (true and false), "Failed AND test 3.");
+	assert(true, (true and true), "Failed AND test 4.");
 
-    //OR
-    assert(false, (false or false), "Failed OR test 1.");
-    assert(true, (false or true), "Failed OR test 2.");
-    assert(true, (true or false), "Failed OR test 3.");
-    assert(true, (true or true), "Failed OR test 4.");
+	//OR
+	assert(false, (false or false), "Failed OR test 1.");
+	assert(true, (false or true), "Failed OR test 2.");
+	assert(true, (true or false), "Failed OR test 3.");
+	assert(true, (true or true), "Failed OR test 4.");
 
-    //XOR
-    assert(false, (false xor false), "Failed XOR test 1.");
-    assert(true, (false xor true), "Failed XOR test 2.");
-    assert(true, (true xor false), "Failed XOR test 3.");
-    assert(false, (true xor true), "Failed XOR test 4.");
+	//XOR
+	assert(false, (false xor false), "Failed XOR test 1.");
+	assert(true, (false xor true), "Failed XOR test 2.");
+	assert(true, (true xor false), "Failed XOR test 3.");
+	assert(false, (true xor true), "Failed XOR test 4.");
 
-    //NOT
-    assert(false, !true, "Failed NOT test 1.");
-    assert(true, !false, "Failed NOT test 2.");
+	//NOT
+	assert(false, !true, "Failed NOT test 1.");
+	assert(true, !false, "Failed NOT test 2.");
 
-    //NAND
-    assert(true, (false nand false), "Failed NAND test 1.");
-    assert(true, (false nand true), "Failed NAND test 2.");
-    assert(true, (true nand false), "Failed NAND test 3.");
-    assert(false, (true nand true), "Failed NAND test 4.");
+	//NAND
+	assert(true, (false nand false), "Failed NAND test 1.");
+	assert(true, (false nand true), "Failed NAND test 2.");
+	assert(true, (true nand false), "Failed NAND test 3.");
+	assert(false, (true nand true), "Failed NAND test 4.");
 
-    //NOR
-    assert(true, (false nor false), "Failed NOR test 1.");
-    assert(false, (false nor true), "Failed NOR test 2.");
-    assert(false, (true nor false), "Failed NOR test 3.");
-    assert(false, (true nor true), "Failed NOR test 4.");
+	//NOR
+	assert(true, (false nor false), "Failed NOR test 1.");
+	assert(false, (false nor true), "Failed NOR test 2.");
+	assert(false, (true nor false), "Failed NOR test 3.");
+	assert(false, (true nor true), "Failed NOR test 4.");
 
-    //XNOR
-    assert(true, (false xnor false), "Failed XNOR test 1.");
-    assert(false, (false xnor true), "Failed XNOR test 2.");
-    assert(false, (true xnor false), "Failed XNOR test 3.");
-    assert(true, (true xnor true), "Failed XNOR test 4.");
+	//XNOR
+	assert(true, (false xnor false), "Failed XNOR test 1.");
+	assert(false, (false xnor true), "Failed XNOR test 2.");
+	assert(false, (true xnor false), "Failed XNOR test 3.");
+	assert(true, (true xnor true), "Failed XNOR test 4.");
 }
 return assert_counter.get_error_counter()

@@ -2,35 +2,35 @@ var assert_counter = require("assert_counter.ltn")
 var assert = assert_counter.assert
 var assert_not = assert_counter.assert_not
 {
-    // Testing Eval
-    var my_prog1 = #
-        var table1 = [:]
-        var str_global = "global"
-        {
-            var str_upvalue = "up"
-            table1.append =
-                function (value1, value2, value3){
-                    return str_global .. value1 .. value2 .. value3 .. str_upvalue
-                }
-        }
-        return table1
-    #
-    var a = eval(my_prog1)
-    //var a = require("prog1.ltn")
+	// Testing Eval
+	var my_prog1 = #
+		var table1 = [:]
+		var str_global = "global"
+		{
+			var str_upvalue = "up"
+			table1.append =
+				function (value1, value2, value3){
+					return str_global .. value1 .. value2 .. value3 .. str_upvalue
+				}
+		}
+		return table1
+	#
+	var a = eval(my_prog1)
+	//var a = require("prog1.ltn")
 
-    assert(a.append("a","b","c"),"globalabcup", "Failed Eval test 1.")
+	assert(a.append("a","b","c"),"globalabcup", "Failed Eval test 1.")
 
-    var my_prog2 = #
-        var str_global = "global"
-        var str_upvalue = "up"
-        return function (value1, value2, value3){
-                return str_global .. value1 .. value2 .. value3 .. str_upvalue
-            }
-    #
-    file.write("file_write_test.ltn", my_prog2)
-    file.append("file_write_test.ltn", my_prog1)
-    a = eval(my_prog2)
-    // a = require("prog2.ltn")
-    assert(a("a","b","c"),"globalabcup", "Failed Eval test 2.")
+	var my_prog2 = #
+		var str_global = "global"
+		var str_upvalue = "up"
+		return function (value1, value2, value3){
+				return str_global .. value1 .. value2 .. value3 .. str_upvalue
+			}
+	#
+	file.write("file_write_test.ltn", my_prog2)
+	file.append("file_write_test.ltn", my_prog1)
+	a = eval(my_prog2)
+	// a = require("prog2.ltn")
+	assert(a("a","b","c"),"globalabcup", "Failed Eval test 2.")
 }
 return assert_counter.get_error_counter()

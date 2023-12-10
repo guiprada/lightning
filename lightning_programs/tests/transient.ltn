@@ -2,45 +2,45 @@ var assert_counter = require("assert_counter.ltn")
 var assert = assert_counter.assert
 var assert_not = assert_counter.assert_not
 {
-    // Transient tests
-    var a = 5
-    var b = a
-    a = 3
-    assert(a, 3, "Failed Transient Test 1.")
-    assert(b, 5, "Failed Transient Test 2.")
+	// Transient tests
+	var a = 5
+	var b = a
+	a = 3
+	assert(a, 3, "Failed Transient Test 1.")
+	assert(b, 5, "Failed Transient Test 2.")
 
-    var str1 = "Hello"
-    var str2 = str1
-    str1 = "World"
-    assert_not(str1, str2, "Failed Transient Test 3.")
+	var str1 = "Hello"
+	var str2 = str1
+	str1 = "World"
+	assert_not(str1, str2, "Failed Transient Test 3.")
 
-    var fun1 = math.sin
-    var fun2 = fun1
-    fun1 = write_line
-    assert_not(fun1, fun2, "Failed Transient Test 4.")
+	var fun1 = math.sin
+	var fun2 = fun1
+	fun1 = write_line
+	assert_not(fun1, fun2, "Failed Transient Test 4.")
 
-    var table1 = [1,2]
-    var table2 = table1
-    table1[2] = 3
-    assert(table2[2], 3, "Failed Transient Test 5.")
+	var table1 = [1,2]
+	var table2 = table1
+	table1[2] = 3
+	assert(table2[2], 3, "Failed Transient Test 5.")
 
-    table2 = null
-    assert(table1[2], 3, "Failed Transient Test 6.")
+	table2 = null
+	assert(table1[2], 3, "Failed Transient Test 6.")
 
-    var truthy
-    var falsy = false
-    truthy = falsy
-    truthy = true
-    assert(falsy, false, "Failed Transient Test 7.")
+	var truthy
+	var falsy = false
+	truthy = falsy
+	truthy = true
+	assert(falsy, false, "Failed Transient Test 7.")
 
-    var something
-    var nothing = null
-    something = nothing
-    something = 1
-    assert(nothing, null, "Failed Transient Test 8.")
+	var something
+	var nothing = null
+	something = nothing
+	something = 1
+	assert(nothing, null, "Failed Transient Test 8.")
 
-    var list1 = [0,1,2]
-    var list2 = list1
-    assert(list2, list1, "Failed Transient Test 9.")
+	var list1 = [0,1,2]
+	var list2 = list1
+	assert(list2, list1, "Failed Transient Test 9.")
 }
 return assert_counter.get_error_counter()

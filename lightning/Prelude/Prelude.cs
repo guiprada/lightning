@@ -266,7 +266,7 @@ namespace lightning
 
 					var options = ScriptOptions.Default.AddReferences(
 						typeof(Unit).Assembly,
-						typeof(VM).Assembly).WithImports("lightning", "System");
+						typeof(VM).Assembly).WithImports("lightning"); //, "System");
 					Func<VM, Unit> new_intrinsic = CSharpScript.EvaluateAsync<Func<VM, Unit>>(body, options)
 						.GetAwaiter().GetResult();
 

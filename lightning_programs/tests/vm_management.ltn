@@ -2,13 +2,13 @@ var assert_counter = require("assert_counter.ltn")
 var assert = assert_counter.assert
 var assert_not = assert_counter.assert_not
 {
-    // Testing VMs management
-    var totalVMs = machine.count_vms()
-    var halth = math.idiv(totalVMs, 2)
-    machine.release_vms(halth)
-    assert(machine.count_vms(), totalVMs - halth, "Failed VMs management Test 1.")
+	// Testing VMs management
+	var totalVMs = machine.count_vms()
+	var halth = math.idiv(totalVMs, 2)
+	machine.release_vms(halth)
+	assert(machine.count_vms(), totalVMs - halth, "Failed VMs management Test 1.")
 
-    machine.release_all_vms()
-    assert(machine.count_vms(), 0, "Failed VMs management Test 0.")
+	machine.release_all_vms()
+	assert(machine.count_vms(), 0, "Failed VMs management Test 0.")
 }
 return assert_counter.get_error_counter()

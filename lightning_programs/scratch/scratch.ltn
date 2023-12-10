@@ -15,33 +15,33 @@ var assert_not = lib_assert_counter_not.assert_not
 
 function count_errors()
 {
-    return lib_assert_counter_not.errors + lib_assert_counter.errors
+	return lib_assert_counter_not.errors + lib_assert_counter.errors
 }
 function clear_errors()
 {
-    lib_assert_counter_not.errors = 0
-    lib_assert_counter.errors = 0
+	lib_assert_counter_not.errors = 0
+	lib_assert_counter.errors = 0
 }
 
 {
-    // Assertions
-    write("assert() ..")
-    assert(1,2," OK!")
-    write("assert_not() ..")
-    assert_not(1,1," OK!")
+	// Assertions
+	write("assert() ..")
+	assert(1,2," OK!")
+	write("assert_not() ..")
+	assert_not(1,1," OK!")
 
-    if (count_errors() == 2){
-        write_line("Reseted error count.")
-        clear_errors()
-    }else{
-        write_line("Assertion functionctions are insane!")
-    }
+	if (count_errors() == 2){
+		write_line("Reseted error count.")
+		clear_errors()
+	}else{
+		write_line("Assertion functionctions are insane!")
+	}
 
-    lib_assert.header = "ERROR: "
+	lib_assert.header = "ERROR: "
 
-    assert(null, null, "Failed null sanity check 1.")
-    assert_not(1, null, "Failed null sanity check 2.")
-    assert(true, true, "Failed true sanity check 3.")
-    assert(false, false, "Failed false sanity check 4.")
-    assert_not(true, false, "Failed boolean sanity check 5.")
+	assert(null, null, "Failed null sanity check 1.")
+	assert_not(1, null, "Failed null sanity check 2.")
+	assert(true, true, "Failed true sanity check 3.")
+	assert(false, false, "Failed false sanity check 4.")
+	assert_not(true, false, "Failed boolean sanity check 5.")
 }

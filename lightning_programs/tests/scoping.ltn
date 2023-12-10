@@ -2,13 +2,13 @@ var assert_counter = require("assert_counter.ltn")
 var assert = assert_counter.assert
 var assert_not = assert_counter.assert_not
 {
-    // Testing lexical scoping
-    var a = "a"
-    {
-        var a = "b"
-        assert(a, "b", "Failed lexical scoping test 1.")
+	// Testing lexical scoping
+	var a = "a"
+	{
+		var a = "b"
+		assert(a, "b", "Failed lexical scoping test 1.")
 
-    }
-    assert(a, "a", "Failed lexical scoping test 2.")
+	}
+	assert(a, "a", "Failed lexical scoping test 2.")
 }
 return assert_counter.get_error_counter()

@@ -2,48 +2,48 @@ var assert_counter = require("assert_counter.ltn")
 var assert = assert_counter.assert
 var assert_not = assert_counter.assert_not
 {
-    // String Comparisson
-    var hello = "hello"
-    var world = "world"
-    assert("hello", hello, "Failed string comparisson test 1.")
-    assert_not(hello, "world", "Failed string comparisson test 2.")
-    assert_not(hello, world, "Failed string comparisson test 3.")
+	// String Comparisson
+	var hello = "hello"
+	var world = "world"
+	assert("hello", hello, "Failed string comparisson test 1.")
+	assert_not(hello, "world", "Failed string comparisson test 2.")
+	assert_not(hello, world, "Failed string comparisson test 3.")
 }
 {
-    //String concatenation
-    var hello = "hello"
-    var world = "world"
-    var result = "hello" .. " " .. "world!"
-    assert(result, "hello world!", "Failed string concatenation test 1.")
-    assert_not(result, "world!", "Failed string concatenation test 2.")
+	//String concatenation
+	var hello = "hello"
+	var world = "world"
+	var result = "hello" .. " " .. "world!"
+	assert(result, "hello world!", "Failed string concatenation test 1.")
+	assert_not(result, "world!", "Failed string concatenation test 2.")
 }
 {
-    // Testing Append and Alphanumeric Addition
-    var char_o = 'o'
-    var char_a = 'a'
-    assert((1 .. 2  .. char_o .. 3 .. 5 .. " " .. char_a), "12o35 a", "Failed Append and Alphanumeric Addition Test 1.")
-    assert((1 + 2  .. char_o .. 3 .. " " .. char_a), "3o3 a", "Failed Append and Alphanumeric Addition Test 2.")
+	// Testing Append and Alphanumeric Addition
+	var char_o = 'o'
+	var char_a = 'a'
+	assert((1 .. 2  .. char_o .. 3 .. 5 .. " " .. char_a), "12o35 a", "Failed Append and Alphanumeric Addition Test 1.")
+	assert((1 + 2  .. char_o .. 3 .. " " .. char_a), "3o3 a", "Failed Append and Alphanumeric Addition Test 2.")
 }
 {
-    // Testing String Contains
-    var hello_world_string = "hello world"
-    assert(hello_world_string:contains("hello"), true, "Failed String Contains Test 1.")
-    assert(hello_world_string:contains("world"), true, "Failed String Contains Test 2.")
-    assert(hello_world_string:contains("llo wo"), true, "Failed String Contains Test 3.")
-    assert(hello_world_string:contains("hey"), false, "Failed String Contains Test 4.")
-    assert(hello_world_string:contains("_wor"), false, "Failed String Contains Test 5.")
-    assert(hello_world_string:contains_char('e'), true, "Failed String Contains Test 6.")
-    assert(hello_world_string:contains_char('l'), true, "Failed String Contains Test 7.")
-    assert(hello_world_string:contains_char('g'), false, "Failed String Contains Test 8.")
+	// Testing String Contains
+	var hello_world_string = "hello world"
+	assert(hello_world_string:contains("hello"), true, "Failed String Contains Test 1.")
+	assert(hello_world_string:contains("world"), true, "Failed String Contains Test 2.")
+	assert(hello_world_string:contains("llo wo"), true, "Failed String Contains Test 3.")
+	assert(hello_world_string:contains("hey"), false, "Failed String Contains Test 4.")
+	assert(hello_world_string:contains("_wor"), false, "Failed String Contains Test 5.")
+	assert(hello_world_string:contains_char('e'), true, "Failed String Contains Test 6.")
+	assert(hello_world_string:contains_char('l'), true, "Failed String Contains Test 7.")
+	assert(hello_world_string:contains_char('g'), false, "Failed String Contains Test 8.")
 }
 {
-    // Test adding methods to String
-    var a_string = "oba"
-    var string_extension_table = [:]
-    string_extension_table.teste1 = \(self){ return self }
-    a_string:set_extension_table(string_extension_table)
-    assert(a_string:teste1(), "oba", "Failed Adding Methods to String Test 1.")
-    assert("another_string":teste1(), "another_string", "Failed Adding Methods to String Test 2.")
-    assert(a_string:get_extension_table(), string_extension_table, "Failed Adding Methods to String Test 3.")
+	// Test adding methods to String
+	var a_string = "oba"
+	var string_extension_table = [:]
+	string_extension_table.teste1 = \(self){ return self }
+	a_string:set_extension_table(string_extension_table)
+	assert(a_string:teste1(), "oba", "Failed Adding Methods to String Test 1.")
+	assert("another_string":teste1(), "another_string", "Failed Adding Methods to String Test 2.")
+	assert(a_string:get_extension_table(), string_extension_table, "Failed Adding Methods to String Test 3.")
 }
 return assert_counter.get_error_counter()

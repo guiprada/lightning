@@ -4,25 +4,25 @@ var assert_not = assert_counter.assert_not
 // Testing Global Lock
 var global_lock_test_counter = 5
 {
-    var n = 1000
-    function increment_global_counter(value)
-    {
-        global_lock_test_counter += value;
-    }
-    write("");
-    tasks(n, increment_global_counter, 1)
-    assert(global_lock_test_counter, n + 5, "Failed Global Lock Test 1.")
+	var n = 1000
+	function increment_global_counter(value)
+	{
+		global_lock_test_counter += value;
+	}
+	write("");
+	tasks(n, increment_global_counter, 1)
+	assert(global_lock_test_counter, n + 5, "Failed Global Lock Test 1.")
 }
 {
-    // Testing UpValue Lock
-    var n = 1000
-    var this_list = List(n)
-    var upvalue_lock_test_counter = 5
-    function many(index, collection)
-    {
-        upvalue_lock_test_counter++;
-    }
-    this_list:rmap(n, many)
-    assert(upvalue_lock_test_counter, n + 5, "Failed UpValue Lock Test 1.")
+	// Testing UpValue Lock
+	var n = 1000
+	var this_list = List(n)
+	var upvalue_lock_test_counter = 5
+	function many(index, collection)
+	{
+		upvalue_lock_test_counter++;
+	}
+	this_list:rmap(n, many)
+	assert(upvalue_lock_test_counter, n + 5, "Failed UpValue Lock Test 1.")
 }
 return assert_counter.get_error_counter()

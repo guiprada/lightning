@@ -2,28 +2,28 @@ var assert_counter = require("assert_counter.ltn")
 var assert = assert_counter.assert
 var assert_not = assert_counter.assert_not
 {
-    // Assertions
-    write("assert() ..")
-    assert(1,2," OK!")
+	// Assertions
+	write("assert() ..")
+	assert(1,2," OK!")
 
-    write("assert_not() ..")
-    assert_not(1,1," OK!")
+	write("assert_not() ..")
+	assert_not(1,1," OK!")
 
-    if (assert_counter.get_error_counter() == 2){
-        assert_counter.reset_error_counter()
-    }else{
-        write_line("Assertion functions are insane!")
-    }
-    write(new_line())
+	if (assert_counter.get_error_counter() == 2){
+		assert_counter.reset_error_counter()
+	}else{
+		write_line("Assertion functions are insane!")
+	}
+	write(new_line())
 
-    assert(null, null, "Failed null sanity check 1.")
-    assert_not(1, null, "Failed null sanity check 2.")
-    assert_not("Nil", null, "Failed null sanity check 3.")
-    assert_not("Null", null, "Failed null sanity check 4.")
-    assert_not("null", null, "Failed null sanity check 5.")
+	assert(null, null, "Failed null sanity check 1.")
+	assert_not(1, null, "Failed null sanity check 2.")
+	assert_not("Nil", null, "Failed null sanity check 3.")
+	assert_not("Null", null, "Failed null sanity check 4.")
+	assert_not("null", null, "Failed null sanity check 5.")
 
-    assert(true, true, "Failed bool sanity check 1.")
-    assert(false, false, "Failed bool sanity check 2.")
-    assert_not(true, false, "Failed bool sanity check 3.")
+	assert(true, true, "Failed bool sanity check 1.")
+	assert(false, false, "Failed bool sanity check 2.")
+	assert_not(true, false, "Failed bool sanity check 3.")
 }
 return assert_counter.get_error_counter()

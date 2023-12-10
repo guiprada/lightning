@@ -2,19 +2,19 @@ var lib = Table()
 
 lib.assert = function(value1, value2, msg)
 {
-    if(value1 != value2){
-        write_line(msg)
-        return false
-    }
-    return true
+	if(value1 != value2){
+		write_line(msg)
+		return false
+	}
+	return true
 }
 lib.assert_not = function(value1, value2, msg)
 {
-    if(value1 == value2){
-        write_line(msg)
-        return false
-    }
-    return true
+	if(value1 == value2){
+		write_line(msg)
+		return false
+	}
+	return true
 }
 
 return lib

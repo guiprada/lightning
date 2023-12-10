@@ -2,43 +2,43 @@ var assert_counter = require("assert_counter.ltn")
 var assert = assert_counter.assert
 var assert_not = assert_counter.assert_not
 {
-    // Testing method calls
+	// Testing method calls
 
-    function make_player()
-    {
-        var player = [:]
-        player.position = [:];
-        player.position["x"] = 0
-        player.position["y"] = 0
+	function make_player()
+	{
+		var player = [:]
+		player.position = [:];
+		player.position["x"] = 0
+		player.position["y"] = 0
 
-        player.move = function (self, x, y)
-        {
-            self.position.x = self.position.x + x;
-            self.position.y = self.position.y + y;
-            return self.position
-        }
-        player[-2] = player.move
-        player[-2.5] = player.move
+		player.move = function (self, x, y)
+		{
+			self.position.x = self.position.x + x;
+			self.position.y = self.position.y + y;
+			return self.position
+		}
+		player[-2] = player.move
+		player[-2.5] = player.move
 
-        return player
-    }
+		return player
+	}
 
-    var p1 = make_player();
-    assert(p1:move(1,0).x, 1, "Failed method call test 1.")
-    assert(p1:move(0,3).y, 3, "Failed method call test 2.")
+	var p1 = make_player();
+	assert(p1:move(1,0).x, 1, "Failed method call test 1.")
+	assert(p1:move(0,3).y, 3, "Failed method call test 2.")
 
-    var name = "move"
-    assert(p1[name](p1,0,3).y, 6, "Failed method call test 3.")
-    assert(p1["move"](p1,0,0).y, 6, "Failed method call test 4.")
-    assert(p1[-(1+1)](p1,0,0).y, 6, "Failed method call test 5.")
-    assert(p1["mo".."ve"](p1,0,0).y, 6, "Failed method call test 6.")
+	var name = "move"
+	assert(p1[name](p1,0,3).y, 6, "Failed method call test 3.")
+	assert(p1["move"](p1,0,0).y, 6, "Failed method call test 4.")
+	assert(p1[-(1+1)](p1,0,0).y, 6, "Failed method call test 5.")
+	assert(p1["mo".."ve"](p1,0,0).y, 6, "Failed method call test 6.")
 
-    assert(p1:[name](0,0).y, 6, "Failed method call test 7.")
-    assert(p1:"move"(0,0).y, 6, "Failed method call test 8.")
-    assert(p1:["move"](0,0).y, 6, "Failed method call test 9.")
-    assert(p1:[-(1 + 1)](0,0).y, 6, "Failed method call test 10.")
-    assert(p1:-2(0,0).y, 6, "Failed method call test 11.")
-    assert(p1:-2.5(0,0).y, 6, "Failed method call test 12.")
-    assert(p1:["mo".."ve"](0,0).y, 6, "Failed method call test 13.")
+	assert(p1:[name](0,0).y, 6, "Failed method call test 7.")
+	assert(p1:"move"(0,0).y, 6, "Failed method call test 8.")
+	assert(p1:["move"](0,0).y, 6, "Failed method call test 9.")
+	assert(p1:[-(1 + 1)](0,0).y, 6, "Failed method call test 10.")
+	assert(p1:-2(0,0).y, 6, "Failed method call test 11.")
+	assert(p1:-2.5(0,0).y, 6, "Failed method call test 12.")
+	assert(p1:["mo".."ve"](0,0).y, 6, "Failed method call test 13.")
 }
 return assert_counter.get_error_counter()

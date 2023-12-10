@@ -5,13 +5,13 @@ var parser_numbers_part = parsec.At_least_one(parsec.digit)
 var parser_dot = parsec.make_string_parser(".")
 var number_parser = parsec.Optional(parsec.And(parser_numbers_part, parser_dot))
 parser.number_parser = parsec.And(number_parser, parser_numbers_part)
- 
-//parsec.And(parsec.Optional(parsec.And(parsec.At_least_one(parsec.digit), parsec.make_string_parser("."))), parsec.At_least_one(parsec.digit))
+
+// parsec.And(parsec.Optional(parsec.And(parsec.At_least_one(parsec.digit), parsec.make_string_parser("."))), parsec.At_least_one(parsec.digit))
 
 // parser.number_parser = function()
 // {
-//     return parsec.And(parsec.Optional(parsec.And(parsec.At_least_one(parsec.digit), parsec.make_string_parser("."))), parsec.At_least_one(parsec.digit))
+// 	return parsec.And(parsec.Optional(parsec.And(parsec.At_least_one(parsec.digit), parsec.make_string_parser("."))), parsec.At_least_one(parsec.digit))
 // }
-//write_line(parser.number_parser)
+// write_line(parser.number_parser)
 
 return parser

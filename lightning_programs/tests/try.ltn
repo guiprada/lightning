@@ -2,24 +2,28 @@ var assert_counter = require("assert_counter.ltn")
 var assert = assert_counter.assert
 var assert_not = assert_counter.assert_not
 {
-    // Testing try
-    var array1
-    var a = 1
-    var success = try(\(str1, str2){
-        write_line(array1[0])
-        a = 2
-    }, ["oi", "mundo"])
-    assert(a, 1, "Failed try() Test 1.")
+	// Testing try
+	var array1
+	var a = 1
+	var success = try(\(str1, str2){
+		write_line(array1[0])
+		a = 2
+	}, ["oi", "mundo"])
+	assert(a, 1, "Failed try() Test 1.")
 
-    success = try(\{
-        write_line(array1[0])
-        a = 2
-    }, null)
-    assert(a, 1, "Failed try() Test 2.")
+	success = try(\{
+		write_line(array1[0])
+		a = 2
+	}, null)
+	assert(a, 1, "Failed try() Test 2.")
 
-    try(\{
-        a = 2
-    }, [])
-    assert(a, 2, "Failed try() Test 3.")
+	try(\{
+		a = 2
+	}, [])
+	assert(a, 2, "Failed try() Test 3.")
+
+	var t = Table()
+	a = try(\{t.x}, [])
+	assert(a, false, "Failed try() Test 4.")
 }
 return assert_counter.get_error_counter()
