@@ -17,6 +17,7 @@ function count_errors()
 {
 	return lib_assert_counter_not.errors + lib_assert_counter.errors
 }
+
 function clear_errors()
 {
 	lib_assert_counter_not.errors = 0

@@ -266,7 +266,7 @@ namespace lightning
 
 					var options = ScriptOptions.Default.AddReferences(
 						typeof(Unit).Assembly,
-						typeof(VM).Assembly).WithImports("lightning"); //, "System");
+						typeof(VM).Assembly).WithImports(); // "lightning", "System");
 					Func<VM, Unit> new_intrinsic = CSharpScript.EvaluateAsync<Func<VM, Unit>>(body, options)
 						.GetAwaiter().GetResult();
 
@@ -617,23 +617,23 @@ namespace lightning
 				Scanner scanner = new Scanner(eval_code, eval_name);
 				List<Token> tokens = scanner.Tokens;
 				if(scanner.HasScanned == false){
-					Console.WriteLine("Module " + eval_name + " scanning had errors!");
-					return new Unit(UnitType.Null);
+					Logger.LogNew("Module " + eval_name + " scanning had errors!", "vm.log");
+					throw new Exception("Scanning Error");
 				}
 
 				Parser parser = new Parser(tokens, eval_name);
 
 				Node program = parser.ParsedTree;
 				if(parser.HasParsed == false){
-					Console.WriteLine("Module " + eval_name + "  parsing had errors!");
-					return new Unit(UnitType.Null);
+						Logger.LogNew("Module " + eval_name + " parsing had errors!", "vm.log");
+						throw new Exception("Parsing Error");
 				}
 
 				Chunker chunker = new Chunker(program, eval_name, p_vm.Prelude);
 				Chunk chunk = chunker.Chunk;
 				if (chunker.HasChunked == false){
-					Console.WriteLine("Module " + eval_name + "  code generation had errors!");
-					return new Unit(UnitType.Null);
+					Logger.LogNew("Module " + eval_name + " code generation had errors!", "vm.log");
+					throw new Exception("Code Generation Error");
 				}
 
 				if (chunker.HasChunked == true)
@@ -647,7 +647,7 @@ namespace lightning
 						return result.value;
 					}
 				}
-				return new Unit(UnitType.Null);
+				throw new Exception("Code Execution not OK :|");
 			}
 			functions.Add(new IntrinsicUnit("eval", Eval, 1));
 
@@ -672,22 +672,22 @@ namespace lightning
 					Scanner scanner = new Scanner(module_code, name);
 					List<Token> tokens = scanner.Tokens;
 					if(scanner.HasScanned == false){
-						Console.WriteLine("Module " + name + " scanning had errors!");
-						return new Unit(UnitType.Null);
+						Logger.LogNew("Module " + name + " scanning had errors!", "vm.log");
+						throw new Exception("Scanning Error");
 					}
 
 					Parser parser = new Parser(tokens, name);
 					Node program = parser.ParsedTree;
 					if(parser.HasParsed == false){
-						Console.WriteLine("Module " + name + "  parsing had errors!");
-						return new Unit(UnitType.Null);
+						Logger.LogNew("Module " + name + " parsing had errors!", "vm.log");
+						throw new Exception("Parsing Error");
 					}
 
 					Chunker chunker = new Chunker(program, name, p_vm.Prelude);
 					Chunk chunk = chunker.Chunk;
 					if (chunker.HasChunked == false){
-						Console.WriteLine("Module " + name + "  code generation had errors!");
-						return new Unit(UnitType.Null);
+						Logger.LogNew("Module " + name + " code generation had errors!", "vm.log");
+						throw new Exception("Code Generation Error");
 					}
 
 					if (chunker.HasChunked == true){
@@ -699,7 +699,7 @@ namespace lightning
 						}
 					}
 				}
-				return new Unit(UnitType.Null);
+				throw new Exception("Code Execution not OK :|");
 			}
 			functions.Add(new IntrinsicUnit("require", Require, 1));
 

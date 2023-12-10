@@ -46,8 +46,8 @@ namespace lightning
 					try
 					{
 						Parse();
-						PrintWarnings();
-						PrintErrors();
+						LogWarnings();
+						LogErrors();
 						if(Errors.Count > 0)
 							return null;
 						else{
@@ -69,8 +69,8 @@ namespace lightning
 							e.ToString(),
 							Path.ToPath(moduleName) + "_parser.log"
 						);
-						PrintWarnings();
-						PrintErrors();
+						LogWarnings();
+						LogErrors();
 						return null;
 					}
 				}
@@ -93,19 +93,19 @@ namespace lightning
 			ast = Program();
 		}
 
-		private void PrintWarnings(){
+		private void LogWarnings(){
 			if (Warnings.Count > 0){
-				Console.WriteLine("Parsing had Warnings:");
+				Logger.LogNew("Parsing had warnings:", "vm.log");
 				foreach (string warning in Warnings)
-					Console.WriteLine(warning);
+					Logger.LogNew("\t-" + warning, "vm.log");
 			}
 		}
 
-		private void PrintErrors(){
+		private void LogErrors(){
 			if (Errors.Count > 0){
-				Console.WriteLine("Parsing had Errors:");
+				Logger.LogNew("Parsing had Errors:", "vm.log");
 				foreach (string error in Errors)
-					Console.WriteLine(error);
+					Logger.LogNew("\t-" + error, "vm.log");
 			}
 		}
 
@@ -1140,7 +1140,7 @@ namespace lightning
 					return new LiteralNode(Previous().PositionData);
 				}
 			}else{
-				Error("No match found! " + Peek().PositionData + " " + Peek());
+				Error("Primary Terminal expected - Primary node can not begin with: " + Peek());
 				return null;
 			}
 		}

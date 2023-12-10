@@ -88,9 +88,9 @@ namespace lightning
 
 		private void PrintErrors(){
 			if (errors.Count > 0)
-				Console.WriteLine("Scanning had errors on module: " + moduleName);
+				Logger.LogNew("Scanning had errors on module " + moduleName + ":", "vm.log");
 					foreach(string error in errors)
-						Console.WriteLine(error);
+						Logger.LogNew("\t-" + error, "vm.log");
 		}
 
 		private List<Token> ScanTokens()

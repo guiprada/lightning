@@ -25,5 +25,17 @@ var assert_not = assert_counter.assert_not
 	var t = Table()
 	a = try(\{t.x}, [])
 	assert(a, false, "Failed try() Test 4.")
+
+	var broken_func1 = \{eval ("var code =")}
+	var broken_result1 = try(broken_func1, [])
+	assert(broken_result1, false, "Failed try() Test 5.")
+
+
+	var broken_func2 = \{eval (#
+	// var a
+	(a)
+	// write("hello world!")#)}
+	var broken_result2 = try(broken_func2, [])
+	assert(broken_result2, false, "Failed try() Test 6.")
 }
 return assert_counter.get_error_counter()

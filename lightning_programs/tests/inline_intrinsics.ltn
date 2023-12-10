@@ -5,8 +5,9 @@ var assert_not = assert_counter.assert_not
 	// Testing inline Intrinsics
 	var intr_sum =
 	#
-		using Number = System.Double;
 		using System;
+		using Number = System.Double;
+		using lightning;
 
 		(vm) => {
 			Number opA = vm.GetNumber(0);
