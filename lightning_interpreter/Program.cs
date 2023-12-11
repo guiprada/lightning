@@ -52,7 +52,7 @@ namespace interpreter
 			Node program = parser.ParsedTree;
 			if(parser.HasParsed == false){ return 0; }
 
-			Chunker chunker = new Chunker(program, name, Prelude.GetPrelude());
+			Compiler chunker = new Compiler(program, name, Prelude.GetPrelude());
 			Chunk chunk = chunker.Chunk;
 			if (chunker.HasChunked == true)
 			{

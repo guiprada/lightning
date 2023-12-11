@@ -14,7 +14,7 @@ using Operand = System.UInt16;
 
 namespace lightning
 {
-	public class Chunker
+	public class Compiler
 	{
 		enum ValueType
 		{
@@ -83,7 +83,7 @@ namespace lightning
 					catch (Exception e)
 					{
 						Console.WriteLine("Chunking broke the runtime, check " + System.IO.Path.DirectorySeparatorChar + Path.ToPath(moduleName) + "_chunker.log!");
-						Logger.LogNew(e.ToString(), Path.ToPath(moduleName) + "_chunker.log");
+						Logger.LogLine(e.ToString(), Path.ToPath(moduleName) + "_chunker.log");
 						PrintErrors();
 						return null;
 					}
@@ -92,7 +92,7 @@ namespace lightning
 			}
 		}
 
-		public Chunker(Node p_ast, string p_moduleName, Library p_prelude)
+		public Compiler(Node p_ast, string p_moduleName, Library p_prelude)
 		{
 			chunk = new Chunk(p_moduleName, p_prelude);
 			moduleName = p_moduleName;

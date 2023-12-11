@@ -52,7 +52,8 @@ namespace lightning
 			{
 				if (hasScanned == false)
 				{
-					try{
+					try
+					{
 						ScanTokens();
 						PrintErrors();
 						if (errors.Count > 0){
@@ -66,7 +67,7 @@ namespace lightning
 						}
 					}catch (Exception e){
 						Console.WriteLine("Scanning broke the runtime, check out " + System.IO.Path.DirectorySeparatorChar + Path.ToPath(moduleName) + "_scanner.log!");
-						Logger.LogNew(e.ToString(), Path.ToPath(moduleName) + "_scanner.log");
+						Logger.LogLine(e.ToString(), Path.ToPath(moduleName) + "_scanner.log");
 						PrintErrors();
 						return null;
 					}
@@ -88,9 +89,9 @@ namespace lightning
 
 		private void PrintErrors(){
 			if (errors.Count > 0)
-				Logger.LogNew("Scanning had errors on module " + moduleName + ":", "vm.log");
+				Logger.LogLine("Scanning had errors on module " + moduleName + ":", "vm.log");
 					foreach(string error in errors)
-						Logger.LogNew("\t-" + error, "vm.log");
+						Logger.LogLine("\t-" + error, "vm.log");
 		}
 
 		private List<Token> ScanTokens()
@@ -112,7 +113,6 @@ namespace lightning
 		private void ScanToken()
 		{
 			char c = Advance();;
-			char[] new_line = Environment.NewLine.ToCharArray();
 			switch (c)
 			{
 				case ' ':
@@ -121,12 +121,11 @@ namespace lightning
 					// Ignore whitespace.
 					break;
 				case '\n':
+					tokens.Add(new Token(TokenType.NEW_LINE, line, Column));
 					line++;
 					column = 0;
-					while (IsWhiteSpace(Peek()) )
+					while (IsWhiteSpaceNotNewLine(Peek()))
 						Advance();
-					if(Peek() == '(')
-						Error("Parentheses can not be used in the beggining of a line!");
 					break;
 				case '(': tokens.Add(new Token(TokenType.LEFT_PAREN, line, Column)); break;
 				case ')': tokens.Add(new Token(TokenType.RIGHT_PAREN, line, Column)); break;
@@ -266,7 +265,7 @@ namespace lightning
 			return is_end;
 		}
 
-		private bool IsWhiteSpace(char p_c){
+		private bool IsWhiteSpaceNotNewLine(char p_c){
 			return (p_c == ' ' || p_c == '\t');
 		}
 
@@ -350,7 +349,7 @@ namespace lightning
 				return null;
 			}
 
-			// The closing ".
+			// The closing double quote(")
 			Advance();
 
 			// Trim the surrounding quotes.

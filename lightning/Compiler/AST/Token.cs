@@ -22,6 +22,7 @@ namespace lightning
 		}
 	}
 	public enum TokenType {
+		NEW_LINE,
 		// one character tokens.
 		LEFT_PAREN,
 		RIGHT_PAREN,

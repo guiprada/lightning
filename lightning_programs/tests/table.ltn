@@ -142,7 +142,10 @@ var assert_not = assert_counter.assert_not
 	// Testing List sort
 	var a_list = []
 	var a_table = [:]
-	var this_list = [3, "string", 1, false, 2, 'a', null, 0, '0', a_list, a_table]
+	var this_list = [// testing for newlines inside list literal
+		3
+		,
+		 "string", 1, false, 2, 'a', null, 0, '0', a_list, a_table]
 	var ordered_list = [null, false, '0', 'a', 0, 1, 2, 3, "string", a_list, a_table]
 	this_list:sort()
 
@@ -195,6 +198,9 @@ var assert_not = assert_counter.assert_not
 	var a_table = [
 		value: 100,
 		a_function: \{return 99}
+		,
+		test: "testing",// Testing for newlines inside table literal
+
 	]
 	assert(a_table.a_function(), 99, "Failed Table Map Access By Literal String 2." )
 	var name = "a_function"

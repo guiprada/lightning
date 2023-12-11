@@ -65,7 +65,7 @@ namespace lightning
 							Path.ToPath(moduleName) +
 							"_parser.log!"
 						);
-						Logger.LogNew(
+						Logger.LogLine(
 							e.ToString(),
 							Path.ToPath(moduleName) + "_parser.log"
 						);
@@ -95,17 +95,17 @@ namespace lightning
 
 		private void LogWarnings(){
 			if (Warnings.Count > 0){
-				Logger.LogNew("Parsing had warnings:", "vm.log");
+				Logger.LogLine("Parsing had warnings:", "vm.log");
 				foreach (string warning in Warnings)
-					Logger.LogNew("\t-" + warning, "vm.log");
+					Logger.LogLine("\t-" + warning, "vm.log");
 			}
 		}
 
 		private void LogErrors(){
 			if (Errors.Count > 0){
-				Logger.LogNew("Parsing had Errors:", "vm.log");
+				Logger.LogLine("Parsing had Errors:", "vm.log");
 				foreach (string error in Errors)
-					Logger.LogNew("\t-" + error, "vm.log");
+					Logger.LogLine("\t-" + error, "vm.log");
 			}
 		}
 
@@ -113,6 +113,7 @@ namespace lightning
 
 		Node Program()
 		{
+			ElideMany(TokenType.NEW_LINE);
 			var statements = new List<Node>();
 
 			while (!IsAtEnd())
@@ -127,15 +128,21 @@ namespace lightning
 		{
 			if (Match(TokenType.VAR))
 			{
-				return VarDecl();
+				Node varDecl = VarDecl();
+				ElideMany(TokenType.NEW_LINE);
+				return varDecl;
 			}
 			else if(Match(TokenType.FUN))
 			{
-				return FunctionDecl();
+				Node functionDecl = FunctionDecl();
+				ElideMany(TokenType.NEW_LINE);
+				return functionDecl;
 			}
 			else
 			{
-				return Statement();
+				Node statement = Statement();
+				ElideMany(TokenType.NEW_LINE);
+				return statement;
 			}
 		}
 
@@ -194,17 +201,24 @@ namespace lightning
 				true
 			);
 			Node initializer;
-			if (Match(TokenType.EQUAL))
+			if (Match(TokenType.EQUAL)) {
+				ElideMany(TokenType.NEW_LINE);
 				initializer = Expression();
-			else
+			} else {
 				initializer = null;
+			}
 
+			ElideMany(TokenType.NEW_LINE);
 			Elide(TokenType.SEMICOLON);
+			ElideMany(TokenType.NEW_LINE);
+
 			return new VarDeclarationNode(name.value, initializer, name.PositionData);
 		}
 
 		List<string> Parameters(){
 			List<string> parameters = new List<string>();
+
+			ElideMany(TokenType.NEW_LINE);
 			bool has_parameter = Check(TokenType.IDENTIFIER);
 			while (has_parameter)
 			{
@@ -214,6 +228,7 @@ namespace lightning
 					true
 				);
 				parameters.Add(new_parameter.value);
+				ElideMany(TokenType.NEW_LINE);
 				if (Check(TokenType.COMMA))
 				{
 					Consume(
@@ -221,6 +236,7 @@ namespace lightning
 						"Expected ',' separating parameter list",
 						true
 					);
+					ElideMany(TokenType.NEW_LINE);
 					has_parameter = Check(TokenType.IDENTIFIER);
 				}
 				else
@@ -228,6 +244,7 @@ namespace lightning
 					has_parameter = false;
 				}
 			}
+			ElideMany(TokenType.NEW_LINE);
 			Consume(
 				TokenType.RIGHT_PAREN,
 				"Expected ')' after 'function expression'.",
@@ -294,18 +311,34 @@ namespace lightning
 
 		Node Statement()
 		{
-			if (Match(TokenType.FOR))
-				return For();
-			else if (Match(TokenType.RETURN))
-				return Return();
-			else if (Match(TokenType.IF))
-				return If();
-			else if (Match(TokenType.WHILE))
-				return While();
-			else if (Match(TokenType.LEFT_BRACE))
-				return Block();
-			else
-				return ExprStmt();
+			ElideMany(TokenType.NEW_LINE);
+
+			if (Match(TokenType.FOR)) {
+				Node statement = For();
+				ElideMany(TokenType.NEW_LINE);
+				return statement;
+			} else if (Match(TokenType.RETURN)) {
+				Node statement = Return();
+				ElideMany(TokenType.NEW_LINE);
+				return statement;
+			} else if (Match(TokenType.IF)) {
+				Node statement = If();
+				ElideMany(TokenType.NEW_LINE);
+				return statement;
+			} else if (Match(TokenType.WHILE)) {
+				Node statement = While();
+				ElideMany(TokenType.NEW_LINE);
+				return statement;
+			} else if (Match(TokenType.LEFT_BRACE)) {
+				ElideMany(TokenType.NEW_LINE);
+				Node statement = Block();
+				ElideMany(TokenType.NEW_LINE);
+				return statement;
+			} else {
+				Node statement = ExprStmt();
+				ElideMany(TokenType.NEW_LINE);
+				return statement;
+			}
 		}
 
 		Node Return()
@@ -415,10 +448,10 @@ namespace lightning
 			PositionData position_data = Previous().PositionData;
 			List<Node> statements = new List<Node>();
 
-			while(!Check(TokenType.RIGHT_BRACE) && !IsAtEnd())
-			{
+			while(!Check(TokenType.RIGHT_BRACE) && !IsAtEnd()) {
 				statements.Add(Declaration());
 			}
+
 			Consume(
 				TokenType.RIGHT_BRACE,
 				"Expected '}' to terminate 'block'.",
@@ -446,6 +479,7 @@ namespace lightning
 
 			if (Match(TokenType.PLUS_EQUAL))
 			{
+				ElideMany(TokenType.NEW_LINE);
 				Node value = Assignment();
 
 				if (assigned.Type == NodeType.VARIABLE)
@@ -460,6 +494,7 @@ namespace lightning
 			}
 			else if (Match(TokenType.PLUS_PLUS))
 			{
+				ElideMany(TokenType.NEW_LINE);
 				Node value = new LiteralNode(1, assigned.PositionData);
 
 				if (assigned.Type == NodeType.VARIABLE)
@@ -474,6 +509,7 @@ namespace lightning
 			}
 			else if (Match(TokenType.MINUS_EQUAL))
 			{
+				ElideMany(TokenType.NEW_LINE);
 				Node value = Assignment();
 
 				if (assigned.Type == NodeType.VARIABLE)
@@ -488,6 +524,7 @@ namespace lightning
 			}
 			else if (Match(TokenType.MINUS_MINUS))
 			{
+				ElideMany(TokenType.NEW_LINE);
 				Node value = new LiteralNode(1, assigned.PositionData);
 
 				if (assigned.Type == NodeType.VARIABLE)
@@ -501,6 +538,7 @@ namespace lightning
 			}
 			else if (Match(TokenType.STAR_EQUAL))
 			{
+				ElideMany(TokenType.NEW_LINE);
 				Node value = Assignment();
 
 				if (assigned.Type == NodeType.VARIABLE)
@@ -515,6 +553,7 @@ namespace lightning
 			}
 			if (Match(TokenType.SLASH_EQUAL))
 			{
+				ElideMany(TokenType.NEW_LINE);
 				Node value = Assignment();
 
 				if (assigned.Type == NodeType.VARIABLE)
@@ -529,6 +568,7 @@ namespace lightning
 			}
 			else if (Match(TokenType.EQUAL))
 			{
+				ElideMany(TokenType.NEW_LINE);
 				Node value = Assignment();
 
 				if (assigned.Type == NodeType.VARIABLE)
@@ -542,6 +582,7 @@ namespace lightning
 					Error("Invalid assignment.");
 			}
 
+			ElideMany(TokenType.NEW_LINE);
 			return assigned;
 		}
 
@@ -787,20 +828,19 @@ namespace lightning
 
 		Node Call()
 		{
-			Node maybe_func = Primary();
+			Node maybe_funcall = Primary();
 
 			if (Check(TokenType.LEFT_PAREN))
 			{
 				Node function_call_node = new FunctionCallNode(
-					(maybe_func as VariableNode),
-					maybe_func.PositionData);
-				function_call_node = CallTail(function_call_node);
-				return function_call_node;
+					(maybe_funcall as VariableNode),
+					maybe_funcall.PositionData);
+				maybe_funcall = CallTail(function_call_node);
+			} else if(Check(TokenType.COLON)){
+				maybe_funcall = AnonymousCall(maybe_funcall);
 			}
-			if(Check(TokenType.COLON)){
-				return AnonymousCall(maybe_func);
-			}
-			return maybe_func;
+
+			return maybe_funcall;
 		}
 
 		Node MethodAccess(Node p_node){
@@ -932,11 +972,16 @@ namespace lightning
 				"Expected '(' before 'function call' arguments.",
 				true
 			);
+
 			List<Node> arguments = new List<Node>();
+			ElideMany(TokenType.NEW_LINE);
+
 			if (!Check(TokenType.RIGHT_PAREN))
 			{
 				do{
+					ElideMany(TokenType.NEW_LINE);
 					arguments.Add(Expression());
+					ElideMany(TokenType.NEW_LINE);
 				}while (Match(TokenType.COMMA));
 			}
 			Consume(
@@ -1031,11 +1076,13 @@ namespace lightning
 					}
 				}
 			}
+
 			return p_tableNode;
 		}
 
 		Node Table()
 		{
+			ElideMany(TokenType.NEW_LINE);
 			PositionData position_data = Previous().PositionData;
 
 			if (Match(TokenType.COLON)){// empty table
@@ -1051,7 +1098,9 @@ namespace lightning
 					TableNode table_node = new TableNode(map, position_data);
 
 					do{
+						ElideMany(TokenType.NEW_LINE);
 						table_node = TableEntry(table_node);
+						ElideMany(TokenType.NEW_LINE);
 					}while(Match(TokenType.COMMA));
 
 					table_or_list = table_node;
@@ -1060,16 +1109,21 @@ namespace lightning
 					ListNode list_node = new ListNode(elements, position_data);
 
 					do{
+						ElideMany(TokenType.NEW_LINE);
 						list_node = ListEntry(list_node);
+						ElideMany(TokenType.NEW_LINE);
 					}while(Match(TokenType.COMMA));
 
 					table_or_list = list_node;
 				}
+
+				ElideMany(TokenType.NEW_LINE);
 				Consume(
 					TokenType.RIGHT_BRACKET,
 					"Expected ']' to close 'table'",
 					true
 				);
+				ElideMany(TokenType.NEW_LINE);
 
 				return table_or_list;
 
@@ -1100,7 +1154,7 @@ namespace lightning
 						((TokenNumber)Previous()).floatValue,
 						Previous().PositionData
 					);
-			}else if (Match(TokenType.STRING))
+			} else if (Match(TokenType.STRING))
 				return new LiteralNode(
 					((TokenString)Previous()).value,
 					Previous().PositionData
@@ -1118,7 +1172,7 @@ namespace lightning
 					true
 				);
 				return new GroupingNode(expr, expr.PositionData);
-			}else if (Check(TokenType.FUN))
+			} else if (Check(TokenType.FUN))
 				return FunctionExpr();
 			else if (Check(TokenType.IDENTIFIER))
 				return CompoundVar();
@@ -1139,13 +1193,14 @@ namespace lightning
 					Error("Number expected after (-)! " + Previous().PositionData);
 					return new LiteralNode(Previous().PositionData);
 				}
-			}else{
+			} else {
 				Error("Primary Terminal expected - Primary node can not begin with: " + Peek());
 				return null;
 			}
 		}
 
 ///////////////////////////////////////////////////////////////////////////////
+
 		Token Advance()
 		{
 			if (!IsAtEnd()) current++;
@@ -1255,10 +1310,15 @@ namespace lightning
 
 		}
 
-		Token Elide(TokenType p_type)
+		void Elide(TokenType p_type)
 		{
-			if (Check(p_type)) return Advance();
-			return null;
+			if (Check(p_type)) Advance();
+		}
+
+		void ElideMany(TokenType p_type)
+		{
+			while (Peek().Type == p_type)
+				Elide(p_type);
 		}
 
 		void Error(string p_msg)

@@ -2,10 +2,11 @@
 {
 	var os_string = get_os()
 	var os = "Unknown"
-	if (os_string:contains("Windows"))
+	if (os_string:contains("Windows")){
 		os = "Windows"
-	else if (os_string:contains("Unix"))
+	} else if (os_string:contains("Unix")){
 		os = "Unix"
+	}
 
 	write_line(get_os())
 
@@ -58,36 +59,38 @@ var clear_errors = assert_counter.reset_error_counter
 
 var errors = 0
 
-errors += require("tests/assert.ltn")
-errors += require("tests/numbers.ltn")
-errors += require("tests/strings.ltn")
-errors += require("tests/pmap.ltn")
-errors += require("tests/rmap.ltn")
-errors += require("tests/map.ltn")
-errors += require("tests/reduce.ltn")
-errors += require("tests/table.ltn")
-errors += require("tests/scoping.ltn")
-errors += require("tests/up_value.ltn")
-errors += require("tests/closures.ltn")
-errors += require("tests/lambdas.ltn")
-errors += require("tests/boolean.ltn")
-errors += require("tests/iterators.ltn")
-errors += require("tests/methods.ltn")
-errors += require("tests/compound_calls.ltn")
-errors += require("tests/transient.ltn")
-errors += require("tests/math.ltn")
-errors += require("tests/eval.ltn")
-errors += require("tests/maybe.ltn")
-errors += require("tests/assign_op.ltn")
-errors += require("tests/lock.ltn")
-errors += require("tests/vm_management.ltn")
-errors += require("tests/inline_intrinsics.ltn")
-errors += require("tests/nuples.ltn")
-errors += require("tests/super_table.ltn")
-errors += require("tests/char.ltn")
-errors += require("tests/integers.ltn")
 errors += require("tests/anonymous_call.ltn")
+errors += require("tests/assert.ltn")
+errors += require("tests/assign_op.ltn")
+errors += require("tests/boolean.ltn")
+errors += require("tests/char.ltn")
+errors += require("tests/closures.ltn")
+errors += require("tests/compound_calls.ltn")
+errors += require("tests/eval.ltn")
+errors += require("tests/inline_intrinsics.ltn")
+errors += require("tests/integers.ltn")
+errors += require("tests/iterators.ltn")
+errors += require("tests/lambdas.ltn")
+errors += require("tests/lock.ltn")
+errors += require("tests/map.ltn")
+errors += require("tests/math.ltn")
+errors += require("tests/maybe.ltn")
+errors += require("tests/methods.ltn")
+errors += require("tests/numbers.ltn")
+errors += require("tests/nuples.ltn")
+errors += require("tests/pmap.ltn")
+errors += require("tests/reduce.ltn")
+errors += require("tests/rmap.ltn")
+errors += require("tests/scoping.ltn")
+errors += require("tests/strings.ltn")
+errors += require("tests/super_table.ltn")
+errors += require("tests/table.ltn")
+errors += require("tests/transient.ltn")
 errors += require("tests/try.ltn")
+errors += require("tests/up_value.ltn")
+errors += require("tests/vm_management.ltn")
+
+
 
 machine.trim()
 

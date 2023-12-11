@@ -617,7 +617,7 @@ namespace lightning
 				Scanner scanner = new Scanner(eval_code, eval_name);
 				List<Token> tokens = scanner.Tokens;
 				if(scanner.HasScanned == false){
-					Logger.LogNew("Module " + eval_name + " scanning had errors!", "vm.log");
+					Logger.LogLine("Module " + eval_name + " scanning had errors!", "vm.log");
 					throw new Exception("Scanning Error");
 				}
 
@@ -625,14 +625,14 @@ namespace lightning
 
 				Node program = parser.ParsedTree;
 				if(parser.HasParsed == false){
-						Logger.LogNew("Module " + eval_name + " parsing had errors!", "vm.log");
+						Logger.LogLine("Module " + eval_name + " parsing had errors!", "vm.log");
 						throw new Exception("Parsing Error");
 				}
 
-				Chunker chunker = new Chunker(program, eval_name, p_vm.Prelude);
+				Compiler chunker = new Compiler(program, eval_name, p_vm.Prelude);
 				Chunk chunk = chunker.Chunk;
 				if (chunker.HasChunked == false){
-					Logger.LogNew("Module " + eval_name + " code generation had errors!", "vm.log");
+					Logger.LogLine("Module " + eval_name + " code generation had errors!", "vm.log");
 					throw new Exception("Code Generation Error");
 				}
 
@@ -672,21 +672,21 @@ namespace lightning
 					Scanner scanner = new Scanner(module_code, name);
 					List<Token> tokens = scanner.Tokens;
 					if(scanner.HasScanned == false){
-						Logger.LogNew("Module " + name + " scanning had errors!", "vm.log");
+						Logger.LogLine("Module " + name + " scanning had errors!", "vm.log");
 						throw new Exception("Scanning Error");
 					}
 
 					Parser parser = new Parser(tokens, name);
 					Node program = parser.ParsedTree;
 					if(parser.HasParsed == false){
-						Logger.LogNew("Module " + name + " parsing had errors!", "vm.log");
+						Logger.LogLine("Module " + name + " parsing had errors!", "vm.log");
 						throw new Exception("Parsing Error");
 					}
 
-					Chunker chunker = new Chunker(program, name, p_vm.Prelude);
+					Compiler chunker = new Compiler(program, name, p_vm.Prelude);
 					Chunk chunk = chunker.Chunk;
 					if (chunker.HasChunked == false){
-						Logger.LogNew("Module " + name + " code generation had errors!", "vm.log");
+						Logger.LogLine("Module " + name + " code generation had errors!", "vm.log");
 						throw new Exception("Code Generation Error");
 					}
 
@@ -723,12 +723,13 @@ namespace lightning
 					this_arguments = ((ListUnit)this_unit.heapUnitValue).Elements;
 
 				VM try_vm = p_vm.GetVM();
-				try{
+				try
+				{
 					try_vm.CallFunction(this_callable, this_arguments);
 					p_vm.RecycleVM(try_vm);
 					return new Unit(true);
 				}catch(Exception e){
-					Logger.LogLine("-------------------\n" + p_vm.CurrentInstructionPositionDataString(), try_log_path);
+					Logger.LogLine("------------------- Try log\n" + p_vm.CurrentInstructionPositionDataString() + "\n-------------------", try_log_path);
 					Logger.LogLine(e.ToString(), try_log_path);
 					p_vm.RecycleVM(try_vm);
 					return new Unit(false);

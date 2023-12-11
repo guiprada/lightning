@@ -294,16 +294,16 @@ namespace lightning
 
 //////////////////////////// End Accessors
 		public Unit ProtectedCallFunction(Unit p_callable, List<Unit> p_args = null){
-			try{
+			try
+			{
 				return CallFunction(p_callable, p_args);
 			}
 			catch (Exception e)
 			{
 				Console.WriteLine("VM Busted ... " + CurrentInstructionPositionDataString());
-				Logger.LogNew(e.ToString(),"vm.log" );
+				Logger.LogLine(e.ToString(),"vm.log" );
 				Console.WriteLine(e.ToString());
 				Console.WriteLine("Check vm.log!");
-				System.Environment.Exit(1);
 				return new Unit(UnitType.Null);
 			}
 		}
@@ -410,16 +410,16 @@ namespace lightning
 		}
 
 		public VMResult ProtectedRun(){
-			try{
+			try
+			{
 				return Run();
 			}
 			catch (Exception e)
 			{
 				Console.WriteLine("VM Busted ... " + CurrentInstructionPositionDataString());
-				Logger.LogNew(e.ToString(), "vm.log");
+				Logger.LogLine(e.ToString(), "vm.log");
 				Console.WriteLine(e.ToString());
 				Console.WriteLine("Check vm.log!");
-				System.Environment.Exit(1);
 				return new VMResult(VMResultType.ERROR, new Unit(UnitType.Null));
 			}
 		}

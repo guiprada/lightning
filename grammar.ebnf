@@ -11,9 +11,9 @@ primary         <- NUMBER
                 | table;
 
 (* STATEMENTS *)
-declaration     <- functionDecl
-                | varDecl
-                | statement;
+declaration     <- functionDecl ("\n")*
+                | varDecl ("\n")*
+                | statement ("\n")*;
 functionDecl    <- "function" | "\" compoundVar function;
 function        <- ("(" parameters ")")? statement;
 parameters      <- IDENTIFIER ( "," IDENTIFIER )*;

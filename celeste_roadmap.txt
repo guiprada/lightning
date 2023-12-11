@@ -5,11 +5,14 @@
 - Iniciar blog tutorial.
 - Registrar dominio celeste.org e registrar o nome intuição eletrica.
 - Abrir empresa
-- criar sistema de configuracao por json e remover valores hard_coded
-- Rename it celeste and refactor out as compiler, interpreter and library, add syntax versioning, deploy on blazor option.
-- try to run in blazor.
+
 - Solve lone node quirk; perhaps add ";"  or enforce expression separating comas, ocaml style
 	forbid parentheses on LHS
+- criar sistema de configuracao por json e remover valores hard_coded
+- Test and fix logger
+- Split prelude
+
+- try to run in blazor.
 - solve table-list and supertable mess. Keep in mind that language should be simple and not high performance, at this point. Perhaps replace metatables with non recurring dispatching tables, with autoflatten logic. Create object as all pvt attributes, message only table, create actor as a object with programable update hooks.
 - Verify Garbage collection and Env for memory leaks.
 - verify formal language definition.

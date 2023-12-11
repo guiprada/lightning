@@ -60,6 +60,9 @@ namespace lightning
 		}
 		private static void Add(LogEntry entry){
 			queue.Enqueue(entry);
+#if DEBUG
+			Console.WriteLine(entry.message);
+#endif
 			if(isProcessing == false)
 				queueProcessing = Task.Run(ProcessQueue);
 		}
