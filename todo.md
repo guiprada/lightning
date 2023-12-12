@@ -8,6 +8,9 @@ use tuples as structs with named access
 
 To be Done
 ----------
+- criar sistema de configuracao por json e remover valores hard_coded
+
+
 add table.flatten => merge with extension table and unset extension table
     add table.flatten_under => merge extension table with table and unset extension table
 rreduce for list
@@ -180,3 +183,10 @@ Done
         fix eval inconstant naming
         replace lambda counter with moduleName + PositionData
     - added global variable data to chunk
+
+Done
+====
+
+- Solve lone node quirk; perhaps add ";"  or enforce expression separating comas, ocaml style forbid parentheses on LHS
+    - Added Newlines to grammar
+    - Added Newline Eliding to parser

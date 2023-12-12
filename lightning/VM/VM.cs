@@ -3,9 +3,11 @@ using System.Collections.Generic;
 using System.IO;
 
 using Operand = System.UInt16;
+using System.Text.Json;
+
 
 #if DOUBLE
-	using Float = System.Double;
+using Float = System.Double;
 	using Integer = System.Int64;
 #else
 	using Float = System.Single;
@@ -29,6 +31,25 @@ namespace lightning
 		{
 			status = p_status;
 			value = p_value;
+		}
+	}
+
+	class VMConfigRead {
+		public int callStackSize {get; set;}
+		public String VMLogFile {get; set;}
+	}
+
+	struct VMConfig
+	{
+		public int callStackSize {get;}
+		public String VMLogFile {get;}
+
+		public VMConfig(
+			int p_callStackSize,
+			string p_VMLogFile)
+		{
+			callStackSize = p_callStackSize;
+			VMLogFile = p_VMLogFile;
 		}
 	}
 
@@ -59,7 +80,7 @@ namespace lightning
 		int Env{ get{ return variables.Env; } }
 
 		static Stack<VM> vmPool;
-		static int callStackSize;
+		static VMConfig config;
 		public const Operand ASSIGN = (Operand)AssignmentOperatorType.ASSIGN;
 		public const Operand ADDITION_ASSIGN = (Operand)AssignmentOperatorType.ADDITION_ASSIGN;
 		public const Operand SUBTRACTION_ASSIGN = (Operand)AssignmentOperatorType.SUBTRACTION_ASSIGN;
@@ -68,18 +89,36 @@ namespace lightning
 
 //////////////////////////////////////////////////// Public
 		static VM(){
-			VM.callStackSize = 30;
+			VMConfigRead source = new VMConfigRead();
+
+			try{
+				using (StreamReader r = new StreamReader("VM.json"))
+				{
+					string read_json = r.ReadToEnd();
+					source = JsonSerializer.Deserialize<VMConfigRead>(read_json);
+				}
+			} catch(Exception) {
+				Console.WriteLine("NO VM.json -> Using VM defaults");
+				source.callStackSize = 30;
+				source.VMLogFile = "_vm.log";
+			} finally {
+				config = new VMConfig(
+					source.callStackSize,
+					source.VMLogFile
+				);
+			}
 		}
+
 		public VM(Chunk p_chunk)
 		{
 			IP = 0;
 			parallelVM = false;
 
-			main = p_chunk.MainFunctionUnit("main");
+			main = p_chunk.MainFunctionUnit("Main");
 
-			instructions = new InstructionStack(callStackSize, main, out instructionsCache);
+			instructions = new InstructionStack(config.callStackSize, main, out instructionsCache);
 
-			stack = new Stack(callStackSize);
+			stack = new Stack(config.callStackSize);
 
 			variables = new Memory<Unit>();
 			upValues = new Memory<UpValueUnit>();
@@ -126,8 +165,8 @@ namespace lightning
 			IP = 0;
 			parallelVM = p_parallelVM;
 
-			instructions = new InstructionStack(callStackSize, main, out instructionsCache);
-			stack = new Stack(callStackSize);
+			instructions = new InstructionStack(config.callStackSize, main, out instructionsCache);
+			stack = new Stack(config.callStackSize);
 			variables = new Memory<Unit>();
 			upValues = new Memory<UpValueUnit>();
 			registeredUpValues = new UpValueEnv(variables);
@@ -224,7 +263,7 @@ namespace lightning
 		public string GetString(int p_n){
 			if(stack.Peek(p_n).Type != UnitType.String)
 				throw new Exception("Expected a String.");
-			return ((StringUnit)(stack.Peek(p_n).heapUnitValue)).content;
+			return ((StringUnit)stack.Peek(p_n).heapUnitValue).content;
 		}
 
 		public Float GetNumber(int p_n){
@@ -253,31 +292,31 @@ namespace lightning
 		public TableUnit GetTable(int p_n){
 			if(stack.Peek(p_n).Type != UnitType.Table)
 				throw new Exception("Expected a Table.");
-			return (TableUnit)(stack.Peek(p_n).heapUnitValue);
+			return (TableUnit)stack.Peek(p_n).heapUnitValue;
 		}
 
 		public ListUnit GetList(int p_n){
 			if(stack.Peek(p_n).Type != UnitType.List)
 				throw new Exception("Expected a List.");
-			return (ListUnit)(stack.Peek(p_n).heapUnitValue);
+			return (ListUnit)stack.Peek(p_n).heapUnitValue;
 		}
 
 		public T GetWrappedContent<T>(int p_n){
 			if(stack.Peek(p_n).Type != UnitType.Wrapper)
 				throw new Exception("Expected a Wrapper.");
-			return ((WrapperUnit<T>)(stack.Peek(p_n).heapUnitValue)).UnWrapp();
+			return ((WrapperUnit<T>)stack.Peek(p_n).heapUnitValue).UnWrapp();
 		}
 
 		public WrapperUnit<T> GetWrapperUnit<T>(int p_n){
 			if(stack.Peek(p_n).Type != UnitType.Wrapper)
 				throw new Exception("Expected a Wrapper.");
-			return ((WrapperUnit<T>)(stack.Peek(p_n).heapUnitValue));
+			return (WrapperUnit<T>)stack.Peek(p_n).heapUnitValue;
 		}
 
 		public StringUnit GetStringUnit(int p_n){
 			if(stack.Peek(p_n).Type != UnitType.String)
 				throw new Exception("Expected a String.");
-			return ((StringUnit)(stack.Peek(p_n).heapUnitValue));
+			return (StringUnit)stack.Peek(p_n).heapUnitValue;
 		}
 
 		public char GetChar(int p_n){
@@ -300,7 +339,7 @@ namespace lightning
 			}
 			catch (Exception e)
 			{
-				Logger.LogLine("VM Busted ...\n" + e.ToString(),"_vm.log" );
+				Logger.LogLine("VM Busted ...\n" + e.ToString(), config.VMLogFile);
 				return new Unit(UnitType.Null);
 			}
 		}
@@ -316,7 +355,7 @@ namespace lightning
 			if (this_type == UnitType.Function)
 			{
 				instructions.PushRET((Operand)(main.Body.Count - 1));
-				FunctionUnit this_func = (FunctionUnit)(p_callable.heapUnitValue);
+				FunctionUnit this_func = (FunctionUnit)p_callable.heapUnitValue;
 				instructions.PushFunction(this_func, Env, out instructionsCache);
 
 				IP = 0;
@@ -324,7 +363,7 @@ namespace lightning
 			else if (this_type == UnitType.Closure)
 			{
 				instructions.PushRET((Operand)(main.Body.Count - 1));
-				ClosureUnit this_closure = (ClosureUnit)(p_callable.heapUnitValue);
+				ClosureUnit this_closure = (ClosureUnit)p_callable.heapUnitValue;
 
 				upValues.PushEnv();
 
@@ -339,7 +378,7 @@ namespace lightning
 			}
 			else if (this_type == UnitType.Intrinsic)
 			{
-				IntrinsicUnit this_intrinsic = (IntrinsicUnit)(p_callable.heapUnitValue);
+				IntrinsicUnit this_intrinsic = (IntrinsicUnit)p_callable.heapUnitValue;
 				Unit intrinsic_result = this_intrinsic.Function(this);
 				stack.top -= this_intrinsic.Arity;
 				return intrinsic_result;
@@ -392,9 +431,9 @@ namespace lightning
 
 		public string CurrentInstructionPositionDataString()
 		{
-			return "Function: " + instructions.ExecutingFunction.Name +
-			" from module: " + instructions.ExecutingFunction.Module +
-			" on position: " + instructions.ExecutingFunction.ChunkPosition.GetPosition(IP);
+			return	"Function: " + instructions.ExecutingFunction.Name +
+					" from module: " + instructions.ExecutingFunction.Module +
+					" on position: " + instructions.ExecutingFunction.ChunkPosition.GetPosition(IP);
 		}
 
 		public string CurrentInstructionModule()
@@ -413,7 +452,7 @@ namespace lightning
 			}
 			catch (Exception e)
 			{
-				Logger.LogLine("VM Busted ...\n" + e.ToString(), "_vm.log");
+				Logger.LogLine("VM Busted ...\n" + e.ToString(), config.VMLogFile);
 				return new VMResult(VMResultType.ERROR, new Unit(UnitType.Null));
 			}
 		}
@@ -516,7 +555,7 @@ namespace lightning
 							}
 							else
 							{
-								ClosureUnit this_closure = (ClosureUnit)(this_callable.heapUnitValue);
+								ClosureUnit this_closure = (ClosureUnit)this_callable.heapUnitValue;
 
 								// new upvalues
 								List<UpValueUnit> new_upValues = new List<UpValueUnit>();
@@ -714,7 +753,7 @@ namespace lightning
 							Unit value = stack.Pop();
 							foreach (Unit v in indexes)
 							{
-								value = (value.heapUnitValue).Get(v);
+								value = value.heapUnitValue.Get(v);
 							}
 							stack.Push(value);
 							break;
@@ -735,14 +774,14 @@ namespace lightning
 							for (int i = 0; i < indexes_counter - 1; i++)
 							{
 								Unit v = indexes[i];
-								this_table = (this_table.heapUnitValue).Get(v);
+								this_table = this_table.heapUnitValue.Get(v);
 							}
 							Unit new_value = stack.Peek();
 							Unit index = indexes[indexes_counter - 1];
 							UnitType index_type = indexes[indexes_counter - 1].Type;
 							if (op == ASSIGN)
 							{
-								((this_table.heapUnitValue)).Set(index, new_value);
+								this_table.heapUnitValue.Set(index, new_value);
 							}
 							else if(parallelVM == true)
 							{
@@ -751,30 +790,30 @@ namespace lightning
 								switch(op){
 									case ADDITION_ASSIGN:
 										lock(this_table.heapUnitValue){
-											old_value = ((TableUnit)(this_table.heapUnitValue)).Get(index);
+											old_value = ((TableUnit)this_table.heapUnitValue).Get(index);
 											result = old_value + new_value;
-											(this_table.heapUnitValue).Set(index, result);
+											this_table.heapUnitValue.Set(index, result);
 										}
 										break;
 									case SUBTRACTION_ASSIGN:
 										lock(this_table.heapUnitValue){
-											old_value = ((TableUnit)(this_table.heapUnitValue)).Get(index);
+											old_value = ((TableUnit)this_table.heapUnitValue).Get(index);
 											result = old_value - new_value;
-											(this_table.heapUnitValue).Set(index, result);
+											this_table.heapUnitValue.Set(index, result);
 										}
 										break;
 									case MULTIPLICATION_ASSIGN:
 										lock(this_table.heapUnitValue){
-											old_value = ((TableUnit)(this_table.heapUnitValue)).Get(index);
+											old_value = ((TableUnit)this_table.heapUnitValue).Get(index);
 											result = old_value * new_value;
-											(this_table.heapUnitValue).Set(index, result);
+											this_table.heapUnitValue.Set(index, result);
 										}
 										break;
 									case DIVISION_ASSIGN:
 										lock(this_table.heapUnitValue){
-											old_value = ((TableUnit)(this_table.heapUnitValue)).Get(index);
+											old_value = ((TableUnit)this_table.heapUnitValue).Get(index);
 											result = old_value / new_value;
-											(this_table.heapUnitValue).Set(index, result);
+											this_table.heapUnitValue.Set(index, result);
 										}
 										break;
 									default:
@@ -784,7 +823,7 @@ namespace lightning
 							}
 							else
 							{
-								Unit old_value = (this_table.heapUnitValue).Get(index);
+								Unit old_value = this_table.heapUnitValue.Get(index);
 								Unit result;
 								switch(op){
 									case ADDITION_ASSIGN:
@@ -803,7 +842,7 @@ namespace lightning
 										throw new Exception("Unknown operator");
 
 								}
-								(this_table.heapUnitValue).Set(index, result);
+								this_table.heapUnitValue.Set(index, result);
 							}
 							break;
 						}

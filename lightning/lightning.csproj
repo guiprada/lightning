@@ -15,4 +15,12 @@
   <ItemGroup>
     <PackageReference Include="Microsoft.CodeAnalysis.CSharp.Scripting" Version="3.10.0" />
   </ItemGroup>
+
+  <!-- Config files -->
+  <!-- <ItemGroup>
+    <ContentWithTargetPath Include="VM.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <TargetPath>%(RecursiveDir)\%(Filename)%(Extension)</TargetPath>
+    </ContentWithTargetPath>
+  </ItemGroup> -->
 </Project>

@@ -12,4 +12,12 @@
   <ItemGroup>
     <ProjectReference Include="..\lightning\lightning.csproj" />
   </ItemGroup>
+
+  <!-- Config files -->
+  <!-- <ItemGroup>
+    <ContentWithTargetPath Include="VM.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <TargetPath>%(RecursiveDir)\%(Filename)%(Extension)</TargetPath>
+    </ContentWithTargetPath>
+  </ItemGroup> -->
 </Project>

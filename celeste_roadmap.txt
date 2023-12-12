@@ -6,9 +6,6 @@
 - Registrar dominio celeste.org e registrar o nome intuição eletrica.
 - Abrir empresa
 
-- Solve lone node quirk; perhaps add ";"  or enforce expression separating comas, ocaml style
-	forbid parentheses on LHS
-- criar sistema de configuracao por json e remover valores hard_coded
 - Test and fix logger
 - Split prelude
 
