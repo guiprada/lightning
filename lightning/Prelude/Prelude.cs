@@ -617,7 +617,6 @@ namespace lightning
 				Scanner scanner = new Scanner(eval_code, eval_name);
 				List<Token> tokens = scanner.Tokens;
 				if(scanner.HasScanned == false){
-					Logger.LogLine("Module " + eval_name + " scanning had errors!", "vm.log");
 					throw new Exception("Scanning Error");
 				}
 
@@ -625,14 +624,12 @@ namespace lightning
 
 				Node program = parser.ParsedTree;
 				if(parser.HasParsed == false){
-						Logger.LogLine("Module " + eval_name + " parsing had errors!", "vm.log");
 						throw new Exception("Parsing Error");
 				}
 
 				Compiler chunker = new Compiler(program, eval_name, p_vm.Prelude);
 				Chunk chunk = chunker.Chunk;
 				if (chunker.HasChunked == false){
-					Logger.LogLine("Module " + eval_name + " code generation had errors!", "vm.log");
 					throw new Exception("Code Generation Error");
 				}
 
@@ -672,21 +669,18 @@ namespace lightning
 					Scanner scanner = new Scanner(module_code, name);
 					List<Token> tokens = scanner.Tokens;
 					if(scanner.HasScanned == false){
-						Logger.LogLine("Module " + name + " scanning had errors!", "vm.log");
 						throw new Exception("Scanning Error");
 					}
 
 					Parser parser = new Parser(tokens, name);
 					Node program = parser.ParsedTree;
 					if(parser.HasParsed == false){
-						Logger.LogLine("Module " + name + " parsing had errors!", "vm.log");
 						throw new Exception("Parsing Error");
 					}
 
 					Compiler chunker = new Compiler(program, name, p_vm.Prelude);
 					Chunk chunk = chunker.Chunk;
 					if (chunker.HasChunked == false){
-						Logger.LogLine("Module " + name + " code generation had errors!", "vm.log");
 						throw new Exception("Code Generation Error");
 					}
 
@@ -703,17 +697,6 @@ namespace lightning
 			}
 			functions.Add(new IntrinsicUnit("require", Require, 1));
 
-			//////////////////////////////////////////////////////
-			// start a new _try.log file
-			string try_log_path = @"try.log";
-			using (System.IO.StreamWriter file = new System.IO.StreamWriter(try_log_path, false)){
-				Console.SetOut(file);
-				Console.WriteLine("------------------- try log:");
-				var standardOutput = new StreamWriter(Console.OpenStandardOutput());
-				standardOutput.AutoFlush = true;
-				Console.SetOut(standardOutput);
-			}
-
 			Unit Try(VM p_vm)
 			{
 				Unit this_callable = p_vm.GetUnit(0);
@@ -729,8 +712,8 @@ namespace lightning
 					p_vm.RecycleVM(try_vm);
 					return new Unit(true);
 				}catch(Exception e){
-					Logger.LogLine("------------------- Try log\n" + p_vm.CurrentInstructionPositionDataString() + "\n-------------------", try_log_path);
-					Logger.LogLine(e.ToString(), try_log_path);
+					Logger.LogLine("------------------- Try log\n" + p_vm.CurrentInstructionPositionDataString() + "\n-------------------", "_try.log");
+					Logger.LogLine(e.ToString(), "_try.log");
 					p_vm.RecycleVM(try_vm);
 					return new Unit(false);
 				}

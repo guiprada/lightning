@@ -95,17 +95,17 @@ namespace lightning
 
 		private void LogWarnings(){
 			if (Warnings.Count > 0){
-				Logger.LogLine("Parsing had warnings:", "vm.log");
+				Logger.LogLine("Parsing had warnings:", "_parser.log");
 				foreach (string warning in Warnings)
-					Logger.LogLine("\t-" + warning, "vm.log");
+					Logger.LogLine("\t-" + warning, "_parser.log");
 			}
 		}
 
 		private void LogErrors(){
 			if (Errors.Count > 0){
-				Logger.LogLine("Parsing had Errors:", "vm.log");
+				Logger.LogLine("Parsing had Errors:", "_parser.log");
 				foreach (string error in Errors)
-					Logger.LogLine("\t-" + error, "vm.log");
+					Logger.LogLine("\t-" + error, "_parser.log");
 			}
 		}
 

@@ -300,10 +300,7 @@ namespace lightning
 			}
 			catch (Exception e)
 			{
-				Console.WriteLine("VM Busted ... " + CurrentInstructionPositionDataString());
-				Logger.LogLine(e.ToString(),"vm.log" );
-				Console.WriteLine(e.ToString());
-				Console.WriteLine("Check vm.log!");
+				Logger.LogLine("VM Busted ...\n" + e.ToString(),"_vm.log" );
 				return new Unit(UnitType.Null);
 			}
 		}
@@ -416,10 +413,7 @@ namespace lightning
 			}
 			catch (Exception e)
 			{
-				Console.WriteLine("VM Busted ... " + CurrentInstructionPositionDataString());
-				Logger.LogLine(e.ToString(), "vm.log");
-				Console.WriteLine(e.ToString());
-				Console.WriteLine("Check vm.log!");
+				Logger.LogLine("VM Busted ...\n" + e.ToString(), "_vm.log");
 				return new VMResult(VMResultType.ERROR, new Unit(UnitType.Null));
 			}
 		}
@@ -583,7 +577,6 @@ namespace lightning
 								default:
 									throw new Exception("Unknown operator");
 							}
-
 							break;
 						}
 					case OpCode.ASSIGN_GLOBAL:

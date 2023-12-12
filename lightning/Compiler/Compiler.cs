@@ -72,7 +72,7 @@ namespace lightning
 					try
 					{
 						ChunkIt(ast);
-						PrintErrors();
+						LogErrors();
 						if (Errors.Count > 0){
 							return null;
 						}else{
@@ -82,9 +82,8 @@ namespace lightning
 					}
 					catch (Exception e)
 					{
-						Console.WriteLine("Chunking broke the runtime, check " + System.IO.Path.DirectorySeparatorChar + Path.ToPath(moduleName) + "_chunker.log!");
-						Logger.LogLine(e.ToString(), Path.ToPath(moduleName) + "_chunker.log");
-						PrintErrors();
+						Logger.LogLine("Chunking broke the runtime!\n" + e.ToString(), Path.ToPath(moduleName) + "_compiler.log");
+						LogErrors();
 						return null;
 					}
 				}
@@ -121,10 +120,10 @@ namespace lightning
 			}
 		}
 
-		private void PrintErrors(){
+		private void LogErrors(){
 			if(Errors.Count > 0)
 				foreach(string error in Errors)
-					Console.WriteLine(error);
+					Logger.LogLine(error, "_compiler.log");
 		}
 
 		private void ChunkIt(Node p_node)
