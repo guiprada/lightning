@@ -244,12 +244,6 @@ namespace lightning
 					has_parameter = false;
 				}
 			}
-			ElideMany(TokenType.NEW_LINE);
-			Consume(
-				TokenType.RIGHT_PAREN,
-				"Expected ')' after 'function expression'.",
-				true
-			);
 
 			return parameters;
 		}
@@ -258,6 +252,13 @@ namespace lightning
 			List<string> parameters = null;
 			if(Match(TokenType.LEFT_PAREN)){
 				parameters = Parameters();
+
+				ElideMany(TokenType.NEW_LINE);
+				Consume(
+					TokenType.RIGHT_PAREN,
+					"Expected ')' after 'function expression'.",
+					true
+				);
 			}
 
 			Node body = Statement();
@@ -330,7 +331,6 @@ namespace lightning
 				ElideMany(TokenType.NEW_LINE);
 				return statement;
 			} else if (Match(TokenType.LEFT_BRACE)) {
-				ElideMany(TokenType.NEW_LINE);
 				Node statement = Block();
 				ElideMany(TokenType.NEW_LINE);
 				return statement;
@@ -445,6 +445,7 @@ namespace lightning
 
 		Node Block()
 		{
+			ElideMany(TokenType.NEW_LINE);
 			PositionData position_data = Previous().PositionData;
 			List<Node> statements = new List<Node>();
 
@@ -978,12 +979,14 @@ namespace lightning
 
 			if (!Check(TokenType.RIGHT_PAREN))
 			{
-				do{
+				do {
 					ElideMany(TokenType.NEW_LINE);
 					arguments.Add(Expression());
 					ElideMany(TokenType.NEW_LINE);
-				}while (Match(TokenType.COMMA));
+				} while (Match(TokenType.COMMA));
 			}
+
+			ElideMany(TokenType.NEW_LINE);
 			Consume(
 				TokenType.RIGHT_PAREN,
 				"Expected ')' after 'function call' arguments.",

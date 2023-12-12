@@ -1,29 +1,34 @@
-﻿program         <- declaration* EOF;
-primary         <- NUMBER
-                | STRING
-                | "false"
-                | "true"
-                | "null"
-                | "(" expression ")"
-                | compoundVar
-                | list
-                | funExpr
-                | table;
+﻿program         <- newLines declaration* EOF;
+primary         <-
+                NUMBER |
+                STRING |
+                "false"|
+                "true" |
+                "null" |
+                "(" expression ")" |
+                compoundVar |
+                list |
+                funExpr |
+                table;
+newLines        <- ("\n")*
 
 (* STATEMENTS *)
-declaration     <- functionDecl ("\n")*
-                | varDecl ("\n")*
-                | statement ("\n")*;
+declaration     <- functionDecl newLines
+                | varDecl newLines
+                | statement newLines;
 functionDecl    <- "function" | "\" compoundVar function;
-function        <- ("(" parameters ")")? statement;
-parameters      <- IDENTIFIER ( "," IDENTIFIER )*;
-varDecl         <- "var" IDENTIFIER ( "=" expression ) ? ";";
-statement       <- exprStmt
-                | forStmt
-                | ifStmt
-                | returnStmt
-                | whileStmt
-                | block;
+function        <- ("(" parameters newLines ")")? statement;
+parameters      <- newLines IDENTIFIER newLines ( "," newLines IDENTIFIER )*;
+varDecl         <- "var" IDENTIFIER ( "=" newLines expression ) ? newLines ";" newLines;
+statement       <- newLines
+                (
+                    exprStmt |
+                    forStmt |
+                    ifStmt |
+                    returnStmt |
+                    whileStmt |
+                    block
+                ) newLines;
 returnStmt      <- "return" expression? ";";
 exprStmt        <- expression ";";
 forStmt         <- "for" "("( varDecl | exprStmt | ";" )
@@ -31,12 +36,25 @@ forStmt         <- "for" "("( varDecl | exprStmt | ";" )
                             expression? ")" statement;
 ifStmt          <- "if" "(" expression ")" statement ( "else" statement )?;
 whileStmt       <- "while" "(" expression ")" statement;
-block           <- "{" declaration* "}";
+block           <- "{" newLines declaration* "}";
 
 (* EXPRESSIONS *)
 funExpr         <- ("function" | "\") function;
 expression      <- assignment;
-assignment      <- compoundVar "=" | "+=" | "-=" | "*=" | "/=" | "++" | "--" assignment | logic_or;
+assignment      <- (
+                        compoundVar
+                        (
+                            "="  newLines |
+                            "+=" newLines |
+                            "-=" newLines |
+                            "*=" newLines |
+                            "/=" newLines |
+                            "++" newLines |
+                            "--" newLines
+                        )
+                            assignment |
+                            logic_or;
+                    ) newLines
 logic_or        <- logic_and ( "or" logic_and)*;
 logic_and       <- logic_xor ( "xor" logic_xor)*;
 logic_xor       <- equality ( "and" equality)*;
@@ -47,11 +65,11 @@ multiplication  <- unary ( ( "/" | "*" | "++" | "--" ) unary )*;
 unary           <- ( "!" | "-" ) unary | call;
 
 (* CALL *)
-call                <- primary (callTail | anonymousMethodCall);
+call                <- primary ( callTail | anonymousMethodCall );
 callTail            <- "(" arguments* ")" indexedAccess* sequentialCall* anonymousMethodCall?;
 anonymousMethodCall <- methodAccess callTail;
 sequentialCall      <- ("(" arguments* ")" indexedAccess);
-arguments           <- expression ( "," expression )*;
+arguments           <-  newLines expression newLines ( newLines "," newLines expression )* newLines;
 
 (* ACCESS *)
 compoundVar     <- IDENTIFIER indexedAccess* methodAccess;
@@ -59,6 +77,6 @@ indexedAccess   <- ( "[" expression "]" ) | ( "." IDENTIFIER );
 methodAccess    <-  ( ":" IDENTIFIER )?;
 
 (* TABLE *)
-table           <- [ tableEntry (, tableEntry )* ];
+table           <- "[" newLines tableEntry ( newLines "," newLines tableEntry )* newLines "]" newLines;
 tableEntry      <- ( (-)? primary)
                 | ( (-)? IDENTIFIER : primary );
