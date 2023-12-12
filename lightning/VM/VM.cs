@@ -5,7 +5,6 @@ using System.IO;
 using Operand = System.UInt16;
 using System.Text.Json;
 
-
 #if DOUBLE
 using Float = System.Double;
 	using Integer = System.Int64;
@@ -55,6 +54,7 @@ namespace lightning
 
 	public class VM
 	{
+		const String VMConfigPath = "VM.json";
 
 		Operand IP;
 		FunctionUnit main;
@@ -92,15 +92,21 @@ namespace lightning
 			VMConfigRead source = new VMConfigRead();
 
 			try{
-				using (StreamReader r = new StreamReader("VM.json"))
+				using (StreamReader r = new StreamReader(VMConfigPath))
 				{
 					string read_json = r.ReadToEnd();
 					source = JsonSerializer.Deserialize<VMConfigRead>(read_json);
 				}
 			} catch(Exception) {
-				Console.WriteLine("NO VM.json -> Using VM defaults");
+				Console.WriteLine("NO 'VM.json' -> Created new 'VM.json', using VM defaults");
 				source.callStackSize = 30;
 				source.VMLogFile = "_vm.log";
+
+				string jsonString = JsonSerializer.Serialize(source, new JsonSerializerOptions() {WriteIndented = true});
+				using (StreamWriter outputFile = new StreamWriter(VMConfigPath))
+				{
+					outputFile.WriteLine(jsonString);
+				}
 			} finally {
 				config = new VMConfig(
 					source.callStackSize,
