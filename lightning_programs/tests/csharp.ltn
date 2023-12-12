@@ -1,0 +1,33 @@
+var assert_counter = require("assert_counter.ltn")
+var assert = assert_counter.assert
+var assert_not = assert_counter.assert_not
+{
+	// Testing csharp module
+	var csharp_sum =
+	#
+		5 + 6
+	#
+	if (csharp.eval_to_int != null){
+		var result = csharp.eval_to_int(csharp_sum)
+		assert(result, 11, "Failed csharp.eval test 1." .. type(result))
+	}
+
+	var csharp_sum_func_code =
+	#
+		using System;
+		using Number = System.Double;
+		using lightning;
+
+		(vm) => {
+			Number opA = vm.GetNumber(0);
+			Number opB = vm.GetNumber(1);
+
+			return new Unit(opA + opB);
+		}
+	#
+	if (csharp.script_compile != null){
+		var csharp_sum_func = csharp.script_compile("csharp_sum_func", 2, csharp_sum_func_code)
+		assert(csharp_sum_func(5, 6), 11, "Failed csharp.script_compile test 1.")
+	}
+}
+return assert_counter.get_error_counter()

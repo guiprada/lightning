@@ -22,6 +22,8 @@ namespace lightning
 		public char charValue;
 		[FieldOffset(0)]
 		public bool boolValue;
+		[FieldOffset(0)]
+		public bool isHeapUnit;
 
 #if DOUBLE
 		[FieldOffset(8)]
@@ -38,7 +40,7 @@ namespace lightning
 
 		public Unit(HeapUnit p_value):this()
 		{
-			floatValue = 0;
+			isHeapUnit = true;
 			heapUnitValue = p_value;
 		}
 		public Unit(Float p_number):this()
@@ -61,7 +63,7 @@ namespace lightning
 
 		public Unit(String p_string):this()
 		{
-			floatValue = 0;
+			isHeapUnit = true;
 			heapUnitValue = new StringUnit(p_string);
 		}
 

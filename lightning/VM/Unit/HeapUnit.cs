@@ -636,7 +636,7 @@ namespace lightning
 		{
 			return content.GetHashCode();
 		}
-		public T UnWrapp()
+		public T UnWrap()
 		{
 			if (this.content.GetType() == typeof(T))
 			{
@@ -644,7 +644,7 @@ namespace lightning
 			}
 			else
 			{
-				throw new Exception("UnWrapp<" + typeof(T) +">() type Error!");
+				throw new Exception("UnWrap<" + typeof(T) +">() type Error!");
 			}
 		}
 

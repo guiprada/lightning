@@ -101,9 +101,9 @@ namespace lightning
 				source.logFile = VMDefaults.logFile;
 
 				string jsonString = JsonSerializer.Serialize(source, new JsonSerializerOptions() {WriteIndented = true});
-				using (StreamWriter outputFile = new StreamWriter(VMDefaults.configPath))
+				using (StreamWriter outFile = new StreamWriter(VMDefaults.configPath))
 				{
-					outputFile.WriteLine(jsonString);
+					outFile.WriteLine(jsonString);
 				}
 			} finally {
 				config = new VMConfig(
@@ -308,7 +308,7 @@ namespace lightning
 		public T GetWrappedContent<T>(int p_n){
 			if(stack.Peek(p_n).Type != UnitType.Wrapper)
 				throw new Exception("Expected a Wrapper.");
-			return ((WrapperUnit<T>)stack.Peek(p_n).heapUnitValue).UnWrapp();
+			return ((WrapperUnit<T>)stack.Peek(p_n).heapUnitValue).UnWrap();
 		}
 
 		public WrapperUnit<T> GetWrapperUnit<T>(int p_n){

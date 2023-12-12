@@ -256,9 +256,9 @@ namespace lightning
 			////////////////////////////////////////////////////////////////////////////////////////////////////////////
 			////////////////////////////////////////////////////////////////////////////////////////////////// intrinsic
 			{
-				TableUnit intrinsic = new TableUnit(null);
 #if ROSLYN
-				Unit CreateIntrinsic(VM p_vm)
+				TableUnit cSharp = new TableUnit(null);
+				Unit CSharpScriptCompile(VM p_vm)
 				{
 					string name = p_vm.GetString(0);
 					Float arity = p_vm.GetInteger(1);
@@ -267,16 +267,26 @@ namespace lightning
 					var options = ScriptOptions.Default.AddReferences(
 						typeof(Unit).Assembly,
 						typeof(VM).Assembly).WithImports(); // "lightning", "System");
-					Func<VM, Unit> new_intrinsic = CSharpScript.EvaluateAsync<Func<VM, Unit>>(body, options)
+					Func<VM, Unit> new_func = CSharpScript.EvaluateAsync<Func<VM, Unit>>(body, options)
 						.GetAwaiter().GetResult();
+					return new Unit(new IntrinsicUnit(name, new_func, (int)arity));
 
-					return new Unit(new IntrinsicUnit(name, new_intrinsic, (int)arity));
 				}
-				intrinsic.Set("create", new IntrinsicUnit("create", CreateIntrinsic, 3));
+				cSharp.Set("script_compile", new IntrinsicUnit("script_compile", CSharpScriptCompile, 3));
+
+				Unit CSharpScriptEvalToInt(VM p_vm)
+				{
+					string body = p_vm.GetString(0);
+					Integer result = CSharpScript.EvaluateAsync<Integer>(body)
+						.GetAwaiter().GetResult();
+					return new Unit(result);
+				}
+				cSharp.Set("eval_to_int", new IntrinsicUnit("eval_to_int", CSharpScriptEvalToInt, 1));
+
+				tables.Add("csharp", cSharp);
 #else
-				intrinsic.Set("create", new Unit(UnitType.Null));
+				tables.Add("csharp", new Unit(UnitType.Null));
 #endif
-				tables.Add("intrinsic", intrinsic);
 			}
 			////////////////////////////////////////////////////////////////////////////////////////////////////////////
 			/////////////////////////////////////////////////////////////////////////////////////////////////////// rand

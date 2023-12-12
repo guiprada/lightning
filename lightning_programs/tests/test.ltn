@@ -16,10 +16,10 @@
 	else
 		write_line("Running Humbly on " .. processor_count .. " processor" )
 }
-if (intrinsic.create == null)
-	write_line("No inline intrinsic support!")
+if (csharp == null)
+	write_line("No csharp support!")
 else
-	write_line("Inline intrinsic support! :)")
+	write_line("Csharp support! :)")
 
 write_line("-- Starting tests --")
 var start_time = time.now()
@@ -66,8 +66,8 @@ errors += require("tests/boolean.ltn")
 errors += require("tests/char.ltn")
 errors += require("tests/closures.ltn")
 errors += require("tests/compound_calls.ltn")
+errors += require("tests/csharp.ltn")
 errors += require("tests/eval.ltn")
-errors += require("tests/inline_intrinsics.ltn")
 errors += require("tests/integers.ltn")
 errors += require("tests/iterators.ltn")
 errors += require("tests/lambdas.ltn")
