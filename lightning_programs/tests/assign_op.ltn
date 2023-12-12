@@ -30,9 +30,21 @@ var assert_not = assert_counter.assert_not
 	assert(j3, 1, "Failed Increment Test 4.")
 
 	j = 2
-	j1 = j += 1 // chained ASSIGN_VARIABLE_INCREMENT op works weird, this is equivalent to j1 = 1; j += 1
-	assert(j1, 1, "Failed Increment Assign Test 1.")
-	assert(j, 3, "Failed Increment Assign Test 2." .. j)
+	j1 = j += 1 // this is equivalent to j += 1; j1 = j
+	assert(j1, 3, "Failed Increment Assign Test 1.")
+	assert(j, 3, "Failed Increment Assign Test 2.")
+
+	j = -5
+	j1 = j += 3 // this is equivalent to j += 3; j1 = j
+	assert(j1, -2, "Failed Increment Assign Test 3.")
+	assert(j, -2, "Failed Increment Assign Test 4.")
+
+	j = -3
+	j1 = 3
+	j2 = j1 += j *= 2  // this is equivalent to j *= 2 (-6); j1 += j (-3); j2 = j1 (-3)
+	assert(j2, -3, "Failed Increment Assign Test 5.")
+	assert(j1, -3, "Failed Increment Assign Test 6.")
+	assert(j, -6, "Failed Increment Assign Test 7.")
 }
 
 return assert_counter.get_error_counter()

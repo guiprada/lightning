@@ -561,24 +561,29 @@ namespace lightning
 									variables.SetAt(stack.Peek(), instruction.opA, CalculateEnvShift(instruction.opB));
 									break;
 								case ADDITION_ASSIGN:
-									result = old_value + stack.Peek();
+									result = old_value + stack.Pop();
+									stack.Push(result);
 									variables.SetAt(result, instruction.opA, CalculateEnvShift(instruction.opB));
 									break;
 								case SUBTRACTION_ASSIGN:
-									result = old_value - stack.Peek();
+									result = old_value - stack.Pop();
+									stack.Push(result);
 									variables.SetAt(result, instruction.opA, CalculateEnvShift(instruction.opB));
 									break;
 								case MULTIPLICATION_ASSIGN:
-									result = old_value * stack.Peek();
+									result = old_value * stack.Pop();
+									stack.Push(result);
 									variables.SetAt(result, instruction.opA, CalculateEnvShift(instruction.opB));
 									break;
 								case DIVISION_ASSIGN:
-									result = old_value / stack.Peek();
+									result = old_value / stack.Pop();
+									stack.Push(result);
 									variables.SetAt(result, instruction.opA, CalculateEnvShift(instruction.opB));
 									break;
 								default:
 									throw new Exception("Unknown operator");
 							}
+
 							break;
 						}
 					case OpCode.ASSIGN_GLOBAL:

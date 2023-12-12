@@ -524,7 +524,6 @@ namespace lightning
 							int this_index = upvalueStack.Peek().IndexOf(this_var);
 							Add(OpCode.ASSIGN_UPVALUE, (Operand)this_index, op, p_node.PositionData);
 							break;
-
 					}
 				}else{//  it is a compoundVar
 					LoadVariable(this_var, p_node.PositionData);
