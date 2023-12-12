@@ -35,27 +35,25 @@ namespace lightning
 
 	class VMConfigRead {
 		public int callStackSize {get; set;}
-		public String VMLogFile {get; set;}
+		public String logFile {get; set;}
 	}
 
 	struct VMConfig
 	{
 		public int callStackSize {get;}
-		public String VMLogFile {get;}
+		public String logFile {get;}
 
 		public VMConfig(
 			int p_callStackSize,
 			string p_VMLogFile)
 		{
 			callStackSize = p_callStackSize;
-			VMLogFile = p_VMLogFile;
+			logFile = p_VMLogFile;
 		}
 	}
 
 	public class VM
 	{
-		const String VMConfigPath = "VM.json";
-
 		Operand IP;
 		FunctionUnit main;
 		private bool parallelVM;
@@ -92,25 +90,25 @@ namespace lightning
 			VMConfigRead source = new VMConfigRead();
 
 			try{
-				using (StreamReader r = new StreamReader(VMConfigPath))
+				using (StreamReader r = new StreamReader(VMDefaults.configPath))
 				{
 					string read_json = r.ReadToEnd();
 					source = JsonSerializer.Deserialize<VMConfigRead>(read_json);
 				}
 			} catch(Exception) {
 				Console.WriteLine("NO 'VM.json' -> Created new 'VM.json', using VM defaults");
-				source.callStackSize = 30;
-				source.VMLogFile = "_vm.log";
+				source.callStackSize = VMDefaults.callStackSize;
+				source.logFile = VMDefaults.logFile;
 
 				string jsonString = JsonSerializer.Serialize(source, new JsonSerializerOptions() {WriteIndented = true});
-				using (StreamWriter outputFile = new StreamWriter(VMConfigPath))
+				using (StreamWriter outputFile = new StreamWriter(VMDefaults.configPath))
 				{
 					outputFile.WriteLine(jsonString);
 				}
 			} finally {
 				config = new VMConfig(
 					source.callStackSize,
-					source.VMLogFile
+					source.logFile
 				);
 			}
 		}
@@ -345,7 +343,7 @@ namespace lightning
 			}
 			catch (Exception e)
 			{
-				Logger.LogLine("VM Busted ...\n" + e.ToString(), config.VMLogFile);
+				Logger.LogLine("VM Busted ...\n" + e.ToString(), config.logFile);
 				return new Unit(UnitType.Null);
 			}
 		}
@@ -458,7 +456,7 @@ namespace lightning
 			}
 			catch (Exception e)
 			{
-				Logger.LogLine("VM Busted ...\n" + e.ToString(), config.VMLogFile);
+				Logger.LogLine("VM Busted ...\n" + e.ToString(), config.logFile);
 				return new VMResult(VMResultType.ERROR, new Unit(UnitType.Null));
 			}
 		}
