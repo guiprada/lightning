@@ -53,6 +53,16 @@ var assert_not = assert_counter.assert_not
 		assert(result, null, "Failed csharp.eval test 5. ")
 	}
 
+	var csharp_unknown =
+	#
+		(System.Int128)1
+	#
+	if (csharp.eval != null){
+		var result = csharp.eval(csharp_unknown)
+		assert_not(result, null, "Failed csharp.eval test 6. ")
+		assert_not(result, 1, "Failed csharp.eval test 7. ")
+	}
+
 	var csharp_sum_func_code =
 	#
 		using System;
