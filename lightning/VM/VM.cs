@@ -1,16 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
-
-using Operand = System.UInt16;
-using System.Text.Json;
 
 #if DOUBLE
-using Float = System.Double;
+	using Float = System.Double;
 	using Integer = System.Int64;
+	using Operand = System.UInt16;
 #else
 	using Float = System.Single;
 	using Integer = System.Int32;
+	using Operand = System.UInt16;
 #endif
 
 namespace lightning
@@ -30,25 +28,6 @@ namespace lightning
 		{
 			status = p_status;
 			value = p_value;
-		}
-	}
-
-	class VMConfigRead {
-		public int callStackSize {get; set;}
-		public String logFile {get; set;}
-	}
-
-	struct VMConfig
-	{
-		public int callStackSize {get;}
-		public String logFile {get;}
-
-		public VMConfig(
-			int p_callStackSize,
-			string p_VMLogFile)
-		{
-			callStackSize = p_callStackSize;
-			logFile = p_VMLogFile;
 		}
 	}
 
@@ -87,30 +66,7 @@ namespace lightning
 
 //////////////////////////////////////////////////// Public
 		static VM(){
-			VMConfigRead source = new VMConfigRead();
-
-			try{
-				using (StreamReader r = new StreamReader(VMDefaults.configPath))
-				{
-					string read_json = r.ReadToEnd();
-					source = JsonSerializer.Deserialize<VMConfigRead>(read_json);
-				}
-			} catch(Exception) {
-				Console.WriteLine("NO 'VM.json' -> Created new 'VM.json', using VM defaults");
-				source.callStackSize = VMDefaults.callStackSize;
-				source.logFile = VMDefaults.logFile;
-
-				string jsonString = JsonSerializer.Serialize(source, new JsonSerializerOptions() {WriteIndented = true});
-				using (StreamWriter outFile = new StreamWriter(VMDefaults.configPath))
-				{
-					outFile.WriteLine(jsonString);
-				}
-			} finally {
-				config = new VMConfig(
-					source.callStackSize,
-					source.logFile
-				);
-			}
+			config = VMDefaults.GetConfig();
 		}
 
 		public VM(Chunk p_chunk)

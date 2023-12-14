@@ -2,8 +2,6 @@
 using System.Collections.Generic;
 using System.IO;
 
-using Operand = System.UInt16;
-
 #if ROSLYN
 	using Microsoft.CodeAnalysis.Scripting;
 	using Microsoft.CodeAnalysis.CSharp.Scripting;
@@ -12,9 +10,11 @@ using Operand = System.UInt16;
 #if DOUBLE
 	using Float = System.Double;
 	using Integer = System.Int64;
+	using Operand = System.UInt16;
 #else
 	using Float = System.Single;
 	using Integer = System.Int32;
+	using Operand = System.UInt16;
 #endif
 
 namespace lightning
@@ -274,14 +274,16 @@ namespace lightning
 				}
 				cSharp.Set("script_compile", new IntrinsicUnit("script_compile", CSharpScriptCompile, 3));
 
-				Unit CSharpScriptEvalToInt(VM p_vm)
+				Unit CSharpScriptEval(VM p_vm)
 				{
 					string body = p_vm.GetString(0);
-					Integer result = CSharpScript.EvaluateAsync<Integer>(body)
+
+					var result = CSharpScript.EvaluateAsync(body)
 						.GetAwaiter().GetResult();
-					return new Unit(result);
+
+					return Unit.FromObject(result);
 				}
-				cSharp.Set("eval_to_int", new IntrinsicUnit("eval_to_int", CSharpScriptEvalToInt, 1));
+				cSharp.Set("eval", new IntrinsicUnit("eval", CSharpScriptEval, 1));
 
 				tables.Add("csharp", cSharp);
 #else

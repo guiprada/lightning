@@ -96,6 +96,43 @@ namespace lightning
 			}
 		}
 
+		public static Unit FromObject(object p_obj)
+		{
+			if (p_obj == null)
+				return new Unit(UnitType.Null);
+
+			Type this_type = p_obj.GetType();
+
+			if (this_type == typeof(Unit)) // Returns the same object - it should work :)
+				return (Unit) p_obj;
+
+			if (this_type == typeof(char))
+				return new Unit((char)p_obj);
+
+			if (this_type == typeof(String))
+				return new Unit((String)p_obj);
+
+			if (this_type == typeof(bool))
+				return new Unit((bool)p_obj);
+
+
+#if DOUBLE
+
+			if (this_type == typeof(System.Int16)
+				|| this_type == typeof(System.Int32)
+			)
+				return new Unit(Convert.ToInt64(p_obj));
+			else if (this_type == typeof(Integer))
+				return new Unit((Integer)p_obj);
+#else
+			if (this_type == typeof(System.Int16)))
+				return new Unit(Convert.ToInt64(p_obj));
+			else if (this_type == typeof(Integer))
+				return new Unit((Integer)p_obj);
+#endif
+			return new Unit(new WrapperUnit<object>(p_obj));
+		}
+
 		public override string ToString()
 		{
 			UnitType this_type = this.Type;
