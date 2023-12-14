@@ -199,7 +199,7 @@ namespace lightning
 	{
 		public string Name{get; private set;}
 		public Func<VM, Unit> Function{get; private set;}
-		public int Arity{get; private set;}
+		public Operand Arity{get; private set;}
 
 		public override UnitType Type{
 			get{
@@ -207,7 +207,7 @@ namespace lightning
 			}
 		}
 
-		public IntrinsicUnit(string p_Name, Func<VM, Unit> p_Function, int p_Arity)
+		public IntrinsicUnit(string p_Name, Func<VM, Unit> p_Function, Operand p_Arity)
 		{
 			Name = p_Name;
 			Function = p_Function;

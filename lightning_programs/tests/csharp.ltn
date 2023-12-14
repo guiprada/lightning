@@ -83,22 +83,25 @@ var assert_not = assert_counter.assert_not
 
 	var csharp_native_sum_func_code =
 	#
-		using System;
-		public class MyClass
+	using System;
+	using System.IO;
+	namespace RoslynCore
+	{
+		public static class Helper
 		{
-			public static void Main()
+			public static double CalculateCircleArea(double radius)
 			{
-				Console.WriteLine(""Hello World!"");
-				Console.ReadLine();
+				return radius * radius * Math.PI;
 			}
 		}
+	}
 	#
-	// if (csharp.script_compile != null){
-	// 	var csharp_native_sum_func = csharp.compile("csharp_native_sum_func", 2, csharp_native_sum_func_code)
+	if (csharp.compile != null){
+		var csharp_native_sum_func = csharp.compile("csharp_native_sum_func", 0, csharp_native_sum_func_code)
 
-	// 	if try(csharp_native_sum_func, [1, 1]) {
-	// 		assert(csharp_native_sum_func(5, 6), 11, "Failed csharp.compile test 1.")
-	// 	}
-	// }
+		if (try(csharp_native_sum_func, [])) {
+			assert(csharp_native_sum_func(), 11, "Failed csharp.compile test 1.")
+		}
+	}
 }
 return assert_counter.get_error_counter()

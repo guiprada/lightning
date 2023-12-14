@@ -11,6 +11,11 @@ using System.IO;
 	using Float = System.Double;
 	using Integer = System.Int64;
 	using Operand = System.UInt16;
+using Microsoft.CodeAnalysis.CSharp;
+using System.Reflection;
+using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.Emit;
+using System.Runtime.Loader;
 #else
 	using Float = System.Single;
 	using Integer = System.Int32;
@@ -269,7 +274,7 @@ namespace lightning
 						typeof(VM).Assembly).WithImports(); // "lightning", "System");
 					Func<VM, Unit> new_func = CSharpScript.EvaluateAsync<Func<VM, Unit>>(body, options)
 						.GetAwaiter().GetResult();
-					return new Unit(new IntrinsicUnit(name, new_func, (int)arity));
+					return new Unit(new IntrinsicUnit(name, new_func, (Operand)arity));
 
 				}
 				cSharp.Set("script_compile", new IntrinsicUnit("script_compile", CSharpScriptCompile, 3));
@@ -284,6 +289,51 @@ namespace lightning
 					return Unit.FromObject(result);
 				}
 				cSharp.Set("eval", new IntrinsicUnit("eval", CSharpScriptEval, 1));
+
+				Unit CSharpCompile(VM p_vm)
+				{
+					string name = p_vm.GetString(0);
+					Float arity = p_vm.GetInteger(1);
+					string body = p_vm.GetString(2);
+
+					var tree = SyntaxFactory.ParseSyntaxTree(body);
+					string file_name = name + ".dll";
+
+					var systemRefLocation = typeof(object).GetTypeInfo().Assembly.Location;
+					var systemReference = MetadataReference.CreateFromFile(systemRefLocation);
+					var compilation = CSharpCompilation.Create(file_name)
+						.WithOptions(
+						new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary))
+						.AddReferences(systemReference)
+						.AddSyntaxTrees(tree);
+
+					string path = System.IO.Path.Combine(Directory.GetCurrentDirectory(), file_name);
+					EmitResult compilationResult = compilation.Emit(path);
+					if(compilationResult.Success)
+					{
+						// Load the assembly
+						Assembly asm =
+						AssemblyLoadContext.Default.LoadFromAssemblyPath(path);
+						// Invoke the RoslynCore.Helper.CalculateCircleArea method passing an argument
+						double radius = 10;
+						object result =
+						asm.GetType("RoslynCore.Helper").GetMethod("CalculateCircleArea").
+							Invoke(null, new object[] { radius });
+						Console.WriteLine($"Circle area with radius = {radius} is {result}");
+					}
+					else
+					{
+						foreach (Diagnostic codeIssue in compilationResult.Diagnostics)
+						{
+						string issue = $"ID: {codeIssue.Id}, Message: {codeIssue.GetMessage()}, Location: {codeIssue.Location.GetLineSpan()}, Severity: {codeIssue.Severity}";
+						Console.WriteLine(issue);
+						}
+					}
+
+					return new Unit(UnitType.Null);
+					// return new Unit(new IntrinsicUnit(name, new_func, (Operand)arity));
+				}
+				cSharp.Set("compile", new IntrinsicUnit("compile", CSharpCompile, 3));
 
 				tables.Add("csharp", cSharp);
 #else
