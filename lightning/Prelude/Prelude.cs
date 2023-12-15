@@ -10,10 +10,13 @@ using System.IO;
 	using Microsoft.CodeAnalysis;
 	using Microsoft.CodeAnalysis.Emit;
 	using System.Runtime.Loader;
+	using Microsoft.Extensions.DependencyModel;
+using Microsoft.CodeAnalysis.Scripting.Hosting;
+
 #endif
 
 #if DOUBLE
-	using Float = System.Double;
+using Float = System.Double;
 	using Integer = System.Int64;
 	using Operand = System.UInt16;
 #else
@@ -21,6 +24,8 @@ using System.IO;
 	using Integer = System.Int32;
 	using Operand = System.UInt16;
 #endif
+
+using System.Linq;
 
 namespace lightning
 {
@@ -272,8 +277,10 @@ namespace lightning
 					var options = ScriptOptions.Default.AddReferences(
 						typeof(Unit).Assembly,
 						typeof(VM).Assembly).WithImports(); // "lightning", "System");
+
 					Func<VM, Unit> new_func = CSharpScript.EvaluateAsync<Func<VM, Unit>>(body, options)
 						.GetAwaiter().GetResult();
+
 					return new Unit(new IntrinsicUnit(name, new_func, (Operand)arity));
 
 				}
@@ -299,34 +306,68 @@ namespace lightning
 					var tree = SyntaxFactory.ParseSyntaxTree(body);
 					string file_name = name + ".dll";
 
-					var systemRefLocation = typeof(object).GetTypeInfo().Assembly.Location;
-					var systemReference = MetadataReference.CreateFromFile(systemRefLocation);
+					// var refsLocations = new []
+					// {
+					// 	typeof(object).GetTypeInfo().Assembly.Location
+					// 	, typeof(VM).GetTypeInfo().Assembly.Location
+					// 	, typeof(Unit).GetTypeInfo().Assembly.Location
+					// };
+					// var refs = refsLocations.Select(
+					// 	(x) => {
+					// 		return MetadataReference.CreateFromFile(x);
+					// 	}
+					// );
 
-					var unityRefLocation = typeof(Unit).GetTypeInfo().Assembly.Location;
-					var unityReference = MetadataReference.CreateFromFile(unityRefLocation);
 
-					// var refs = new []
+					// MetadataReference[] refs =
+					// 	DependencyContext.Default.CompileLibraries
+					// 	.SelectMany(cl => cl.ResolveReferencePaths())
+					// 	.Select(path => MetadataReference.CreateFromFile(path))
+					// 	.ToArray();
+					// refs.Append(MetadataReference.CreateFromFile(typeof(Unit).GetTypeInfo().Assembly.Location));
+
+					var refs = new [] {
+						MetadataReference.CreateFromFile(typeof(Unit).GetTypeInfo().Assembly.Location)
+						, MetadataReference.CreateFromFile(AppDomain.CurrentDomain.BaseDirectory + "refs/" + "System.Runtime.dll")
+						, MetadataReference.CreateFromFile(AppDomain.CurrentDomain.BaseDirectory + "refs/" + "System.Console.dll")
+						, MetadataReference.CreateFromFile(AppDomain.CurrentDomain.BaseDirectory + "refs/" + "System.Core.dll")
+					};
+					// Console.WriteLine(AppDomain.CurrentDomain.BaseDirectory);
+					// foreach (string dll in Directory.GetFiles(AppDomain.CurrentDomain.BaseDirectory + "refs", "*.dll"))
+					// {
+					// 	Console.WriteLine(dll);
+					// 	refs.Append(MetadataReference.CreateFromFile(dll));
+					// }
 
 					var compilation = CSharpCompilation.Create(file_name)
 						.WithOptions(
-						new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary))
-						.AddReferences(systemReference, unityReference)
+							new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary)
+						)
+						.AddReferences(refs)
 						.AddSyntaxTrees(tree);
 
 					string path = System.IO.Path.Combine(Directory.GetCurrentDirectory(), file_name);
-					EmitResult compilationResult = compilation.Emit(path);
+
+					// Emit to disk
+					// EmitResult compilationResult = compilation.Emit(path);
+					var ms = new MemoryStream();
+					var compilationResult = compilation.Emit(ms);
 					if(compilationResult.Success)
 					{
-						// Load the assembly
-						Assembly asm =
-						AssemblyLoadContext.Default.LoadFromAssemblyPath(path);
+						// Load the assembly from file
+						// Assembly ourAssembly =
+						// AssemblyLoadContext.Default.LoadFromAssemblyPath(path);
+
+						// Load from memory
+						// Load into currently running assembly. Normally we'd probably want to do this in an AppDomain
+						var ourAssembly = Assembly.Load(ms.ToArray());
 
 						// Create func
-						MethodInfo func = asm.GetType("RoslynCore.Helper").GetMethod("CalculateCircleArea");
+						MethodInfo func = ourAssembly.GetType("RoslynCore.Helper").GetMethod("CalculateCircleArea");
 
 						// Invoke the RoslynCore.Helper.CalculateCircleArea method passing an argument
 						double radius = 10;
-						object result = func.Invoke(null, new object[] { radius });
+						object result = func.Invoke(null, new object[] { p_vm, radius });
 						Console.WriteLine($"Circle area with radius = {radius} is {result}");
 					}
 					else
@@ -1348,4 +1389,13 @@ namespace lightning
 			}
 		}
 	}
+
+    internal class CSharpScriptExecution
+    {
+        public CSharpScriptExecution()
+        {
+        }
+
+        public bool SaveGeneratedCode { get; set; }
+    }
 }

@@ -91,8 +91,11 @@ var assert_not = assert_counter.assert_not
 	{
 		public static class Helper
 		{
-			public static Unit CalculateCircleArea(double radius)
+			public static Unit CalculateCircleArea(VM vm, double radius)
 			{
+				Console.WriteLine("Hello");
+				Console.WriteLine(new Unit(5));
+
 				return new Unit(radius * radius * Math.PI);
 			}
 		}
