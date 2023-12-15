@@ -1,0 +1,8 @@
+{
+  "CallStackSize": 30,
+  "VMLogFile": "_vm.log",
+  "TryLogFile": "_try.log",
+  "CompilerLogFile": "_compiler.log",
+  "ParserLogFile": "_parser.log",
+  "ScannerLogFile": "_scanner.log"
+}

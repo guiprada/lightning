@@ -85,13 +85,15 @@ var assert_not = assert_counter.assert_not
 	#
 	using System;
 	using System.IO;
+	using lightning;
+
 	namespace RoslynCore
 	{
 		public static class Helper
 		{
-			public static double CalculateCircleArea(double radius)
+			public static Unit CalculateCircleArea(double radius)
 			{
-				return radius * radius * Math.PI;
+				return new Unit(radius * radius * Math.PI);
 			}
 		}
 	}

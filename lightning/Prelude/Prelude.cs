@@ -301,10 +301,16 @@ namespace lightning
 
 					var systemRefLocation = typeof(object).GetTypeInfo().Assembly.Location;
 					var systemReference = MetadataReference.CreateFromFile(systemRefLocation);
+
+					var unityRefLocation = typeof(Unit).GetTypeInfo().Assembly.Location;
+					var unityReference = MetadataReference.CreateFromFile(unityRefLocation);
+
+					// var refs = new []
+
 					var compilation = CSharpCompilation.Create(file_name)
 						.WithOptions(
 						new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary))
-						.AddReferences(systemReference)
+						.AddReferences(systemReference, unityReference)
 						.AddSyntaxTrees(tree);
 
 					string path = System.IO.Path.Combine(Directory.GetCurrentDirectory(), file_name);
@@ -327,8 +333,9 @@ namespace lightning
 					{
 						foreach (Diagnostic codeIssue in compilationResult.Diagnostics)
 						{
-						string issue = $"ID: {codeIssue.Id}, Message: {codeIssue.GetMessage()}, Location: {codeIssue.Location.GetLineSpan()}, Severity: {codeIssue.Severity}";
-						Console.WriteLine(issue);
+							string issue = $"ID: {codeIssue.Id}, Message: {codeIssue.GetMessage()}, Location: {codeIssue.Location.GetLineSpan()}, Severity: {codeIssue.Severity}";
+						// Console.WriteLine(issue);
+							Logger.LogLine(issue, Defaults.Config.VMLogFile);
 						}
 					}
 
@@ -757,7 +764,7 @@ namespace lightning
 						}
 					}
 				}
-				throw new Exception("Code Execution not OK :|");
+				throw new Exception("Code Execution was NOT OK :|");
 			}
 			functions.Add(new IntrinsicUnit("require", Require, 1));
 
@@ -779,8 +786,8 @@ namespace lightning
 						p_vm.RecycleVM(try_vm);
 						return new Unit(true);
 					}catch(Exception e){
-						Logger.LogLine("------------------- (Try log) " + p_vm.CurrentInstructionPositionDataString(), "_try.log");
-						Logger.LogLine(e.ToString() + "\n---", "_try.log");
+						Logger.LogLine("------------------- (Try log) " + p_vm.CurrentInstructionPositionDataString(), Defaults.Config.TryLogFile);
+						Logger.LogLine(e.ToString() + "\n---", Defaults.Config.TryLogFile);
 						p_vm.RecycleVM(try_vm);
 					}
 				}

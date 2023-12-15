@@ -4,66 +4,96 @@ using System.Text.Json;
 
 namespace lightning
 {
-    class VMConfigRead
-    {
-        public int callStackSize { get; set; }
-        public String logFile { get; set; }
-    }
+	class ConfigRead
+	{
+		public int CallStackSize { get; set; }
+		public string VMLogFile { get; set; }
+		public string TryLogFile { get; set; }
+		public string CompilerLogFile { get; set; }
+		public string ParserLogFile { get; set; }
+		public string ScannerLogFile { get; set; }
 
-    public struct VMConfig
-    {
-        public int callStackSize { get; }
-        public String logFile { get; }
+		public ConfigRead()
+		{
+			CallStackSize = 30;
+			VMLogFile = "_vm.log";
+			TryLogFile = "_try.log";
+			CompilerLogFile = "_compiler.log";
+			ParserLogFile = "_parser.log";
+			ScannerLogFile = "_scanner.log";
+		}
 
-        public VMConfig(
-            int p_callStackSize,
-            string p_VMLogFile)
-        {
-            callStackSize = p_callStackSize;
-            logFile = p_VMLogFile;
-        }
-    }
+		public Config ToConfig()
+		{
+			return new Config(
+				CallStackSize,
+				VMLogFile,
+				TryLogFile,
+				CompilerLogFile,
+				ParserLogFile,
+				ScannerLogFile
+			);
+		}
+	}
 
-    public class VMDefaults
-    {
-        private const String configPath = "VM.json";
-        private const int callStackSize = 30;
-        private const String logFile = "_vm.log";
+	public struct Config
+	{
+		public int CallStackSize { get; }
+		public string VMLogFile { get; }
+		public string TryLogFile { get; }
+		public string CompilerLogFile { get; }
+		public string ParserLogFile { get; }
+		public string ScannerLogFile { get; }
 
-        public static VMConfig GetConfig()
-        {
-            VMConfigRead source = new VMConfigRead();
-            VMConfig new_config;
+		public Config(
+			int p_CallStackSize,
+			string p_VMLogFile,
+			string p_TryLogFile,
+			string p_CompilerLogFile,
+			string p_ParserLogFile,
+			string p_ScannerLogFile
+		)
+		{
+			CallStackSize = p_CallStackSize;
+			VMLogFile = p_VMLogFile;
+			TryLogFile = p_TryLogFile;
+			CompilerLogFile = p_CompilerLogFile;
+			ParserLogFile = p_ParserLogFile;
+			ScannerLogFile = p_ScannerLogFile;
+		}
+	}
 
-            try
-            {
-                using (StreamReader r = new StreamReader(VMDefaults.configPath))
-                {
-                    string read_json = r.ReadToEnd();
-                    source = JsonSerializer.Deserialize<VMConfigRead>(read_json);
-                }
-            }
-            catch (Exception)
-            {
-                Console.WriteLine("NO 'VM.json' -> Created new 'VM.json', using VM defaults");
-                source.callStackSize = VMDefaults.callStackSize;
-                source.logFile = VMDefaults.logFile;
+	public class Defaults
+	{
+		private const string configPath = "Defaults.json";
+		public static Config Config { get; private set;}
 
-                string jsonString = JsonSerializer.Serialize(source, new JsonSerializerOptions() { WriteIndented = true });
-                using (StreamWriter outFile = new StreamWriter(VMDefaults.configPath))
-                {
-                    outFile.WriteLine(jsonString);
-                }
-            }
-            finally
-            {
-                new_config = new VMConfig(
-                    source.callStackSize,
-                    source.logFile
-                );
-            }
+		static Defaults()
+		{
+			ConfigRead source = new ConfigRead();
 
-            return new_config;
-        }
-    }
+			try
+			{
+				using (StreamReader r = new StreamReader(Defaults.configPath))
+				{
+					string read_json = r.ReadToEnd();
+					source = JsonSerializer.Deserialize<ConfigRead>(read_json);
+				}
+			}
+			catch (Exception)
+			{
+				Console.WriteLine("NO 'VM.json' -> Created new 'VM.json', using VM defaults");
+
+				string jsonString = JsonSerializer.Serialize(source, new JsonSerializerOptions() { WriteIndented = true });
+				using (StreamWriter outFile = new StreamWriter(Defaults.configPath))
+				{
+					outFile.WriteLine(jsonString);
+				}
+			}
+			finally
+			{
+				Config = source.ToConfig();
+			}
+		}
+	}
 }
