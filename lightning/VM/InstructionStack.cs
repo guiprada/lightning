@@ -2,84 +2,99 @@ using System.Collections.Generic;
 
 using Operand = System.UInt16;
 
-namespace lightning{
-	public struct InstructionStack
-	{
-		int currentInstructionsIndex;
-		FunctionUnit[] functions;
-		int returnAddressTop;
-		Operand[] returnAddress;
-		int[] funCallEnv;
+namespace lightning
+{
+    public struct InstructionStack
+    {
+        int currentInstructionsIndex;
+        FunctionUnit[] functions;
+        int returnAddressTop;
+        Operand[] returnAddress;
+        int[] funCallEnv;
 
-		public int TargetEnv{
-			get{
-				return funCallEnv[currentInstructionsIndex];
-			}
-		}
+        public int TargetEnv
+        {
+            get
+            {
+                return funCallEnv[currentInstructionsIndex];
+            }
+        }
 
-		public FunctionUnit ExecutingFunction{
-			get {
-				return functions[currentInstructionsIndex];
-			}
-		}
+        public FunctionUnit ExecutingFunction
+        {
+            get
+            {
+                return functions[currentInstructionsIndex];
+            }
+        }
 
-		public List<Instruction> ExecutingInstructions{
-			get{
-				return functions[currentInstructionsIndex].Body;
-			}
-		}
+        public List<Instruction> ExecutingInstructions
+        {
+            get
+            {
+                return functions[currentInstructionsIndex].Body;
+            }
+        }
 
-		public int ExecutingInstructionsIndex{
-			get{
-				return currentInstructionsIndex;
-			}
-		}
+        public int ExecutingInstructionsIndex
+        {
+            get
+            {
+                return currentInstructionsIndex;
+            }
+        }
 
-		public InstructionStack(int p_callStackSize, FunctionUnit p_main, out List<Instruction> p_instructionsCache){
-			functions = new FunctionUnit[p_callStackSize];
-			returnAddress = new Operand[2 * p_callStackSize];
-			funCallEnv = new int[p_callStackSize];
+        public InstructionStack(int p_callStackSize, FunctionUnit p_main, out List<Instruction> p_instructionsCache)
+        {
+            functions = new FunctionUnit[p_callStackSize];
+            returnAddress = new Operand[2 * p_callStackSize];
+            funCallEnv = new int[p_callStackSize];
 
-			returnAddressTop = 0;
-			currentInstructionsIndex = 0;
+            returnAddressTop = 0;
+            currentInstructionsIndex = 0;
 
-			PushRET((Operand)(p_main.Body.Count - 1));
-			functions[currentInstructionsIndex] = p_main;
+            PushRET((Operand)(p_main.Body.Count - 1));
+            functions[currentInstructionsIndex] = p_main;
 
-			p_instructionsCache = ExecutingInstructions;
-		}
+            p_instructionsCache = ExecutingInstructions;
+        }
 
-		public void Reset(){
-			returnAddressTop = 1;
-			currentInstructionsIndex = 0;
-		}
+        public void Reset()
+        {
+            returnAddressTop = 1;
+            currentInstructionsIndex = 0;
+        }
 
-		public Operand PopFunction(out List<Instruction> p_instructionsCache){
-			returnAddressTop--;
-			currentInstructionsIndex--;
+        public Operand PopFunction(out List<Instruction> p_instructionsCache)
+        {
+            returnAddressTop--;
+            currentInstructionsIndex--;
 
-			p_instructionsCache = ExecutingInstructions;
+            p_instructionsCache = ExecutingInstructions;
 
-			return returnAddress[returnAddressTop];
-		}
+            return returnAddress[returnAddressTop];
+        }
 
-		public void PushFunction(FunctionUnit p_function, int p_env, out List<Instruction> p_instructionsCache){
-			currentInstructionsIndex++;
+        public void PushFunction(FunctionUnit p_function, int p_env, out List<Instruction> p_instructionsCache)
+        {
+            currentInstructionsIndex++;
 
-			funCallEnv[currentInstructionsIndex] = p_env;
-			functions[currentInstructionsIndex] = p_function;
+            funCallEnv[currentInstructionsIndex] = p_env;
+            functions[currentInstructionsIndex] = p_function;
 
-			p_instructionsCache = ExecutingInstructions;
-		}
+            p_instructionsCache = ExecutingInstructions;
+        }
 
-		public Operand PopRET(){
-			returnAddressTop--;
-			return returnAddress[returnAddressTop];
-		}
+        public Operand PopRET()
+        {
+            returnAddressTop--;
+            return returnAddress[returnAddressTop];
+        }
 
-		public void PushRET(Operand p_address){
-			returnAddress[returnAddressTop] = p_address;
-			returnAddressTop ++;
-		}
-	}
+        public void PushRET(Operand p_address)
+        {
+            returnAddress[returnAddressTop] = p_address;
+            returnAddressTop++;
+        }
+    }
 }

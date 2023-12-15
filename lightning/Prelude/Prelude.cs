@@ -5,17 +5,17 @@ using System.IO;
 #if ROSLYN
 	using Microsoft.CodeAnalysis.Scripting;
 	using Microsoft.CodeAnalysis.CSharp.Scripting;
+	using Microsoft.CodeAnalysis.CSharp;
+	using System.Reflection;
+	using Microsoft.CodeAnalysis;
+	using Microsoft.CodeAnalysis.Emit;
+	using System.Runtime.Loader;
 #endif
 
 #if DOUBLE
 	using Float = System.Double;
 	using Integer = System.Int64;
 	using Operand = System.UInt16;
-using Microsoft.CodeAnalysis.CSharp;
-using System.Reflection;
-using Microsoft.CodeAnalysis;
-using Microsoft.CodeAnalysis.Emit;
-using System.Runtime.Loader;
 #else
 	using Float = System.Single;
 	using Integer = System.Int32;
@@ -314,11 +314,14 @@ namespace lightning
 						// Load the assembly
 						Assembly asm =
 						AssemblyLoadContext.Default.LoadFromAssemblyPath(path);
+
+						// Create func
+						MethodInfo func = asm.GetType("RoslynCore.Helper").GetMethod("CalculateCircleArea");
+						Console.WriteLine("type: " + func.GetType());
+
 						// Invoke the RoslynCore.Helper.CalculateCircleArea method passing an argument
 						double radius = 10;
-						object result =
-						asm.GetType("RoslynCore.Helper").GetMethod("CalculateCircleArea").
-							Invoke(null, new object[] { radius });
+						object result = func.Invoke(null, new object[] { radius });
 						Console.WriteLine($"Circle area with radius = {radius} is {result}");
 					}
 					else
