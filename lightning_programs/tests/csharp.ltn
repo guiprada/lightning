@@ -98,8 +98,12 @@ var assert_not = assert_counter.assert_not
 	#
 	if (csharp.compile != null){
 		var csharp_native_sum_func = csharp.compile("csharp_native_sum_func", 0, csharp_native_sum_func_code)
+		write_line(csharp_native_sum_func)
 
-		if (try(csharp_native_sum_func, [])) {
+		// assert(csharp_native_sum_func(), 11, "Failed csharp.compile test 1.")
+		// try(csharp_native_sum_func, null)
+
+		if (try(csharp_native_sum_func, null)) {
 			assert(csharp_native_sum_func(), 11, "Failed csharp.compile test 1.")
 		}
 	}

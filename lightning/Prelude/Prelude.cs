@@ -317,7 +317,6 @@ namespace lightning
 
 						// Create func
 						MethodInfo func = asm.GetType("RoslynCore.Helper").GetMethod("CalculateCircleArea");
-						Console.WriteLine("type: " + func.GetType());
 
 						// Invoke the RoslynCore.Helper.CalculateCircleArea method passing an argument
 						double radius = 10;
@@ -766,22 +765,27 @@ namespace lightning
 			{
 				Unit this_callable = p_vm.GetUnit(0);
 				Unit this_unit = p_vm.GetUnit(1);
-				List<Unit> this_arguments = null;
-				if(this_unit.Type == UnitType.List)
-					this_arguments = ((ListUnit)this_unit.heapUnitValue).Elements;
 
-				VM try_vm = p_vm.GetVM();
-				try
+				if (Unit.IsCallable(this_callable))
 				{
-					try_vm.CallFunction(this_callable, this_arguments);
-					p_vm.RecycleVM(try_vm);
-					return new Unit(true);
-				}catch(Exception e){
-					Logger.LogLine("------------------- Try log\n" + p_vm.CurrentInstructionPositionDataString() + "\n-------------------", "_try.log");
-					Logger.LogLine(e.ToString(), "_try.log");
-					p_vm.RecycleVM(try_vm);
-					return new Unit(false);
+					List<Unit> this_arguments = null;
+					if(this_unit.Type == UnitType.List)
+						this_arguments = ((ListUnit)this_unit.heapUnitValue).Elements;
+
+					VM try_vm = p_vm.GetVM();
+					try
+					{
+						try_vm.CallFunction(this_callable, this_arguments);
+						p_vm.RecycleVM(try_vm);
+						return new Unit(true);
+					}catch(Exception e){
+						Logger.LogLine("------------------- Try log\n" + p_vm.CurrentInstructionPositionDataString() + "\n-------------------", "_try.log");
+						Logger.LogLine(e.ToString(), "_try.log");
+						p_vm.RecycleVM(try_vm);
+					}
 				}
+
+				return new Unit(false);
 			}
 			functions.Add(new IntrinsicUnit("try", Try, 2));
 
