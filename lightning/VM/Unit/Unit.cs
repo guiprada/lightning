@@ -527,7 +527,7 @@ namespace lightning
 				case UnitType.UpValue:
 				case UnitType.Module:
 				case UnitType.Wrapper:
-					return (this.heapUnitValue).CompareTo(p_compareTo);
+					return heapUnitValue.CompareTo(p_compareTo);
 				default:
 					throw new Exception("Trying to compare a Unit to unkown UnitType.");
 			}
@@ -535,7 +535,7 @@ namespace lightning
 		public static bool IsNumeric(Unit p_value)
 		{
 			UnitType type = p_value.Type;
-			return (type == UnitType.Float || type == UnitType.Integer);
+			return type == UnitType.Float || type == UnitType.Integer;
 		}
 
 		public static bool IsCallable(Unit p_value)

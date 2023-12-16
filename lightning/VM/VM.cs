@@ -379,11 +379,11 @@ namespace lightning
 			else if (this_type == UnitType.ExternalFunction)
 			{
 				ExternalFunctionUnit this_external_function = (ExternalFunctionUnit)p_callable.heapUnitValue;
-				object[] arguments = [];
+				object[] arguments = [this_external_function.Arity];
 
 				if (p_args != null && p_args.Count == this_external_function.Arity)
 					for (int i = this_external_function.Arity - 1; i >= 0; i--)
-						arguments.Append(Unit.ToObject(p_args[i]));
+						arguments[i] = Unit.ToObject(p_args[i]);
 
 				Unit this_external_result = Unit.FromObject(this_external_function.Function.Invoke(null, arguments));
 				return this_external_result;
@@ -1112,12 +1112,16 @@ namespace lightning
 							}
 							else if (this_type == UnitType.ExternalFunction)
 							{
-								object[] arguments = [];
 								ExternalFunctionUnit this_external_function = (ExternalFunctionUnit)this_callable.heapUnitValue;
+								object[] arguments = [this_external_function.Arity];
 
-								for (int i = this_external_function.Arity - 1; i >= 0; i--)
-									arguments.Append(Unit.ToObject(stack.Pop()));
+								for (int i = this_external_function.Arity - 1; i >= 0; i--){
+									object arg = Unit.ToObject(stack.Pop());
+									Console.WriteLine("+1 " + arg.ToString());
+									arguments[i] = arg;
+								}
 
+								Console.WriteLine("len: " + arguments.Count().ToString());
 								Unit result = Unit.FromObject(this_external_function.Function.Invoke(null, arguments));
 								stack.Push(result);
 							}

@@ -91,30 +91,17 @@ var assert_not = assert_counter.assert_not
 	{
 		public static class Helper
 		{
-			public static Unit CalculateCircleArea(double radius)
+			public static long ExFuncTest(long i)
 			{
-				Console.WriteLine("Hello");
-
-				return new Unit(radius * radius * Math.PI);
-			}
-
-			public static void ExFuncTest()
-			{
-				Console.WriteLine("Hello Extenal World!");
+				return i + 1;
 			}
 		}
 	}
 	#
 	if (csharp.compile != null){
-		var csharp_native_sum_func = csharp.compile("csharp_native_sum_func", 0, csharp_native_sum_func_code)
-		write_line(csharp_native_sum_func)
-
-		try(csharp_native_sum_func, null)
-		assert(csharp_native_sum_func(), null, "Failed csharp.compile test 1.")
-
-		// if (try(csharp_native_sum_func, null)) {
-		// 	assert(csharp_native_sum_func(), 11, "Failed csharp.compile test 1.")
-		// }
+		var csharp_native_sum_func = csharp.compile("ExFuncTest", 1, csharp_native_sum_func_code)
+		assert(csharp_native_sum_func(2), 3, "Failed csharp.compile test 1.")
+		assert(try(csharp_native_sum_func, [2]), true, "Failed csharp.compile test 2.")
 	}
 }
 return assert_counter.get_error_counter()

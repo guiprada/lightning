@@ -357,16 +357,16 @@ namespace lightning
 						// Load into currently running assembly. Normally we'd probably want to do this in an AppDomain
 						var ourAssembly = Assembly.Load(ms.ToArray());
 
-						// Create func
-						MethodInfo func_1 = ourAssembly.GetType("RoslynCore.Helper").GetMethod("CalculateCircleArea");
+						// // Create func
+						// MethodInfo func_1 = ourAssembly.GetType("RoslynCore.Helper").GetMethod("CalculateCircleArea");
 
-						// Invoke the RoslynCore.Helper.CalculateCircleArea method passing an argument
-						double radius = 10;
-						object result = func_1.Invoke(null, new object[] { radius });
-						Console.WriteLine($"Circle area with radius = {radius} is {result}");
+						// // Invoke the RoslynCore.Helper.CalculateCircleArea method passing an argument
+						// double radius = 10;
+						// object result = func_1.Invoke(null, new object[] { radius });
+						// Console.WriteLine($"Circle area with radius = {radius} is {result}");
 
 						MethodInfo func_2 = ourAssembly.GetType("RoslynCore.Helper").GetMethod("ExFuncTest");
-						Unit ex_func_2 = new Unit(new ExternalFunctionUnit(name, func_2, (Operand)0));
+						Unit ex_func_2 = new Unit(new ExternalFunctionUnit(name, func_2, (Operand)arity));
 						return ex_func_2;
 					}
 					else
