@@ -164,6 +164,7 @@ namespace lightning
                     return 1;
                 case UnitType.Function:
                 case UnitType.Intrinsic:
+                case UnitType.ExternalFunction:
                 case UnitType.Closure:
                 case UnitType.UpValue:
                 case UnitType.Module:

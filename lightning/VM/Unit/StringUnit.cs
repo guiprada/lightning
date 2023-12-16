@@ -93,6 +93,7 @@ namespace lightning
                 case UnitType.List:
                 case UnitType.Function:
                 case UnitType.Intrinsic:
+                case UnitType.ExternalFunction:
                 case UnitType.Closure:
                 case UnitType.UpValue:
                 case UnitType.Module:
