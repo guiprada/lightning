@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
+
 
 #if DOUBLE
 using Float = System.Double;
@@ -326,15 +328,16 @@ namespace lightning
 		}
 		public Unit CallFunction(Unit p_callable, List<Unit> p_args = null)
 		{
-			UnitType this_type = p_callable.Type;
-			if (p_args != null)
-				for (int i = p_args.Count - 1; i >= 0; i--)
-					stack.Push(p_args[i]);
-
 			Operand before_call_IP = IP;
+
+			UnitType this_type = p_callable.Type;
 
 			if (this_type == UnitType.Function)
 			{
+				if (p_args != null)
+					for (int i = p_args.Count - 1; i >= 0; i--)
+						stack.Push(p_args[i]);
+
 				instructions.PushRET((Operand)(main.Body.Count - 1));
 				FunctionUnit this_func = (FunctionUnit)p_callable.heapUnitValue;
 				instructions.PushFunction(this_func, Env, out instructionsCache);
@@ -343,6 +346,10 @@ namespace lightning
 			}
 			else if (this_type == UnitType.Closure)
 			{
+				if (p_args != null)
+					for (int i = p_args.Count - 1; i >= 0; i--)
+						stack.Push(p_args[i]);
+
 				instructions.PushRET((Operand)(main.Body.Count - 1));
 				ClosureUnit this_closure = (ClosureUnit)p_callable.heapUnitValue;
 
@@ -360,9 +367,26 @@ namespace lightning
 			else if (this_type == UnitType.Intrinsic)
 			{
 				IntrinsicUnit this_intrinsic = (IntrinsicUnit)p_callable.heapUnitValue;
+				if (p_args != null && p_args.Count == this_intrinsic.Arity)
+					for (int i = this_intrinsic.Arity - 1; i >= 0; i--)
+						stack.Push(p_args[i]);
+
 				Unit intrinsic_result = this_intrinsic.Function(this);
 				stack.top -= this_intrinsic.Arity;
+
 				return intrinsic_result;
+			}
+			else if (this_type == UnitType.ExternalFunction)
+			{
+				ExternalFunctionUnit this_external_function = (ExternalFunctionUnit)p_callable.heapUnitValue;
+				object[] arguments = [];
+
+				if (p_args != null && p_args.Count == this_external_function.Arity)
+					for (int i = this_external_function.Arity - 1; i >= 0; i--)
+						arguments.Append(Unit.ToObject(p_args[i]));
+
+				Unit this_external_result = Unit.FromObject(this_external_function.Function.Invoke(null, arguments));
+				return this_external_result;
 			}
 
 			VMResult result = Run();
@@ -1084,6 +1108,17 @@ namespace lightning
 								IntrinsicUnit this_intrinsic = (IntrinsicUnit)this_callable.heapUnitValue;
 								Unit result = this_intrinsic.Function(this);
 								stack.top -= this_intrinsic.Arity;
+								stack.Push(result);
+							}
+							else if (this_type == UnitType.ExternalFunction)
+							{
+								object[] arguments = [];
+								ExternalFunctionUnit this_external_function = (ExternalFunctionUnit)this_callable.heapUnitValue;
+
+								for (int i = this_external_function.Arity - 1; i >= 0; i--)
+									arguments.Append(Unit.ToObject(stack.Pop()));
+
+								Unit result = Unit.FromObject(this_external_function.Function.Invoke(null, arguments));
 								stack.Push(result);
 							}
 							else

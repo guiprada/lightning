@@ -118,8 +118,6 @@ namespace lightning
 
 			if (this_type == typeof(bool))
 				return new Unit((bool)p_obj);
-
-
 #if DOUBLE
 
 			if (this_type == typeof(System.Int16)
@@ -135,6 +133,36 @@ namespace lightning
 				return new Unit((Integer)p_obj);
 #endif
 			return new Unit(new WrapperUnit<object>(p_obj));
+		}
+
+		public static object ToObject(Unit p_unity)
+		{
+			UnitType this_type = p_unity.Type;
+
+			if (this_type == UnitType.Float)
+				return p_unity.floatValue;
+
+			if (this_type == UnitType.Integer)
+				return p_unity.integerValue;
+
+			if (this_type == UnitType.Null)
+				return null;
+
+			if (this_type == UnitType.Char)
+				return p_unity.charValue;
+
+			if (this_type == UnitType.String)
+				return ((StringUnit)p_unity.heapUnitValue).content;
+
+			if (this_type == UnitType.Boolean)
+				return p_unity.boolValue;
+
+			if (this_type == UnitType.Wrapper)
+			{
+				return ((WrapperUnit<object>)p_unity.heapUnitValue).UnWrap();
+			}
+
+			throw new Exception("Unit.ToObject - Could not convert to object!");
 		}
 
 		public override string ToString()
@@ -514,8 +542,9 @@ namespace lightning
 		{
 			UnitType this_callable_type = p_value.Type;
 			return	this_callable_type == UnitType.Function
-				||	this_callable_type == UnitType.Closure
-				||	this_callable_type == UnitType.Intrinsic;
+				||	this_callable_type == UnitType.Intrinsic
+				||	this_callable_type == UnitType.ExternalFunction
+				||	this_callable_type == UnitType.Closure;
 		}
 	}
 }
