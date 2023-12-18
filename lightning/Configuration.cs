@@ -12,6 +12,7 @@ namespace lightning
 		public string CompilerLogFile { get; set; }
 		public string ParserLogFile { get; set; }
 		public string ScannerLogFile { get; set; }
+		public string AssembliesPath { get; set; }
 
 		public ConfigRead()
 		{
@@ -21,6 +22,7 @@ namespace lightning
 			CompilerLogFile = "_compiler.log";
 			ParserLogFile = "_parser.log";
 			ScannerLogFile = "_scanner.log";
+			AssembliesPath = "refs";
 		}
 
 		public Config ToConfig()
@@ -31,7 +33,8 @@ namespace lightning
 				TryLogFile,
 				CompilerLogFile,
 				ParserLogFile,
-				ScannerLogFile
+				ScannerLogFile,
+				AssembliesPath
 			);
 		}
 	}
@@ -44,6 +47,8 @@ namespace lightning
 		public string CompilerLogFile { get; }
 		public string ParserLogFile { get; }
 		public string ScannerLogFile { get; }
+		public string AssembliesPath { get; }
+		public string BaseDirectoryPath { get; }
 
 		public Config(
 			int p_CallStackSize,
@@ -51,15 +56,19 @@ namespace lightning
 			string p_TryLogFile,
 			string p_CompilerLogFile,
 			string p_ParserLogFile,
-			string p_ScannerLogFile
+			string p_ScannerLogFile,
+			string p_AssembliesPath
 		)
 		{
+			BaseDirectoryPath = AppDomain.CurrentDomain.BaseDirectory;
+
 			CallStackSize = p_CallStackSize;
 			VMLogFile = p_VMLogFile;
 			TryLogFile = p_TryLogFile;
 			CompilerLogFile = p_CompilerLogFile;
 			ParserLogFile = p_ParserLogFile;
 			ScannerLogFile = p_ScannerLogFile;
+			AssembliesPath = BaseDirectoryPath + "/" + p_AssembliesPath;
 		}
 	}
 

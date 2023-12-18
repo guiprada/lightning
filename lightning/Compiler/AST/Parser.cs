@@ -70,7 +70,7 @@ namespace lightning
 						);
 						Logger.LogLine(
 							e.ToString(),
-							Path.ToPath(moduleName) + Defaults.Config.ParserLogFile
+							Defaults.Config.ParserLogFile
 						);
 						LogWarnings();
 						LogErrors();
@@ -100,9 +100,9 @@ namespace lightning
 		{
 			if (Warnings.Count > 0)
 			{
-				Logger.LogLine("Parsing had warnings:", Path.ToPath(moduleName) + Defaults.Config.ParserLogFile);
+				Logger.LogLine("Parsing had warnings on module: " + moduleName, Defaults.Config.ParserLogFile);
 				foreach (string warning in Warnings)
-					Logger.LogLine("\t-" + warning, Path.ToPath(moduleName) + Defaults.Config.ParserLogFile);
+					Logger.LogLine("\t-" + warning, Defaults.Config.ParserLogFile);
 			}
 		}
 
@@ -110,9 +110,9 @@ namespace lightning
 		{
 			if (Errors.Count > 0)
 			{
-				Logger.LogLine("Parsing had Errors:", Path.ToPath(moduleName) + Defaults.Config.ParserLogFile);
+				Logger.LogLine("Parsing had Errors on module: " + moduleName, Defaults.Config.ParserLogFile);
 				foreach (string error in Errors)
-					Logger.LogLine("\t-" + error, Path.ToPath(moduleName) + Defaults.Config.ParserLogFile);
+					Logger.LogLine("\t-" + error, Defaults.Config.ParserLogFile);
 			}
 		}
 

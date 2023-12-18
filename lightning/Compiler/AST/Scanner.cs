@@ -73,8 +73,7 @@ namespace lightning
 					}
 					catch (Exception e)
 					{
-						Console.WriteLine("Scanning broke the runtime, check out " + System.IO.Path.DirectorySeparatorChar + Defaults.Config.ParserLogFile);
-						Logger.LogLine(e.ToString(), Defaults.Config.ParserLogFile);
+						Logger.LogLine(e.ToString(), Defaults.Config.ScannerLogFile);
 						PrintErrors();
 						return null;
 					}
@@ -98,9 +97,9 @@ namespace lightning
 		private void PrintErrors()
 		{
 			if (errors.Count > 0)
-				Logger.LogLine("Scanning had errors on module " + moduleName + ":", Defaults.Config.ParserLogFile);
+				Logger.LogLine("Scanning had errors on module " + moduleName + ":", Defaults.Config.ScannerLogFile);
 			foreach (string error in errors)
-				Logger.LogLine("\t-" + error, Defaults.Config.ParserLogFile);
+				Logger.LogLine("\t-" + error, Defaults.Config.ScannerLogFile);
 		}
 
 		private List<Token> ScanTokens()

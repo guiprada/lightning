@@ -84,7 +84,7 @@ namespace lightning
 					}
 					catch (Exception e)
 					{
-						Logger.LogLine("Chunking broke the runtime!\n" + e.ToString(), Path.ToPath(moduleName) + Defaults.Config.CompilerLogFile);
+						Logger.LogLine("Chunking broke the runtime!\n" + e.ToString(), Defaults.Config.CompilerLogFile);
 						LogErrors();
 						return null;
 					}
@@ -126,7 +126,7 @@ namespace lightning
 		{
 			if (Errors.Count > 0)
 				foreach (string error in Errors)
-					Logger.LogLine(error, Path.ToPath(moduleName) + Defaults.Config.CompilerLogFile);
+					Logger.LogLine(error, Defaults.Config.CompilerLogFile);
 		}
 
 		private void ChunkIt(Node p_node)
@@ -493,6 +493,10 @@ namespace lightning
 					LoadIndexes(p_node.Indexes);
 					Add(OpCode.GET, (Operand)p_node.Indexes.Count, p_node.PositionData);
 				}
+			}
+			else
+			{
+				Error("Variable: " + p_node.Name + " not found!", p_node.PositionData);
 			}
 		}
 

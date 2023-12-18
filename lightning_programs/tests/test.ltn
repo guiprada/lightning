@@ -16,10 +16,11 @@
 	else
 		write_line("Running Humbly on " .. processor_count .. " processor" )
 }
-if (csharp == null)
-	write_line("No csharp support!")
+
+if (roslyn == null)
+	write_line("No roslyn support!")
 else
-	write_line("Csharp support! :)")
+	write_line("Roslyn support! :)")
 
 write_line("-- Starting tests --")
 var start_time = time.now()
@@ -66,7 +67,6 @@ errors += require("tests/boolean.ltn")
 errors += require("tests/char.ltn")
 errors += require("tests/closures.ltn")
 errors += require("tests/compound_calls.ltn")
-errors += require("tests/csharp.ltn")
 errors += require("tests/eval.ltn")
 errors += require("tests/integers.ltn")
 errors += require("tests/iterators.ltn")
@@ -81,6 +81,7 @@ errors += require("tests/nuples.ltn")
 errors += require("tests/pmap.ltn")
 errors += require("tests/reduce.ltn")
 errors += require("tests/rmap.ltn")
+errors += require("tests/roslyn.ltn")
 errors += require("tests/scoping.ltn")
 errors += require("tests/strings.ltn")
 errors += require("tests/super_table.ltn")
