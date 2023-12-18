@@ -852,15 +852,17 @@ namespace lightning
 						// local var
 						return new Variable(p_name, this_env.IndexOf(p_name), top_index - i, ValueType.Local);
 					}
-					if (isGlobal && globals.Contains(p_name))
-					{// Sanity check
+					if (isGlobal && globals.Contains(p_name))// Sanity check
+					{
 						return new Variable(p_name, this_env.IndexOf(p_name), 0, ValueType.Global);
 					}
-					Error("Var finding gone mad! Variable: " + p_name + " not found!", p_positionData);
+					else
+					{
+						Error("Var finding gone mad, global Variable: " + p_name + " not found!", p_positionData);
+					}
 					return null;
 				}
 			}
-			Error("Variable: " + p_name + " not found!", p_positionData);
 			return null;
 		}
 

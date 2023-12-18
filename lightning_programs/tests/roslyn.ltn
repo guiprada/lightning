@@ -106,7 +106,6 @@ var assert_not = assert_counter.assert_not
     }
 
     var asm_paths = roslyn.get_available_assemblies()
-    write_line(asm_paths)
-    write_line(roslyn.get_references_from_assemblies_list(asm_paths))
+    var references = roslyn.get_references_from_assemblies_list(asm_paths)
 }
 return assert_counter.get_error_counter()
