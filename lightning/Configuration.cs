@@ -68,7 +68,7 @@ namespace lightning
 			CompilerLogFile = p_CompilerLogFile;
 			ParserLogFile = p_ParserLogFile;
 			ScannerLogFile = p_ScannerLogFile;
-			AssembliesPath = BaseDirectoryPath + "/" + p_AssembliesPath;
+			AssembliesPath = System.IO.Path.Combine(BaseDirectoryPath, p_AssembliesPath);
 		}
 	}
 
