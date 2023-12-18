@@ -35,20 +35,7 @@ namespace lightning
 
         static void CloseLogger(object sender, EventArgs e)
         {
-            bool is_processing;
-            lock(queue)
-                is_processing = isProcessing;
-
-            if(is_processing)
-            {
-                Console.WriteLine("Waiting for Logger to finish!");
-                queueProcessing.Wait();
-            }
-            else
-            {
-                Console.WriteLine("Logger is idle!");
-            }
-
+            queueProcessing.Wait();
             Console.WriteLine("Logger has exited :)");
             Console.Out.Flush();
         }
