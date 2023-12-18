@@ -36,7 +36,7 @@ namespace lightning
         static void CloseLogger(object sender, EventArgs e)
         {
             bool is_processing;
-            // lock(queue)
+            lock(queue)
                 is_processing = isProcessing;
 
             if(is_processing)
@@ -59,7 +59,7 @@ namespace lightning
             bool has_entry;
             do
             {
-                // lock(queue)
+                lock(queue)
                 {
                     if (queue.Count == 0)
                         isProcessing = false;
@@ -81,7 +81,7 @@ namespace lightning
         }
         private static async void Add(LogEntry entry)
         {
-            // lock(queue)
+            lock(queue)
             {
                 queue.Enqueue(entry);
 #if VERBOSE
