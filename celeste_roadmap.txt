@@ -6,7 +6,6 @@
 - Registrar dominio celeste.org e registrar o nome intuição eletrica.
 - Abrir empresa
 
-- Test and fix logger
 - Split prelude
 
 - try to run in blazor.

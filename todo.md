@@ -185,9 +185,7 @@ Done
         replace lambda counter with moduleName + PositionData
     - added global variable data to chunk
 
-Done
-====
-
-- Solve lone node quirk; perhaps add ";"  or enforce expression separating comas, ocaml style forbid parentheses on LHS
+    - Solve lone node quirk; perhaps add ";"  or enforce expression separating comas, ocaml style forbid parentheses on LHS
     - Added Newlines to grammar
     - Added Newline Eliding to parser
+    - Test and fix logger
