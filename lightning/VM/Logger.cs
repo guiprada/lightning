@@ -43,7 +43,7 @@ namespace lightning
         static void ProcessQueue()
         {
             LogEntry entry;
-            bool keep_going;
+            bool keep_going = true;
 
             do
             {
@@ -54,9 +54,9 @@ namespace lightning
                     using (System.IO.StreamWriter file = new System.IO.StreamWriter(entry.path, entry.append))
                     {
                         if (entry.isLine)
-                            file.WriteLineAsync(entry.message);
+                            file.WriteLine(entry.message);
                         else
-                            file.WriteAsync(entry.message);
+                            file.Write(entry.message);
                     }
                 }
                 lock(isProcessingLock)
