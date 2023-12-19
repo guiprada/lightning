@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Concurrent;
-using System.Threading;
 using System.Threading.Tasks;
 
 namespace lightning
@@ -40,45 +39,35 @@ namespace lightning
             Console.Out.Flush();
         }
 
-        static void ProcessQueue()
+        static async void ProcessQueue()
         {
             LogEntry entry;
             bool has_entry;
             do
             {
-                lock(queue)
-                {
-                    if (queue.Count == 0)
-                        isProcessing = false;
-                    else
-                        isProcessing = true;
-                    has_entry = queue.TryDequeue(out entry);
-                }
+                isProcessing = true;
+                has_entry = queue.TryDequeue(out entry);
                 if (has_entry)
                 {
                     using (System.IO.StreamWriter file = new System.IO.StreamWriter(entry.path, entry.append))
                     {
                         if (entry.isLine)
-                            file.WriteLine(entry.message);
+                            await file.WriteLineAsync(entry.message);
                         else
-                            file.Write(entry.message);
+                            await file.WriteAsync(entry.message);
                     }
                 }
+                isProcessing = !queue.IsEmpty;
             } while (isProcessing);
         }
-        private static async void Add(LogEntry entry)
+        private static void Add(LogEntry entry)
         {
-            lock(queue)
-            {
-                queue.Enqueue(entry);
+            queue.Enqueue(entry);
 #if VERBOSE
-			    Console.WriteLine(entry.message);
+            Console.WriteLine(entry.message);
 #endif
-                if (isProcessing == false)
-                    queueProcessing = Task.Run(ProcessQueue);
-            }
-
-            await queueProcessing;
+            if (isProcessing == false)
+                queueProcessing = Task.Run(ProcessQueue);
         }
 
         public static void LogLine(string p_line, string p_path)
