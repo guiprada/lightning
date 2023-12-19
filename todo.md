@@ -8,8 +8,7 @@ use tuples as structs with named access
 
 To be Done
 ----------
-- Split prelude
-- criar sistema de configuracao por json e remover valores hard_coded
+
 - readonly fields in Unit?
 - configurar tipos numéricos padrao em tempo de execução via json
 
@@ -190,3 +189,5 @@ Done
     - Added Newlines to grammar
     - Added Newline Eliding to parser
     - Test and fix logger
+    - Split prelude
+    - criar sistema de configuracao por json e remover valores hard_coded

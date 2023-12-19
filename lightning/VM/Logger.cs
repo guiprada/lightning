@@ -60,14 +60,23 @@ namespace lightning
                 isProcessing = !queue.IsEmpty;
             } while (isProcessing);
         }
+
+        private static void StartLogger(){
+            queueProcessing = Task.Run(ProcessQueue);
+        }
         private static void Add(LogEntry entry)
         {
             queue.Enqueue(entry);
 #if VERBOSE
             Console.WriteLine(entry.message);
 #endif
+#if PLOG
+            if (isProcessing == false)
+                Parallel.Invoke(StartLogger);
+#else
             if (isProcessing == false)
                 queueProcessing = Task.Run(ProcessQueue);
+#endif
         }
 
         public static void LogLine(string p_line, string p_path)
