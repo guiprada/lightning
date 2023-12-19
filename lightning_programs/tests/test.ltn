@@ -17,7 +17,7 @@
 		write_line("Running Humbly on " .. processor_count .. " processor" )
 }
 
-if (roslyn == null)
+if (csharp == null)
 	write_line("No roslyn support!")
 else
 	write_line("Roslyn support! :)")

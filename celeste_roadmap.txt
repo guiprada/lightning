@@ -1,16 +1,10 @@
 
-			we are slow, but have some tricks
-			we are simple but many
-
-- Iniciar blog tutorial.
-- Registrar dominio celeste.org e registrar o nome intuição eletrica.
-- Abrir empresa
-
 - try to run in blazor.
 - solve table-list and supertable mess. Keep in mind that language should be simple and not high performance, at this point. Perhaps replace metatables with non recurring dispatching tables, with autoflatten logic. Create object as all pvt attributes, message only table, create actor as a object with programable update hooks.
 - Verify Garbage collection and Env for memory leaks.
 - verify formal language definition.
 - verify multicore implementation.
+- add concurrency support (yield or await)
 - code clean up.
 - remove nill and exceptions, after adding an Option type
 - add yield for coroutines and become for tail call optimization.
@@ -52,27 +46,32 @@ languages on .NET?
 - implement infered and optionally typed lisp compiler, lisp is ast
 - port to web, with Dom manipulation.
 - implement compiler optimizations.https://www.ocamlwiki.com/wiki/Bytecode_Optimization_in_OCaml
-	Bytecode Optimization in OCaml[edit | edit source]
-	Bytecode optimization in OCaml is a crucial aspect of optimizing the execution of OCaml programs compiled to bytecode. This process involves various techniques that enhance the performance and efficiency of the bytecode, resulting in improved execution speed and reduced memory consumption. Bytecode optimization plays a significant role in maximizing the benefits of using the OCaml programming language.
-	Background[edit | edit source]
-	OCaml is a statically typed functional programming language that provides a bytecode compiler, which translates OCaml source code into bytecode. The bytecode is then executed by the OCaml virtual machine (OCamlrun). Although the bytecode is not as fast as native machine code, it offers platform independence and enables the execution of OCaml programs on different platforms without recompilation.
-	Optimization Techniques[edit | edit source]
-	Several techniques are utilized to optimize OCaml bytecode and enhance its performance. These techniques focus on different aspects of the bytecode, such as reducing unnecessary overhead, improving memory management, and enhancing execution speed.
-	Instruction Selection and Scheduling[edit | edit source]
-	Instruction selection and scheduling are essential steps in bytecode optimization. This process involves choosing the most efficient bytecode instructions and arranging them in a way that minimizes execution time and resource usage.
-	Constant Folding and Propagation[edit | edit source]
-	Constant folding and propagation eliminate unnecessary computations by replacing expressions involving constants with the resulting constant value. This optimization reduces redundant calculations and improves the overall efficiency of the bytecode.
-	Dead Code Elimination[edit | edit source]
-	Dead code elimination identifies and removes portions of the bytecode that are unreachable or do not contribute to the final program output. This optimization reduces the size of the bytecode and improves execution speed by eliminating unnecessary computations.
-	Inlining[edit | edit source]
-	Inlining is a technique that replaces function calls with the actual function body. This optimization eliminates the overhead associated with function call instructions and improves performance by reducing the number of instructions executed.
-	Loop Optimization[edit | edit source]
-	Loop optimization techniques aim to improve the execution speed of loops within the bytecode. These techniques include loop unrolling, loop fusion, loop interchange, and loop invariant code motion. By optimizing loops, the bytecode can execute more efficiently and achieve better performance.
-	Garbage Collection Optimization[edit | edit source]
-	Garbage collection optimization techniques focus on managing memory allocation and deallocation efficiently. By improving garbage collection, the bytecode can minimize memory fragmentation and reduce the frequency of garbage collection sweeps, resulting in improved overall performance.
-	Benefits[edit | edit source]
+	Instruction Selection and Scheduling
+		Instruction selection and scheduling are essential steps in bytecode optimization. This process involves
+		choosing the most efficient bytecode instructions and arranging them in a way that minimizes execution time and resource usage.
+	Constant Folding and Propagation
+		Constant folding and propagation eliminate unnecessary computations by replacing expressions involving
+		constants with the resulting constant value. This optimization reduces redundant calculations and improves
+		the overall efficiency of the bytecode.
+	Dead Code Elimination
+		Dead code elimination identifies and removes portions of the bytecode that are unreachable or do not contribute to the final
+		program output. This optimization reduces the size of the bytecode and improves execution speed by eliminating unnecessary computations.
+	Inlining
+		Inlining is a technique that replaces function calls with the actual function body. This optimization eliminates the overhead associated with
+		function call instructions and improves performance by reducing the number of instructions executed.
+	Loop Optimization
+		Loop optimization techniques aim to improve the execution speed of loops within the bytecode. These techniques include loop unrolling, loop
+		fusion, loop interchange, and loop invariant code motion. By optimizing loops, the bytecode can execute more efficiently and achieve better
+		performance.
+	Garbage Collection Optimization
+		Garbage collection optimization techniques focus on managing memory allocation and deallocation efficiently. By improving garbage collection,
+		the bytecode can minimize memory fragmentation and reduce the frequency of garbage collection sweeps, resulting in improved overall performance.
+	Benefits
 	Bytecode optimization in OCaml provides several benefits, including:
-	- Improved execution speed and reduced program latency. - Reduced memory consumption and efficient memory management. - Enhanced performance of OCaml programs running on multiple platforms. - Increased efficiency of the bytecode, resulting in faster program execution.
+		- Improved execution speed and reduced program latency.
+		- Reduced memory consumption and efficient memory management.
+		- Enhanced performance of OCaml programs running on multiple platforms.
+		- Increased efficiency of the bytecode, resulting in faster program execution.
 
 - c# interpreter optimizations
 - code clean_up

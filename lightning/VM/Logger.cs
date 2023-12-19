@@ -22,6 +22,7 @@ namespace lightning
     {
         private static ConcurrentQueue<LogEntry> queue;
         private static bool isProcessing;
+        private static object isProcessingLock = new object();
         private static Task queueProcessing;
 
         static Logger()
@@ -39,44 +40,42 @@ namespace lightning
             Console.Out.Flush();
         }
 
-        static async void ProcessQueue()
+        static void ProcessQueue()
         {
             LogEntry entry;
-            bool has_entry;
+            bool keep_going;
+
             do
             {
-                isProcessing = true;
-                has_entry = queue.TryDequeue(out entry);
-                if (has_entry)
+                lock(isProcessingLock)
+                    isProcessing = true;
+                if (queue.TryDequeue(out entry))
                 {
                     using (System.IO.StreamWriter file = new System.IO.StreamWriter(entry.path, entry.append))
                     {
                         if (entry.isLine)
-                            await file.WriteLineAsync(entry.message);
+                            file.WriteLineAsync(entry.message);
                         else
-                            await file.WriteAsync(entry.message);
+                            file.WriteAsync(entry.message);
                     }
                 }
-                isProcessing = !queue.IsEmpty;
-            } while (isProcessing);
+                lock(isProcessingLock)
+                {
+                    isProcessing = !queue.IsEmpty;
+                    keep_going = isProcessing;
+                }
+            } while (keep_going);
         }
 
-        private static void StartLogger(){
-            queueProcessing = Task.Run(ProcessQueue);
-        }
         private static void Add(LogEntry entry)
         {
             queue.Enqueue(entry);
 #if VERBOSE
             Console.WriteLine(entry.message);
 #endif
-#if PLOG
-            if (isProcessing == false)
-                Parallel.Invoke(StartLogger);
-#else
-            if (isProcessing == false)
-                queueProcessing = Task.Run(ProcessQueue);
-#endif
+            lock(isProcessingLock)
+                if (isProcessing == false)
+                    queueProcessing = Task.Run(ProcessQueue);
         }
 
         public static void LogLine(string p_line, string p_path)
