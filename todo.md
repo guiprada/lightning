@@ -8,7 +8,8 @@ use tuples as structs with named access
 
 To be Done
 ----------
-
+- Create maybe type
+- Remove null
 - readonly fields in Unit?
 - configurar tipos numéricos padrao em tempo de execução via json
 
