@@ -2,10 +2,6 @@
     using Float = System.Double;
     using Integer = System.Int64;
     using Operand = System.UInt16;
-using System.Collections.Generic;
-using System.IO;
-
-
 #else
     using Float = System.Single;
     using Integer = System.Int32;
@@ -21,6 +17,8 @@ using Microsoft.CodeAnalysis.Scripting;
 #endif
 
 using System;
+using System.Collections.Generic;
+using System.IO;
 
 namespace lightning
 {
