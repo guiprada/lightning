@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.IO;
 
-using Operand = System.UInt16;
 
 // using lightningPrelude;
 using lightningUnit;

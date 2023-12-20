@@ -1,13 +1,5 @@
 ﻿using System;
 
-#if DOUBLE
-using Float = System.Double;
-using Integer = System.Int64;
-#else
-	using Float = System.Single;
-	using Integer = System.Int32;
-#endif
-
 using lightningChunk;
 namespace lightningAST
 {

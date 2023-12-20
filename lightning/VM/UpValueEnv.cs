@@ -1,6 +1,5 @@
 using System.Collections.Generic;
 
-using Operand = System.UInt16;
 
 using lightningUnit;
 namespace lightningVM

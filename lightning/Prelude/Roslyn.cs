@@ -1,15 +1,5 @@
-#if DOUBLE
-    using Float = System.Double;
-    using Integer = System.Int64;
-    using Operand = System.UInt16;
-#else
-    using Float = System.Single;
-    using Integer = System.Int32;
-    using Operand = System.UInt16;
-#endif
-
 #if ROSLYN
-using Microsoft.CodeAnalysis.Scripting;
+    using Microsoft.CodeAnalysis.Scripting;
     using Microsoft.CodeAnalysis.CSharp.Scripting;
     using Microsoft.CodeAnalysis.CSharp;
     using System.Reflection;

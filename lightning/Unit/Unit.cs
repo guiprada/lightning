@@ -1,14 +1,6 @@
 ﻿using System;
 using System.Runtime.InteropServices;
 
-#if DOUBLE
-using Float = System.Double;
-using Integer = System.Int64;
-#else
-    using Float = System.Single;
-    using Integer = System.Int32;
-#endif
-
 namespace lightningUnit
 {
     [StructLayout(LayoutKind.Explicit)]

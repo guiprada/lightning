@@ -1,16 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 
-#if DOUBLE
-using Float = System.Double;
-using Integer = System.Int64;
-using Operand = System.UInt16;
-#else
-	using Float = System.Single;
-	using Integer = System.Int32;
-	using Operand = System.UInt16;
-#endif
-
 using lightningTools;
 using lightningChunk;
 using lightningUnit;
