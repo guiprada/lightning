@@ -9,7 +9,8 @@ using Integer = System.Int64;
 	using Integer = System.Int32;
 #endif
 
-namespace lightning
+using lightningVM;
+namespace lightningUnit
 {
     public class TableUnit : HeapUnit
     {

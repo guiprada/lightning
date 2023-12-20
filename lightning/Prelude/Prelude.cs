@@ -12,20 +12,14 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 
-namespace lightning
+using lightningTools;
+using lightningChunk;
+using lightningVM;
+using lightningCompiler;
+using lightningAST;
+using lightningUnit;
+namespace lightningPrelude
 {
-    public struct Library
-    {
-        public List<IntrinsicUnit> intrinsics;
-        public Dictionary<string, TableUnit> tables;
-
-        public Library(List<IntrinsicUnit> p_intrinsics, Dictionary<string, TableUnit> p_tables)
-        {
-            intrinsics = p_intrinsics;
-            tables = p_tables;
-        }
-    }
-
     public class Prelude
     {
         ////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -76,7 +70,7 @@ namespace lightning
 
             ////////////////////////////////////////////////////////////////////////////////////////////////////////////
             /////////////////////////////////////////////////////////////////////////////////////////////////////// math
-            tables.Add("math", MathLightning.GetTableUnit());
+            tables.Add("math", LightningMath.GetTableUnit());
 
             ////////////////////////////////////////////////////////////////////////////////////////////////////////////
             /////////////////////////////////////////////////////////////////////////////////////////////////////// time
@@ -84,11 +78,11 @@ namespace lightning
 
             ////////////////////////////////////////////////////////////////////////////////////////////////////////////
             /////////////////////////////////////////////////////////////////////////////////////////////////////// char
-            tables.Add("char", CharLightning.GetTableUnit());
+            tables.Add("char", LightningChar.GetTableUnit());
 
             ////////////////////////////////////////////////////////////////////////////////////////////////////////////
             /////////////////////////////////////////////////////////////////////////////////////////////////////// file
-            tables.Add("file", FileLightning.GetTableUnit());
+            tables.Add("file", LightningFile.GetTableUnit());
 
             ////////////////////////////////////////////////////////////////////////////////////////////////////////////
             ////////////////////////////////////////////////////////////////////////////////////////// Global Intrinsics
@@ -99,7 +93,7 @@ namespace lightning
             Unit Eval(VM p_vm)
             {
                 string eval_code = p_vm.GetString(0);
-                string eval_name = "eval@" + Path.ToLambdaName(p_vm.CurrentInstructionModule())+ p_vm.CurrentInstructionPositionData();
+                string eval_name = "eval@" + lightningPath.ToLambdaName(p_vm.CurrentInstructionModule())+ p_vm.CurrentInstructionPositionData();
 
                 Scanner scanner = new Scanner(eval_code, eval_name);
                 List<Token> tokens = scanner.Tokens;
@@ -139,7 +133,7 @@ namespace lightning
             Unit Require(VM p_vm)
             {
                 string path = p_vm.GetString(0);
-                string name = Path.ModuleName(path);
+                string name = lightningPath.ModuleName(path);
                 foreach (ModuleUnit v in p_vm.modules)// skip already imported modules
                 {
                     if (v.Name == name)

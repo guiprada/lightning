@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-
-#if DOUBLE
+﻿#if DOUBLE
 using Float = System.Double;
 using Integer = System.Int64;
 #else
@@ -10,7 +6,12 @@ using Integer = System.Int64;
 	using Integer = System.Int32;
 #endif
 
-namespace lightning
+using System;
+using System.Collections.Generic;
+
+using lightningTools;
+using lightningChunk;
+namespace lightningAST
 {
 	public class Parser
 	{
@@ -56,7 +57,7 @@ namespace lightning
 							PrettyPrinter astPrinter = new PrettyPrinter();
 							astPrinter.PrintToFile(
 								ParsedTree,
-								Path.ToPath(moduleName) + ".ast"
+								lightningPath.ToPath(moduleName) + ".ast"
 							);
 						}
 					}
@@ -65,7 +66,7 @@ namespace lightning
 						Console.WriteLine(
 							"Parsing broke the runtime, check out " +
 							System.IO.Path.DirectorySeparatorChar +
-							Path.ToPath(moduleName) +
+							lightningPath.ToPath(moduleName) +
 							"_parser.log!"
 						);
 						Logger.LogLine(

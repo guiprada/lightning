@@ -11,7 +11,12 @@ using Operand = System.UInt16;
 	using Operand = System.UInt16;
 #endif
 
-namespace lightning
+using lightningTools;
+using lightningChunk;
+using lightningUnit;
+using lightningPrelude;
+using lightningAST;
+namespace lightningCompiler
 {
 	public class Compiler
 	{
@@ -79,7 +84,7 @@ namespace lightning
 						else
 						{
 							HasChunked = true;
-							chunk.PrintToFile(Path.ToPath(moduleName) + ".chunk");
+							chunk.PrintToFile(lightningPath.ToPath(moduleName) + ".chunk");
 						}
 					}
 					catch (Exception e)
@@ -1001,7 +1006,7 @@ namespace lightning
 
 		private string GetLambdaName(Node p_node)
 		{
-			return "lambda@" + Path.ToLambdaName(moduleName) + p_node.PositionData;
+			return "lambda@" + lightningPath.ToLambdaName(moduleName) + p_node.PositionData;
 		}
 
 		private void Error(string p_msg, PositionData p_positionData)

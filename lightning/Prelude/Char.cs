@@ -10,9 +10,11 @@
 
 using System;
 
-namespace lightning
+using lightningUnit;
+using lightningVM;
+namespace lightningPrelude
 {
-    public class CharLightning
+    public class LightningChar
     {
         public static TableUnit GetTableUnit()
         {

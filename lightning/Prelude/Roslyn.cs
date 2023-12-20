@@ -20,7 +20,10 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 
-namespace lightning
+using lightningTools;
+using lightningUnit;
+using lightningVM;
+namespace lightningPrelude
 {
     public class Roslyn
     {

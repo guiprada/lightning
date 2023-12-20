@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Text.RegularExpressions;
-
-#if DOUBLE
+﻿#if DOUBLE
 using Float = System.Double;
 using Integer = System.Int64;
 #else
@@ -11,7 +6,13 @@ using Integer = System.Int64;
 	using Integer = System.Int32;
 #endif
 
-namespace lightning
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Text.RegularExpressions;
+
+using lightningTools;
+namespace lightningAST
 {
 	public class Scanner
 	{
@@ -64,7 +65,7 @@ namespace lightning
 						else
 						{
 							hasScanned = true;
-							using (StreamWriter file = new StreamWriter(Path.ToPath(moduleName) + ".tokens", false))
+							using (StreamWriter file = new StreamWriter(lightningPath.ToPath(moduleName) + ".tokens", false))
 							{
 								foreach (Token token in tokens)
 									file.WriteLine(token.ToString());

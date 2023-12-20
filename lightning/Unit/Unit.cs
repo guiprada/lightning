@@ -9,7 +9,7 @@ using Integer = System.Int64;
     using Integer = System.Int32;
 #endif
 
-namespace lightning
+namespace lightningUnit
 {
     [StructLayout(LayoutKind.Explicit)]
     public struct Unit : IComparable

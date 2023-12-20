@@ -2,7 +2,8 @@
 using System.Collections.Generic;
 using System.IO;
 
-namespace lightning
+using lightningChunk;
+namespace lightningAST
 {
     public class PrettyPrinter
     {

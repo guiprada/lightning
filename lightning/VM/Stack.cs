@@ -1,5 +1,6 @@
 using System;
-namespace lightning
+using lightningUnit;
+namespace lightningVM
 {
     public struct Stack
     {

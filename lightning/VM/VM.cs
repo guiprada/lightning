@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-
-
-#if DOUBLE
+﻿#if DOUBLE
 using Float = System.Double;
 using Integer = System.Int64;
 using Operand = System.UInt16;
@@ -13,7 +8,14 @@ using Operand = System.UInt16;
     using Operand = System.UInt16;
 #endif
 
-namespace lightning
+using System;
+using System.Collections.Generic;
+
+using lightningTools;
+using lightningChunk;
+using lightningUnit;
+using lightningPrelude;
+namespace lightningVM
 {
     public enum VMResultType
     {

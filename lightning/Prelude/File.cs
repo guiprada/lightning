@@ -11,9 +11,11 @@
 using System;
 using System.IO;
 
-namespace lightning
+using lightningUnit;
+using lightningVM;
+namespace lightningPrelude
 {
-    public class FileLightning
+    public class LightningFile
     {
         public static TableUnit GetTableUnit()
         {

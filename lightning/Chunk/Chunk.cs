@@ -4,8 +4,26 @@ using System.IO;
 
 using Operand = System.UInt16;
 
-namespace lightning
+// using lightningPrelude;
+using lightningUnit;
+using lightningPrelude;
+namespace lightningChunk
 {
+    public struct PositionData
+    {
+        int line;
+        int column;
+        public PositionData(int p_line, int p_column)
+        {
+            line = p_line;
+            column = p_column;
+        }
+        public override string ToString()
+        {
+            return "(" + line + "," + column + ")";
+        }
+    }
+
     public struct ChunkPosition
     {
         public List<PositionData> positions;
@@ -31,6 +49,16 @@ namespace lightning
             return new ChunkPosition(positionSlice);
         }
     }
+
+    public enum AssignmentOperatorType
+    {
+        ASSIGN,
+        ADDITION_ASSIGN,
+        SUBTRACTION_ASSIGN,
+        MULTIPLICATION_ASSIGN,
+        DIVISION_ASSIGN,
+    }
+
     public struct Instruction
     {
         public OpCode opCode;

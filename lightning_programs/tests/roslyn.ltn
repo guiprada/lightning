@@ -67,7 +67,7 @@ var assert_not = assert_counter.assert_not
     #
         using System;
         using Number = System.Double;
-        using lightning;
+        using lightningUnit;
 
         (vm) => {
             Number opA = vm.GetNumber(0);
@@ -86,7 +86,6 @@ var assert_not = assert_counter.assert_not
     #
     using System;
     using System.IO;
-    using lightning;
 
     namespace RoslynCore
     {

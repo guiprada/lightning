@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Threading;
 
-namespace lightning
+namespace lightningVM
 {
     public class Memory<T>
     {

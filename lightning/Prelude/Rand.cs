@@ -10,7 +10,9 @@
 
 using System;
 
-namespace lightning
+using lightningUnit;
+using lightningVM;
+namespace lightningPrelude
 {
     public class Rand
     {

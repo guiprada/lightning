@@ -11,7 +11,9 @@ using Operand = System.UInt16;
     using Operand = System.UInt16;
 #endif
 
-namespace lightning
+using lightningChunk;
+using lightningVM;
+namespace lightningUnit
 {
     public enum UnitType
     {
@@ -463,7 +465,7 @@ public class ExternalFunctionUnit : HeapUnit
         public Operand Env { get; private set; }
         private bool isCaptured;
         public bool IsCaptured { get { return isCaptured; } }
-        private Memory<Unit> variables;
+        private lightningVM.Memory<Unit> variables;
         private Unit value;
         public override UnitType Type
         {
@@ -499,7 +501,7 @@ public class ExternalFunctionUnit : HeapUnit
             value = new Unit(UnitType.Null);
         }
 
-        public void Attach(Memory<Unit> p_variables)
+        public void Attach(lightningVM.Memory<Unit> p_variables)
         {
             variables = p_variables;
         }

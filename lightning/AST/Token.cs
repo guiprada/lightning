@@ -8,22 +8,9 @@ using Integer = System.Int64;
 	using Integer = System.Int32;
 #endif
 
-namespace lightning
+using lightningChunk;
+namespace lightningAST
 {
-    public struct PositionData
-    {
-        int line;
-        int column;
-        public PositionData(int p_line, int p_column)
-        {
-            line = p_line;
-            column = p_column;
-        }
-        public override string ToString()
-        {
-            return "(" + line + "," + column + ")";
-        }
-    }
     public enum TokenType
     {
         NEW_LINE,

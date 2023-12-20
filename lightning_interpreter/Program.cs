@@ -2,8 +2,13 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 
-using lightning;
-
+using lightningTools;
+using lightningVM;
+using lightningCompiler;
+using lightningAST;
+using lightningChunk;
+using lightningPrelude;
+using lightningUnit;
 namespace interpreter
 {
     class Program
@@ -30,7 +35,7 @@ namespace interpreter
                 {
                     input = sr.ReadToEnd();
                 }
-                string name = lightning.Path.ModuleName(path);
+                string name = lightningPath.ModuleName(path);
                 return Run(input, name);
             }
             catch (IOException e)

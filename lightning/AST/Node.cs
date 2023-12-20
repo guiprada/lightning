@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-
-#if DOUBLE
+﻿#if DOUBLE
 using Float = System.Double;
 using Integer = System.Int64;
 #else
@@ -9,7 +6,11 @@ using Integer = System.Int64;
 	using Integer = System.Int32;
 #endif
 
-namespace lightning
+using System;
+using System.Collections.Generic;
+
+using lightningChunk;
+namespace lightningAST
 {
     public enum NodeType
     {
@@ -70,15 +71,6 @@ namespace lightning
         LESS,
         LESS_EQUAL,
         VOID
-    }
-
-    public enum AssignmentOperatorType
-    {
-        ASSIGN,
-        ADDITION_ASSIGN,
-        SUBTRACTION_ASSIGN,
-        MULTIPLICATION_ASSIGN,
-        DIVISION_ASSIGN,
     }
 
     public enum VarAccessType

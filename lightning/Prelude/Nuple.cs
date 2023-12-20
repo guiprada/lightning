@@ -8,7 +8,9 @@
     using Operand = System.UInt16;
 #endif
 
-namespace lightning
+using lightningUnit;
+using lightningVM;
+namespace lightningPrelude
 {
     public class Nuple
     {

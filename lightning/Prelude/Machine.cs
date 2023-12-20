@@ -1,7 +1,9 @@
 using System;
 using System.Collections.Generic;
 
-namespace lightning
+using lightningUnit;
+using lightningVM;
+namespace lightningPrelude
 {
     public class Machine
     {

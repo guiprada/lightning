@@ -1,4 +1,6 @@
-namespace lightning
+using lightningUnit;
+using lightningVM;
+namespace lightningPrelude
 {
     public class Tuple
     {

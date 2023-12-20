@@ -3,15 +3,14 @@
 
 To Think
 --------
-add typing tests, don allow variables to change type
-use tuples as structs with named access
+- Add typing tests, dont allow variables to change type
+- readonly fields in Unit?
+
 
 To be Done
 ----------
 - Create maybe type
 - Remove null
-- readonly fields in Unit?
-- configurar tipos numéricos padrao em tempo de execução via json
 
 add table.flatten => merge with extension table and unset extension table
     add table.flatten_under => merge extension table with table and unset extension table

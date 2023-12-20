@@ -2,7 +2,9 @@ using System.Collections.Generic;
 
 using Operand = System.UInt16;
 
-namespace lightning
+using lightningChunk;
+using lightningUnit;
+namespace lightningVM
 {
     public struct InstructionStack
     {

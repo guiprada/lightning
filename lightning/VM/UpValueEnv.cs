@@ -2,7 +2,8 @@ using System.Collections.Generic;
 
 using Operand = System.UInt16;
 
-namespace lightning
+using lightningUnit;
+namespace lightningVM
 {
     public class UpValueEnv
     {

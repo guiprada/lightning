@@ -1,6 +1,6 @@
-namespace lightning
+namespace lightningTools
 {
-    public class Path
+	public class lightningPath
     {
         public static string ModuleName(string p_path)
         {
