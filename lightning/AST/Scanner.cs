@@ -366,7 +366,7 @@ namespace lightningAST
 			//int this_lenght = (current - 1) - (start + 1);
 			String new_string = new string(source, start + 1, current - start - 2);
 
-			return new_string;
+			return Regex.Unescape(new_string);
 		}
 
 

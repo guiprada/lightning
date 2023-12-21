@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Runtime.InteropServices;
+using System.Text.RegularExpressions;
 
 namespace lightningUnit
 {
@@ -166,7 +167,7 @@ namespace lightningUnit
                 case UnitType.Integer:
                     return integerValue.ToString();
                 case UnitType.Char:
-                    return charValue.ToString();
+                    return Regex.Escape(charValue.ToString());
                 case UnitType.Null:
                     return "Null";
                 case UnitType.Boolean:
