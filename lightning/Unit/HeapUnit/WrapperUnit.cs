@@ -57,7 +57,7 @@ namespace lightningUnit
         {
             if (this.content.GetType() == typeof(T))
             {
-                return (T)this.content;
+                return (T)content;
             }
             else
             {
