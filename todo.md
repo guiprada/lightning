@@ -11,6 +11,7 @@ To be Done
 ----------
 - Create maybe type
 - Remove null
+- Fix writeln unescape "\n"
 
 add table.flatten => merge with extension table and unset extension table
     add table.flatten_under => merge extension table with table and unset extension table

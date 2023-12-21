@@ -66,37 +66,6 @@ namespace lightningUnit
             return methodTable.ExtensionTable;
         }
 
-        public override int CompareTo(object p_compareTo)
-        {
-            if (p_compareTo.GetType() != typeof(Unit))
-                throw new Exception("Trying to compare StringUnit to non Unit type");
-            Unit other = (Unit)p_compareTo;
-            UnitType other_type = other.Type;
-            switch (other_type)
-            {
-                case UnitType.String:
-                    return this.content.CompareTo(((StringUnit)(other.heapUnitValue)).content);
-                case UnitType.Float:
-                case UnitType.Integer:
-                case UnitType.Char:
-                case UnitType.Null:
-                case UnitType.Boolean:
-                    return 1;
-                case UnitType.Table:
-                case UnitType.List:
-                case UnitType.Function:
-                case UnitType.Intrinsic:
-                case UnitType.ExternalFunction:
-                case UnitType.Closure:
-                case UnitType.UpValue:
-                case UnitType.Module:
-                case UnitType.Wrapper:
-                    return -1;
-                default:
-                    throw new Exception("Trying to compare a StringUnit to unkown UnitType.");
-            }
-        }
-
         ////////////////////////////////////////////////////////////////////////////////////////////////////////////
         ///////////////////////////////////////////////////////////////////////////////////////////////////// String
         private static TableUnit methodTable = new TableUnit(null);

@@ -432,95 +432,50 @@ namespace lightningUnit
 
         public int CompareTo(object p_compareTo)
         {
-            UnitType this_type = this.Type;
-            if (p_compareTo.GetType() != typeof(Unit)) return -1;
-            Unit other = (Unit)p_compareTo;
-            UnitType other_type = ((Unit)other).Type;
-            switch (this_type)
+            if (p_compareTo.GetType() != typeof(Unit))
+                throw new Exception("Trying to compare a Unit to: " + p_compareTo.GetType());
+
+            Unit lhs = this;
+            UnitType lhs_type = lhs.Type;
+            Unit rhs = (Unit)p_compareTo;
+            UnitType rhs_type = rhs.Type;
+
+            // Resolve UpValue
+            if (lhs_type == UnitType.UpValue)
+            {
+                lhs = ((UpValueUnit)lhs.heapUnitValue).UpValue;
+                lhs_type = lhs.Type;
+            }
+            if (rhs_type == UnitType.UpValue)
+            {
+                rhs = ((UpValueUnit)rhs.heapUnitValue).UpValue;
+                rhs_type = rhs.Type;
+            }
+
+            switch (lhs_type)
             {
                 case UnitType.Float:
-                    switch (other_type)
-                    {
-                        case UnitType.Float:
-                            return floatValue.CompareTo(other.floatValue);
-                        case UnitType.Integer:
-                            return floatValue.CompareTo(other.integerValue);
-                        case UnitType.Char:
-                            return 1;
-                        case UnitType.Null:
-                            return 1;
-                        case UnitType.Boolean:
-                            return 1;
-                        default:
-                            return -1;
-                    }
+                    if (rhs_type == UnitType.Float)
+                        return lhs.floatValue.CompareTo(rhs.floatValue);
+                    else
+                        throw new Exception("Trying to compare a UnitType.Float to UnitType: " + rhs_type);
                 case UnitType.Integer:
-                    switch (other_type)
-                    {
-                        case UnitType.Float:
-                            if (this.integerValue > other.floatValue)
-                                return 1;
-                            else if (this.integerValue < other.floatValue)
-                                return -1;
-                            else
-                                return 0;
-                        case UnitType.Integer:
-                            return integerValue.CompareTo(other.integerValue);
-                        case UnitType.Char:
-                        case UnitType.Null:
-                        case UnitType.Boolean:
-                            return 1;
-                        default:
-                            return -1;
-                    }
+                    if (rhs_type == UnitType.Integer)
+                        return lhs.integerValue.CompareTo(rhs.integerValue);
+                    else
+                        throw new Exception("Trying to compare a UnitType.Integer to UnitType: " + rhs_type);
                 case UnitType.Char:
-                    switch (other_type)
-                    {
-                        case UnitType.Float:
-                        case UnitType.Integer:
-                            return -1;
-                        case UnitType.Char:
-                            return charValue.CompareTo(other.charValue);
-                        case UnitType.Null:
-                        case UnitType.Boolean:
-                            return 1;
-                        default:
-                            return -1;
-                    }
-                case UnitType.Null:
-                    switch (other_type)
-                    {
-                        case UnitType.Null:
-                            return 0;
-                        default:
-                            return -1;
-                    }
-                case UnitType.Boolean:
-                    switch (other_type)
-                    {
-                        case UnitType.Float:
-                        case UnitType.Integer:
-                        case UnitType.Char:
-                            return -1;
-                        case UnitType.Null:
-                            return 1;
-                        case UnitType.Boolean:
-                            return boolValue.CompareTo(other.boolValue);
-                        default:
-                            return -1;
-                    }
+                    if (rhs_type == UnitType.Char)
+                        return lhs.charValue.CompareTo(rhs.charValue);
+                    else
+                        throw new Exception("Trying to compare a UnitType.Char to UnitType: " + rhs_type);
                 case UnitType.String:
-                case UnitType.Table:
-                case UnitType.List:
-                case UnitType.Function:
-                case UnitType.Intrinsic:
-                case UnitType.Closure:
-                case UnitType.UpValue:
-                case UnitType.Module:
-                case UnitType.Wrapper:
-                    return heapUnitValue.CompareTo(p_compareTo);
+                    if (rhs_type == UnitType.String)
+                        return ((StringUnit)lhs.heapUnitValue).content.CompareTo(((StringUnit)rhs.heapUnitValue).content);
+                    else
+                        throw new Exception("Trying to compare a UnitType.String to UnitType: " + rhs_type);
                 default:
-                    throw new Exception("Trying to compare a Unit to unkown UnitType.");
+                    throw new Exception("Trying to compare a UnitType: " + lhs_type + "to UnitType: " + rhs_type);
             }
         }
         public static bool IsNumeric(Unit p_value)
