@@ -9,7 +9,6 @@ namespace lightningUnit
     {
         Float
         , Integer
-        , Null
         , Boolean
         , String
         , Char
@@ -22,6 +21,8 @@ namespace lightningUnit
         , List
         , Module
         , Wrapper
+        , Option
+        , Null
     }
 
     public abstract class HeapUnit
