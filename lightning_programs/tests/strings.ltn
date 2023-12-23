@@ -44,6 +44,6 @@ var assert_not = assert_counter.assert_not
 	a_string:set_extension_table(string_extension_table)
 	assert(a_string:teste1(), "oba", "Failed Adding Methods to String Test 1.")
 	assert("another_string":teste1(), "another_string", "Failed Adding Methods to String Test 2.")
-	assert(a_string:get_extension_table(), string_extension_table, "Failed Adding Methods to String Test 3.")
+	assert(a_string:get_extension_table():unwrap(), string_extension_table, "Failed Adding Methods to String Test 3.")
 }
 return assert_counter.get_error_counter()

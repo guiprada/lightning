@@ -29,7 +29,7 @@ namespace lightningUnit
 
         public override String ToString()
         {
-            return "Otion: " +  Value.ToString();
+            return "Option: " +  Value.ToString();
 
         }
 
@@ -63,7 +63,7 @@ namespace lightningUnit
         public Unit UnWrap()
         {
             if (Value.Type == UnitType.Empty)
-                 throw new Exception("Option is empty!");
+                throw new Exception("Option is empty!");
             else
                 return Value;
         }
@@ -73,6 +73,40 @@ namespace lightningUnit
             if (p_value.Type == UnitType.Option)
             {
                 return ((OptionUnit)p_value.heapUnitValue).UnWrap();
+            }
+            return p_value;
+        }
+
+        public Unit Expect(string p_msg)
+        {
+            if (Value.Type == UnitType.Empty)
+                throw new Exception("Option is empty! " + p_msg);
+            else
+                return Value;
+        }
+
+        public static Unit Expect(Unit p_value, string p_msg)
+        {
+            if (p_value.Type == UnitType.Option)
+            {
+                return ((OptionUnit)p_value.heapUnitValue).Expect(p_msg);
+            }
+            return p_value;
+        }
+
+        public Unit Default(Unit p_default)
+        {
+            if (Value.Type == UnitType.Empty)
+                return p_default;
+            else
+                return Value;
+        }
+
+        public static Unit Default(Unit p_value, Unit p_default)
+        {
+            if (p_value.Type == UnitType.Option)
+            {
+                return ((OptionUnit)p_value.heapUnitValue).Default(p_default);
             }
             return p_value;
         }
@@ -88,6 +122,21 @@ namespace lightningUnit
         private static void initMethodTable()
         {
             {
+                Unit NewOption (VM vm)
+                {
+                    Unit value = vm.GetUnit(0);
+                    return new Unit(new OptionUnit(value));
+                }
+                methodTable.Set("new", new IntrinsicUnit("option_new", NewOption, 1));
+
+                //////////////////////////////////////////////////////
+                Unit NewEmptyOption (VM vm)
+                {
+                    return new Unit(new OptionUnit());
+                }
+                methodTable.Set("new_empty", new IntrinsicUnit("option_new_empty", NewEmptyOption, 0));
+
+                //////////////////////////////////////////////////////
                 Unit OK (VM vm)
                 {
                     OptionUnit this_option = vm.GetOptionUnit(0);
@@ -104,6 +153,26 @@ namespace lightningUnit
                     return this_option.UnWrap();
                 }
                 methodTable.Set("unwrap", new IntrinsicUnit("option_unwrap", Unwrap, 1));
+
+                //////////////////////////////////////////////////////
+                Unit Expect (VM vm)
+                {
+                    OptionUnit this_option = vm.GetOptionUnit(0);
+                    StringUnit expect_string = vm.GetStringUnit(1);
+
+                    return this_option.Expect(expect_string.content);
+                }
+                methodTable.Set("expect", new IntrinsicUnit("option_expect", Expect, 2));
+
+                //////////////////////////////////////////////////////
+                Unit Default (VM vm)
+                {
+                    OptionUnit this_option = vm.GetOptionUnit(0);
+                    Unit default_unit = vm.GetUnit(1);
+
+                    return this_option.Default(default_unit);
+                }
+                methodTable.Set("default", new IntrinsicUnit("option_default", Default, 2));
 
                 //////////////////////////////////////////////////////
             }

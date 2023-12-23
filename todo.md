@@ -9,9 +9,9 @@ To Think
 
 To be Done
 ----------
-- Create maybe type
-- Remove null
-- Fix writeln unescape "\n"
+- Finish roslyn module
+- Create option default_action
+- Create option unwrap() tests
 
 add table.flatten => merge with extension table and unset extension table
     add table.flatten_under => merge extension table with table and unset extension table
@@ -192,3 +192,6 @@ Done
     - Test and fix logger
     - Split prelude
     - criar sistema de configuracao por json e remover valores hard_coded
+    - Create option type
+    - Remove null
+    - Fix writeln unescape "\n"

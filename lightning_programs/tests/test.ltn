@@ -1,26 +1,26 @@
 ﻿write_line("*** Welcome to lightning test suite Zzz :) ***")
 {
-	var os_string = get_os()
-	var os = "Unknown"
-	if (os_string:contains("Windows")){
-		os = "Windows"
-	} else if (os_string:contains("Unix")){
-		os = "Unix"
-	}
+    var os_string = get_os()
+    var os = "Unknown"
+    if (os_string:contains("Windows")){
+        os = "Windows"
+    } else if (os_string:contains("Unix")){
+        os = "Unix"
+    }
 
-	write_line(get_os())
+    write_line(get_os())
 
-	var processor_count = machine.processor_count()
-	if (processor_count > 1)
-		write_line("Running on " .. processor_count .. " processors" )
-	else
-		write_line("Running Humbly on " .. processor_count .. " processor" )
+    var processor_count = machine.processor_count()
+    if (processor_count > 1)
+        write_line("Running on " .. processor_count .. " processors" )
+    else
+        write_line("Running Humbly on " .. processor_count .. " processor" )
 }
 
 if (roslyn.enabled)
-	write_line("Roslyn support! :)")
+    write_line("Roslyn support! :)")
 else
-	write_line("No roslyn support!")
+    write_line("No roslyn support!")
 
 write_line("-- Starting tests --")
 var start_time = time.now()
@@ -48,65 +48,62 @@ errors += require("tests/assign_op.ltn")
 write_line("Boolean tests ...")
 errors += require("tests/boolean.ltn")
 
-// write_line("Char tests ...")
-// errors += require("tests/char.ltn")
+write_line("Char tests ...")
+errors += require("tests/char.ltn")
 
-// write_line("Closure tests ...")
-// errors += require("tests/closures.ltn")
+write_line("Closure tests ...")
+errors += require("tests/closures.ltn")
 
-// write_line("Compound Call tests ...")
-// errors += require("tests/compound_calls.ltn")
+write_line("Compound Call tests ...")
+errors += require("tests/compound_calls.ltn")
 
-// write_line("Eval tests ...")
-// errors += require("tests/eval.ltn")
+write_line("Eval tests ...")
+errors += require("tests/eval.ltn")
 
-// write_line("Integer tests ...")
-// errors += require("tests/integers.ltn")
+write_line("Integer tests ...")
+errors += require("tests/integers.ltn")
 
-// write_line("Iterator tests ...")
-// errors += require("tests/iterators.ltn")
+write_line("Iterator tests ...")
+errors += require("tests/iterators.ltn")
 
-// write_line("Lambda tests ...")
-// errors += require("tests/lambdas.ltn")
+write_line("Lambda tests ...")
+errors += require("tests/lambdas.ltn")
 
-// write_line("Lock tests ...")
-// errors += require("tests/lock.ltn")
+write_line("Lock tests ...")
+errors += require("tests/lock.ltn")
 
-// write_line("Map tests ...")
-// errors += require("tests/map.ltn")
+write_line("Map tests ...")
+errors += require("tests/map.ltn")
 
-// write_line("Math tests ...")
-// errors += require("tests/math.ltn")
+write_line("Math tests ...")
+errors += require("tests/math.ltn")
 
-// write_line("Maybe tests ...")
-// errors += require("tests/maybe.ltn")
+write_line("Methods tests ...")
+errors += require("tests/methods.ltn")
 
-// write_line("Methods tests ...")
-// errors += require("tests/methods.ltn")
+write_line("Numbers tests ...")
+errors += require("tests/numbers.ltn")
 
-// write_line("Numbers tests ...")
-// errors += require("tests/numbers.ltn")
+write_line("Nuples tests ...")
+errors += require("tests/nuples.ltn")
 
-// write_line("Nuples tests ...")
-// errors += require("tests/nuples.ltn")
+write_line("Pmap tests ...")
+errors += require("tests/pmap.ltn")
 
-// write_line("Pmap tests ...")
-// errors += require("tests/pmap.ltn")
+write_line("Reduce tests ...")
+errors += require("tests/reduce.ltn")
 
-// write_line("Reduce tests ...")
-// errors += require("tests/reduce.ltn")
+write_line("Rmap tests ...")
+errors += require("tests/rmap.ltn")
 
-// write_line("Rmap tests ...")
-// errors += require("tests/rmap.ltn")
+write_line("Roslyn tests ...")
+errors += require("tests/roslyn.ltn")
 
-// write_line("Roslyn tests ...")
-// errors += require("tests/roslyn.ltn")
+write_line("Scoping tests ...")
+errors += require("tests/scoping.ltn")
 
-// write_line("Scoping tests ...")
-// errors += require("tests/scoping.ltn")
-
-// write_line("Strings tests ...")
-// errors += require("tests/strings.ltn")
+write_line("Strings tests ...")
+errors += require("tests/strings.ltn")
 
 // write_line("Super Table tests ...")
 // errors += require("tests/super_table.ltn")

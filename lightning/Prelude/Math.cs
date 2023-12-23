@@ -165,7 +165,7 @@ namespace lightningPrelude
             {
                 Float value1 = p_vm.GetNumber(0);
                 Float value2 = p_vm.GetNumber(1);
-                return new Unit(value1 % value2);
+                return new Unit((Integer)(value1 % value2));
             }
             math.Set("mod", new IntrinsicUnit("mod", Mod, 2));
 

@@ -327,24 +327,6 @@ namespace lightningPrelude
             functions.Add(new IntrinsicUnit("List", ListNew, 1));
 
             //////////////////////////////////////////////////////
-            Unit Maybe(VM p_vm)
-            {
-                Unit first = p_vm.stack.Peek(0);
-                Unit second = p_vm.stack.Peek(1);
-                if (first.Type != UnitType.Option)
-                    return first;
-                else
-                {
-                    OptionUnit first_as_option = (OptionUnit)first.heapUnitValue;
-                    if (first_as_option.OK())
-                        return first_as_option.Value;
-                    else
-                        return second;
-                }
-            }
-            functions.Add(new IntrinsicUnit("maybe", Maybe, 2));
-
-            //////////////////////////////////////////////////////
             Unit Tasks(VM p_vm)
             {
 

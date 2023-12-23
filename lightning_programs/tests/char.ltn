@@ -6,8 +6,8 @@ var assert_not = assert_counter.assert_not
 	var another_a = 'a'
 	assert(another_a, 'a', "Failed Char Test 1.")
 	var hello_string = "hello"
-	assert('h', hello_string:char_at(0), "Failed Char Test 2.")
-	assert('o', hello_string:char_at(4), "Failed Char Test 3.")
+	assert('h', hello_string:char_at(0):unwrap(), "Failed Char Test 2.")
+	assert('o', hello_string:char_at(4):unwrap(), "Failed Char Test 3.")
 	var char_list = hello_string:to_list()
 	assert('h', char_list[0], "Failed Char Test 4.")
 	assert('o', char_list[4], "Failed Char Test 5.")
@@ -17,14 +17,14 @@ a"
 	var new_line = new_line()
 	var new_line_size = new_line:length()
 	if(new_line_size == 2){
-		assert('\n', line_skip_string:char_at(2), "Failed Char Test 6.")
-		assert('a', line_skip_string:char_at(3), "Failed Char Test 7.")
-		assert('a', line_skip_string:char_at(0), "Failed Char Test 8.")
-		assert('\r', line_skip_string:char_at(1), "Failed Char Test 9.")
+		assert('\n', line_skip_string:char_at(2):unwrap(), "Failed Char Test 6.")
+		assert('a', line_skip_string:char_at(3):unwrap(), "Failed Char Test 7.")
+		assert('a', line_skip_string:char_at(0):unwrap(), "Failed Char Test 8.")
+		assert('\r', line_skip_string:char_at(1):unwrap(), "Failed Char Test 9.")
 	}else if(new_line_size == 1){
-		assert('\n', line_skip_string:char_at(1), "Failed Char Test 6.")
-		assert('a', line_skip_string:char_at(2), "Failed Char Test 7.")
-		assert('a', line_skip_string:char_at(0), "Failed Char Test 8.")
+		assert('\n', line_skip_string:char_at(1):unwrap(), "Failed Char Test 6.")
+		assert('a', line_skip_string:char_at(2):unwrap(), "Failed Char Test 7.")
+		assert('a', line_skip_string:char_at(0):unwrap(), "Failed Char Test 8.")
 	}
 }
 return assert_counter.get_error_counter()
