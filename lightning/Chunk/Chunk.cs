@@ -355,7 +355,7 @@ namespace lightningChunk
                 }
 
             }
-            return new Unit(UnitType.Null);
+            throw new Exception("Could not find Function: " + p_name);
         }
 
         public Unit GetUnitFromTable(string p_table, string p_name)
@@ -368,7 +368,7 @@ namespace lightningChunk
                 }
 
             }
-            return new Unit(UnitType.Null);
+            throw new Exception("Could not find Unit: " + p_name + " in table: " + p_table);
         }
 
         public List<Instruction> Slice(int p_start, int p_end)

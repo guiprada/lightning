@@ -21,7 +21,7 @@ namespace lightningPrelude
             {
                 WrapperUnit<long> this_time = p_vm.GetWrapperUnit<long>(0);
                 this_time.content = DateTime.Now.Ticks;
-                return new Unit(UnitType.Null);
+                return new Unit(true);
             }
             timeMethods.Set("reset", new IntrinsicUnit("time_reset", TimeReset, 1));
 

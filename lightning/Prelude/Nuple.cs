@@ -14,12 +14,12 @@ namespace lightningPrelude
                 Integer size = p_vm.GetInteger(0);
                 Unit[] new_nuple = new Unit[size];
                 for(int i = 0; i < size; i++)
-                    new_nuple[i] = new Unit(UnitType.Null);
+                    new_nuple[i] = new Unit(new OptionUnit());
                 WrapperUnit<Unit[]> new_nuple_object = new WrapperUnit<Unit[]>(new_nuple, nupleMethods);
 
                 return new Unit(new_nuple_object);
             }
-            nuple.Set("new", new IntrinsicUnit("tuple_new", NupleNew, 1));
+            nuple.Set("new", new IntrinsicUnit("nuple_new", NupleNew, 1));
 
             //////////////////////////////////////////////////////
             Unit NupleFromList(VM p_vm)
@@ -33,7 +33,7 @@ namespace lightningPrelude
 
                 return new Unit(new_nuple_object);
             }
-            nuple.Set("from_list", new IntrinsicUnit("tuple_from_list", NupleFromList, 1));
+            nuple.Set("from_list", new IntrinsicUnit("nuple_from_list", NupleFromList, 1));
 
             //////////////////////////////////////////////////////
             Unit NupleGet(VM p_vm)
@@ -49,7 +49,7 @@ namespace lightningPrelude
             {
                 p_vm.GetWrappedContent<Unit[]>(0)[(int)p_vm.GetInteger(1)] = p_vm.GetUnit(2);
 
-                return new Unit(UnitType.Null);
+                return new Unit(true);
             }
             nupleMethods.Set("set", new IntrinsicUnit("nuple_set", NupleSet, 3));
 

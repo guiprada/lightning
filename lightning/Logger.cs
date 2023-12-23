@@ -47,8 +47,6 @@ namespace lightningTools
 
             do
             {
-                lock(isProcessingLock)
-                    isProcessing = true;
                 if (queue.TryDequeue(out entry))
                 {
                     using (System.IO.StreamWriter file = new System.IO.StreamWriter(entry.path, entry.append))
@@ -75,7 +73,10 @@ namespace lightningTools
 #endif
             lock(isProcessingLock)
                 if (isProcessing == false)
+                {
+                    isProcessing = true;
                     queueProcessing = Task.Run(ProcessQueue);
+                }
         }
 
         public static void LogLine(string p_line, string p_path)

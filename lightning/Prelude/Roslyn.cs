@@ -20,6 +20,8 @@ namespace lightningPrelude
         public static TableUnit GetTableUnit()
         {
             TableUnit roslyn = new TableUnit(null);
+#if ROSLYN
+            roslyn.Set("enabled", true);
 
             Unit CSharpScriptCompile(VM p_vm)
             {
@@ -136,11 +138,13 @@ namespace lightningPrelude
                     }
                 }
 
-                return new Unit(UnitType.Null);
+                return new Unit(true);
                 // return new Unit(new IntrinsicUnit(name, new_func, (Operand)arity));
             }
             roslyn.Set("compile", new IntrinsicUnit("compile", CSharpCompile, 3));
-
+#else
+            roslyn.Set("enabled", false);
+#endif
             return roslyn;
         }
     }

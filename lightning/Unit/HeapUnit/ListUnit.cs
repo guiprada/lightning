@@ -179,7 +179,7 @@ namespace lightningUnit
                 {
                     ListUnit this_list = vm.GetList(0);
                     this_list.Elements.Clear();
-                    return new Unit(UnitType.Null);
+                    return new Unit(true);
                 }
                 methodTable.Set("clear", new IntrinsicUnit("list_clear", Clear, 1));
 
@@ -233,7 +233,6 @@ namespace lightningUnit
                 {
                     ListUnit this_list = vm.GetList(0);
                     int i = -1;
-                    Unit value = new Unit(UnitType.Null);
 
                     TableUnit iterator = new TableUnit(null);
                     Unit next(VM vm)
@@ -259,9 +258,9 @@ namespace lightningUnit
                     int size = this_list.Count;
 
                     for (int i = size; i < new_end; i++)
-                        this_list.Elements.Add(new Unit(UnitType.Null));
+                        this_list.Elements.Add(new Unit(new OptionUnit()));
 
-                    return new Unit(UnitType.Null);
+                    return new Unit(true);
                 }
                 methodTable.Set("init", new IntrinsicUnit("list_init", Init, 2));
 
@@ -272,7 +271,7 @@ namespace lightningUnit
                     Unit value = vm.GetUnit(1);
                     this_list.Elements.Add(value);
 
-                    return new Unit(UnitType.Null);
+                    return new Unit(true);
                 }
                 methodTable.Set("push", new IntrinsicUnit("list_push", Push, 2));
 
@@ -295,7 +294,7 @@ namespace lightningUnit
                     int range_end = (int)vm.GetInteger(2);
                     this_list.Elements.RemoveRange(range_init, range_end - range_init + 1);
 
-                    return new Unit(UnitType.Null);
+                    return new Unit(true);
                 }
                 methodTable.Set("remove", new IntrinsicUnit("list_remove", RemoveRange, 3));
 
@@ -332,7 +331,7 @@ namespace lightningUnit
                     ListUnit this_list = vm.GetList(0);
                     this_list.Elements.Reverse();
 
-                    return new Unit(UnitType.Null);
+                    return new Unit(true);
                 }
                 methodTable.Set("reverse", new IntrinsicUnit("list_reverse", Reverse, 1));
 
@@ -342,7 +341,7 @@ namespace lightningUnit
                     ListUnit this_list = vm.GetList(0);
                     this_list.Elements.Sort();
 
-                    return new Unit(UnitType.Null);
+                    return new Unit(true);
                 }
                 methodTable.Set("sort", new IntrinsicUnit("list_sort", Sort, 1));
 
@@ -361,7 +360,7 @@ namespace lightningUnit
                         list[i] = swap;
                     }
 
-                    return new Unit(UnitType.Null);
+                    return new Unit(true);
                 }
                 methodTable.Set("shuffle", new IntrinsicUnit("list_shuffle", Shuffle, 1));
 
@@ -382,7 +381,7 @@ namespace lightningUnit
                         this_list.ElementSet(index_unit, result);
                     }
 
-                    return new Unit(UnitType.Null);
+                    return new Unit(true);
                 }
 
                 methodTable.Set("map", new IntrinsicUnit("list_map", Map, 2));
@@ -413,7 +412,7 @@ namespace lightningUnit
                     {
                         vm.RecycleVM(vms[i]);
                     }
-                    return new Unit(UnitType.Null);
+                    return new Unit(true);
                 }
 
                 methodTable.Set("pmap", new IntrinsicUnit("list_pmap", ParallelMap, 2));
@@ -458,7 +457,7 @@ namespace lightningUnit
                     {
                         vm.RecycleVM(vms[i]);
                     }
-                    return new Unit(UnitType.Null);
+                    return new Unit(true);
                 }
 
                 methodTable.Set("rmap", new IntrinsicUnit("list_rmap", RangeMap, 3));

@@ -1,3 +1,4 @@
+using System;
 using System.IO;
 
 using lightningUnit;
@@ -12,15 +13,19 @@ namespace lightningPrelude
             Unit LoadFile(VM p_vm)
             {
                 string path = p_vm.GetString(0);
-                string input;
-                using (var sr = new StreamReader(path))
+                string contents;
+                try
                 {
-                    input = sr.ReadToEnd();
+                    using (var sr = new StreamReader(path))
+                    {
+                        contents = sr.ReadToEnd();
+                    }
                 }
-                if (input != null)
-                    return new Unit(input);
-
-                return new Unit(UnitType.Null);
+                catch(Exception)
+                {
+                    return new Unit(new OptionUnit());
+                }
+                return new Unit(new OptionUnit(new Unit(contents)));
             }
             file.Set("load", new IntrinsicUnit("file_load_file", LoadFile, 1));
 
@@ -29,12 +34,18 @@ namespace lightningPrelude
             {
                 string path = p_vm.GetString(0);
                 string output = p_vm.GetString(1);
-                using (System.IO.StreamWriter file = new System.IO.StreamWriter(path, false))
+                try
                 {
-                    file.Write(output);
+                    using (System.IO.StreamWriter file = new System.IO.StreamWriter(path, false))
+                    {
+                        file.Write(output);
+                    }
                 }
-
-                return new Unit(UnitType.Null);
+                catch(Exception)
+                {
+                    return new Unit(new OptionUnit());
+                }
+                return new Unit(new OptionUnit(new Unit(true)));
             }
             file.Set("write", new IntrinsicUnit("file_write_file", WriteFile, 2));
 
@@ -43,12 +54,18 @@ namespace lightningPrelude
             {
                 string path = p_vm.GetString(0);
                 string output = p_vm.GetString(1);
-                using (System.IO.StreamWriter file = new System.IO.StreamWriter(path, true))
+                try
                 {
-                    file.Write(output);
+                    using (System.IO.StreamWriter file = new System.IO.StreamWriter(path, true))
+                    {
+                        file.Write(output);
+                    }
                 }
-
-                return new Unit(UnitType.Null);
+                catch(Exception)
+                {
+                    return new Unit(new OptionUnit());
+                }
+                return new Unit(new OptionUnit(new Unit(true)));
             }
             file.Set("append", new IntrinsicUnit("file_append_file", AppendFile, 2));
 

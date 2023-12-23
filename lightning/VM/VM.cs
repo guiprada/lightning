@@ -214,7 +214,7 @@ namespace lightningVM
             if (maybe_address.HasValue)
                 return GetGlobal(maybe_address.Value);
             else
-                return new Unit(UnitType.Null);
+                throw new Exception("Global value: " + p_name + " not found in module: " + p_chunk.ModuleName);
         }
 
         //////////////////////////// Accessors
@@ -305,6 +305,13 @@ namespace lightningVM
             return stack.Peek(p_n).ToBool();
         }
 
+        public OptionUnit GetOptionUnit(int p_n)
+        {
+            if (stack.Peek(p_n).Type != UnitType.Option)
+                throw new Exception("Expected an Option.");
+            return (OptionUnit)stack.Peek(p_n).heapUnitValue;
+        }
+
         //////////////////////////// End Accessors
         public Unit ProtectedCallFunction(Unit p_callable, List<Unit> p_args = null)
         {
@@ -314,14 +321,12 @@ namespace lightningVM
             }
             catch (Exception e)
             {
-                Logger.LogLine("VM Busted ...\n" + e.ToString(), Defaults.Config.VMLogFile);
-                return new Unit(UnitType.Null);
+                Logger.LogLine("VM Busted ...\n" + CurrentInstructionPositionDataString() + "\n" + e.ToString(), Defaults.Config.VMLogFile);
+                return new Unit(UnitType.Empty);
             }
         }
         public Unit CallFunction(Unit p_callable, List<Unit> p_args = null)
         {
-            Operand before_call_IP = IP;
-
             UnitType this_type = p_callable.Type;
 
             if (this_type == UnitType.Function)
@@ -333,8 +338,6 @@ namespace lightningVM
                 instructions.PushRET((Operand)(main.Body.Count - 1));
                 FunctionUnit this_func = (FunctionUnit)p_callable.heapUnitValue;
                 instructions.PushFunction(this_func, Env, out instructionsCache);
-
-                IP = 0;
             }
             else if (this_type == UnitType.Closure)
             {
@@ -353,8 +356,6 @@ namespace lightningVM
                     upValues.Add(u);
                 }
                 instructions.PushFunction(this_closure.Function, Env, out instructionsCache);
-
-                IP = 0;
             }
             else if (this_type == UnitType.Intrinsic)
             {
@@ -381,11 +382,16 @@ namespace lightningVM
                 return this_external_result;
             }
 
+            Operand before_call_IP = IP;
+            IP = 0;
             VMResult result = Run();
             IP = before_call_IP;
             if (result.status == VMResultType.OK)
                 return result.value;
-            return new Unit(UnitType.Null);
+            else
+                Error("Function Execution was not OK!");
+
+            return new Unit(UnitType.Empty);//this is dead code just to keep the compiler happy
         }
         //////////////////////////////////////////////////// End Public
 
@@ -426,7 +432,7 @@ namespace lightningVM
 
         public void Error(string p_msg)
         {
-            throw new Exception(p_msg);
+            throw new Exception(CurrentInstructionPositionDataString() +  p_msg);
         }
 
         public string CurrentInstructionPositionDataString()
@@ -453,8 +459,8 @@ namespace lightningVM
             }
             catch (Exception e)
             {
-                Logger.LogLine("VM Busted ...\n" + e.ToString(), Defaults.Config.VMLogFile);
-                return new VMResult(VMResultType.ERROR, new Unit(UnitType.Null));
+                Logger.LogLine("VM Busted ...\n" + CurrentInstructionPositionDataString() + "\n" + e.ToString(), Defaults.Config.VMLogFile);
+                return new VMResult(VMResultType.ERROR, new Unit(UnitType.Empty));
             }
         }
         private VMResult Run()
@@ -509,7 +515,7 @@ namespace lightningVM
                         break;
                     case OpCode.LOAD_NIL:
                         IP++;
-                        stack.Push(new Unit(UnitType.Null));
+                        stack.Push(new Unit(UnitType.Empty));
                         break;
                     case OpCode.LOAD_TRUE:
                         IP++;
@@ -1118,7 +1124,6 @@ namespace lightningVM
                             else
                             {
                                 Error("Trying to call a " + this_callable.Type);
-                                return new VMResult(VMResultType.OK, new Unit(UnitType.Null));
                             }
                             break;
                         }
@@ -1133,10 +1138,10 @@ namespace lightningVM
                     case OpCode.EXIT:
                         if (stack.top > 0)
                             return new VMResult(VMResultType.OK, stack.Pop());
-                        return new VMResult(VMResultType.OK, new Unit(UnitType.Null));
+                        return new VMResult(VMResultType.OK, new Unit(UnitType.Empty));
                     default:
                         Error("Unkown OpCode: " + instruction.opCode);
-                        return new VMResult(VMResultType.ERROR, new Unit(UnitType.Null));
+                        return new VMResult(VMResultType.ERROR, new Unit(UnitType.Empty));
                 }
             }
         }

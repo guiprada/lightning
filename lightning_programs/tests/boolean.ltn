@@ -44,15 +44,17 @@ var assert_not = assert_counter.assert_not
 	assert(true, (true xnor true), "Failed XNOR test 4.");
 
 	//Truthness of null :)
-	var a
-	if (!null) {
-		a = 1
-	}
-	assert(a, 1, "Failed Truthness of null test 1.")
-	assert_not(null, !null, "Failed Truthness of null test 2.")
-	assert(1, maybe(null, 1), "Failed Truthness of null test 3.")
-	assert(!null, maybe(!null, 5), "Failed Truthness of null test 4.")
-	assert_not(null, maybe(!null, 5), "Failed Truthness of null test 5.")
-	assert_not(!null, 5, "Failed Truthness of null test 6.")
+	var try_result = try(\{return null == null}, [])
+	assert(try_result, false, "Failed null sanity check 1.")
+
+	try_result = try(\{return true == null}, [])
+	assert(try_result, false, "Failed null sanity check 2.")
+
+	try_result = try(\{return null == false}, [])
+	assert(try_result, false, "Failed null sanity check 3.")
+
+	assert(true, true, "Failed bool sanity check 1.")
+	assert(false, false, "Failed bool sanity check 2.")
+	assert_not(true, false, "Failed bool sanity check 3.")
 }
 return assert_counter.get_error_counter()

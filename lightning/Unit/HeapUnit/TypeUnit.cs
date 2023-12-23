@@ -4,9 +4,9 @@ namespace lightningUnit
     {
         public static TypeUnit Float = new TypeUnit(UnitType.Float);
         public static TypeUnit Integer = new TypeUnit(UnitType.Integer);
-        public static TypeUnit Null = new TypeUnit(UnitType.Null);
         public static TypeUnit Boolean = new TypeUnit(UnitType.Boolean);
         public static TypeUnit Char = new TypeUnit(UnitType.Char);
+        public static TypeUnit Empty = new TypeUnit(UnitType.Empty);
 
         UnitType type;
 
@@ -29,8 +29,8 @@ namespace lightningUnit
                 return "UnitType.Float";
             else if (this.type == UnitType.Integer)
                 return "UnitType.Integer";
-            else if (this.type == UnitType.Null)
-                return "UnitType.Null";
+            else if (this.type == UnitType.Empty)
+                return "UnitType.Empty";
             else if (this.type == UnitType.Boolean)
                 return "UnitType.Boolean";
             else if (this.type == UnitType.Char)

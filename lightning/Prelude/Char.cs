@@ -39,9 +39,8 @@ namespace lightningPrelude
                     {
                         return new Unit(true);
                     }
-                    return new Unit(false);
                 }
-                return new Unit(UnitType.Null);
+                return new Unit(false);
             }
             char_table.Set("is_digit", new IntrinsicUnit("char_is_digit", IsDigit, 1));
 

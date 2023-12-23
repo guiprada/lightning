@@ -78,6 +78,7 @@ namespace lightningUnit
         public override Unit Get(Unit p_key)
         {
             Unit this_unit;
+
             if (Map.TryGetValue(p_key, out this_unit))
                 return this_unit;
             else if ((ExtensionTable != null) && ExtensionTable.Map.TryGetValue(p_key, out this_unit))
@@ -186,7 +187,7 @@ namespace lightningUnit
                 {
                     TableUnit this_table = vm.GetTable(0);
                     this_table.Map.Clear();
-                    return new Unit(UnitType.Null);
+                    return new Unit(true);
                 }
                 methodTable.Set("clear", new IntrinsicUnit("table_clear", Clear, 1));
 
@@ -224,8 +225,8 @@ namespace lightningUnit
                     System.Collections.IDictionaryEnumerator enumerator = this_table.Map.GetEnumerator();
 
                     TableUnit iterator = new TableUnit(null);
-                    iterator.Set("key", new Unit(UnitType.Null));
-                    iterator.Set("value", new Unit(UnitType.Null));
+                    iterator.Set("key", new Unit(UnitType.Empty));
+                    iterator.Set("value", new Unit(UnitType.Empty));
 
                     Unit next(VM vm)
                     {
@@ -250,8 +251,8 @@ namespace lightningUnit
                     System.Collections.IDictionaryEnumerator enumerator = this_table.Map.GetEnumerator();
 
                     TableUnit iterator = new TableUnit(null);
-                    iterator.Set("key", new Unit(UnitType.Null));
-                    iterator.Set("value", new Unit(UnitType.Null));
+                    iterator.Set("key", new Unit(UnitType.Empty));
+                    iterator.Set("value", new Unit(UnitType.Empty));
 
                     Unit next(VM vm)
                     {
@@ -322,7 +323,7 @@ namespace lightningUnit
 
                     this_unit.heapUnitValue.SetExtensionTable(extension_table);
 
-                    return new Unit(UnitType.Null);
+                    return new Unit(true);
                 }
                 methodTable.Set("set_extension_table", new IntrinsicUnit("table_set_extension_table", SetExtensionTable, 2));
 
@@ -332,7 +333,7 @@ namespace lightningUnit
                     Unit this_unit = vm.GetUnit(0);
                     this_unit.heapUnitValue.UnsetExtensionTable();
 
-                    return new Unit(UnitType.Null);
+                    return new Unit(true);
                 }
                 methodTable.Set("unset_extension_table", new IntrinsicUnit("table_unset_extension_table", UnsetExtensionTable, 1));
 
@@ -342,9 +343,9 @@ namespace lightningUnit
                     Unit this_unit = vm.GetUnit(0);
                     TableUnit extension_table = this_unit.heapUnitValue.GetExtensionTable();
                     if (extension_table == null)
-                        return new Unit(UnitType.Null);
+                        return new Unit(new OptionUnit());
 
-                    return new Unit(extension_table);
+                    return new Unit(new OptionUnit(new Unit(extension_table)));
                 }
                 methodTable.Set("get_extension_table", new IntrinsicUnit("table_get_extension_table", GetExtensionTable, 1));
 
@@ -359,7 +360,7 @@ namespace lightningUnit
                         if (!this_table.Map.ContainsKey(u.Key))
                             this_table.Map.Add(u.Key, u.Value);
                     }
-                    return new Unit(UnitType.Null);
+                    return new Unit(true);
                 }
                 methodTable.Set("merge", new IntrinsicUnit("merge", Merge, 2));
 

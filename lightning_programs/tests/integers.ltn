@@ -3,9 +3,9 @@ var assert = assert_counter.assert
 var assert_not = assert_counter.assert_not
 {
 	// Testing Integer
-	assert(1.0, 1, "Failed Integer test 1.")
-	assert_not(1.000000000000001, 1, "Failed Integer test 2.")
-	assert((0.5 + 0.5), 1, "Failed Integer test 3.")
+	assert(1.0, 1.0, "Failed Integer test 1.")
+	assert_not(1.000000000000001, 1.0, "Failed Integer test 2.")
+	assert((0.5 + 0.5), 1.0, "Failed Integer test 3.")
 	var this_table = [:]
 	this_table[5.1] = 10
 	this_table[5] = 20

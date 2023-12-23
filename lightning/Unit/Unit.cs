@@ -4,6 +4,26 @@ using System.Text.RegularExpressions;
 
 namespace lightningUnit
 {
+    public enum UnitType
+    {
+        Float
+        , Integer
+        , Boolean
+        , String
+        , Char
+        , UpValue
+        , Table
+        , List
+        , Function
+        , Intrinsic
+        , ExternalFunction
+        , Closure
+        , Module
+        , Wrapper
+        , Option
+        , Empty
+    }
+
     [StructLayout(LayoutKind.Explicit)]
     public struct Unit : IComparable
     {
@@ -72,8 +92,8 @@ namespace lightningUnit
         {
             switch (p_type)
             {
-                case UnitType.Null:
-                    heapUnitValue = TypeUnit.Null;
+                case UnitType.Empty:
+                    heapUnitValue = TypeUnit.Empty;
                     break;
                 case UnitType.Boolean:
                     heapUnitValue = TypeUnit.Boolean;
@@ -95,63 +115,67 @@ namespace lightningUnit
         public static Unit FromObject(object p_obj)
         {
             if (p_obj == null)
-                return new Unit(UnitType.Null);
+                return new Unit(new OptionUnit());
 
             Type this_type = p_obj.GetType();
 
             if (this_type == typeof(Unit)) // Returns the same object - it should work :)
-                return (Unit)p_obj;
+                return new Unit(new OptionUnit((Unit)p_obj));
 
             if (this_type == typeof(char))
-                return new Unit((char)p_obj);
+                return new Unit(new OptionUnit(new Unit((char)p_obj)));
 
             if (this_type == typeof(String))
-                return new Unit((String)p_obj);
+                return new Unit(new OptionUnit(new Unit((String)p_obj)));
 
             if (this_type == typeof(bool))
-                return new Unit((bool)p_obj);
+                return new Unit(new OptionUnit(new Unit((bool)p_obj)));
 #if DOUBLE
 
-            if (this_type == typeof(System.Int16)
-                || this_type == typeof(System.Int32)
-            )
-                return new Unit(Convert.ToInt64(p_obj));
+            if ( this_type == typeof(System.Int16) || this_type == typeof(System.Int32) )
+                return new Unit(new OptionUnit(new Unit(Convert.ToInt64(p_obj))));
             else if (this_type == typeof(Integer))
-                return new Unit((Integer)p_obj);
+                return new Unit(new OptionUnit(new Unit((Integer)p_obj)));
 #else
-            if (this_type == typeof(System.Int16)))
-                return new Unit(Convert.ToInt64(p_obj));
+            if (this_type == typeof(System.Int16))
+                return new Unit(new OptionUnit(new Unit(Convert.ToInt64(p_obj))));
             else if (this_type == typeof(Integer))
-                return new Unit((Integer)p_obj);
+                return new Unit(new OptionUnit(new Unit((Integer)p_obj)));
 #endif
-            return new Unit(new WrapperUnit<object>(p_obj));
+            return new Unit(new OptionUnit(new Unit(new WrapperUnit<object>(p_obj))));
         }
 
-        public static object ToObject(Unit p_unity)
+        public static object ToObject(Unit p_value)
         {
-            UnitType this_type = p_unity.Type;
+            UnitType this_type = p_value.Type;
 
             if (this_type == UnitType.Float)
-                return p_unity.floatValue;
+                return p_value.floatValue;
 
             if (this_type == UnitType.Integer)
-                return p_unity.integerValue;
-
-            if (this_type == UnitType.Null)
-                return null;
+                return p_value.integerValue;
 
             if (this_type == UnitType.Char)
-                return p_unity.charValue;
+                return p_value.charValue;
 
             if (this_type == UnitType.String)
-                return ((StringUnit)p_unity.heapUnitValue).content;
+                return ((StringUnit)p_value.heapUnitValue).content;
 
             if (this_type == UnitType.Boolean)
-                return p_unity.boolValue;
+                return p_value.boolValue;
 
             if (this_type == UnitType.Wrapper)
             {
-                return ((WrapperUnit<object>)p_unity.heapUnitValue).UnWrap();
+                return ((WrapperUnit<object>)p_value.heapUnitValue).UnWrap();
+            }
+
+            if (this_type == UnitType.Option)
+            {
+                OptionUnit opt_value = (OptionUnit)p_value.heapUnitValue;
+                if (opt_value.OK())
+                    return ToObject(opt_value.Value);
+                else
+                    return null;
             }
 
             throw new Exception("Unit.ToObject - Could not convert to object!");
@@ -167,11 +191,11 @@ namespace lightningUnit
                 case UnitType.Integer:
                     return integerValue.ToString();
                 case UnitType.Char:
-                    return Regex.Escape(charValue.ToString());
-                case UnitType.Null:
-                    return "Null";
+                    return charValue.ToString();
                 case UnitType.Boolean:
                     return boolValue.ToString();
+                case UnitType.Empty:
+                    return "Empty";
                 default:
                     return heapUnitValue.ToString();
             }
@@ -182,18 +206,10 @@ namespace lightningUnit
             UnitType this_type = this.Type;
             switch (this_type)
             {
-                case UnitType.Float:
-                    throw new Exception("Can not convert Float to Bool.");
-                case UnitType.Integer:
-                    throw new Exception("Can not convert Integer to Bool.");
-                case UnitType.Char:
-                    throw new Exception("Can not convert Char to Bool.");
-                case UnitType.Null:
-                    return false;
                 case UnitType.Boolean:
                     return boolValue;
                 default:
-                    return heapUnitValue.ToBool();
+                    throw new Exception("Can not convert UnitType: " + this_type + " to Bool.");
             }
         }
 
@@ -204,6 +220,11 @@ namespace lightningUnit
 
             UnitType this_type = this.Type;
             UnitType other_type = ((Unit)p_other).Type;
+            if (this_type == UnitType.Empty || other_type == UnitType.Empty)
+            {
+                throw new Exception("Trying to compare Empty Values");
+            }
+
             switch (this_type)
             {
                 case UnitType.Float:
@@ -213,17 +234,20 @@ namespace lightningUnit
                     }
                     else if (other_type == UnitType.Integer)
                     {
-                        return ((Unit)p_other).integerValue == floatValue;
+                        throw new Exception("Trying to compare Float to Integer!");
+                        // return ((Unit)p_other).integerValue == floatValue;
                     }
                     return false;
                 case UnitType.Integer:
-                    if (other_type == UnitType.Float)
-                    {
-                        return (((Unit)p_other).floatValue) == integerValue;
-                    }
-                    else if (other_type == UnitType.Integer)
+                    if (other_type == UnitType.Integer)
                     {
                         return ((Unit)p_other).integerValue == integerValue;
+                    }
+                    else
+                    if (other_type == UnitType.Float)
+                    {
+                        throw new Exception("Trying to compare Integer to Float!");
+                        // return (((Unit)p_other).floatValue) == integerValue;
                     }
                     return false;
                 case UnitType.Char:
@@ -232,26 +256,12 @@ namespace lightningUnit
                         return this.charValue == ((Unit)p_other).charValue;
                     }
                     return false;
-                case UnitType.Null:
-                    if (other_type == UnitType.Null)
+                case UnitType.Boolean:
+                    if (other_type == UnitType.Boolean)
                     {
-                        return true;
+                        return boolValue == ((Unit)p_other).boolValue;
                     }
                     return false;
-                case UnitType.Boolean:
-                    if (other_type == UnitType.Float)
-                    {
-                        return false;
-                    }
-                    else if (other_type == UnitType.Integer)
-                    {
-                        return false;
-                    }
-                    else if (other_type == UnitType.Char)
-                    {
-                        return false;
-                    }
-                    return ToBool() == ((Unit)p_other).ToBool();
                 default:
                     return heapUnitValue.Equals(p_other);
             }
@@ -268,8 +278,8 @@ namespace lightningUnit
                     return integerValue.GetHashCode();
                 case UnitType.Char:
                     return charValue.GetHashCode();
-                case UnitType.Null:
-                    return UnitType.Null.GetHashCode();
+                case UnitType.Empty:
+                    return "empty".GetHashCode();
                 case UnitType.Boolean:
                     return boolValue.GetHashCode();
                 default:

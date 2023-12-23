@@ -163,7 +163,6 @@ var assert_not = assert_counter.assert_not
 	this_list = ['C', '\n', 'a', 'z', 'm']
 	ordered_list = ['\n', 'C', 'a', 'm', 'z']
 	this_list:sort()
-	write_line(this_list)
 
 	for(var i=0; i<this_list:count(); i++){
 		assert(this_list[i], ordered_list[i], "Failed List Sort Test 2 index: " .. (i+1) ..".")
@@ -195,5 +194,25 @@ var assert_not = assert_counter.assert_not
 	assert(a_table["a_function"](), 99, "Failed Table Map Access By Literal String 4." )
 	assert(a_table["a" .. "_function"](), 99, "Failed Table Map Access By Literal String 5." )
 	assert(a_table["value"], 100, "Failed Table Map Access By Literal String 6.")
+}
+{
+	var a_table = [:]
+	function a_table["he" .. "y"] (){
+		return 99
+	}
+	assert(a_table["hey"](), 99, "Failed Expression Indexed Member Function Declaration Test 1.")
+}
+{
+	var a_list = []
+	try(
+		list.init,
+		[a_list, 5]
+	)
+	var a_table = [:]
+	var common_table = [hey: "oba"]
+	assert(try(
+		table.set_extension_table,
+		[a_table, common_table]
+	), true, "Failed Set Extension Table Test 1")
 }
 return assert_counter.get_error_counter()

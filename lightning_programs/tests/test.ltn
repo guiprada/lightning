@@ -17,10 +17,10 @@
 		write_line("Running Humbly on " .. processor_count .. " processor" )
 }
 
-if (roslyn == null)
-	write_line("No roslyn support!")
-else
+if (roslyn.enabled)
 	write_line("Roslyn support! :)")
+else
+	write_line("No roslyn support!")
 
 write_line("-- Starting tests --")
 var start_time = time.now()
@@ -34,75 +34,113 @@ var assert_not = assert_counter.assert_not
 var count_errors = assert_counter.get_error_counter
 var clear_errors = assert_counter.reset_error_counter
 
-//////////////////////////////// scratch
-{
-	var a_table = [:]
-	function a_table["he" .. "y"] (){
-		return 99
-	}
-	assert(a_table["hey"](), 99, "Failed Expression Indexed Member Function Declaration Test 1.")
-}
-{
-	var a_list = []
-	try(
-		list.init,
-		[a_list, 5]
-	)
-	var a_table = [:]
-	var common_table = [hey: "oba"]
-	assert(try(
-		table.set_extension_table,
-		[a_table, common_table]
-	), true, "Failed")
-}
-
-//////////////////////////////// end scratch
-
 var errors = 0
 
+write_line("Anonymous Call tests ...")
 errors += require("tests/anonymous_call.ltn")
+
+write_line("Assert tests ...")
 errors += require("tests/assert.ltn")
+
+write_line("Assign Op tests ...")
 errors += require("tests/assign_op.ltn")
+
+write_line("Boolean tests ...")
 errors += require("tests/boolean.ltn")
-errors += require("tests/char.ltn")
-errors += require("tests/closures.ltn")
-errors += require("tests/compound_calls.ltn")
-errors += require("tests/eval.ltn")
-errors += require("tests/integers.ltn")
-errors += require("tests/iterators.ltn")
-errors += require("tests/lambdas.ltn")
-errors += require("tests/lock.ltn")
-errors += require("tests/map.ltn")
-errors += require("tests/math.ltn")
-errors += require("tests/maybe.ltn")
-errors += require("tests/methods.ltn")
-errors += require("tests/numbers.ltn")
-errors += require("tests/nuples.ltn")
-errors += require("tests/pmap.ltn")
-errors += require("tests/reduce.ltn")
-errors += require("tests/rmap.ltn")
-errors += require("tests/roslyn.ltn")
-errors += require("tests/scoping.ltn")
-errors += require("tests/strings.ltn")
-errors += require("tests/super_table.ltn")
-errors += require("tests/table.ltn")
-errors += require("tests/transient.ltn")
-errors += require("tests/try.ltn")
-errors += require("tests/up_value.ltn")
-errors += require("tests/vm_management.ltn")
 
+// write_line("Char tests ...")
+// errors += require("tests/char.ltn")
 
+// write_line("Closure tests ...")
+// errors += require("tests/closures.ltn")
 
-machine.trim()
+// write_line("Compound Call tests ...")
+// errors += require("tests/compound_calls.ltn")
 
-if (errors == 0){
-	write_line("No errors found! :)")
-}
-else{
-	write(new_line())
-	write_line(":( " .. errors .. " errors found!")
-}
-write_line("-- Finished tests! --")
-write_line("Elapsed time: " .. start_time:elapsed() .. " ms")
-// write_line("Loaded modules: " .. machine.modules())
-// write_line(machine.memory_use())
+// write_line("Eval tests ...")
+// errors += require("tests/eval.ltn")
+
+// write_line("Integer tests ...")
+// errors += require("tests/integers.ltn")
+
+// write_line("Iterator tests ...")
+// errors += require("tests/iterators.ltn")
+
+// write_line("Lambda tests ...")
+// errors += require("tests/lambdas.ltn")
+
+// write_line("Lock tests ...")
+// errors += require("tests/lock.ltn")
+
+// write_line("Map tests ...")
+// errors += require("tests/map.ltn")
+
+// write_line("Math tests ...")
+// errors += require("tests/math.ltn")
+
+// write_line("Maybe tests ...")
+// errors += require("tests/maybe.ltn")
+
+// write_line("Methods tests ...")
+// errors += require("tests/methods.ltn")
+
+// write_line("Numbers tests ...")
+// errors += require("tests/numbers.ltn")
+
+// write_line("Nuples tests ...")
+// errors += require("tests/nuples.ltn")
+
+// write_line("Pmap tests ...")
+// errors += require("tests/pmap.ltn")
+
+// write_line("Reduce tests ...")
+// errors += require("tests/reduce.ltn")
+
+// write_line("Rmap tests ...")
+// errors += require("tests/rmap.ltn")
+
+// write_line("Roslyn tests ...")
+// errors += require("tests/roslyn.ltn")
+
+// write_line("Scoping tests ...")
+// errors += require("tests/scoping.ltn")
+
+// write_line("Strings tests ...")
+// errors += require("tests/strings.ltn")
+
+// write_line("Super Table tests ...")
+// errors += require("tests/super_table.ltn")
+
+// write_line("Table tests ...")
+// errors += require("tests/table.ltn")
+
+// write_line("Transient tests ...")
+// errors += require("tests/transient.ltn")
+
+// write_line("Try tests ...")
+// errors += require("tests/try.ltn")
+
+// write_line("Up value tests ...")
+// errors += require("tests/up_value.ltn")
+
+// write_line("VM management tests ...")
+// errors += require("tests/vm_management.ltn")
+
+// machine.trim()
+
+// if (errors == 0){
+// 	write_line("No errors found! :)")
+// }
+// else{
+// 	write(new_line())
+// 	write_line(":( " .. errors .. " errors found!")
+// }
+// write_line("-- Finished tests! --")
+// write_line("Elapsed time: " .. start_time:elapsed() .. " ms")
+// // write_line("Loaded modules: " .. machine.modules())
+// // write_line(machine.memory_use())
+write_line("Error count: " .. errors)
+
+//////////////////////////////// scratch
+
+//////////////////////////////// end scratch

@@ -3,11 +3,11 @@ var assert = assert_counter.assert
 var assert_not = assert_counter.assert_not
 {
 	// Testing Anonymous Call to method
-	var teste = ('e' .. 'o'):char_at(0) .. "eo":char_at(1)
+	var teste = ('e' .. 'o'):char_at(0):unwrap() .. "eo":char_at(1):unwrap()
 	assert("eo", teste, "Failed Anonymous Call to Method Test 1.")
 
-	teste = ('e' .. "eo":char_at(1)):char_at(0) .. "eo":char_at(1)
-	assert("eo", teste, "Failed Anonymous Call to Method Test 2.")
+	teste = (('e' .. "eo":char_at(1):unwrap()):char_at(0):unwrap() .. ("eo":char_at(1):unwrap())):char_at(0):unwrap()
+	assert('e', teste, "Failed Anonymous Call to Method Test 2.")
 
 	var counter = 0
 	for(var i="":length(); i<"3__":length(); i++){

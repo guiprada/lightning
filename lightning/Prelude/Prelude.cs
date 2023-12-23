@@ -48,11 +48,7 @@ namespace lightningPrelude
 
             ////////////////////////////////////////////////////////////////////////////////////////////////////////////
             ///////////////////////////////////////////////////////////////////////////////////////////////////// roslyn
-#if ROSLYN
             tables.Add("roslyn", Roslyn.GetTableUnit());
-#else
-            tables.Add("roslyn", new Unit(UnitType.Null));
-#endif
 
             ////////////////////////////////////////////////////////////////////////////////////////////////////////////
             /////////////////////////////////////////////////////////////////////////////////////////////////////// rand
@@ -129,42 +125,50 @@ namespace lightningPrelude
                     if (v.Name == name)
                         return new Unit(v);
                 }
+
                 string module_code;
                 using (var sr = new StreamReader(path))
                 {
                     module_code = sr.ReadToEnd();
                 }
-                if (module_code != null)
-                {
 
+                if (module_code == null)
+                {
+                    throw new Exception("Failed to read module: " + name);
+                }
+                else
+                {
                     Scanner scanner = new Scanner(module_code, name);
                     List<Token> tokens = scanner.Tokens;
                     if(scanner.HasScanned == false){
-                        throw new Exception("Scanning Error");
+                        throw new Exception("Scanning Error on module: " + name);
                     }
 
                     Parser parser = new Parser(tokens, name);
                     Node program = parser.ParsedTree;
                     if(parser.HasParsed == false){
-                        throw new Exception("Parsing Error");
+                        throw new Exception("Parsing Error on module: " + name);
                     }
 
                     Compiler chunker = new Compiler(program, name, p_vm.Prelude);
                     Chunk chunk = chunker.Chunk;
                     if (chunker.HasChunked == false){
-                        throw new Exception("Code Generation Error");
+                        throw new Exception("Code Generation Error on module: " + name);
                     }
-
-                    if (chunker.HasChunked == true){
+                    else
+                    {
                         VM imported_vm = new VM(chunk);
                         VMResult result = imported_vm.ProtectedRun();
                         if (result.status == VMResultType.OK){
                             MakeModule(result.value, name, p_vm, imported_vm);
                             return result.value;
                         }
+                        else
+                        {
+                            throw new Exception("Code execution was not OK :| on module: " + name);
+                        }
                     }
                 }
-                throw new Exception("Code Execution was NOT OK :|");
             }
             functions.Add(new IntrinsicUnit("require", Require, 1));
 
@@ -200,7 +204,7 @@ namespace lightningPrelude
             Unit WriteLine(VM p_vm)
             {
                 Console.WriteLine(p_vm.GetUnit(0).ToString());
-                return new Unit(UnitType.Null);
+                return new Unit(true);
             }
             functions.Add(new IntrinsicUnit("write_line", WriteLine, 1));
 
@@ -208,7 +212,7 @@ namespace lightningPrelude
             Unit Write(VM p_vm)
             {
                 Console.Write(p_vm.GetUnit(0).ToString());
-                return new Unit(UnitType.Null);
+                return new Unit(true);
             }
             functions.Add(new IntrinsicUnit("write", Write, 1));
 
@@ -216,7 +220,7 @@ namespace lightningPrelude
             Unit WriteLineRaw(VM p_vm)
             {
                 Console.WriteLine(System.Text.RegularExpressions.Regex.Escape(p_vm.GetUnit(0).ToString()));
-                return new Unit(UnitType.Null);
+                return new Unit(true);
             }
             functions.Add(new IntrinsicUnit("write_line_raw", WriteLineRaw, 1));
 
@@ -224,7 +228,7 @@ namespace lightningPrelude
             Unit WriteRaw(VM p_vm)
             {
                 Console.Write(System.Text.RegularExpressions.Regex.Escape(p_vm.GetUnit(0).ToString()));
-                return new Unit(UnitType.Null);
+                return new Unit(true);
             }
             functions.Add(new IntrinsicUnit("write_raw", WriteRaw, 1));
 
@@ -241,9 +245,9 @@ namespace lightningPrelude
             {
                 string read = Console.ReadLine();
                 if (Float.TryParse(read, out Float n))
-                    return new Unit(n);
+                    return new Unit(new OptionUnit(new Unit(n)));
                 else
-                    return new Unit(UnitType.Null);
+                    return new Unit(new OptionUnit());
             }
             functions.Add(new IntrinsicUnit("read_number", readNumber, 0));
 
@@ -254,13 +258,10 @@ namespace lightningPrelude
                 if (read > 0)
                 {
                     char next = Convert.ToChar(read);
-                    if (next == '\n')
-                        return new Unit(UnitType.Null);
-                    else
-                        return new Unit(Char.ToString(next));
+                    return new Unit(new OptionUnit(new Unit(Char.ToString(next))));
                 }
                 else
-                    return new Unit(UnitType.Null);
+                    return new Unit(new OptionUnit());
             }
             functions.Add(new IntrinsicUnit("read", Read, 0));
 
@@ -319,7 +320,7 @@ namespace lightningPrelude
                 Integer size = p_vm.GetInteger(0);
                 ListUnit new_list = new ListUnit(null);
                 for(int i=0; i<size; i++)
-                    new_list.Elements.Add(new Unit(UnitType.Null));
+                    new_list.Elements.Add(new Unit(new OptionUnit()));
 
                 return new Unit(new_list);
             }
@@ -330,10 +331,16 @@ namespace lightningPrelude
             {
                 Unit first = p_vm.stack.Peek(0);
                 Unit second = p_vm.stack.Peek(1);
-                if (first.Type != UnitType.Null)
+                if (first.Type != UnitType.Option)
                     return first;
                 else
-                    return second;
+                {
+                    OptionUnit first_as_option = (OptionUnit)first.heapUnitValue;
+                    if (first_as_option.OK())
+                        return first_as_option.Value;
+                    else
+                        return second;
+                }
             }
             functions.Add(new IntrinsicUnit("maybe", Maybe, 2));
 
@@ -361,7 +368,7 @@ namespace lightningPrelude
                 {
                     p_vm.RecycleVM(vms[i]);
                 }
-                return new Unit(UnitType.Null);
+                return new Unit(true);
             }
 
             functions.Add(new IntrinsicUnit("tasks", Tasks, 3));

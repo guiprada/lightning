@@ -4,26 +4,6 @@ using System.Collections.Generic;
 using lightningVM;
 namespace lightningUnit
 {
-    public enum UnitType
-    {
-        Float
-        , Integer
-        , Boolean
-        , String
-        , Char
-        , UpValue
-        , Table
-        , List
-        , Function
-        , Intrinsic
-        , ExternalFunction
-        , Closure
-        , Module
-        , Wrapper
-        , Option
-        , Null
-    }
-
     public abstract class HeapUnit
     {
         public abstract UnitType Type { get; }

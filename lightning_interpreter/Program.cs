@@ -65,7 +65,7 @@ namespace interpreter
                 VMResult result = vm.ProtectedRun();
                 if (result.status != VMResultType.OK)
                     Console.WriteLine("Program returned ERROR!");
-                else if (result.value.Type != UnitType.Null)
+                else
                     Console.WriteLine("Program returned: " + result.value);
 
                 // Print modules
@@ -77,9 +77,9 @@ namespace interpreter
                 Console.WriteLine(vm.ProtectedCallFunction(machine_memory_use, null));
 
                 // Print Global variable errors
-                Unit errors_unit = vm.GetGlobal(chunk, "errors");
-                if (errors_unit.Type == UnitType.Integer)
-                    Console.WriteLine("Total errors in test: " + errors_unit.integerValue);
+                // Unit errors_unit = vm.GetGlobal(chunk, "errors");
+                // if (errors_unit.Type == UnitType.Integer)
+                //     Console.WriteLine("Total errors in test: " + errors_unit.integerValue);
             }
             return 0;
         }

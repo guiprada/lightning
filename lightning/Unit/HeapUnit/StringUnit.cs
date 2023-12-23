@@ -88,7 +88,7 @@ namespace lightningUnit
                     string result = input_string.Substring((int)start, (int)(end - start));
                     return new Unit(result);
                 }
-                return new Unit(UnitType.Null);
+                return new Unit(true);
             }
             methodTable.Set("slice", new IntrinsicUnit("string_slice", StringSlice, 3));
 
@@ -106,7 +106,7 @@ namespace lightningUnit
                     val_input_string.content = input_string.Substring(0, (int)start);
                     return new Unit(result);
                 }
-                return new Unit(UnitType.Null);
+                return new Unit(true);
             }
             methodTable.Set("split", new IntrinsicUnit("string_split", StringSplit, 2));
 
@@ -127,7 +127,7 @@ namespace lightningUnit
                 if (val_input_string.Type == UnitType.String)
                     return new Unit(val_input_string.ToString());
                 else
-                    return new Unit(UnitType.Null);
+                    throw new Exception("Trying to make a string copy of a non string!");
             }
             methodTable.Set("copy", new IntrinsicUnit("string_copy", StringCopy, 1));
 
@@ -152,9 +152,9 @@ namespace lightningUnit
                 if (index < input_string.Length)
                 {
                     char result = input_string[(int)index];
-                    return new Unit(result);
+                    return new Unit(new OptionUnit(new Unit(result)));
                 }
-                return new Unit(UnitType.Null);
+                return new Unit(new OptionUnit());
             }
             methodTable.Set("char_at", new IntrinsicUnit("string_char_at", CharAt, 2));
 

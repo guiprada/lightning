@@ -44,7 +44,7 @@ namespace lightningPrelude
             {
                 p_vm.GetWrappedContent<Unit[]>(0)[0] = p_vm.GetUnit(1);
 
-                return new Unit(UnitType.Null);
+                return new Unit(true);
             }
             tupleMethods.Set("set_x", new IntrinsicUnit("tuple_set_x", TupleSetX, 2));
 
@@ -53,7 +53,7 @@ namespace lightningPrelude
             {
                 p_vm.GetWrappedContent<Unit[]>(0)[1] = p_vm.GetUnit(1);
 
-                return new Unit(UnitType.Null);
+                return new Unit(true);
             }
             tupleMethods.Set("set_y", new IntrinsicUnit("tuple_set_y", TupleSetY, 2));
 

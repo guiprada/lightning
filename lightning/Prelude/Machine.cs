@@ -50,7 +50,7 @@ namespace lightningPrelude
             Unit ResourcesTrim(VM p_vm)
             {
                 p_vm.ResoursesTrim();
-                return new Unit(UnitType.Null);
+                return new Unit(true);
             }
             machine.Set("trim", new IntrinsicUnit("trim", ResourcesTrim, 0));
 
@@ -58,7 +58,7 @@ namespace lightningPrelude
             Unit ReleaseAllVMs(VM p_vm)
             {
                 p_vm.ReleaseVMs();
-                return new Unit(UnitType.Null);
+                return new Unit(true);
             }
             machine.Set("release_all_vms", new IntrinsicUnit("release_all_vms", ReleaseAllVMs, 0));
 
@@ -66,7 +66,7 @@ namespace lightningPrelude
             Unit ReleaseVMs(VM p_vm)
             {
                 p_vm.ReleaseVMs((int)p_vm.GetInteger(0));
-                return new Unit(UnitType.Null);
+                return new Unit(true);
             }
             machine.Set("release_vms", new IntrinsicUnit("release_vms", ReleaseVMs, 1));
 
