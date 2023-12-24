@@ -9,8 +9,13 @@ To Think
 
 To be Done
 ----------
-- Finish roslyn module
+- fix table and list literals to accept function call without parenthesis
+- fix assert error msg
+- add abort compilation on any error
+- convert try to return an option(should try even be needed now?)
+- Finish roslyn module(finish compile)
 - Create option default_action
+- create separated math functions for integers and floats where it makes sense
 - Create option unwrap() tests
 
 add table.flatten => merge with extension table and unset extension table

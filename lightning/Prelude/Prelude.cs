@@ -370,6 +370,21 @@ namespace lightningPrelude
             functions.Add(new IntrinsicUnit("new_line", NewLine, 0));
 
             //////////////////////////////////////////////////////
+            Unit NewOption (VM vm)
+            {
+                Unit value = vm.GetUnit(0);
+                return new Unit(new OptionUnit(value));
+            }
+            functions.Add(new IntrinsicUnit("option_new", NewOption, 1));
+
+            //////////////////////////////////////////////////////
+            Unit NewEmptyOption (VM vm)
+            {
+                return new Unit(new OptionUnit());
+            }
+            functions.Add(new IntrinsicUnit("option_empty", NewEmptyOption, 0));
+
+            //////////////////////////////////////////////////////
             Library prelude = new Library(functions, tables);
 
             return prelude;

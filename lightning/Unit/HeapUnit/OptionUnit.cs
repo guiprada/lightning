@@ -122,21 +122,6 @@ namespace lightningUnit
         private static void initMethodTable()
         {
             {
-                Unit NewOption (VM vm)
-                {
-                    Unit value = vm.GetUnit(0);
-                    return new Unit(new OptionUnit(value));
-                }
-                methodTable.Set("new", new IntrinsicUnit("option_new", NewOption, 1));
-
-                //////////////////////////////////////////////////////
-                Unit NewEmptyOption (VM vm)
-                {
-                    return new Unit(new OptionUnit());
-                }
-                methodTable.Set("new_empty", new IntrinsicUnit("option_new_empty", NewEmptyOption, 0));
-
-                //////////////////////////////////////////////////////
                 Unit OK (VM vm)
                 {
                     OptionUnit this_option = vm.GetOptionUnit(0);
@@ -144,6 +129,15 @@ namespace lightningUnit
                     return new Unit(this_option.OK());
                 }
                 methodTable.Set("ok", new IntrinsicUnit("option_ok", OK, 1));
+
+                //////////////////////////////////////////////////////
+                Unit Empty (VM vm)
+                {
+                    OptionUnit this_option = vm.GetOptionUnit(0);
+
+                    return new Unit(!this_option.OK());
+                }
+                methodTable.Set("empty", new IntrinsicUnit("option_empty", Empty, 1));
 
                 //////////////////////////////////////////////////////
                 Unit Unwrap (VM vm)

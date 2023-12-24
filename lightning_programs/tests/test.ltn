@@ -105,37 +105,36 @@ errors += require("tests/scoping.ltn")
 write_line("Strings tests ...")
 errors += require("tests/strings.ltn")
 
-// write_line("Super Table tests ...")
-// errors += require("tests/super_table.ltn")
+write_line("Super Table tests ...")
+errors += require("tests/super_table.ltn")
 
-// write_line("Table tests ...")
-// errors += require("tests/table.ltn")
+write_line("Table tests ...")
+errors += require("tests/table.ltn")
 
-// write_line("Transient tests ...")
-// errors += require("tests/transient.ltn")
+write_line("Transient tests ...")
+errors += require("tests/transient.ltn")
 
-// write_line("Try tests ...")
-// errors += require("tests/try.ltn")
+write_line("Try tests ...")
+errors += require("tests/try.ltn")
 
-// write_line("Up value tests ...")
-// errors += require("tests/up_value.ltn")
+write_line("Up value tests ...")
+errors += require("tests/up_value.ltn")
 
-// write_line("VM management tests ...")
-// errors += require("tests/vm_management.ltn")
+write_line("VM management tests ...")
+errors += require("tests/vm_management.ltn")
 
-// machine.trim()
-
-// if (errors == 0){
-// 	write_line("No errors found! :)")
-// }
-// else{
-// 	write(new_line())
-// 	write_line(":( " .. errors .. " errors found!")
-// }
-// write_line("-- Finished tests! --")
-// write_line("Elapsed time: " .. start_time:elapsed() .. " ms")
-// // write_line("Loaded modules: " .. machine.modules())
-// // write_line(machine.memory_use())
+machine.trim()
+if (errors == 0){
+	write_line("No errors found! :)")
+}
+else{
+	write(new_line())
+	write_line(":( " .. errors .. " errors found!")
+}
+write_line("-- Finished tests! --")
+write_line("Elapsed time: " .. start_time:elapsed() .. " ms")
+// write_line("Loaded modules: " .. machine.modules())
+// write_line(machine.memory_use())
 write_line("Error count: " .. errors)
 
 //////////////////////////////// scratch

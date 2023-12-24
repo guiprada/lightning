@@ -33,14 +33,8 @@ var assert_not = assert_counter.assert_not
 	truthy = true
 	assert(falsy, false, "Failed Transient Test 7.")
 
-	var something
-	var nothing = null
-	something = nothing
-	something = 1
-	assert(nothing, null, "Failed Transient Test 8.")
-
 	var list1 = [0,1,2]
 	var list2 = list1
-	assert(list2, list1, "Failed Transient Test 9.")
+	assert(list2, list1, "Failed Transient Test 8.")
 }
 return assert_counter.get_error_counter()

@@ -2,48 +2,48 @@ var assert_counter = require("assert_counter.ltn")
 var assert = assert_counter.assert
 var assert_not = assert_counter.assert_not
 {
-	// Table test
-	var this_table = Table()
-	this_table.a = "a"
-	this_table.b = "b"
-	var this_table_alias = this_table
-	assert(this_table_alias, this_table, "Failed Table test 1.")
-	assert_not([a:"a",b:"b",], this_table, "Failed Table test 2.")
-	assert_not([a:"b",b:"b"], this_table, "Failed Table test 3.")
-	assert_not([], this_table, "Failed Table test 4.")
-	assert(this_table:count(), 2, "Failed Table test 5")
-	assert(this_table:count(), 2, "Failed Table test 6")
+    // Table test
+    var this_table = Table()
+    this_table.a = "a"
+    this_table.b = "b"
+    var this_table_alias = this_table
+    assert(this_table_alias, this_table, "Failed Table test 1.")
+    assert_not([a:"a",b:"b",], this_table, "Failed Table test 2.")
+    assert_not([a:"b",b:"b"], this_table, "Failed Table test 3.")
+    assert_not([], this_table, "Failed Table test 4.")
+    assert(this_table:count(), 2, "Failed Table test 5")
+    assert(this_table:count(), 2, "Failed Table test 6")
 
-	var this_array = this_table
-	this_array[0] = 100
-	this_array[1] = null
-	this_array[99] = 0
-	assert(this_array[0], 100, "Failed Array test 1.")
-	assert(this_array[1], null, "Failed Array test 2.")
-	assert(this_array[99], 0, "Failed Array test 3.")
-	assert(this_table:count(), 5, "Failed Array test 4")
-	assert(this_array:count(), 5, "Failed Array test 5.")
+    var this_array = this_table
+    this_array[0] = 100
+    this_array[1] = option_empty()
+    this_array[99] = 0
+    assert(this_array[0], 100, "Failed Array test 1.")
+    assert(this_array[1]:ok(), false, "Failed Array test 2.")
+    assert(this_array[99], 0, "Failed Array test 3.")
+    assert(this_table:count(), 5, "Failed Array test 4")
+    assert(this_array:count(), 5, "Failed Array test 5.")
 
-	var table_negative = [:]
-	table_negative[-1] = 5
-	assert(table_negative[-1], 5, "Failed Table Negative Index Test 1.")
+    var table_negative = [:]
+    table_negative[-1] = 5
+    assert(table_negative[-1], 5, "Failed Table Negative Index Test 1.")
 }
 {
-	// Table literal test
-	var this_list = [null, null, null, null, null, "hello"]
-	for(var i = 0; i<5; i++){
-		assert(this_list[i], null, "Failed Table Literal test " .. (i+1) .. ".")
-	}
-	assert(this_list[5], "hello", "Failed Table Literal test 6.")
+    // Table literal test
+    var this_list = [(option_empty()), (option_empty()), (option_empty()), (option_empty()), (option_empty()), "hello"]
+    for(var i = 0; i<5; i++){
+        assert(this_list[i]:ok(), false, "Failed Table Literal test " .. (i+1) .. ".")
+    }
+    assert(this_list[5], "hello", "Failed Table Literal test 6.")
 
-	var another_table = [ "brazil":"Brasilia", eua:"Washington", australia:"Canberra",]
-	assert(another_table.brazil, "Brasilia", "Failed Table Literal test 7.")
-	assert(another_table.australia, "Canberra", "Failed Super Table Test 3.")
+    var another_table = [ "brazil":"Brasilia", eua:"Washington", australia:"Canberra",]
+    assert(another_table.brazil, "Brasilia", "Failed Table Literal test 7.")
+    assert(another_table.australia, "Canberra", "Failed Super Table Test 3.")
 
-	// Testing Table negative
-	var table_teste = [5:0, 0:-11, -1:2]
-	assert(table_teste[0], -11, "Failed Table Literal Negative Value Test 1.")
-	assert(table_teste[-1], 2, "Failde Table Literal Negatiev Index Test 1.")
+    // Testing Table negative
+    var table_teste = [5:0, 0:-11, -1:2]
+    assert(table_teste[0], -11, "Failed Table Literal Negative Value Test 1.")
+    assert(table_teste[-1], 2, "Failde Table Literal Negatiev Index Test 1.")
 }
 {
 	// Some arrays, functions and recursion

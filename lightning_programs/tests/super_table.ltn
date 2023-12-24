@@ -2,52 +2,50 @@ var assert_counter = require("assert_counter.ltn")
 var assert = assert_counter.assert
 var assert_not = assert_counter.assert_not
 {
-	// Testing super table
-	var extension_table = [ brazil:"Brasilia", eua:"Washington", australia:"Canberra",]
-	var common_table = [:]
-	common_table:set_extension_table(extension_table)
-	assert(common_table.brazil, "Brasilia", "Failed Super Table Test 1.")
+    // Testing super table
+    var extension_table = [ brazil:"Brasilia", eua:"Washington", australia:"Canberra",]
+    var common_table = [:]
+    common_table:set_extension_table(extension_table)
+    assert(common_table.brazil, "Brasilia", "Failed Super Table Test 1.")
 
-	common_table.brazil = "hello"
-	assert(common_table.brazil, "hello", "Failed Super Table Test 2.")
-	assert(extension_table.brazil, "Brasilia", "Failed Super Table Test 3.")
+    common_table.brazil = "hello"
+    assert(common_table.brazil, "hello", "Failed Super Table Test 2.")
+    assert(extension_table.brazil, "Brasilia", "Failed Super Table Test 3.")
 
-	extension_table.a_function = function(self){
-		return self.brazil
-	}
-	assert(common_table:a_function(), "hello", "Failed Super Table Test 4.")
-	assert(extension_table:a_function(), "Brasilia", "Failed Super Table Test 5.")
+    extension_table.a_function = function(self){
+        return self.brazil
+    }
+    assert(common_table:a_function(), "hello", "Failed Super Table Test 4.")
+    assert(extension_table:a_function(), "Brasilia", "Failed Super Table Test 5.")
 
-	var a_table = [:]
-	a_table.a_function = \(self){return self[0]}
-	var this_list = List(0)
-	this_list:push(99)
-	this_list:set_extension_table(a_table)
-	assert(this_list:count(), 1, "Failed Super Table Test 6.")
-	assert(this_list:a_function(), 99, "Failed Super Table Test 7.")
+    var a_table = [:]
+    a_table.a_function = \(self){return self[0]}
+    var this_list = List(0)
+    this_list:push(99)
+    this_list:set_extension_table(a_table)
+    assert(this_list:count(), 1, "Failed Super Table Test 6.")
+    assert(this_list:a_function(), 99, "Failed Super Table Test 7.")
 
-	var another_table = [:]
-	another_table.another_function = \(self){return self[0]}
-	this_list:push(100)
+    var another_table = [:]
+    another_table.another_function = \(self){return self[0]}
+    this_list:push(100)
 
-	// this is not going to work, check try log
-	assert(try(table.set_extension_table, [a_table, common_table]), false, "Failed Super Table Test 8.")
+    // this is not going to work, check try log
+    assert(try(table.set_extension_table, [a_table, common_table]), false, "Failed Super Table Test 8.")
 
-	common_table:merge(common_table:get_extension_table())
-	common_table:unset_extension_table()
-	// now it works
-	assert(try(table.set_extension_table, [a_table, common_table]), true, "Failed Super Table Test 9.")
-	assert(a_table.eua, "Washington", "Failed Super Table Test 10.")
-	assert(a_table.brazil, "hello", "Failed Super Table Test 11.")
+    common_table:merge(common_table:get_extension_table():unwrap())
+    common_table:unset_extension_table()
+    // now it works
+    assert(try(table.set_extension_table, [a_table, common_table]), true, "Failed Super Table Test 9.")
+    assert(a_table.eua, "Washington", "Failed Super Table Test 10.")
+    assert(a_table.brazil, "hello", "Failed Super Table Test 11.")
 
-	assert(this_list:count(), 2, "Failed Super Table Test 12.")
-	assert(this_list:a_function(), 99, "Failed Super Table Test 13.")
+    assert(this_list:count(), 2, "Failed Super Table Test 12.")
+    assert(this_list:a_function(), 99, "Failed Super Table Test 13.")
 
-	assert(this_list:get_extension_table(), a_table, "Failed Super Table Test 14.")
-	assert(a_table:get_extension_table():get_extension_table(), null, "Failed Super Table Test 15.")
-	assert(
-		a_table:get_extension_table():get_extension_table(),
-		common_table:get_extension_table(),
-		"Failed Super Table Test 16.")
+    assert(this_list:get_extension_table():unwrap(), a_table, "Failed Super Table Test 14.")
+    assert(a_table:get_extension_table():unwrap():get_extension_table():ok(), false, "Failed Super Table Test 15.")
+    assert(a_table:get_extension_table():unwrap():get_extension_table():empty(), true, "Failed Super Table Test 16.")
+    assert(common_table:get_extension_table():empty(), true, "Failed Super Table Test 17.")
 }
 return assert_counter.get_error_counter()
