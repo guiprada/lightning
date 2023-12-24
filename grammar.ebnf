@@ -78,5 +78,5 @@ methodAccess    <-  ( ":" IDENTIFIER )?;
 
 (* TABLE *)
 table           <- "[" newLines tableEntry ( newLines "," newLines tableEntry )* newLines "]" newLines;
-tableEntry      <- ( (-)? primary)
-                | ( (-)? IDENTIFIER : primary );
+tableEntry      <- ( (-)? Expression)
+                | ( (-)? IDENTIFIER : Expression );

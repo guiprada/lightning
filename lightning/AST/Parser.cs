@@ -1045,7 +1045,7 @@ namespace lightningAST
 			if (Match(TokenType.MINUS))
 				is_negative = true;
 
-			Node item = Primary();
+			Node item = Expression();
 			bool minus_error = false;
 			if (is_negative)
 			{
@@ -1086,7 +1086,7 @@ namespace lightningAST
 						Previous().PositionData
 					);
 					Match(TokenType.COLON);
-					Node value = Primary();
+					Node value = Expression();
 					table.Add(item, value);
 				}
 				else
@@ -1103,12 +1103,12 @@ namespace lightningAST
 						LiteralNode number_value = (LiteralNode)item;
 						if (!is_negative)
 						{
-							table.Add(number_value, Primary());
+							table.Add(number_value, Expression());
 						}
 						else
 						{
 							number_value.SetNegative();
-							table.Add(number_value, Primary());
+							table.Add(number_value, Expression());
 						}
 					}
 					else if (((LiteralNode)item).ValueType
@@ -1117,12 +1117,12 @@ namespace lightningAST
 						LiteralNode number_value = (LiteralNode)item;
 						if (!is_negative)
 						{
-							table.Add(number_value, Primary());
+							table.Add(number_value, Expression());
 						}
 						else
 						{
 							number_value.SetNegative();
-							table.Add(number_value, Primary());
+							table.Add(number_value, Expression());
 						}
 					}
 					else if (((LiteralNode)item).ValueType == typeof(string))
@@ -1131,7 +1131,7 @@ namespace lightningAST
 							Error("Minus Sign should only be used" +
 								"by Numeric Types in List Declaration.");
 						LiteralNode string_value = (LiteralNode)item;
-						table.Add(string_value, Primary());
+						table.Add(string_value, Expression());
 					}
 				}
 			}

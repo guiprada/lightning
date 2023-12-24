@@ -30,7 +30,7 @@ var assert_not = assert_counter.assert_not
 }
 {
     // Table literal test
-    var this_list = [(option_empty()), (option_empty()), (option_empty()), (option_empty()), (option_empty()), "hello"]
+    var this_list = [option_empty(), option_empty(), option_empty(), option_empty(), option_empty(), "hello"]
     for(var i = 0; i<5; i++){
         assert(this_list[i]:ok(), false, "Failed Table Literal test " .. (i+1) .. ".")
     }

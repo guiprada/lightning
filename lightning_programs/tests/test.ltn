@@ -138,5 +138,7 @@ write_line("Elapsed time: " .. start_time:elapsed() .. " ms")
 write_line("Error count: " .. errors)
 
 //////////////////////////////// scratch
-
+{
+    var test_table = [option_empty(), option_empty()]
+}
 //////////////////////////////// end scratch

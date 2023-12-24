@@ -9,7 +9,6 @@ To Think
 
 To be Done
 ----------
-- fix table and list literals to accept function call without parenthesis
 - fix assert error msg
 - add abort compilation on any error
 - convert try to return an option(should try even be needed now?)
@@ -200,3 +199,4 @@ Done
     - Create option type
     - Remove null
     - Fix writeln unescape "\n"
+    - fix table and list literals to accept function call without parenthesis
