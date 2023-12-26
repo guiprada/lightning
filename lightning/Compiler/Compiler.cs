@@ -43,6 +43,7 @@ namespace lightningCompiler
 				type = ValueType.Expression;
 			}
 		}
+		private static Exception compiler_exeption = new Exception("Compilation Error");
 
 		private Node ast;
 		private Chunk chunk;
@@ -79,7 +80,10 @@ namespace lightningCompiler
 					}
 					catch (Exception e)
 					{
-						Logger.LogLine("Chunking broke the runtime!\n" + e.ToString(), Defaults.Config.CompilerLogFile);
+						if (e == compiler_exeption)
+							Logger.LogLine("Compiling error!\n", Defaults.Config.CompilerLogFile);
+						else
+							Logger.LogLine("Compiling broke the runtime!\n" + e.ToString(), Defaults.Config.CompilerLogFile);
 						LogErrors();
 						return null;
 					}
@@ -1002,6 +1006,7 @@ namespace lightningCompiler
 		private void Error(string p_msg, PositionData p_positionData)
 		{
 			Errors.Add(p_msg + " on module: " + moduleName + " on position: " + p_positionData);
+			throw compiler_exeption;
 		}
 	}
 }

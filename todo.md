@@ -10,7 +10,6 @@ To Think
 To be Done
 ----------
 - fix assert error msg
-- add abort compilation on any error
 - convert try to return an option(should try even be needed now?)
 - Finish roslyn module(finish compile)
 - Create option default_action
@@ -200,3 +199,4 @@ Done
     - Remove null
     - Fix writeln unescape "\n"
     - fix table and list literals to accept function call without parenthesis
+    - add abort compilation on any error
