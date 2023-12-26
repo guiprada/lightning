@@ -84,23 +84,22 @@ namespace lightningPrelude
                 Scanner scanner = new Scanner(eval_code, eval_name);
                 List<Token> tokens = scanner.Tokens;
                 if(scanner.HasScanned == false){
-                    throw new Exception("Scanning Error");
+                    throw new Exception("Scanning Error on eval: " + eval_name);
                 }
 
                 Parser parser = new Parser(tokens, eval_name);
 
                 Node program = parser.ParsedTree;
                 if(parser.HasParsed == false){
-                        throw new Exception("Parsing Error");
+                        throw new Exception("Parsing Error on eval: " + eval_name);
                 }
 
                 Compiler chunker = new Compiler(program, eval_name, p_vm.Prelude);
                 Chunk chunk = chunker.Chunk;
                 if (chunker.HasChunked == false){
-                    throw new Exception("Code Generation Error");
+                    throw new Exception("Code Generation Error on eval: " + eval_name);
                 }
-
-                if (chunker.HasChunked == true)
+                else
                 {
                     VM imported_vm = new VM(chunk);
                     VMResult result = imported_vm.ProtectedRun();
@@ -111,7 +110,7 @@ namespace lightningPrelude
                         return result.value;
                     }
                 }
-                throw new Exception("Code Execution not OK :|");
+                throw new Exception("Code Execution was not OK :| on eval: " + eval_name);
             }
             functions.Add(new IntrinsicUnit("eval", Eval, 1));
 
