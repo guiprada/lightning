@@ -384,6 +384,29 @@ namespace lightningPrelude
             functions.Add(new IntrinsicUnit("option_empty", NewEmptyOption, 0));
 
             //////////////////////////////////////////////////////
+            Unit NewResult (VM vm)
+            {
+                Unit value = vm.GetUnit(0);
+                return new Unit(new ResultUnit(value));
+            }
+            functions.Add(new IntrinsicUnit("result_new", NewResult, 1));
+
+            //////////////////////////////////////////////////////
+            Unit NewEmptyResult (VM vm)
+            {
+                return new Unit(new ResultUnit(new Unit(UnitType.Empty)));
+            }
+            functions.Add(new IntrinsicUnit("result_empty", NewEmptyResult, 0));
+
+            //////////////////////////////////////////////////////
+            Unit NewErrorResult (VM vm)
+            {
+                string error_string = vm.GetString(0);
+                return new Unit(new ResultUnit(error_string));
+            }
+            functions.Add(new IntrinsicUnit("result_error", NewErrorResult, 1));
+
+            //////////////////////////////////////////////////////
             Library prelude = new Library(functions, tables);
 
             return prelude;

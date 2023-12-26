@@ -44,8 +44,8 @@ var assert_not = assert_counter.assert_not
     assert(this_list:a_function(), 99, "Failed Super Table Test 13.")
 
     assert(this_list:get_extension_table():unwrap(), a_table, "Failed Super Table Test 14.")
-    assert(a_table:get_extension_table():unwrap():get_extension_table():ok(), false, "Failed Super Table Test 15.")
-    assert(a_table:get_extension_table():unwrap():get_extension_table():empty(), true, "Failed Super Table Test 16.")
-    assert(common_table:get_extension_table():empty(), true, "Failed Super Table Test 17.")
+    assert(a_table:get_extension_table():unwrap():get_extension_table():is_ok(), false, "Failed Super Table Test 15.")
+    assert(a_table:get_extension_table():unwrap():get_extension_table():is_empty(), true, "Failed Super Table Test 16.")
+    assert(common_table:get_extension_table():is_empty(), true, "Failed Super Table Test 17.")
 }
 return assert_counter.get_error_counter()

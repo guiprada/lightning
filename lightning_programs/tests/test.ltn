@@ -139,6 +139,11 @@ write_line("Error count: " .. errors)
 
 //////////////////////////////// scratch
 {
-    var test_table = [option_empty(), option_empty()]
+    var opt_empty = option_empty()
+    assert(opt_empty:is_ok(), false, "Failed option Test 1.")
+    var opt_in_opt = option_new(opt_empty)
+    assert(opt_in_opt:is_ok, false, "Failed option Test 2.")
+
+
 }
 //////////////////////////////// end scratch

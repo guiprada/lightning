@@ -312,6 +312,13 @@ namespace lightningVM
             return (OptionUnit)stack.Peek(p_n).heapUnitValue;
         }
 
+        public ResultUnit GetResultUnit(int p_n)
+        {
+            if (stack.Peek(p_n).Type != UnitType.Result)
+                throw new Exception("Expected an Result.");
+            return (ResultUnit)stack.Peek(p_n).heapUnitValue;
+        }
+
         //////////////////////////// End Accessors
         public Unit ProtectedCallFunction(Unit p_callable, List<Unit> p_args = null)
         {
@@ -391,7 +398,7 @@ namespace lightningVM
             else
                 Error("Function Execution was not OK!");
 
-            return new Unit(UnitType.Empty);//this is dead code just to keep the compiler happy
+            return new Unit(new OptionUnit());//this is dead code just to keep the compiler happy
         }
         //////////////////////////////////////////////////// End Public
 

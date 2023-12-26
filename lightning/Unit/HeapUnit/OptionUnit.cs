@@ -30,7 +30,6 @@ namespace lightningUnit
         public override String ToString()
         {
             return "Option: " +  Value.ToString();
-
         }
 
         public override bool Equals(object other)
@@ -38,10 +37,10 @@ namespace lightningUnit
             throw new Exception("Trying to check equality of OptionUnit!");
         }
 
-        // public override int CompareTo(object p_compareTo)
-        // {
-        //     throw new Exception("Trying to compare with OptionUnit!");
-        // }
+        public override int CompareTo(object p_compareTo)
+        {
+            throw new Exception("Trying to compare with OptionUnit!");
+        }
 
         public override int GetHashCode()
         {
@@ -128,7 +127,7 @@ namespace lightningUnit
 
                     return new Unit(this_option.OK());
                 }
-                methodTable.Set("ok", new IntrinsicUnit("option_ok", OK, 1));
+                methodTable.Set("is_ok", new IntrinsicUnit("option_is_ok", OK, 1));
 
                 //////////////////////////////////////////////////////
                 Unit Empty (VM vm)
@@ -137,7 +136,7 @@ namespace lightningUnit
 
                     return new Unit(!this_option.OK());
                 }
-                methodTable.Set("empty", new IntrinsicUnit("option_empty", Empty, 1));
+                methodTable.Set("is_empty", new IntrinsicUnit("option_is_empty", Empty, 1));
 
                 //////////////////////////////////////////////////////
                 Unit Unwrap (VM vm)

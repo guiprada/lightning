@@ -19,7 +19,7 @@ var assert_not = assert_counter.assert_not
     this_array[1] = option_empty()
     this_array[99] = 0
     assert(this_array[0], 100, "Failed Array test 1.")
-    assert(this_array[1]:ok(), false, "Failed Array test 2.")
+    assert(this_array[1]:is_ok(), false, "Failed Array test 2.")
     assert(this_array[99], 0, "Failed Array test 3.")
     assert(this_table:count(), 5, "Failed Array test 4")
     assert(this_array:count(), 5, "Failed Array test 5.")
@@ -32,7 +32,7 @@ var assert_not = assert_counter.assert_not
     // Table literal test
     var this_list = [option_empty(), option_empty(), option_empty(), option_empty(), option_empty(), "hello"]
     for(var i = 0; i<5; i++){
-        assert(this_list[i]:ok(), false, "Failed Table Literal test " .. (i+1) .. ".")
+        assert(this_list[i]:is_ok(), false, "Failed Table Literal test " .. (i+1) .. ".")
     }
     assert(this_list[5], "hello", "Failed Table Literal test 6.")
 

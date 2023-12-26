@@ -21,6 +21,7 @@ namespace lightningUnit
         , Module
         , Wrapper
         , Option
+        , Result
         , Empty
     }
 

@@ -35,6 +35,8 @@ namespace lightningUnit
                 return "UnitType.Boolean";
             else if (this.type == UnitType.Char)
                 return "UnitType.Char";
+            else if (this.type == UnitType.Result)
+                return "UnitType.Result";
             else
                 return "Unknown UnitType";
         }

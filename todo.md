@@ -10,6 +10,7 @@ To Think
 To be Done
 ----------
 - fix assert error msg
+- remove call to this constructor in Unit?
 - convert try to return an option(should try even be needed now?)
 - Finish roslyn module(finish compile)
 - Create option default_action

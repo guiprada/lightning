@@ -52,7 +52,7 @@ var assert_not = assert_counter.assert_not
         #
         {
             var result = roslyn.csharp_eval(csharp_null)
-            assert(!result:ok(), true, "Failed roslyn.csharp_eval test 5. ")
+            assert(!result:is_ok(), true, "Failed roslyn.csharp_eval test 5. ")
         }
 
         var csharp_unknown =
@@ -61,7 +61,7 @@ var assert_not = assert_counter.assert_not
         #
         {
             var result = roslyn.csharp_eval(csharp_unknown)
-            assert(result:ok(), true, "Failed roslyn.csharp_eval test 6. ")
+            assert(result:is_ok(), true, "Failed roslyn.csharp_eval test 6. ")
             assert_not(result:unwrap(), 1, "Failed roslyn.csharp_eval test 7. ") // it is a wraper unit
         }
 
