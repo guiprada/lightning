@@ -188,7 +188,9 @@ namespace lightningPrelude
                         Unit result = try_vm.CallFunction(this_callable, this_arguments);
                         p_vm.RecycleVM(try_vm);
                         return new Unit(new ResultUnit(result));
-                    }catch(Exception e){
+                    }
+                    catch(Exception e)
+                    {
                         Logger.LogLine("------------------- (Try log) " + p_vm.CurrentInstructionPositionDataString(), Defaults.Config.TryLogFile);
                         Logger.LogLine(e.ToString() + "\n---", Defaults.Config.TryLogFile);
                         p_vm.RecycleVM(try_vm);
@@ -196,15 +198,22 @@ namespace lightningPrelude
                     }
                 }
 
-                return new Unit(false);
+                return new Unit(new ResultUnit("Trying to call a: " + this_callable.Type));
             }
             functions.Add(new IntrinsicUnit("try", Try, 2));
 
             //////////////////////////////////////////////////////
             Unit WriteLine(VM p_vm)
             {
-                Console.WriteLine(p_vm.GetUnit(0).ToString());
-                return new Unit(true);
+                try
+                {
+                    Console.WriteLine(p_vm.GetUnit(0).ToString());
+                    return new Unit(new ResultUnit());
+                }
+                catch (Exception e)
+                {
+                    return new Unit(new ResultUnit(e));
+                }
             }
             functions.Add(new IntrinsicUnit("write_line", WriteLine, 1));
 

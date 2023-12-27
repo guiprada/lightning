@@ -502,9 +502,9 @@ namespace lightningVM
                         else
                             stack.Push(upValues.GetAt(instruction.opA).UpValue);
                         break;
-                    case OpCode.LOAD_NIL:
+                    case OpCode.LOAD_VOID:
                         IP++;
-                        stack.Push(new Unit(UnitType.Empty));
+                        stack.Push(new Unit(UnitType.Void));
                         break;
                     case OpCode.LOAD_TRUE:
                         IP++;

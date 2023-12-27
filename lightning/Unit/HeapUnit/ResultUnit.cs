@@ -8,6 +8,7 @@ namespace lightningUnit
     public class ResultUnit : HeapUnit
     {
         public Unit Value { get; private set; }
+        public Exception E { get; private set;}
         public bool IsOK { get; private set; }
         public bool HasResult {
             get
@@ -15,7 +16,6 @@ namespace lightningUnit
                 return !(Value.Type == UnitType.Empty);
             }
         }
-        public Exception E { get; private set;}
 
         public override UnitType Type
         {
@@ -29,21 +29,25 @@ namespace lightningUnit
         {
             E = p_e;
             IsOK = false;
+            Value = new Unit(UnitType.Empty);
         }
         public ResultUnit(string p_error_string)
         {
             E = new Exception(p_error_string);
             IsOK = false;
+            Value = new Unit(UnitType.Empty);
         }
         public ResultUnit(Unit p_value)
         {
-            Value = p_value;
+            E = null;
             IsOK = true;
+            Value = p_value;
         }
         public ResultUnit()
         {
-            Value = new Unit(UnitType.Empty);
+            E = null;
             IsOK = true;
+            Value = new Unit(UnitType.Empty);
         }
 
         public override String ToString()
@@ -133,7 +137,7 @@ namespace lightningUnit
                 {
                     ResultUnit this_option = vm.GetResultUnit(0);
 
-                    return new Unit(!this_option.IsOK);
+                    return new Unit(this_option.HasResult);
                 }
                 methodTable.Set("has_result", new IntrinsicUnit("result_has_result", HasResult, 1));
 

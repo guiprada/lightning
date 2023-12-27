@@ -49,7 +49,7 @@ namespace lightningAST
 					try
 					{
 						ScanTokens();
-						PrintErrors();
+						LogErrors();
 						if (errors.Count > 0)
 						{
 							return null;
@@ -67,7 +67,7 @@ namespace lightningAST
 					catch (Exception e)
 					{
 						Logger.LogLine(e.ToString(), Defaults.Config.ScannerLogFile);
-						PrintErrors();
+						LogErrors();
 						return null;
 					}
 				}
@@ -87,10 +87,10 @@ namespace lightningAST
 			current = 0;
 		}
 
-		private void PrintErrors()
+		private void LogErrors()
 		{
 			if (errors.Count > 0)
-				Logger.LogLine("Scanning had errors on module " + moduleName + ":", Defaults.Config.ScannerLogFile);
+				Logger.LogLine("Scanning had errors on module: " + moduleName + ":", Defaults.Config.ScannerLogFile);
 			foreach (string error in errors)
 				Logger.LogLine("\t-" + error, Defaults.Config.ScannerLogFile);
 		}

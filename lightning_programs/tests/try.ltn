@@ -3,10 +3,10 @@ var assert = assert_counter.assert
 var assert_not = assert_counter.assert_not
 {
 	// Testing try
-	var array1
+	var array1 = []
 	var a = 1
 	var success = try(\(str1, str2){
-		write_line(array1[0])
+		write_line(array1[2])
 		a = 2
 	}, ["oi", "mundo"])
 	assert(a, 1, "Failed try() Test 1.")
@@ -14,7 +14,7 @@ var assert_not = assert_counter.assert_not
 	success = try(\{
 		write_line(array1[0])
 		a = 2
-	}, null)
+	}, [])
 	assert(a, 1, "Failed try() Test 2.")
 
 	try(\{
@@ -43,7 +43,7 @@ var assert_not = assert_counter.assert_not
 	(a)
 	#)}
 	var broken_result3 = try(broken_func3, [])
-	assert(broken_result3:is_error(), false, "Failed try() Test 7.")
+	assert(broken_result3:is_error(), true, "Failed try() Test 7.")
 	assert(broken_result3:has_result(), false, "Failed try() Test 8.")
 }
 return assert_counter.get_error_counter()

@@ -11,8 +11,9 @@ To be Done
 ----------
 - fix assert error msg
 - remove call to this constructor in Unit?
-- convert try to return an option(should try even be needed now?)
+- remove null
 - Finish roslyn module(finish compile)
+- Add logic to not recompile in roslyn
 - Create option default_action
 - create separated math functions for integers and floats where it makes sense
 - Create option unwrap() tests
@@ -197,7 +198,7 @@ Done
     - Split prelude
     - criar sistema de configuracao por json e remover valores hard_coded
     - Create option type
-    - Remove null
     - Fix writeln unescape "\n"
     - fix table and list literals to accept function call without parenthesis
     - add abort compilation on any error
+    - convert try to return an option(should try even be needed now?)

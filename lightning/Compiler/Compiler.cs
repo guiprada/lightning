@@ -81,9 +81,9 @@ namespace lightningCompiler
 					catch (Exception e)
 					{
 						if (e == compiler_exeption)
-							Logger.LogLine("Compiling error!\n", Defaults.Config.CompilerLogFile);
+							Logger.LogLine("Compiling had errors on module: " + moduleName, Defaults.Config.CompilerLogFile);
 						else
-							Logger.LogLine("Compiling broke the runtime!\n" + e.ToString(), Defaults.Config.CompilerLogFile);
+							Logger.LogLine("Compiling broke the runtime! on module: " + moduleName + "\nExeption: " + e.ToString(), Defaults.Config.CompilerLogFile);
 						LogErrors();
 						return null;
 					}
@@ -125,7 +125,7 @@ namespace lightningCompiler
 		{
 			if (Errors.Count > 0)
 				foreach (string error in Errors)
-					Logger.LogLine(error, Defaults.Config.CompilerLogFile);
+					Logger.LogLine("\t-" + error, Defaults.Config.CompilerLogFile);
 		}
 
 		private void ChunkIt(Node p_node)
@@ -358,10 +358,6 @@ namespace lightningCompiler
 				int address = AddData((char)p_node.Value);
 				Add(OpCode.LOAD_DATA, (Operand)address, p_node.PositionData);
 			}
-			else if ((string)p_node.Value == null)
-			{
-				Add(OpCode.LOAD_NIL, p_node.PositionData);
-			}
 		}
 
 		private void ChunkGrouping(GroupingNode p_node)
@@ -503,7 +499,8 @@ namespace lightningCompiler
 		{
 			if (p_node.Initializer == null)
 			{
-				Add(OpCode.LOAD_NIL, p_node.PositionData);
+				// This should Error during parsing.
+				Error("Uninitialized Variable: " + p_node.Name, p_node.PositionData);
 			}
 			else
 				ChunkIt(p_node.Initializer);
@@ -683,7 +680,7 @@ namespace lightningCompiler
 		{
 			if (p_node.Expr == null)
 			{
-				Add(OpCode.LOAD_NIL, p_node.PositionData);
+				Add(OpCode.LOAD_VOID, p_node.PositionData);
 			}
 			else
 			{

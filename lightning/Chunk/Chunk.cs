@@ -105,7 +105,7 @@ namespace lightningChunk
                 case OpCode.GREATER:
                 case OpCode.LESS:
                 case OpCode.EXIT:
-                case OpCode.LOAD_NIL:
+                case OpCode.LOAD_VOID:
                 case OpCode.POP:
                 case OpCode.DUP:
                 case OpCode.PUSH_STASH:
@@ -157,7 +157,7 @@ namespace lightningChunk
         LOAD_IMPORTED_DATA,
         LOAD_UPVALUE,
         LOAD_INTRINSIC,
-        LOAD_NIL,
+        LOAD_VOID,
         LOAD_TRUE,
         LOAD_FALSE,
 

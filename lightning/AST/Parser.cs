@@ -210,6 +210,7 @@ namespace lightningAST
 			else
 			{
 				initializer = null;
+				Error("Uninitialized Variable!", name.PositionData);
 			}
 
 			ElideMany(TokenType.NEW_LINE);
@@ -396,7 +397,7 @@ namespace lightningAST
 			{
 				condition = null;
 			}
-			if (condition == null) Error("'For' 'condition' can not be null.");
+			if (condition == null) Error("'For' 'condition' can not be null.", position_data);
 
 			Node finalizer = null;
 			if (Match(TokenType.SEMICOLON))
@@ -423,7 +424,7 @@ namespace lightningAST
 			Consume(TokenType.LEFT_PAREN, "Expected '(' after 'while'.", true);
 			Node condition = Expression();
 			if (condition == null)
-				Error("'while' 'condition' can not be null.");
+				Error("'while' 'condition' can not be null.", position_data);
 			Consume(
 				TokenType.RIGHT_PAREN,
 				"Expected ')' after 'while' condition.",
@@ -444,7 +445,7 @@ namespace lightningAST
 				true
 			);
 			Node condition = Expression();
-			if (condition == null) Error("'if' 'condition' can not be null.");
+			if (condition == null) Error("'if' 'condition' can not be null.", position_data);
 			Consume(
 				TokenType.RIGHT_PAREN,
 				"Expected ')' after 'if' condition.",
@@ -511,7 +512,7 @@ namespace lightningAST
 						assigned.PositionData
 					);
 				else
-					Error("Invalid assignment.");
+					Error("Invalid assignment.", assigned.PositionData);
 			}
 			else if (Match(TokenType.PLUS_PLUS))
 			{
@@ -526,7 +527,7 @@ namespace lightningAST
 						assigned.PositionData
 					);
 				else
-					Error("Invalid assignment.");
+					Error("Invalid assignment.", assigned.PositionData);
 			}
 			else if (Match(TokenType.MINUS_EQUAL))
 			{
@@ -541,7 +542,7 @@ namespace lightningAST
 						assigned.PositionData
 					);
 				else
-					Error("Invalid assignment.");
+					Error("Invalid assignment.", assigned.PositionData);
 			}
 			else if (Match(TokenType.MINUS_MINUS))
 			{
@@ -555,7 +556,7 @@ namespace lightningAST
 						assigned.PositionData
 					);
 				else
-					Error("Invalid assignment.");
+					Error("Invalid assignment.", assigned.PositionData);
 			}
 			else if (Match(TokenType.STAR_EQUAL))
 			{
@@ -570,7 +571,7 @@ namespace lightningAST
 						assigned.PositionData
 					);
 				else
-					Error("Invalid assignment.");
+					Error("Invalid assignment.", assigned.PositionData);
 			}
 			if (Match(TokenType.SLASH_EQUAL))
 			{
@@ -585,7 +586,7 @@ namespace lightningAST
 						assigned.PositionData
 					);
 				else
-					Error("Invalid assignment.");
+					Error("Invalid assignment.", assigned.PositionData);
 			}
 			else if (Match(TokenType.EQUAL))
 			{
@@ -600,7 +601,7 @@ namespace lightningAST
 						assigned.PositionData
 					);
 				else
-					Error("Invalid assignment.");
+					Error("Invalid assignment.", assigned.PositionData);
 			}
 
 			ElideMany(TokenType.NEW_LINE);
@@ -836,7 +837,7 @@ namespace lightningAST
 					this_op = OperatorType.SUBTRACTION;
 				else
 				{
-					Error("Unkown unary operator!");
+					Error("Unkown unary operator!", op.PositionData);
 					this_op = OperatorType.VOID;
 				}
 
@@ -917,7 +918,7 @@ namespace lightningAST
 					}
 					else
 					{
-						Error("Expected Number after '-' in 'Method Access'");
+						Error("Expected Number after '-' in 'Method Access'", Previous().PositionData);
 					}
 				}
 				else if (Match(TokenType.NUMBER))
@@ -978,7 +979,7 @@ namespace lightningAST
 				function_call_node = CallTail(function_call_node);
 				return function_call_node;
 			}
-			Error("Expected ':' after anonymous function call.");
+			Error("Expected ':' after anonymous function call.", Peek().PositionData);
 			return p_node;
 		}
 
@@ -1042,6 +1043,7 @@ namespace lightningAST
 			List<Node> elements = p_listNode.Elements;
 
 			bool is_negative = false;
+			PositionData is_negative_position_data = Peek().PositionData;
 			if (Match(TokenType.MINUS))
 				is_negative = true;
 
@@ -1063,7 +1065,7 @@ namespace lightningAST
 			}
 			if (minus_error == true)
 				Error("Minus Sign should only be used by Numeric" +
-					"Types in List Declaration.");
+					"Types in List Declaration.", is_negative_position_data);
 			elements.Add(item);
 
 			return p_listNode;
@@ -1074,6 +1076,7 @@ namespace lightningAST
 			Dictionary<Node, Node> table = p_tableNode.Map;
 
 			bool is_negative = false;
+			PositionData is_negative_position_data = Peek().PositionData;
 			if (Match(TokenType.MINUS))
 				is_negative = true;
 
@@ -1129,7 +1132,7 @@ namespace lightningAST
 					{
 						if (is_negative)
 							Error("Minus Sign should only be used" +
-								"by Numeric Types in List Declaration.");
+								"by Numeric Types in List Declaration.", is_negative_position_data);
 						LiteralNode string_value = (LiteralNode)item;
 						table.Add(string_value, Expression());
 					}
@@ -1149,7 +1152,7 @@ namespace lightningAST
 				if (Match(TokenType.RIGHT_BRACKET))
 					return new TableNode(null, position_data);
 				else
-					Error("Invalid Table declaration");
+					Error("Invalid Table declaration", position_data);
 				return null;
 			}
 			else if (!Match(TokenType.RIGHT_BRACKET))
@@ -1267,13 +1270,13 @@ namespace lightningAST
 				}
 				else
 				{
-					Error("Number expected after (-)! " + Previous().PositionData);
+					Error("Number expected after (-)! " + Previous(), Previous().PositionData);
 					return new LiteralNode(Previous().PositionData);
 				}
 			}
 			else
 			{
-				Error("Primary Terminal expected - Primary node can not begin with: " + Peek());
+				Error("Primary Terminal expected - Primary node can not begin with: " + Peek(), Peek().PositionData);
 				return null;
 			}
 		}
@@ -1377,13 +1380,9 @@ namespace lightningAST
 			else
 			{
 				if (p_error == true)
-					Error(Peek().ToString() +
-					" on position: " + Peek().PositionData +
-					", " + p_msg);
+					Error(p_msg + Peek(), Peek().PositionData);
 				else
-					Warning(Peek().ToString() +
-					" on position: " + Peek().PositionData +
-					", " + p_msg);
+					Warning(p_msg + Peek(), Peek().PositionData);
 				return null;
 			}
 
@@ -1400,14 +1399,14 @@ namespace lightningAST
 				Elide(p_type);
 		}
 
-		void Error(string p_msg)
+		void Error(string p_msg, PositionData p_positionData)
 		{
-			Errors.Add(p_msg);
+			Errors.Add(p_msg + " on module: " + moduleName + " on position: " + p_positionData);
 		}
 
-		void Warning(string p_msg)
+		void Warning(string p_msg, PositionData p_positionData)
 		{
-			Warnings.Add(p_msg);
+			Warnings.Add(p_msg + " on module: " + moduleName + " on position: " + p_positionData);
 		}
 
 	}

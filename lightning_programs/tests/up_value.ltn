@@ -2,10 +2,10 @@ var assert_counter = require("assert_counter.ltn")
 var assert = assert_counter.assert
 var assert_not = assert_counter.assert_not
 {
-	var f1
-	var f2
-	var f3
-	var get_a
+	var f1 = "to_be_a_func"
+	var f2 = "to_be_a_func"
+	var f3 = "to_be_a_func"
+	var get_a = "to_be_a_func"
 	{
 
 		var a = 0

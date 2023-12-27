@@ -24,10 +24,10 @@ var assert_not = assert_counter.assert_not
 	table1[2] = 3
 	assert(table2[2], 3, "Failed Transient Test 5.")
 
-	table2 = null
+	table2 = []
 	assert(table1[2], 3, "Failed Transient Test 6.")
 
-	var truthy
+	var truthy = true
 	var falsy = false
 	truthy = falsy
 	truthy = true
