@@ -394,12 +394,12 @@ namespace lightningPrelude
             functions.Add(new IntrinsicUnit("option_empty", NewEmptyOption, 0));
 
             //////////////////////////////////////////////////////
-            Unit NewResult (VM vm)
+            Unit NewResultValue (VM vm)
             {
                 Unit value = vm.GetUnit(0);
                 return new Unit(new ResultUnit(value));
             }
-            functions.Add(new IntrinsicUnit("result_new", NewResult, 1));
+            functions.Add(new IntrinsicUnit("result_value", NewResultValue, 1));
 
             //////////////////////////////////////////////////////
             Unit NewEmptyResult (VM vm)

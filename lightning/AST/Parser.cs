@@ -55,13 +55,8 @@ namespace lightningAST
 					}
 					catch (Exception e)
 					{
-						Console.WriteLine(
-							"Parsing broke the runtime, check out " +
-							System.IO.Path.DirectorySeparatorChar +
-							lightningPath.ToPath(moduleName) +
-							"_parser.log!"
-						);
 						Logger.LogLine(
+							"Parsing broke the runtime! Exception: " +
 							e.ToString(),
 							Defaults.Config.ParserLogFile
 						);
@@ -277,8 +272,7 @@ namespace lightningAST
 			}
 			else
 			{
-				statements = new List<Node>();
-				statements.Add(body);
+				statements = [body];
 			}
 
 			if ((statements.Count == 0) ||
@@ -854,8 +848,15 @@ namespace lightningAST
 
 			if (Check(TokenType.LEFT_PAREN))
 			{
+				if (maybe_funcall.Type == NodeType.FUNCTION_EXPRESSION)
+				{
+					maybe_funcall = new VariableNode(
+						maybe_funcall,
+						new List<IndexNode>(),
+						maybe_funcall.PositionData);
+				}
 				Node function_call_node = new FunctionCallNode(
-					(maybe_funcall as VariableNode),
+					maybe_funcall as VariableNode,
 					maybe_funcall.PositionData);
 				maybe_funcall = CallTail(function_call_node);
 			}

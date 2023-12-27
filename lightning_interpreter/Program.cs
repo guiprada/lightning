@@ -51,11 +51,17 @@ namespace interpreter
         {
             Scanner scanner = new Scanner(input, name);
             List<Token> tokens = scanner.Tokens;
-            if (scanner.HasScanned == false) { return 0; }
+            if (scanner.HasScanned == false) {
+                Console.WriteLine("Scanner Error!");
+                return 0;
+            }
 
             Parser parser = new Parser(tokens, name);
             Node program = parser.ParsedTree;
-            if (parser.HasParsed == false) { return 0; }
+            if (parser.HasParsed == false) {
+                Console.WriteLine("Parser Error!");
+                return 0;
+            }
 
             Compiler chunker = new Compiler(program, name, Prelude.GetPrelude());
             Chunk chunk = chunker.Chunk;
@@ -80,6 +86,11 @@ namespace interpreter
                 // Unit errors_unit = vm.GetGlobal(chunk, "errors");
                 // if (errors_unit.Type == UnitType.Integer)
                 //     Console.WriteLine("Total errors in test: " + errors_unit.integerValue);
+            }
+            else
+            {
+                Console.WriteLine("Compiler Error!");
+                return 0;
             }
             return 0;
         }

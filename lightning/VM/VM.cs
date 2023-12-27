@@ -520,11 +520,20 @@ namespace lightningVM
                         break;
                     case OpCode.DECLARE_VARIABLE:
                         IP++;
+
+                        if (stack.Peek().Type == UnitType.Void)
+                            throw new Exception("Trying to assign a void value");
+
                         variables.Add(stack.Pop());
                         break;
                     case OpCode.DECLARE_GLOBAL:
                         IP++;
+
                         // lock(globals) // not needed because global declaration can not happen inside parallel functions
+
+                        if (stack.Peek().Type == UnitType.Void)
+                            throw new Exception("Trying to assign a void value");
+
                         globals.Add(stack.Pop());
                         break;
                     case OpCode.DECLARE_FUNCTION:
@@ -585,6 +594,10 @@ namespace lightningVM
 
                             Unit old_value = variables.GetAt(instruction.opA, CalculateEnvShift(instruction.opB));
                             Unit result;
+
+                            if (stack.Peek().Type == UnitType.Void)
+                                throw new Exception("Trying to assign a void value");
+
                             switch (instruction.opC)
                             {
                                 case ASSIGN:
@@ -621,6 +634,10 @@ namespace lightningVM
                             Operand address = instruction.opA;
                             Operand op = instruction.opB;
                             Unit new_value = stack.Peek();
+
+                            if (new_value.Type == UnitType.Void)
+                                throw new Exception("Trying to assign a void value");
+
                             if (parallelVM == true)
                             {
                                 switch (op)
@@ -693,6 +710,10 @@ namespace lightningVM
                         }
                     case OpCode.ASSIGN_IMPORTED_GLOBAL:
                         IP++;
+
+                        if (stack.Peek().Type == UnitType.Void)
+                            throw new Exception("Trying to assign a void value");
+
                         modules[instruction.opB].SetOpGlobal(stack.Peek(), instruction.opC, instruction.opA);
                         break;
                     case OpCode.ASSIGN_UPVALUE:

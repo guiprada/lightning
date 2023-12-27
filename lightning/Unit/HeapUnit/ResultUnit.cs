@@ -39,9 +39,18 @@ namespace lightningUnit
         }
         public ResultUnit(Unit p_value)
         {
-            E = null;
-            IsOK = true;
-            Value = p_value;
+            if(p_value.Type == UnitType.Void)
+            {
+                E = new Exception("Trying to assign a void value");
+                IsOK = true;
+                Value = new Unit(UnitType.Void);
+            }
+            else
+            {
+                E = null;
+                IsOK = true;
+                Value = p_value;
+            }
         }
         public ResultUnit()
         {
@@ -53,7 +62,10 @@ namespace lightningUnit
         public override String ToString()
         {
             if (IsOK)
-                return "Result OK: " +  Value.ToString();
+                if (HasResult)
+                    return "Result OK: " +  Value.ToString();
+                else
+                    return "Result OK: no value";
             else
                 return "Result Error: " + E.ToString();
         }
@@ -117,45 +129,45 @@ namespace lightningUnit
             {
                 Unit IsOK (VM vm)
                 {
-                    ResultUnit this_option = vm.GetResultUnit(0);
+                    ResultUnit this_result = vm.GetResultUnit(0);
 
-                    return new Unit(this_option.IsOK);
+                    return new Unit(this_result.IsOK);
                 }
                 methodTable.Set("is_ok", new IntrinsicUnit("result_is_ok", IsOK, 1));
 
                 //////////////////////////////////////////////////////
                 Unit IsError (VM vm)
                 {
-                    ResultUnit this_option = vm.GetResultUnit(0);
+                    ResultUnit this_result = vm.GetResultUnit(0);
 
-                    return new Unit(!this_option.IsOK);
+                    return new Unit(!this_result.IsOK);
                 }
                 methodTable.Set("is_error", new IntrinsicUnit("result_is_error", IsError, 1));
 
                 //////////////////////////////////////////////////////
                 Unit HasResult (VM vm)
                 {
-                    ResultUnit this_option = vm.GetResultUnit(0);
+                    ResultUnit this_result = vm.GetResultUnit(0);
 
-                    return new Unit(this_option.HasResult);
+                    return new Unit(this_result.HasResult);
                 }
                 methodTable.Set("has_result", new IntrinsicUnit("result_has_result", HasResult, 1));
 
                 //////////////////////////////////////////////////////
                 Unit Unwrap (VM vm)
                 {
-                    ResultUnit this_option = vm.GetResultUnit(0);
+                    ResultUnit this_result = vm.GetResultUnit(0);
 
-                    return this_option.UnWrap();
+                    return this_result.UnWrap();
                 }
                 methodTable.Set("unwrap", new IntrinsicUnit("result_unwrap", Unwrap, 1));
 
                 //////////////////////////////////////////////////////
                 Unit GetError (VM vm)
                 {
-                    ResultUnit this_option = vm.GetResultUnit(0);
+                    ResultUnit this_result = vm.GetResultUnit(0);
 
-                    return new Unit(new StringUnit(this_option.E.ToString()));
+                    return new Unit(new StringUnit(this_result.E.ToString()));
                 }
                 methodTable.Set("get_error", new IntrinsicUnit("result_get_error", GetError, 1));
             }

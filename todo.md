@@ -11,7 +11,6 @@ To be Done
 ----------
 - fix assert error msg
 - remove call to this constructor in Unit?
-- remove null
 - Finish roslyn module(finish compile)
 - Add logic to not recompile in roslyn
 - Create option default_action
@@ -202,3 +201,4 @@ Done
     - fix table and list literals to accept function call without parenthesis
     - add abort compilation on any error
     - convert try to return an option(should try even be needed now?)
+    - remove null
