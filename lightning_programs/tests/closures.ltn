@@ -68,7 +68,7 @@ var assert_not = assert_counter.assert_not
 	assert(p1:move(0,2).y, 3, "Failed hidden properties test 2.")
 	assert(p2:move(0,2).y, 2, "Failed hidden properties test 3.")
 	var a = try(\{p1.x}, [])
-	assert(a, false, "Failed hidden properties test 4.")
+	assert(a:is_error(), true, "Failed hidden properties test 4.")
 }
 {
 	// Testing "hidden properties" 2
@@ -94,6 +94,6 @@ var assert_not = assert_counter.assert_not
 	assert(p1.move(0,2).y, 3, "Failed hidden properties test 6.")
 	assert(p2.move(0,2).y, 2, "Failed hidden properties test 7.")
 	var b = try(\{p1.x}, [])
-	assert(b, false, "Failed hidden properties test 8.")
+	assert(b:is_error(), true, "Failed hidden properties test 8.")
 }
 return assert_counter.get_error_counter()

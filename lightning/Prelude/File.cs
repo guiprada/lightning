@@ -21,11 +21,11 @@ namespace lightningPrelude
                         contents = sr.ReadToEnd();
                     }
                 }
-                catch(Exception)
+                catch(Exception e)
                 {
-                    return new Unit(new OptionUnit());
+                    return new Unit(new ResultUnit(e));
                 }
-                return new Unit(new OptionUnit(new Unit(contents)));
+                return new Unit(new ResultUnit(new Unit(contents)));
             }
             file.Set("load", new IntrinsicUnit("file_load_file", LoadFile, 1));
 
@@ -41,11 +41,11 @@ namespace lightningPrelude
                         file.Write(output);
                     }
                 }
-                catch(Exception)
+                catch(Exception e)
                 {
-                    return new Unit(new OptionUnit());
+                    return new Unit(new ResultUnit(e));
                 }
-                return new Unit(new OptionUnit(new Unit(true)));
+                return new Unit(new ResultUnit(new Unit(UnitType.Empty)));
             }
             file.Set("write", new IntrinsicUnit("file_write_file", WriteFile, 2));
 
@@ -61,11 +61,11 @@ namespace lightningPrelude
                         file.Write(output);
                     }
                 }
-                catch(Exception)
+                catch(Exception e)
                 {
-                    return new Unit(new OptionUnit());
+                    return new Unit(new ResultUnit(e));
                 }
-                return new Unit(new OptionUnit(new Unit(true)));
+                return new Unit(new ResultUnit(new Unit(UnitType.Empty)));
             }
             file.Set("append", new IntrinsicUnit("file_append_file", AppendFile, 2));
 

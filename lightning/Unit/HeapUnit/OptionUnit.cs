@@ -8,6 +8,14 @@ namespace lightningUnit
     public class OptionUnit : HeapUnit
     {
         public Unit Value { get; private set; }
+        public bool IsOK {
+            get
+            {
+                if (Value.Type == UnitType.Empty)
+                    return false;
+                return true;
+            }
+        }
 
         public override UnitType Type
         {
@@ -24,7 +32,10 @@ namespace lightningUnit
 
         public OptionUnit(Unit p_value)
         {
-            Value = p_value;
+            if (p_value.Type == UnitType.Option)
+                Value = ((OptionUnit)p_value.heapUnitValue).Value;
+            else
+                Value = p_value;
         }
 
         public override String ToString()
@@ -50,13 +61,6 @@ namespace lightningUnit
         public override Unit Get(Unit p_key)
         {
             return methodTable.Get(p_key);
-        }
-
-        public bool OK()
-        {
-            if (Value.Type == UnitType.Empty)
-                return false;
-            return true;
         }
 
         public Unit UnWrap()
@@ -125,7 +129,7 @@ namespace lightningUnit
                 {
                     OptionUnit this_option = vm.GetOptionUnit(0);
 
-                    return new Unit(this_option.OK());
+                    return new Unit(this_option.IsOK);
                 }
                 methodTable.Set("is_ok", new IntrinsicUnit("option_is_ok", OK, 1));
 
@@ -134,7 +138,7 @@ namespace lightningUnit
                 {
                     OptionUnit this_option = vm.GetOptionUnit(0);
 
-                    return new Unit(!this_option.OK());
+                    return new Unit(!this_option.IsOK);
                 }
                 methodTable.Set("is_empty", new IntrinsicUnit("option_is_empty", Empty, 1));
 

@@ -62,11 +62,11 @@ namespace interpreter
             if (chunker.HasChunked == true)
             {
                 VM vm = new VM(chunk);
-                VMResult result = vm.ProtectedRun();
-                if (result.status != VMResultType.OK)
-                    Console.WriteLine("Program returned ERROR!");
+                ResultUnit result = vm.ProtectedRun();
+                if (result.IsOK)
+                    Console.WriteLine("Program returned: " + result.Value);
                 else
-                    Console.WriteLine("Program returned: " + result.value);
+                    Console.WriteLine("Program returned ERROR!");
 
                 // Print modules
                 Unit machine_modules = chunk.GetUnitFromTable("machine", "modules");

@@ -149,12 +149,15 @@ namespace lightningUnit
             {
                 string input_string = vm.GetString(0);
                 Integer index = vm.GetInteger(1);
-                if (index < input_string.Length)
+                try
                 {
                     char result = input_string[(int)index];
-                    return new Unit(new OptionUnit(new Unit(result)));
+                    return new Unit(new ResultUnit(new Unit(result)));
                 }
-                return new Unit(new OptionUnit());
+                catch(Exception e)
+                {
+                    return new Unit(new ResultUnit(e));
+                }
             }
             methodTable.Set("char_at", new IntrinsicUnit("string_char_at", CharAt, 2));
 

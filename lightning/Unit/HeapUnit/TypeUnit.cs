@@ -7,6 +7,7 @@ namespace lightningUnit
         public static TypeUnit Boolean = new TypeUnit(UnitType.Boolean);
         public static TypeUnit Char = new TypeUnit(UnitType.Char);
         public static TypeUnit Empty = new TypeUnit(UnitType.Empty);
+        public static TypeUnit Void = new TypeUnit(UnitType.Void);
 
         UnitType type;
 
@@ -37,6 +38,8 @@ namespace lightningUnit
                 return "UnitType.Char";
             else if (this.type == UnitType.Result)
                 return "UnitType.Result";
+            else if (this.type == UnitType.Void)
+                return "UnitType.Void";
             else
                 return "Unknown UnitType";
         }

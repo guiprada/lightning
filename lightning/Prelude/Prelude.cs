@@ -102,12 +102,12 @@ namespace lightningPrelude
                 else
                 {
                     VM imported_vm = new VM(chunk);
-                    VMResult result = imported_vm.ProtectedRun();
-                    if (result.status == VMResultType.OK)
+                    ResultUnit result = imported_vm.ProtectedRun();
+                    if (result.IsOK)
                     {
-                        if (result.value.Type == UnitType.Table || result.value.Type == UnitType.Function)
-                            MakeModule(result.value, eval_name, p_vm, imported_vm);
-                        return result.value;
+                        if (result.Value.Type == UnitType.Table || result.Value.Type == UnitType.Function)
+                            MakeModule(result.Value, eval_name, p_vm, imported_vm);
+                        return result.Value;
                     }
                 }
                 throw new Exception("Code Execution was not OK :| on eval: " + eval_name);
@@ -157,10 +157,10 @@ namespace lightningPrelude
                     else
                     {
                         VM imported_vm = new VM(chunk);
-                        VMResult result = imported_vm.ProtectedRun();
-                        if (result.status == VMResultType.OK){
-                            MakeModule(result.value, name, p_vm, imported_vm);
-                            return result.value;
+                        ResultUnit result = imported_vm.ProtectedRun();
+                        if (result.IsOK){
+                            MakeModule(result.Value, name, p_vm, imported_vm);
+                            return result.Value;
                         }
                         else
                         {
@@ -185,13 +185,14 @@ namespace lightningPrelude
                     VM try_vm = p_vm.GetVM();
                     try
                     {
-                        try_vm.CallFunction(this_callable, this_arguments);
+                        Unit result = try_vm.CallFunction(this_callable, this_arguments);
                         p_vm.RecycleVM(try_vm);
-                        return new Unit(true);
+                        return new Unit(new ResultUnit(result));
                     }catch(Exception e){
                         Logger.LogLine("------------------- (Try log) " + p_vm.CurrentInstructionPositionDataString(), Defaults.Config.TryLogFile);
                         Logger.LogLine(e.ToString() + "\n---", Defaults.Config.TryLogFile);
                         p_vm.RecycleVM(try_vm);
+                        return new Unit(new ResultUnit(e));
                     }
                 }
 
@@ -394,7 +395,7 @@ namespace lightningPrelude
             //////////////////////////////////////////////////////
             Unit NewEmptyResult (VM vm)
             {
-                return new Unit(new ResultUnit(new Unit(UnitType.Empty)));
+                return new Unit(new ResultUnit());
             }
             functions.Add(new IntrinsicUnit("result_empty", NewEmptyResult, 0));
 

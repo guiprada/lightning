@@ -101,7 +101,7 @@ var assert_not = assert_counter.assert_not
         #{
             var csharp_native_sum_func = roslyn.compile("ExFuncTest", 1, csharp_native_sum_func_code)
             assert(csharp_native_sum_func(2):unwrap(), 3, "Failed roslyn.compile test 1.")
-            assert(try(csharp_native_sum_func, [2]), true, "Failed roslyn.ncompile test 2.")
+            assert(try(csharp_native_sum_func, [2]):is_ok(), true, "Failed roslyn.compile test 2.")
         }
 
         var asm_paths = roslyn.get_available_assemblies()

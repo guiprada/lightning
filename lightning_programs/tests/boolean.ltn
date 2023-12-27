@@ -45,13 +45,13 @@ var assert_not = assert_counter.assert_not
 
 	//Truthness of null :)
 	var try_result = try(\{return null == null}, [])
-	assert(try_result, false, "Failed null sanity check 1.")
+	assert(try_result:is_error(), true, "Failed null sanity check 1.")
 
 	try_result = try(\{return true == null}, [])
-	assert(try_result, false, "Failed null sanity check 2.")
+	assert(try_result:is_error(), true, "Failed null sanity check 2.")
 
 	try_result = try(\{return null == false}, [])
-	assert(try_result, false, "Failed null sanity check 3.")
+	assert(try_result:is_error(), true, "Failed null sanity check 3.")
 
 	assert(true, true, "Failed bool sanity check 1.")
 	assert(false, false, "Failed bool sanity check 2.")

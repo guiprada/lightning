@@ -23,6 +23,7 @@ namespace lightningUnit
         , Option
         , Result
         , Empty
+        , Void
     }
 
     [StructLayout(LayoutKind.Explicit)]
@@ -95,6 +96,9 @@ namespace lightningUnit
             {
                 case UnitType.Empty:
                     heapUnitValue = TypeUnit.Empty;
+                    break;
+                case UnitType.Void:
+                    heapUnitValue = TypeUnit.Void;
                     break;
                 case UnitType.Boolean:
                     heapUnitValue = TypeUnit.Boolean;
@@ -173,7 +177,7 @@ namespace lightningUnit
             if (this_type == UnitType.Option)
             {
                 OptionUnit opt_value = (OptionUnit)p_value.heapUnitValue;
-                if (opt_value.OK())
+                if (opt_value.IsOK)
                     return ToObject(opt_value.Value);
                 else
                     return null;

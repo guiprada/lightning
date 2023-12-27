@@ -7,24 +7,6 @@ using lightningUnit;
 using lightningPrelude;
 namespace lightningVM
 {
-    public enum VMResultType
-    {
-        OK,
-        ERROR
-    }
-
-    public struct VMResult
-    {
-        public VMResultType status;
-        public Unit value;
-
-        public VMResult(VMResultType p_status, Unit p_value)
-        {
-            status = p_status;
-            value = p_value;
-        }
-    }
-
     public class VM
     {
         Operand IP;
@@ -329,7 +311,7 @@ namespace lightningVM
             catch (Exception e)
             {
                 Logger.LogLine("VM Busted ...\n" + CurrentInstructionPositionDataString() + "\n" + e.ToString(), Defaults.Config.VMLogFile);
-                return new Unit(UnitType.Empty);
+                return new Unit(UnitType.Void);
             }
         }
         public Unit CallFunction(Unit p_callable, List<Unit> p_args = null)
@@ -391,14 +373,14 @@ namespace lightningVM
 
             Operand before_call_IP = IP;
             IP = 0;
-            VMResult result = Run();
+            ResultUnit result = Run();
             IP = before_call_IP;
-            if (result.status == VMResultType.OK)
-                return result.value;
+            if (result.IsOK)
+                return result.Value;
             else
                 Error("Function Execution was not OK!");
 
-            return new Unit(new OptionUnit());//this is dead code just to keep the compiler happy
+            return new Unit(UnitType.Void);//this is dead code just to keep the compiler happy
         }
         //////////////////////////////////////////////////// End Public
 
@@ -458,7 +440,7 @@ namespace lightningVM
             return instructions.ExecutingFunction.ChunkPosition.GetPosition(IP);
         }
 
-        public VMResult ProtectedRun()
+        public ResultUnit ProtectedRun()
         {
             try
             {
@@ -467,10 +449,10 @@ namespace lightningVM
             catch (Exception e)
             {
                 Logger.LogLine("VM Busted ...\n" + CurrentInstructionPositionDataString() + "\n" + e.ToString(), Defaults.Config.VMLogFile);
-                return new VMResult(VMResultType.ERROR, new Unit(UnitType.Empty));
+                return new ResultUnit(e);
             }
         }
-        private VMResult Run()
+        private ResultUnit Run()
         {
             Instruction instruction;
 
@@ -1144,11 +1126,11 @@ namespace lightningVM
                         break;
                     case OpCode.EXIT:
                         if (stack.top > 0)
-                            return new VMResult(VMResultType.OK, stack.Pop());
-                        return new VMResult(VMResultType.OK, new Unit(UnitType.Empty));
+                            return new ResultUnit(stack.Pop());
+                        return new ResultUnit(new Unit(UnitType.Void));
                     default:
                         Error("Unkown OpCode: " + instruction.opCode);
-                        return new VMResult(VMResultType.ERROR, new Unit(UnitType.Empty));
+                        return new ResultUnit("Unkown OpCode");
                 }
             }
         }
