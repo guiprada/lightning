@@ -22,7 +22,6 @@ namespace lightningUnit
         , Wrapper
         , Option
         , Result
-        , Empty
         , Void
     }
 
@@ -94,9 +93,6 @@ namespace lightningUnit
         {
             switch (p_type)
             {
-                case UnitType.Empty:
-                    heapUnitValue = TypeUnit.Empty;
-                    break;
                 case UnitType.Void:
                     heapUnitValue = TypeUnit.Void;
                     break;
@@ -199,8 +195,8 @@ namespace lightningUnit
                     return charValue.ToString();
                 case UnitType.Boolean:
                     return boolValue.ToString();
-                case UnitType.Empty:
-                    return "Empty";
+                case UnitType.Void:
+                    return "VOID";
                 default:
                     return heapUnitValue.ToString();
             }
@@ -225,9 +221,9 @@ namespace lightningUnit
 
             UnitType this_type = this.Type;
             UnitType other_type = ((Unit)p_other).Type;
-            if (this_type == UnitType.Empty || other_type == UnitType.Empty)
+            if (this_type == UnitType.Void || other_type == UnitType.Void)
             {
-                throw new Exception("Trying to compare Empty Values");
+                throw new Exception("Trying to compare VOID Values");
             }
 
             switch (this_type)
@@ -283,8 +279,8 @@ namespace lightningUnit
                     return integerValue.GetHashCode();
                 case UnitType.Char:
                     return charValue.GetHashCode();
-                case UnitType.Empty:
-                    return "empty".GetHashCode();
+                case UnitType.Void:
+                    return "VOID".GetHashCode();
                 case UnitType.Boolean:
                     return boolValue.GetHashCode();
                 default:

@@ -11,7 +11,7 @@ namespace lightningUnit
         public bool IsOK {
             get
             {
-                if (Value.Type == UnitType.Empty)
+                if (Value.Type == UnitType.Void)
                     return false;
                 return true;
             }
@@ -19,7 +19,7 @@ namespace lightningUnit
         public bool IsEmpty {
             get
             {
-                if (Value.Type == UnitType.Empty)
+                if (Value.Type == UnitType.Void)
                     return true;
                 return false;
             }
@@ -35,7 +35,7 @@ namespace lightningUnit
 
         public OptionUnit()
         {
-            Value = new Unit(UnitType.Empty);
+            Value = new Unit(UnitType.Void);
         }
 
         public OptionUnit(Unit p_value)
@@ -73,8 +73,8 @@ namespace lightningUnit
 
         public Unit UnWrap()
         {
-            if (Value.Type == UnitType.Empty)
-                throw new Exception("Option is empty!");
+            if (Value.Type == UnitType.Void)
+                throw new Exception("Option is VOID!");
             else
                 return Value;
         }
@@ -90,8 +90,8 @@ namespace lightningUnit
 
         public Unit Expect(string p_msg)
         {
-            if (Value.Type == UnitType.Empty)
-                throw new Exception("Option is empty! " + p_msg);
+            if (Value.Type == UnitType.Void)
+                throw new Exception("Option is VOID! " + p_msg);
             else
                 return Value;
         }
@@ -107,7 +107,7 @@ namespace lightningUnit
 
         public Unit Default(Unit p_default)
         {
-            if (Value.Type == UnitType.Empty)
+            if (Value.Type == UnitType.Void)
                 return p_default;
             else
                 return Value;
@@ -146,7 +146,7 @@ namespace lightningUnit
                 {
                     OptionUnit this_option = vm.GetOptionUnit(0);
 
-                    return new Unit(!this_option.IsOK);
+                    return new Unit(this_option.IsEmpty);
                 }
                 methodTable.Set("is_empty", new IntrinsicUnit("option_is_empty", Empty, 1));
 

@@ -45,7 +45,7 @@ namespace lightningPrelude
                 {
                     return new Unit(new ResultUnit(e));
                 }
-                return new Unit(new ResultUnit(new Unit(UnitType.Empty)));
+                return new Unit(new ResultUnit());
             }
             file.Set("write", new IntrinsicUnit("file_write_file", WriteFile, 2));
 
@@ -65,7 +65,7 @@ namespace lightningPrelude
                 {
                     return new Unit(new ResultUnit(e));
                 }
-                return new Unit(new ResultUnit(new Unit(UnitType.Empty)));
+                return new Unit(new ResultUnit());
             }
             file.Set("append", new IntrinsicUnit("file_append_file", AppendFile, 2));
 

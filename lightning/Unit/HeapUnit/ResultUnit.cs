@@ -13,7 +13,7 @@ namespace lightningUnit
         public bool HasResult {
             get
             {
-                return !(Value.Type == UnitType.Empty);
+                return !(Value.Type == UnitType.Void);
             }
         }
 
@@ -29,13 +29,13 @@ namespace lightningUnit
         {
             E = p_e;
             IsOK = false;
-            Value = new Unit(UnitType.Empty);
+            Value = new Unit(UnitType.Void);
         }
         public ResultUnit(string p_error_string)
         {
             E = new Exception(p_error_string);
             IsOK = false;
-            Value = new Unit(UnitType.Empty);
+            Value = new Unit(UnitType.Void);
         }
         public ResultUnit(Unit p_value)
         {
@@ -56,7 +56,7 @@ namespace lightningUnit
         {
             E = null;
             IsOK = true;
-            Value = new Unit(UnitType.Empty);
+            Value = new Unit(UnitType.Void);
         }
 
         public override String ToString()
@@ -101,8 +101,6 @@ namespace lightningUnit
                         new Exception("Trying to unwrap result out of failed operation!"),
                         E
                     });
-            else if (Value.Type == UnitType.Empty)
-                throw new Exception("Trying to unwrap empty result!");
             else if (Value.Type == UnitType.Void)
                 throw new Exception("Trying to unwrap void result!");
             else

@@ -225,8 +225,8 @@ namespace lightningUnit
                     System.Collections.IDictionaryEnumerator enumerator = this_table.Map.GetEnumerator();
 
                     TableUnit iterator = new TableUnit(null);
-                    iterator.Set("key", new Unit(UnitType.Empty));
-                    iterator.Set("value", new Unit(UnitType.Empty));
+                    iterator.Set("key", new Unit(UnitType.Void));
+                    iterator.Set("value", new Unit(UnitType.Void));
 
                     Unit next(VM vm)
                     {
@@ -251,8 +251,8 @@ namespace lightningUnit
                     System.Collections.IDictionaryEnumerator enumerator = this_table.Map.GetEnumerator();
 
                     TableUnit iterator = new TableUnit(null);
-                    iterator.Set("key", new Unit(UnitType.Empty));
-                    iterator.Set("value", new Unit(UnitType.Empty));
+                    iterator.Set("key", new Unit(UnitType.Void));
+                    iterator.Set("value", new Unit(UnitType.Void));
 
                     Unit next(VM vm)
                     {

@@ -41,7 +41,7 @@ namespace lightningUnit
             Env = p_Env;
             isCaptured = false;
             variables = null;
-            value = new Unit(UnitType.Empty);
+            value = new Unit(UnitType.Void);
         }
 
         public void Attach(lightningVM.Memory<Unit> p_variables)
