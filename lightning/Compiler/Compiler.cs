@@ -6,6 +6,8 @@ using lightningChunk;
 using lightningUnit;
 using lightningPrelude;
 using lightningAST;
+using lightningExceptions;
+
 namespace lightningCompiler
 {
 	public class Compiler
@@ -43,7 +45,6 @@ namespace lightningCompiler
 				type = ValueType.Expression;
 			}
 		}
-		private static Exception compiler_exeption = new Exception("Compilation Error");
 
 		private Node ast;
 		private Chunk chunk;
@@ -80,10 +81,10 @@ namespace lightningCompiler
 					}
 					catch (Exception e)
 					{
-						if (e == compiler_exeption)
+						if (e == Exceptions.compiler_error)
 							Logger.LogLine("Compiling had errors on module: " + moduleName, Defaults.Config.CompilerLogFile);
 						else
-							Logger.LogLine("Compiling broke the runtime! on module: " + moduleName + "\nExeption: " + e.ToString(), Defaults.Config.CompilerLogFile);
+							Logger.LogLine("Compiling broke the runtime! on module: " + moduleName + "\nException: " + e.ToString(), Defaults.Config.CompilerLogFile);
 						LogErrors();
 						return null;
 					}
@@ -1003,7 +1004,7 @@ namespace lightningCompiler
 		private void Error(string p_msg, PositionData p_positionData)
 		{
 			Errors.Add(p_msg + " on module: " + moduleName + " on position: " + p_positionData);
-			throw compiler_exeption;
+			throw Exceptions.compiler_error;
 		}
 	}
 }

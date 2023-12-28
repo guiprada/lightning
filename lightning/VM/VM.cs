@@ -5,6 +5,7 @@ using lightningTools;
 using lightningChunk;
 using lightningUnit;
 using lightningPrelude;
+using lightningExceptions;
 namespace lightningVM
 {
     public class VM
@@ -521,8 +522,8 @@ namespace lightningVM
                     case OpCode.DECLARE_VARIABLE:
                         IP++;
 
-                        if (stack.Peek().Type == UnitType.Void)
-                            throw new Exception("Trying to assign a void value");
+                        if (Unit.IsEmpty(stack.Peek()))
+                            throw Exceptions.non_value;
 
                         variables.Add(stack.Pop());
                         break;
@@ -531,8 +532,8 @@ namespace lightningVM
 
                         // lock(globals) // not needed because global declaration can not happen inside parallel functions
 
-                        if (stack.Peek().Type == UnitType.Void)
-                            throw new Exception("Trying to assign a void value");
+                        if (Unit.IsEmpty(stack.Peek()))
+                            throw Exceptions.non_value;
 
                         globals.Add(stack.Pop());
                         break;
@@ -595,8 +596,8 @@ namespace lightningVM
                             Unit old_value = variables.GetAt(instruction.opA, CalculateEnvShift(instruction.opB));
                             Unit result;
 
-                            if (stack.Peek().Type == UnitType.Void)
-                                throw new Exception("Trying to assign a void value");
+                            if (Unit.IsEmpty(stack.Peek()))
+                                throw Exceptions.non_value;
 
                             switch (instruction.opC)
                             {
@@ -636,7 +637,7 @@ namespace lightningVM
                             Unit new_value = stack.Peek();
 
                             if (new_value.Type == UnitType.Void)
-                                throw new Exception("Trying to assign a void value");
+                                throw Exceptions.non_value;
 
                             if (parallelVM == true)
                             {
@@ -711,8 +712,8 @@ namespace lightningVM
                     case OpCode.ASSIGN_IMPORTED_GLOBAL:
                         IP++;
 
-                        if (stack.Peek().Type == UnitType.Void)
-                            throw new Exception("Trying to assign a void value");
+                        if (Unit.IsEmpty(stack.Peek()))
+                            throw Exceptions.non_value;
 
                         modules[instruction.opB].SetOpGlobal(stack.Peek(), instruction.opC, instruction.opA);
                         break;

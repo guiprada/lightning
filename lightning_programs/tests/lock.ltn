@@ -16,9 +16,9 @@ var global_lock_test_counter = 5
 {
 	// Testing UpValue Lock
 	var n = 1000
-	var this_list = List(n)
+	var this_list = ListInit(n, "not_used_value")
 	var upvalue_lock_test_counter = 5
-	function many(index, collection)
+	function many(item, index)
 	{
 		upvalue_lock_test_counter++;
 	}

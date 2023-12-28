@@ -51,8 +51,7 @@ var assert_not = assert_counter.assert_not
             null
         #
         {
-            var result = roslyn.csharp_eval(csharp_null)
-            assert(!result:is_ok(), true, "Failed roslyn.csharp_eval test 5. ")
+            assert(roslyn.csharp_eval(csharp_null):is_ok(), false, "Failed roslyn.csharp_eval test 5. ")
         }
 
         var csharp_unknown =

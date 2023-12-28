@@ -4,7 +4,7 @@ var assert_not = assert_counter.assert_not
 {
 	// Testing rmap
 	var n = 100
-	var this_list = List(n)
+	var this_list = ListInit(n, "not_used")
 	function init_in_range (item, index)
 	{
 		return index

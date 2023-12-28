@@ -9,6 +9,10 @@ To Think
 
 To be Done
 ----------
+- Construtores em camel case
+- Construtores nao criam option
+- C# eval and company should return ResultUnit
+- consts
 - fix assert error msg
 - remove call to this constructor in Unit?
 - Finish roslyn module(finish compile)

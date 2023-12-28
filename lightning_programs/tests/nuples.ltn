@@ -3,7 +3,7 @@ var assert = assert_counter.assert
 var assert_not = assert_counter.assert_not
 {
 	// Testing tuples
-	var tuple1 = tuple.new(1, "hello")
+	var tuple1 = tuple.New(1, "hello")
 	assert(tuple1:get_x(), 1, "Failed Tuples Test 1.")
 	assert(tuple1:get_y(), "hello", "Failed Tuples Test 2.")
 
@@ -14,7 +14,7 @@ var assert_not = assert_counter.assert_not
 }
 {
 	// Testing nuples
-	var nuple1 = nuple.from_list([1, "hello"])
+	var nuple1 = nuple.FromList([1, "hello"])
 	assert(nuple1:get(0), 1, "Failed Nuples Test 1.")
 	assert(nuple1:get(1), "hello", "Failed Nuples Test 2.")
 
@@ -23,7 +23,7 @@ var assert_not = assert_counter.assert_not
 	assert(nuple1:get(0), "hello", "Failed Nuples Test 3.")
 	assert(nuple1:get(1), "world", "Failed Nuples Test 4.")
 
-	var nuple2 = nuple.new(5)
+	var nuple2 = nuple.NewInit(5, "not_used")
 	assert(nuple2:size(), 5, "Failed Nuples Test 5")
 }
 return assert_counter.get_error_counter()

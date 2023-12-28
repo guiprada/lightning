@@ -93,6 +93,9 @@ errors += require("tests/pmap.ltn")
 write_line("Reduce tests ...")
 errors += require("tests/reduce.ltn")
 
+write_line("Result ...")
+errors += require("tests/result.ltn")
+
 write_line("Rmap tests ...")
 errors += require("tests/rmap.ltn")
 
@@ -144,14 +147,9 @@ write_line("Error count: " .. errors)
     assert(iife, "iife", "Failed IIFE Test 1.")
 
     // Option
-    var opt_empty = option_empty()
+    var opt_empty = OptionEmpty()
     assert(opt_empty:is_ok(), false, "Failed option Test 1.")
-    var opt_in_opt = option_new(opt_empty)
+    var opt_in_opt = OptionNew(opt_empty)
     assert(opt_in_opt:is_ok(), false, "Failed option Test 2.")
-
-    // Void return
-    var teste = try(\{}, [])
-    assert(teste:get_error(), "System.Exception: Trying to assign a void value", "Failed assign void Test 1.")
-
 }
 //////////////////////////////// end scratch

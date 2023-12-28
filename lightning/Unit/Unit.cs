@@ -503,10 +503,16 @@ namespace lightningUnit
         public static bool IsCallable(Unit p_value)
         {
             UnitType this_callable_type = p_value.Type;
-            return	this_callable_type == UnitType.Function
-                ||	this_callable_type == UnitType.Intrinsic
-                ||	this_callable_type == UnitType.ExternalFunction
-                ||	this_callable_type == UnitType.Closure;
+            return  this_callable_type == UnitType.Function
+                ||  this_callable_type == UnitType.Intrinsic
+                ||  this_callable_type == UnitType.ExternalFunction
+                ||  this_callable_type == UnitType.Closure;
+        }
+
+        public static bool IsEmpty(Unit p_value)
+        {
+            UnitType this_callable_type = p_value.Type;
+            return this_callable_type == UnitType.Void;
         }
     }
 }

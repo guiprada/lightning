@@ -41,7 +41,7 @@ namespace lightningUnit
         {
             if(p_value.Type == UnitType.Void)
             {
-                E = new Exception("Trying to assign a void value");
+                E = new Exception("Void ResultUnit created!");
                 IsOK = true;
                 Value = new Unit(UnitType.Void);
             }
@@ -98,11 +98,13 @@ namespace lightningUnit
             if (!IsOK)
                 throw new AggregateException(
                     new Exception[]{
-                        new Exception("Trying to get result out of failed operation!"),
+                        new Exception("Trying to unwrap result out of failed operation!"),
                         E
                     });
             else if (Value.Type == UnitType.Empty)
-                throw new Exception("Trying to get result out of void operation!");
+                throw new Exception("Trying to unwrap empty result!");
+            else if (Value.Type == UnitType.Void)
+                throw new Exception("Trying to unwrap void result!");
             else
                 return Value;
         }

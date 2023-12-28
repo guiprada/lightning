@@ -19,7 +19,7 @@ namespace lightningPrelude
 
                 return new Unit(tuple_object);
             }
-            tuple.Set("new", new IntrinsicUnit("tuple_new", TupleNew, 2));
+            tuple.Set("New", new IntrinsicUnit("tuple_New", TupleNew, 2));
 
             //////////////////////////////////////////////////////
             Unit TupleGetX(VM p_vm)

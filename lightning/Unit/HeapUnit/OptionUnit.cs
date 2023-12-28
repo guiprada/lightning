@@ -16,6 +16,14 @@ namespace lightningUnit
                 return true;
             }
         }
+        public bool IsEmpty {
+            get
+            {
+                if (Value.Type == UnitType.Empty)
+                    return true;
+                return false;
+            }
+        }
 
         public override UnitType Type
         {

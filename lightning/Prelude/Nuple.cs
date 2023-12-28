@@ -9,7 +9,7 @@ namespace lightningPrelude
             TableUnit nuple = new TableUnit(null);
             TableUnit nupleMethods = new TableUnit(null);
 
-            Unit NupleNew(VM p_vm)
+            Unit NupleNewInit(VM p_vm)
             {
                 Integer size = p_vm.GetInteger(0);
                 Unit[] new_nuple = new Unit[size];
@@ -19,7 +19,7 @@ namespace lightningPrelude
 
                 return new Unit(new_nuple_object);
             }
-            nuple.Set("new", new IntrinsicUnit("nuple_new", NupleNew, 1));
+            nuple.Set("NewInit", new IntrinsicUnit("nuple_NewInit", NupleNewInit, 2));
 
             //////////////////////////////////////////////////////
             Unit NupleFromList(VM p_vm)
@@ -33,7 +33,7 @@ namespace lightningPrelude
 
                 return new Unit(new_nuple_object);
             }
-            nuple.Set("from_list", new IntrinsicUnit("nuple_from_list", NupleFromList, 1));
+            nuple.Set("FromList", new IntrinsicUnit("nuple_FromList", NupleFromList, 1));
 
             //////////////////////////////////////////////////////
             Unit NupleGet(VM p_vm)
