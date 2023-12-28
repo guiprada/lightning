@@ -9,5 +9,6 @@ namespace lightningExceptions
 
 		// VM
 		public static Exception non_value = new Exception("Trying to assign a non-value!");
+		public static Exception created_void = new Exception("Void ResultUnit created!");
 	}
 }

@@ -1,6 +1,6 @@
 using System;
-using System.Collections.Generic;
 
+using lightningExceptions;
 using lightningVM;
 
 namespace lightningUnit
@@ -41,7 +41,7 @@ namespace lightningUnit
         {
             if(p_value.Type == UnitType.Void)
             {
-                E = new Exception("Void ResultUnit created!");
+                E = Exceptions.created_void;
                 IsOK = true;
                 Value = new Unit(UnitType.Void);
             }
@@ -54,7 +54,7 @@ namespace lightningUnit
         }
         public ResultUnit()
         {
-            E = null;
+            E = Exceptions.created_void;
             IsOK = true;
             Value = new Unit(UnitType.Void);
         }
