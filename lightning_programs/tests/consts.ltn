@@ -1,0 +1,41 @@
+var assert_counter = require("assert_counter.ltn")
+var assert = assert_counter.assert
+var assert_not = assert_counter.assert_not
+{
+	const ONE = 1
+	ONE = 2
+
+	assert(ONE, 1, "Failed consts Test 1.")
+
+	function change_const()
+	{
+		ONE = 3
+	}
+	assert(ONE, 1, "Failed consts Test 2.")
+
+//
+	function ONE_FUNC ()
+	{
+		return 1
+	}
+
+	function TWO_FUNC ()
+	{
+		return 2
+	}
+
+// Function declarations should be const
+	ONE_FUNC = TWO_FUNC
+	assert(ONE_FUNC(), 1, "Failed consts Test 3.")
+
+// Function expressions should be var by defauld, optionally const
+	var ONE_FUNC_ALIAS = ONE_FUNC
+	ONE_FUNC_ALIAS = TWO_FUNC
+	assert(ONE_FUNC(), 2, "Failed consts Test 4.")
+	ONE_FUNC_ALIAS = ONE_FUNC
+
+	const CONST_ONE_FUNC_ALIAS = ONE_FUNC
+	CONST_ONE_FUNC_ALIAS = TWO_FUNC
+	assert(ONE_FUNC(), 1, "Failed consts Test 5.")
+}
+return assert_counter.get_error_counter()

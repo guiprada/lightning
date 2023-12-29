@@ -10,6 +10,7 @@ To Think
 To be Done
 ----------
 - function declaration should be const!
+- test imported consts behavior
 - remove exceptions and try intrinsic
 - Construtores em camel case
 - Construtores nao criam option

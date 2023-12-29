@@ -57,6 +57,9 @@ errors += require("tests/closures.ltn")
 write_line("Compound Call tests ...")
 errors += require("tests/compound_calls.ltn")
 
+write_line("Consts tests ...")
+errors += require("tests/consts.ltn")
+
 write_line("Eval tests ...")
 errors += require("tests/eval.ltn")
 
@@ -148,6 +151,6 @@ write_line("Error count: " .. errors)
 
 //////////////////////////////// scratch
 {
-    const tests = 1
+
 }
 //////////////////////////////// end scratch
