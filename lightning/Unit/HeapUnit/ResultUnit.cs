@@ -1,6 +1,7 @@
 using System;
 
 using lightningExceptions;
+using lightningTools;
 using lightningVM;
 
 namespace lightningUnit
@@ -72,12 +73,14 @@ namespace lightningUnit
 
         public override bool Equals(object other)
         {
-            throw new Exception("Trying to check equality of ResultUnit!");
+            Logger.Log("Trying to check equality of ResultUnit!", Defaults.Config.VMLogFile);
+            throw Exceptions.not_supported;
         }
 
         public override int CompareTo(object p_compareTo)
         {
-            throw new Exception("Trying to compare with ResultUnit!");
+            Logger.Log("Trying to compare with ResultUnit!", Defaults.Config.VMLogFile);
+            throw Exceptions.can_not_compare;
         }
 
         public override int GetHashCode()
@@ -96,13 +99,19 @@ namespace lightningUnit
         public Unit UnWrap()
         {
             if (!IsOK)
+            {
+                Logger.Log("Trying to unwrap result out of failed operation!", Defaults.Config.VMLogFile);
                 throw new AggregateException(
                     new Exception[]{
-                        new Exception("Trying to unwrap result out of failed operation!"),
+                        Exceptions.not_supported,
                         E
                     });
+            }
             else if (Value.Type == UnitType.Void)
-                throw new Exception("Trying to unwrap void result!");
+            {
+                Logger.Log("Trying to unwrap void result!", Defaults.Config.VMLogFile);
+                throw Exceptions.not_supported;
+            }
             else
                 return Value;
         }

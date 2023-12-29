@@ -1,7 +1,10 @@
 using System;
 using System.Collections.Generic;
 
+using lightningExceptions;
+using lightningTools;
 using lightningVM;
+
 namespace lightningUnit
 {
     public class ListUnit : HeapUnit
@@ -37,10 +40,16 @@ namespace lightningUnit
         public override void Set(Unit p_key, Unit p_value)
         {
             if (p_key.Type != UnitType.Integer)
-                throw new Exception("List only supports Integer indexes: " + p_key.ToString());
+            {
+                Logger.Log("List only supports Integer indexes: " + p_key.ToString(), Defaults.Config.VMLogFile);
+                throw Exceptions.not_supported;
+            }
             Integer index = p_key.integerValue;
             if ((index > Count) || (index < 0))
-                throw new Exception("List index is out of bounds: " + p_key.ToString());
+            {
+                Logger.Log("List index is out of bounds: " + p_key.ToString(), Defaults.Config.VMLogFile);
+                throw Exceptions.out_of_bounds;
+            }
             ElementSet(p_key, p_value);
         }
         public override Unit Get(Unit p_key)
@@ -59,7 +68,9 @@ namespace lightningUnit
         {
             if (MethodTable != null)
                 return MethodTable.Get(p_key);
-            throw new Exception("List does not contain a Method Table: " + p_key.ToString());
+
+            Logger.Log("List does not contain a Method Table: " + p_key.ToString(), Defaults.Config.VMLogFile);
+            throw Exceptions.not_found;
         }
 
         Unit GetElement(Unit p_key)
@@ -67,7 +78,9 @@ namespace lightningUnit
             Integer index = p_key.integerValue;
             if ((index >= 0) && (index < Elements.Count))
                 return Elements[(int)index];
-            throw new Exception("List does not contain index: " + p_key.ToString());
+
+            Logger.Log("List does not contain index: " + p_key.ToString(), Defaults.Config.VMLogFile);
+            throw Exceptions.not_found;
         }
 
         void ElementSet(Unit p_key, Unit value)

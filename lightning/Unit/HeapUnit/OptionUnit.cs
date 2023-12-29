@@ -1,6 +1,7 @@
 using System;
-using System.Collections.Generic;
 
+using lightningExceptions;
+using lightningTools;
 using lightningVM;
 
 namespace lightningUnit
@@ -53,12 +54,14 @@ namespace lightningUnit
 
         public override bool Equals(object other)
         {
-            throw new Exception("Trying to check equality of OptionUnit!");
+            Logger.Log("Trying to check equality of OptionUnit!", Defaults.Config.VMLogFile);
+            throw Exceptions.not_supported;
         }
 
         public override int CompareTo(object p_compareTo)
         {
-            throw new Exception("Trying to compare with OptionUnit!");
+            Logger.Log("Trying to compare with OptionUnit!", Defaults.Config.VMLogFile);
+            throw Exceptions.not_supported;
         }
 
         public override int GetHashCode()
@@ -74,7 +77,10 @@ namespace lightningUnit
         public Unit UnWrap()
         {
             if (Value.Type == UnitType.Void)
-                throw new Exception("Option is VOID!");
+            {
+                Logger.Log("Option is VOID!", Defaults.Config.VMLogFile);
+                throw Exceptions.not_supported;
+            }
             else
                 return Value;
         }
@@ -91,7 +97,10 @@ namespace lightningUnit
         public Unit Expect(string p_msg)
         {
             if (Value.Type == UnitType.Void)
-                throw new Exception("Option is VOID! " + p_msg);
+            {
+                Logger.Log("Option is VOID! " + p_msg, Defaults.Config.VMLogFile);
+                throw Exceptions.not_supported;
+            }
             else
                 return Value;
         }

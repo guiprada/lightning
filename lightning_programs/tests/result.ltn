@@ -8,6 +8,6 @@ var assert_not = assert_counter.assert_not
     assert(teste1:get_error(), "System.Exception: Void ResultUnit created!", "Get error from void result Test 1.")
 
     var teste2 = try(teste1.unwrap, [teste1])
-    assert(teste2:get_error():contains("System.Exception: Trying to unwrap void result!"), true, "Unwrap void result Test 1.")
+    assert(teste2:get_error():contains("System.Exception: Operation not supported!"), true, "Unwrap void result Test 1.")
 }
 return assert_counter.get_error_counter()

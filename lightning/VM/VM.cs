@@ -6,6 +6,7 @@ using lightningChunk;
 using lightningUnit;
 using lightningPrelude;
 using lightningExceptions;
+
 namespace lightningVM
 {
     public class VM
@@ -197,7 +198,10 @@ namespace lightningVM
             if (maybe_address.HasValue)
                 return GetGlobal(maybe_address.Value);
             else
-                throw new Exception("Global value: " + p_name + " not found in module: " + p_chunk.ModuleName);
+            {
+                Logger.Log("Global value: " + p_name + " not found in module: " + p_chunk.ModuleName, Defaults.Config.VMLogFile);
+                throw Exceptions.not_found;
+            }
         }
 
         //////////////////////////// Accessors
@@ -209,7 +213,10 @@ namespace lightningVM
         public string GetString(int p_n)
         {
             if (stack.Peek(p_n).Type != UnitType.String)
-                throw new Exception("Expected a String.");
+            {
+                Logger.Log("Expected a String.", Defaults.Config.VMLogFile);
+                throw Exceptions.wrong_type;
+            }
             return ((StringUnit)stack.Peek(p_n).heapUnitValue).content;
         }
 
@@ -220,15 +227,19 @@ namespace lightningVM
                 return this_value.integerValue;
             if (this_value.Type == UnitType.Float)
                 return this_value.floatValue;
-            throw new Exception("Expected a Float or Integer.");
+
+            Logger.Log("Expected a Float or Integer.", Defaults.Config.VMLogFile);
+            throw Exceptions.wrong_type;
         }
 
         public Float GetFloat(int p_n)
         {
             Unit this_value = stack.Peek(p_n);
             if (this_value.Type == UnitType.Float)
-                return (this_value.floatValue);
-            throw new Exception("Expected a Float.");
+                return this_value.floatValue;
+
+            Logger.Log("Expected a Float.", Defaults.Config.VMLogFile);
+            throw Exceptions.wrong_type;
         }
 
         public Integer GetInteger(int p_n)
@@ -236,69 +247,98 @@ namespace lightningVM
             Unit this_value = stack.Peek(p_n);
             if (this_value.Type == UnitType.Integer)
                 return this_value.integerValue;
-            throw new Exception("Expected a Integer.");
+
+            Logger.Log("Expected a Integer.", Defaults.Config.VMLogFile);
+            throw Exceptions.wrong_type;
         }
 
         public TableUnit GetTable(int p_n)
         {
             if (stack.Peek(p_n).Type != UnitType.Table)
-                throw new Exception("Expected a Table.");
+            {
+                Logger.Log("Expected a Table.", Defaults.Config.VMLogFile);
+                throw Exceptions.wrong_type;
+            }
             return (TableUnit)stack.Peek(p_n).heapUnitValue;
         }
 
         public ListUnit GetList(int p_n)
         {
             if (stack.Peek(p_n).Type != UnitType.List)
-                throw new Exception("Expected a List.");
+            {
+                Logger.Log("Expected a List.", Defaults.Config.VMLogFile);
+                throw Exceptions.wrong_type;
+            }
             return (ListUnit)stack.Peek(p_n).heapUnitValue;
         }
 
         public T GetWrappedContent<T>(int p_n)
         {
             if (stack.Peek(p_n).Type != UnitType.Wrapper)
-                throw new Exception("Expected a Wrapper.");
+            {
+                Logger.Log("Expected a Wrapper.", Defaults.Config.VMLogFile);
+                throw Exceptions.wrong_type;
+            }
             return ((WrapperUnit<T>)stack.Peek(p_n).heapUnitValue).UnWrap();
         }
 
         public WrapperUnit<T> GetWrapperUnit<T>(int p_n)
         {
             if (stack.Peek(p_n).Type != UnitType.Wrapper)
-                throw new Exception("Expected a Wrapper.");
+            {
+                Logger.Log("Expected a Wrapper.", Defaults.Config.VMLogFile);
+                throw Exceptions.wrong_type;
+            }
             return (WrapperUnit<T>)stack.Peek(p_n).heapUnitValue;
         }
 
         public StringUnit GetStringUnit(int p_n)
         {
             if (stack.Peek(p_n).Type != UnitType.String)
-                throw new Exception("Expected a String.");
+            {
+                Logger.Log("Expected a String.", Defaults.Config.VMLogFile);
+                throw Exceptions.wrong_type;
+            }
             return (StringUnit)stack.Peek(p_n).heapUnitValue;
         }
 
         public char GetChar(int p_n)
         {
             if (stack.Peek(p_n).Type != UnitType.Char)
-                throw new Exception("Expected a Char.");
+            {
+                Logger.Log("Expected a Char.", Defaults.Config.VMLogFile);
+                throw Exceptions.wrong_type;
+            }
             return (stack.Peek(p_n).charValue);
         }
 
         public bool GetBool(int p_n)
         {
             if (stack.Peek(p_n).Type != UnitType.Boolean)
-                throw new Exception("Expected a Boolean.");
+            {
+                Logger.Log("Expected a Boolean.", Defaults.Config.VMLogFile);
+                throw Exceptions.wrong_type;
+            }
             return stack.Peek(p_n).ToBool();
         }
 
         public OptionUnit GetOptionUnit(int p_n)
         {
             if (stack.Peek(p_n).Type != UnitType.Option)
-                throw new Exception("Expected an Option.");
+            {
+                Logger.Log("Expected an Option.", Defaults.Config.VMLogFile);
+                throw Exceptions.wrong_type;
+            }
             return (OptionUnit)stack.Peek(p_n).heapUnitValue;
         }
 
         public ResultUnit GetResultUnit(int p_n)
         {
             if (stack.Peek(p_n).Type != UnitType.Result)
-                throw new Exception("Expected an Result.");
+            {
+                Logger.Log("Expected an Result.", Defaults.Config.VMLogFile);
+                throw Exceptions.wrong_type;
+            }
             return (ResultUnit)stack.Peek(p_n).heapUnitValue;
         }
 
@@ -422,7 +462,8 @@ namespace lightningVM
 
         public void Error(string p_msg)
         {
-            throw new Exception(CurrentInstructionPositionDataString() +  p_msg);
+            Logger.Log("VM Error: " + CurrentInstructionPositionDataString() +  p_msg, Defaults.Config.VMLogFile);
+            throw Exceptions.code_execution_error;
         }
 
         public string CurrentInstructionPositionDataString()
@@ -523,7 +564,7 @@ namespace lightningVM
                         IP++;
 
                         if (Unit.IsEmpty(stack.Peek()))
-                            throw Exceptions.non_value;
+                            throw Exceptions.non_value_assign;
 
                         variables.Add(stack.Pop());
                         break;
@@ -533,7 +574,7 @@ namespace lightningVM
                         // lock(globals) // not needed because global declaration can not happen inside parallel functions
 
                         if (Unit.IsEmpty(stack.Peek()))
-                            throw Exceptions.non_value;
+                            throw Exceptions.non_value_assign;
 
                         globals.Add(stack.Pop());
                         break;
@@ -597,7 +638,7 @@ namespace lightningVM
                             Unit result;
 
                             if (Unit.IsEmpty(stack.Peek()))
-                                throw Exceptions.non_value;
+                                throw Exceptions.non_value_assign;
 
                             switch (instruction.opC)
                             {
@@ -625,7 +666,7 @@ namespace lightningVM
                                     variables.SetAt(result, instruction.opA, CalculateEnvShift(instruction.opB));
                                     break;
                                 default:
-                                    throw new Exception("Unknown operator");
+                                    throw Exceptions.unknown_operator;
                             }
                             break;
                         }
@@ -637,7 +678,7 @@ namespace lightningVM
                             Unit new_value = stack.Peek();
 
                             if (new_value.Type == UnitType.Void)
-                                throw Exceptions.non_value;
+                                throw Exceptions.non_value_assign;
 
                             if (parallelVM == true)
                             {
@@ -676,7 +717,7 @@ namespace lightningVM
                                         }
                                         break;
                                     default:
-                                        throw new Exception("Unknown operator");
+                                        throw Exceptions.unknown_operator;
                                 }
                             }
                             else
@@ -704,7 +745,7 @@ namespace lightningVM
                                         globals.Set(result, address);
                                         break;
                                     default:
-                                        throw new Exception("Unknown operator");
+                                        throw Exceptions.unknown_operator;
                                 }
                             }
                             break;
@@ -713,7 +754,7 @@ namespace lightningVM
                         IP++;
 
                         if (Unit.IsEmpty(stack.Peek()))
-                            throw Exceptions.non_value;
+                            throw Exceptions.non_value_assign;
 
                         modules[instruction.opB].SetOpGlobal(stack.Peek(), instruction.opC, instruction.opA);
                         break;
@@ -746,7 +787,7 @@ namespace lightningVM
                                         this_upValue.UpValue = upValues.GetAt(instruction.opA).UpValue / stack.Peek();
                                     break;
                                 default:
-                                    throw new Exception("Unknown operator");
+                                    throw Exceptions.unknown_operator;
                             }
                         }
                         else
@@ -770,7 +811,7 @@ namespace lightningVM
                                     this_upValue.UpValue = this_upValue.UpValue / stack.Peek();
                                     break;
                                 default:
-                                    throw new Exception("Unknown operator");
+                                    throw Exceptions.unknown_operator;
                             }
                         }
                         break;
@@ -855,7 +896,7 @@ namespace lightningVM
                                         }
                                         break;
                                     default:
-                                        throw new Exception("Unknown operator");
+                                        throw Exceptions.unknown_operator;
 
                                 }
                             }
@@ -878,7 +919,7 @@ namespace lightningVM
                                         result = old_value / new_value;
                                         break;
                                     default:
-                                        throw new Exception("Unknown operator");
+                                        throw Exceptions.unknown_operator;
 
                                 }
                                 this_table.heapUnitValue.Set(index, result);
@@ -956,11 +997,11 @@ namespace lightningVM
                         break;
                     case OpCode.INCREMENT:
                         IP++;
-                        stack.Push(stack.Pop() + 1);
+                        stack.Push(Unit.increment(stack.Pop()));
                         break;
                     case OpCode.DECREMENT:
                         IP++;
-                        stack.Push(stack.Pop() - 1);
+                        stack.Push(Unit.decrement(stack.Pop()));
                         break;
                     case OpCode.EQUALS:
                         IP++;

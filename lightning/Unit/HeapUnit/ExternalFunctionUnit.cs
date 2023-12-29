@@ -1,4 +1,6 @@
 using System;
+using lightningExceptions;
+using lightningTools;
 
 namespace lightningUnit
 {
@@ -25,7 +27,10 @@ namespace lightningUnit
                 Arity = p_Arity;
             }
             else
-                throw new Exception("Cannot create ExternalFunctionUnit from null!");
+            {
+                Logger.Log("Cannot create ExternalFunctionUnit from null!", Defaults.Config.VMLogFile);
+                throw Exceptions.can_not_create;
+            }
         }
 
         public override string ToString()

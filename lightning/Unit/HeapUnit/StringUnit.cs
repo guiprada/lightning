@@ -1,6 +1,8 @@
 using System;
 using System.Collections.Generic;
 
+using lightningExceptions;
+using lightningTools;
 using lightningVM;
 namespace lightningUnit
 {
@@ -127,7 +129,10 @@ namespace lightningUnit
                 if (val_input_string.Type == UnitType.String)
                     return new Unit(val_input_string.ToString());
                 else
-                    throw new Exception("Trying to make a string copy of a non string!");
+                {
+                    Logger.Log("Trying to make a string copy of a non string!", Defaults.Config.VMLogFile);
+                    throw Exceptions.not_supported;
+                }
             }
             methodTable.Set("copy", new IntrinsicUnit("string_copy", StringCopy, 1));
 

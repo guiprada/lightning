@@ -1,6 +1,8 @@
 using System;
 using System.Collections.Generic;
 
+using lightningExceptions;
+using lightningTools;
 using lightningVM;
 
 namespace lightningUnit
@@ -68,7 +70,8 @@ namespace lightningUnit
                         globals[p_index] /= p_value;
                     break;
                 default:
-                    throw new Exception("Unknown operator");
+                    Logger.Log("Unknown assignment operator: " + op, Defaults.Config.VMLogFile);
+                    throw Exceptions.unknown_operator;
             }
         }
 
@@ -110,12 +113,11 @@ namespace lightningUnit
         {
             Unit this_unit;
             if (Table.TryGetValue(p_key, out this_unit))
-            {
                 return this_unit;
-            }
             else
             {
-                throw new Exception("Module Table does not contain index:" + p_key.ToString());
+                Logger.Log("Module Table does not contain index:" + p_key.ToString(), Defaults.Config.VMLogFile);
+                throw Exceptions.not_found;
             }
         }
     }

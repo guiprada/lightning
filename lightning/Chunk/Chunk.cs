@@ -6,6 +6,9 @@ using System.IO;
 // using lightningPrelude;
 using lightningUnit;
 using lightningPrelude;
+using lightningExceptions;
+using lightningTools;
+
 namespace lightningChunk
 {
     public struct PositionData
@@ -355,7 +358,8 @@ namespace lightningChunk
                 }
 
             }
-            throw new Exception("Could not find Function: " + p_name);
+            Logger.Log(("Could not find Function: " + p_name), Defaults.Config.VMLogFile);
+            throw Exceptions.not_found;
         }
 
         public Unit GetUnitFromTable(string p_table, string p_name)
@@ -368,7 +372,8 @@ namespace lightningChunk
                 }
 
             }
-            throw new Exception("Could not find Unit: " + p_name + " in table: " + p_table);
+            Logger.Log("Could not find Unit: " + p_name + " in table: " + p_table, Defaults.Config.VMLogFile);
+            throw Exceptions.not_found;
         }
 
         public List<Instruction> Slice(int p_start, int p_end)

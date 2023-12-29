@@ -1,5 +1,8 @@
 using System;
 
+using lightningExceptions;
+using lightningTools;
+
 namespace lightningUnit
 {
 	public class WrapperUnit<T> : HeapUnit
@@ -61,7 +64,8 @@ namespace lightningUnit
             }
             else
             {
-                throw new Exception("UnWrap<" + typeof(T) + ">() type Error!");
+                Logger.Log("UnWrap<" + typeof(T) + ">() type Error!", Defaults.Config.VMLogFile);
+                throw Exceptions.wrong_type;
             }
         }
 

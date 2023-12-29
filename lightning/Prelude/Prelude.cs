@@ -8,6 +8,8 @@ using lightningVM;
 using lightningCompiler;
 using lightningAST;
 using lightningUnit;
+using lightningExceptions;
+
 namespace lightningPrelude
 {
     public class Prelude
@@ -84,20 +86,23 @@ namespace lightningPrelude
                 Scanner scanner = new Scanner(eval_code, eval_name);
                 List<Token> tokens = scanner.Tokens;
                 if(scanner.HasScanned == false){
-                    throw new Exception("Scanning Error on eval: " + eval_name);
+                    Logger.Log("Scanning Error on eval: " + eval_name, Defaults.Config.VMLogFile);
+                    throw Exceptions.scanner_error;
                 }
 
                 Parser parser = new Parser(tokens, eval_name);
 
                 Node program = parser.ParsedTree;
                 if(parser.HasParsed == false){
-                        throw new Exception("Parsing Error on eval: " + eval_name);
+                        Logger.Log("Parsing Error on eval: " + eval_name, Defaults.Config.VMLogFile);
+                        throw Exceptions.parser_error;
                 }
 
                 Compiler chunker = new Compiler(program, eval_name, p_vm.Prelude);
                 Chunk chunk = chunker.Chunk;
                 if (chunker.HasChunked == false){
-                    throw new Exception("Code Generation Error on eval: " + eval_name);
+                    Logger.Log("Code Generation Error on eval: " + eval_name, Defaults.Config.VMLogFile);
+                    throw Exceptions.compiler_error;
                 }
                 else
                 {
@@ -110,7 +115,8 @@ namespace lightningPrelude
                         return result.Value;
                     }
                 }
-                throw new Exception("Code Execution was not OK :| on eval: " + eval_name);
+                Logger.Log("Code Execution was not OK :| on eval: " + eval_name, Defaults.Config.VMLogFile);
+                throw Exceptions.code_execution_error;
             }
             functions.Add(new IntrinsicUnit("eval", Eval, 1));
 
@@ -133,26 +139,30 @@ namespace lightningPrelude
 
                 if (module_code == null)
                 {
-                    throw new Exception("Failed to read module: " + name);
+                    Logger.Log("Failed to read module: " + name, Defaults.Config.VMLogFile);
+                    throw Exceptions.io_error;
                 }
                 else
                 {
                     Scanner scanner = new Scanner(module_code, name);
                     List<Token> tokens = scanner.Tokens;
                     if(scanner.HasScanned == false){
-                        throw new Exception("Scanning Error on module: " + name);
+                        Logger.Log("Scanning Error on module: " + name, Defaults.Config.VMLogFile);
+                        throw Exceptions.scanner_error;
                     }
 
                     Parser parser = new Parser(tokens, name);
                     Node program = parser.ParsedTree;
                     if(parser.HasParsed == false){
-                        throw new Exception("Parsing Error on module: " + name);
+                        Logger.Log("Parsing Error on module: " + name, Defaults.Config.VMLogFile);
+                        throw Exceptions.parser_error;
                     }
 
                     Compiler chunker = new Compiler(program, name, p_vm.Prelude);
                     Chunk chunk = chunker.Chunk;
                     if (chunker.HasChunked == false){
-                        throw new Exception("Code Generation Error on module: " + name);
+                        Logger.Log("Code Generation Error on module: " + name, Defaults.Config.VMLogFile);
+                        throw Exceptions.compiler_error;
                     }
                     else
                     {
@@ -164,7 +174,8 @@ namespace lightningPrelude
                         }
                         else
                         {
-                            throw new Exception("Code execution was not OK :| on module: " + name);
+                            Logger.Log("Code execution was not OK :| on module: " + name, Defaults.Config.VMLogFile);
+                            throw Exceptions.code_execution_error;
                         }
                     }
                 }

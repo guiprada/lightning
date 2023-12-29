@@ -1,7 +1,10 @@
 using System;
 using System.Collections.Generic;
 
+using lightningExceptions;
+using lightningTools;
 using lightningVM;
+
 namespace lightningUnit
 {
     public class TableUnit : HeapUnit
@@ -86,8 +89,10 @@ namespace lightningUnit
             else if (methodTable.Map.TryGetValue(p_key, out this_unit))
                 return this_unit;
             else
-                // return  new Unit(TypeUnit.Null);
-                throw new Exception("Table does not contain index: " + p_key.ToString());
+            {
+                Logger.Log("Table does not contain index: " + p_key.ToString(), Defaults.Config.VMLogFile);
+                throw Exceptions.not_found;
+            }
         }
 
         public override string ToString()
@@ -317,12 +322,17 @@ namespace lightningUnit
                     TableUnit extension_table = vm.GetTable(1);
 
                     if (extension_table.GetExtensionTable() != null)
-                        throw new Exception("Extension Table has an Extention Table!");
+                    {
+                        Logger.Log("Extension Table has an Extention Table!", Defaults.Config.VMLogFile);
+                        throw Exceptions.extension_table_has_extension_table;
+                    }
                     if (this_unit.heapUnitValue.GetExtensionTable() != null)
-                        throw new Exception("Table already has an Extention Table!");
+                    {
+                        Logger.Log("Table already has an Extention Table!", Defaults.Config.VMLogFile);
+                        throw Exceptions.can_not_override_extension_table;
+                    }
 
                     this_unit.heapUnitValue.SetExtensionTable(extension_table);
-
                     return new Unit(true);
                 }
                 methodTable.Set("set_extension_table", new IntrinsicUnit("table_set_extension_table", SetExtensionTable, 2));

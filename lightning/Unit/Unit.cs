@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Runtime.InteropServices;
 using System.Text.RegularExpressions;
+using lightningExceptions;
+using lightningTools;
 
 namespace lightningUnit
 {
@@ -109,7 +111,8 @@ namespace lightningUnit
                     heapUnitValue = TypeUnit.Char;
                     break;
                 default:
-                    throw new Exception("Trying to create a Unit of unknown type.");
+                    Logger.Log("Trying to create a Unit of unknown type.", Defaults.Config.VMLogFile);
+                    throw Exceptions.unknown_type;
             }
         }
 
@@ -179,7 +182,8 @@ namespace lightningUnit
                     return null;
             }
 
-            throw new Exception("Unit.ToObject - Could not convert to object!");
+            Logger.Log("Unit.ToObject - Could not convert to object!", Defaults.Config.VMLogFile);
+            throw Exceptions.can_not_convert;
         }
 
         public override string ToString()
@@ -210,20 +214,25 @@ namespace lightningUnit
                 case UnitType.Boolean:
                     return boolValue;
                 default:
-                    throw new Exception("Can not convert UnitType: " + this_type + " to Bool.");
+                    Logger.Log("Can not convert UnitType: " + this_type + " to Bool.", Defaults.Config.VMLogFile);
+                    throw Exceptions.can_not_convert;
             }
         }
 
         public override bool Equals(object p_other)
         {
             if (p_other.GetType() != typeof(Unit))
-                throw new Exception("Trying to compare Unit to non Unit type.");
+            {
+                Logger.Log("Trying to compare Unit to non Unit type.", Defaults.Config.VMLogFile);
+                throw Exceptions.can_not_compare;
+            }
 
             UnitType this_type = this.Type;
             UnitType other_type = ((Unit)p_other).Type;
             if (this_type == UnitType.Void || other_type == UnitType.Void)
             {
-                throw new Exception("Trying to compare VOID Values");
+                Logger.Log("Trying to compare VOID Values", Defaults.Config.VMLogFile);
+                throw Exceptions.can_not_compare;
             }
 
             switch (this_type)
@@ -235,8 +244,8 @@ namespace lightningUnit
                     }
                     else if (other_type == UnitType.Integer)
                     {
-                        throw new Exception("Trying to compare Float to Integer!");
-                        // return ((Unit)p_other).integerValue == floatValue;
+                        Logger.Log("Trying to compare Float to Integer!", Defaults.Config.VMLogFile);
+                        throw Exceptions.not_supported;
                     }
                     return false;
                 case UnitType.Integer:
@@ -247,8 +256,8 @@ namespace lightningUnit
                     else
                     if (other_type == UnitType.Float)
                     {
-                        throw new Exception("Trying to compare Integer to Float!");
-                        // return (((Unit)p_other).floatValue) == integerValue;
+                        Logger.Log("Trying to compare Integer to Float!", Defaults.Config.VMLogFile);
+                        throw Exceptions.not_supported;
                     }
                     return false;
                 case UnitType.Char:
@@ -288,7 +297,6 @@ namespace lightningUnit
             }
         }
 
-        // public static Unit operator +(Unit op) => op;
         public static Unit operator -(Unit p_op)
         {
             UnitType op_type = p_op.Type;
@@ -296,12 +304,15 @@ namespace lightningUnit
             {
                 return new Unit(-p_op.floatValue);
             }
-            if (op_type == UnitType.Integer)
+            else if (op_type == UnitType.Integer)
             {
                 return new Unit(-p_op.integerValue);
             }
-            throw new Exception("Trying to negate non numeric UnitType.");
+
+            Logger.Log("Trying to negate non numeric UnitType.", Defaults.Config.VMLogFile);
+            throw Exceptions.not_supported;
         }
+
         public static Unit operator +(Unit p_opA, Unit p_opB)
         {
             UnitType opA_type = p_opA.Type;
@@ -311,45 +322,15 @@ namespace lightningUnit
             {
                 if (opB_type == UnitType.Float)
                     return new Unit(p_opA.floatValue + p_opB.floatValue);
-                throw new Exception("Trying to add different UnitTypes.");
             }
-            if (opA_type == UnitType.Integer)
+            else if (opA_type == UnitType.Integer)
             {
                 if (opB_type == UnitType.Integer)
                     return new Unit(p_opA.integerValue + p_opB.integerValue);
-                throw new Exception("Trying to add different UnitTypes.");
             }
-            throw new Exception("Trying to add non alphanumeric UnitType.");
-        }
 
-        public static Unit operator +(Unit p_opA, Float p_opB)
-        {
-            UnitType opA_type = p_opA.Type;
-
-            if (opA_type == UnitType.Float)
-            {
-                return new Unit(p_opA.floatValue + p_opB);
-            }
-            if (opA_type == UnitType.Integer)
-            {
-                return new Unit(p_opA.integerValue + (Integer)p_opB);
-            }
-            throw new Exception("Trying to increment non numeric UnitType.");
-        }
-
-        public static Unit operator +(Unit p_opA, Integer p_opB)
-        {
-            UnitType opA_type = p_opA.Type;
-
-            if (opA_type == UnitType.Float)
-            {
-                return new Unit(p_opA.floatValue + (Float)p_opB);
-            }
-            if (opA_type == UnitType.Integer)
-            {
-                return new Unit(p_opA.integerValue + p_opB);
-            }
-            throw new Exception("Trying to increment non numeric UnitType.");
+            Logger.Log("Adition between type: " + opA_type + " and type: " + opB_type + " is not supported!", Defaults.Config.VMLogFile);
+            throw Exceptions.not_supported;
         }
 
         public static Unit operator -(Unit p_opA, Unit p_opB)
@@ -361,45 +342,15 @@ namespace lightningUnit
             {
                 if (opB_type == UnitType.Float)
                     return new Unit(p_opA.floatValue - p_opB.floatValue);
-                throw new Exception("Trying to subtract different UnitTypes.");
             }
-            if (opA_type == UnitType.Integer)
+            else if (opA_type == UnitType.Integer)
             {
                 if (opB_type == UnitType.Integer)
                     return new Unit(p_opA.integerValue - p_opB.integerValue);
-                throw new Exception("Trying to subtract different UnitTypes.");
             }
-            throw new Exception("Trying to subtract non numeric UnitType.");
-        }
 
-        public static Unit operator -(Unit p_opA, Float p_opB)
-        {
-            UnitType opA_type = p_opA.Type;
-
-            if (opA_type == UnitType.Float)
-            {
-                return new Unit(p_opA.floatValue - p_opB);
-            }
-            if (opA_type == UnitType.Integer)
-            {
-                return new Unit(p_opA.integerValue - (Integer)p_opB);
-            }
-            throw new Exception("Trying to decrement non numeric UnitType.");
-        }
-
-        public static Unit operator -(Unit p_opA, Integer p_opB)
-        {
-            UnitType opA_type = p_opA.Type;
-
-            if (opA_type == UnitType.Float)
-            {
-                return new Unit(p_opA.floatValue - (Float)p_opB);
-            }
-            if (opA_type == UnitType.Integer)
-            {
-                return new Unit(p_opA.integerValue - p_opB);
-            }
-            throw new Exception("Trying to decrement non numeric UnitType.");
+            Logger.Log("Subtraction between type: " + opA_type + " and type: " + opB_type + " is not supported!", Defaults.Config.VMLogFile);
+            throw Exceptions.not_supported;
         }
 
         public static Unit operator *(Unit p_opA, Unit p_opB)
@@ -411,15 +362,15 @@ namespace lightningUnit
             {
                 if (opB_type == UnitType.Float)
                     return new Unit(p_opA.floatValue * p_opB.floatValue);
-                throw new Exception("Trying to multiply different UnitTypes.");
             }
-            if (opA_type == UnitType.Integer)
+            else if (opA_type == UnitType.Integer)
             {
                 if (opB_type == UnitType.Integer)
                     return new Unit(p_opA.integerValue * p_opB.integerValue);
-                throw new Exception("Trying to multiply different UnitTypes.");
             }
-            throw new Exception("Trying to multiply non numeric UnitType.");
+
+            Logger.Log("Multiplication between type: " + opA_type + " and type: " + opB_type + " is not supported!", Defaults.Config.VMLogFile);
+            throw Exceptions.not_supported;
         }
 
         public static Unit operator /(Unit p_opA, Unit p_opB)
@@ -431,21 +382,54 @@ namespace lightningUnit
             {
                 if (opB_type == UnitType.Float)
                     return new Unit(p_opA.floatValue / p_opB.floatValue);
-                throw new Exception("Trying to divide different UnitTypes.");
             }
-            if (opA_type == UnitType.Integer)
+            else if (opA_type == UnitType.Integer)
             {
                 if (opB_type == UnitType.Integer)
                     return new Unit(p_opA.integerValue / p_opB.integerValue);
-                throw new Exception("Trying to divide different UnitTypes.");
             }
-            throw new Exception("Trying to divide non numeric UnitType.");
+
+            Logger.Log("Division between type: " + opA_type + " and type: " + opB_type + " is not supported!", Defaults.Config.VMLogFile);
+            throw Exceptions.not_supported;
+        }
+
+        public static Unit increment (Unit p_opA)
+        {
+            UnitType opA_type = p_opA.Type;
+
+            if (opA_type == UnitType.Float)
+            {
+                return new Unit(p_opA.floatValue + 1.0);
+            }
+            else if (opA_type == UnitType.Integer)
+            {
+                return new Unit(p_opA.integerValue + 1);
+            }
+
+            Logger.Log("Can not incrementn type: " + opA_type, Defaults.Config.VMLogFile);
+            throw Exceptions.not_supported;
+        }
+        public static Unit decrement(Unit p_opA)
+        {
+            UnitType opA_type = p_opA.Type;
+
+            if (opA_type == UnitType.Float)
+            {
+                return new Unit(p_opA.floatValue - 1.0);
+            }
+            else if (opA_type == UnitType.Integer)
+            {
+                return new Unit(p_opA.integerValue - 1);
+            }
+
+            Logger.Log("Can not decrementn type: " + opA_type, Defaults.Config.VMLogFile);
+            throw Exceptions.not_supported;
         }
 
         public int CompareTo(object p_compareTo)
         {
             if (p_compareTo.GetType() != typeof(Unit))
-                throw new Exception("Trying to compare a Unit to: " + p_compareTo.GetType());
+                throw Exceptions.can_not_compare;
 
             Unit lhs = this;
             UnitType lhs_type = lhs.Type;
@@ -470,24 +454,37 @@ namespace lightningUnit
                     if (rhs_type == UnitType.Float)
                         return lhs.floatValue.CompareTo(rhs.floatValue);
                     else
-                        throw new Exception("Trying to compare a UnitType.Float to UnitType: " + rhs_type);
+                    {
+                        Logger.Log("Trying to compare a: " + lhs_type + " to UnitType: " + rhs_type, Defaults.Config.VMLogFile);
+                        throw Exceptions.can_not_compare;
+                    }
                 case UnitType.Integer:
                     if (rhs_type == UnitType.Integer)
                         return lhs.integerValue.CompareTo(rhs.integerValue);
                     else
-                        throw new Exception("Trying to compare a UnitType.Integer to UnitType: " + rhs_type);
+                    {
+                        Logger.Log("Trying to compare a: " + lhs_type + " to UnitType: " + rhs_type, Defaults.Config.VMLogFile);
+                        throw Exceptions.can_not_compare;
+                    }
                 case UnitType.Char:
                     if (rhs_type == UnitType.Char)
                         return lhs.charValue.CompareTo(rhs.charValue);
                     else
-                        throw new Exception("Trying to compare a UnitType.Char to UnitType: " + rhs_type);
+                    {
+                        Logger.Log("Trying to compare a: " + lhs_type + " to UnitType: " + rhs_type, Defaults.Config.VMLogFile);
+                        throw Exceptions.can_not_compare;
+                    }
                 case UnitType.String:
                     if (rhs_type == UnitType.String)
                         return ((StringUnit)lhs.heapUnitValue).content.CompareTo(((StringUnit)rhs.heapUnitValue).content);
                     else
-                        throw new Exception("Trying to compare a UnitType.String to UnitType: " + rhs_type);
+                    {
+                        Logger.Log("Trying to compare a: " + lhs_type + " to UnitType: " + rhs_type, Defaults.Config.VMLogFile);
+                        throw Exceptions.can_not_compare;
+                    }
                 default:
-                    throw new Exception("Trying to compare a UnitType: " + lhs_type + "to UnitType: " + rhs_type);
+                    Logger.Log("Trying to compare a: " + lhs_type + " to UnitType: " + rhs_type, Defaults.Config.VMLogFile);
+                    throw Exceptions.can_not_compare;
             }
         }
         public static bool IsNumeric(Unit p_value)

@@ -11,6 +11,7 @@ To be Done
 ----------
 - Construtores em camel case
 - Construtores nao criam option
+- Criar const, ou let
 - C# eval and company should return ResultUnit
 - consts
 - fix assert error msg

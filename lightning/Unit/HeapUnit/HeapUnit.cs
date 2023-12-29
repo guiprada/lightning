@@ -1,7 +1,10 @@
 using System;
 using System.Collections.Generic;
 
+using lightningExceptions;
+using lightningTools;
 using lightningVM;
+
 namespace lightningUnit
 {
     public abstract class HeapUnit
@@ -10,33 +13,40 @@ namespace lightningUnit
         public abstract override string ToString();
         public virtual bool ToBool()
         {
-            throw new Exception("Can not convert " + Type + " to Bool.");
+            Logger.Log("Can not convert " + Type + " to Bool.", Defaults.Config.VMLogFile);
+            throw Exceptions.can_not_convert;
         }
         public abstract override bool Equals(object other);
         public abstract override int GetHashCode();
         public virtual Unit Get(Unit p_key)
         {
-            throw new Exception("Trying to Get a Table value of " + Type);
+            Logger.Log("Trying to Get a Table value of " + Type, Defaults.Config.VMLogFile);
+            throw Exceptions.not_supported;
         }
         public virtual void Set(Unit index, Unit value)
         {
-            throw new Exception("Trying to Set a Table value of " + Type);
+            Logger.Log("Trying to Set a Table value of " + Type, Defaults.Config.VMLogFile);
+            throw Exceptions.not_supported;
         }
         public virtual void SetExtensionTable(TableUnit p_ExtensionTable)
         {
-            throw new Exception("Trying to set a Extension Table of a " + Type);
+            Logger.Log("Trying to set a Extension Table of a " + Type, Defaults.Config.VMLogFile);
+            throw Exceptions.not_supported;
         }
         public virtual void UnsetExtensionTable()
         {
-            throw new Exception("Trying to unset a Extension Table of a " + Type);
+            Logger.Log("Trying to unset a Extension Table of a " + Type, Defaults.Config.VMLogFile);
+            throw Exceptions.not_supported;
         }
         public virtual TableUnit GetExtensionTable()
         {
-            throw new Exception("Trying to get a Extension Table of a " + Type);
+            Logger.Log("Trying to get a Extension Table of a " + Type, Defaults.Config.VMLogFile);
+            throw Exceptions.not_supported;
         }
         public virtual int CompareTo(object p_compareTo)
         {
-            throw new Exception("Trying to compare a " + Type);
+            Logger.Log("Trying to compare a " + Type, Defaults.Config.VMLogFile);
+            throw Exceptions.can_not_compare;
         }
     }
 }

@@ -1,5 +1,7 @@
-using System;
+using lightningExceptions;
+using lightningTools;
 using lightningUnit;
+
 namespace lightningVM
 {
     public struct Stack
@@ -45,7 +47,8 @@ namespace lightningVM
         {
             if ((p_n < 0) || (p_n > (top - 1)))
             {
-                throw new Exception("Atempt to read empty stack.");
+                Logger.Log("Atempt to read empty stack.", Defaults.Config.VMLogFile);
+                throw Exceptions.empty_stack;
             }
             return values[top - p_n - 1];
         }
