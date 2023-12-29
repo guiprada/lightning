@@ -64,7 +64,7 @@ namespace lightningUnit
             }
             else
             {
-                Logger.Log("UnWrap<" + typeof(T) + ">() type Error!", Defaults.Config.VMLogFile);
+                Logger.LogLine("UnWrap<" + typeof(T) + ">() type Error!", Defaults.Config.VMLogFile);
                 throw Exceptions.wrong_type;
             }
         }

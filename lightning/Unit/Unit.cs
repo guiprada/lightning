@@ -111,7 +111,7 @@ namespace lightningUnit
                     heapUnitValue = TypeUnit.Char;
                     break;
                 default:
-                    Logger.Log("Trying to create a Unit of unknown type.", Defaults.Config.VMLogFile);
+                    Logger.LogLine("Trying to create a Unit of unknown type.", Defaults.Config.VMLogFile);
                     throw Exceptions.unknown_type;
             }
         }
@@ -182,7 +182,7 @@ namespace lightningUnit
                     return null;
             }
 
-            Logger.Log("Unit.ToObject - Could not convert to object!", Defaults.Config.VMLogFile);
+            Logger.LogLine("Unit.ToObject - Could not convert to object!", Defaults.Config.VMLogFile);
             throw Exceptions.can_not_convert;
         }
 
@@ -214,7 +214,7 @@ namespace lightningUnit
                 case UnitType.Boolean:
                     return boolValue;
                 default:
-                    Logger.Log("Can not convert UnitType: " + this_type + " to Bool.", Defaults.Config.VMLogFile);
+                    Logger.LogLine("Can not convert UnitType: " + this_type + " to Bool.", Defaults.Config.VMLogFile);
                     throw Exceptions.can_not_convert;
             }
         }
@@ -223,7 +223,7 @@ namespace lightningUnit
         {
             if (p_other.GetType() != typeof(Unit))
             {
-                Logger.Log("Trying to compare Unit to non Unit type.", Defaults.Config.VMLogFile);
+                Logger.LogLine("Trying to compare Unit to non Unit type.", Defaults.Config.VMLogFile);
                 throw Exceptions.can_not_compare;
             }
 
@@ -231,7 +231,7 @@ namespace lightningUnit
             UnitType other_type = ((Unit)p_other).Type;
             if (this_type == UnitType.Void || other_type == UnitType.Void)
             {
-                Logger.Log("Trying to compare VOID Values", Defaults.Config.VMLogFile);
+                Logger.LogLine("Trying to compare VOID Values", Defaults.Config.VMLogFile);
                 throw Exceptions.can_not_compare;
             }
 
@@ -244,7 +244,7 @@ namespace lightningUnit
                     }
                     else if (other_type == UnitType.Integer)
                     {
-                        Logger.Log("Trying to compare Float to Integer!", Defaults.Config.VMLogFile);
+                        Logger.LogLine("Trying to compare Float to Integer!", Defaults.Config.VMLogFile);
                         throw Exceptions.not_supported;
                     }
                     return false;
@@ -256,7 +256,7 @@ namespace lightningUnit
                     else
                     if (other_type == UnitType.Float)
                     {
-                        Logger.Log("Trying to compare Integer to Float!", Defaults.Config.VMLogFile);
+                        Logger.LogLine("Trying to compare Integer to Float!", Defaults.Config.VMLogFile);
                         throw Exceptions.not_supported;
                     }
                     return false;
@@ -309,7 +309,7 @@ namespace lightningUnit
                 return new Unit(-p_op.integerValue);
             }
 
-            Logger.Log("Trying to negate non numeric UnitType.", Defaults.Config.VMLogFile);
+            Logger.LogLine("Trying to negate non numeric UnitType.", Defaults.Config.VMLogFile);
             throw Exceptions.not_supported;
         }
 
@@ -329,7 +329,7 @@ namespace lightningUnit
                     return new Unit(p_opA.integerValue + p_opB.integerValue);
             }
 
-            Logger.Log("Adition between type: " + opA_type + " and type: " + opB_type + " is not supported!", Defaults.Config.VMLogFile);
+            Logger.LogLine("Adition between type: " + opA_type + " and type: " + opB_type + " is not supported!", Defaults.Config.VMLogFile);
             throw Exceptions.not_supported;
         }
 
@@ -349,7 +349,7 @@ namespace lightningUnit
                     return new Unit(p_opA.integerValue - p_opB.integerValue);
             }
 
-            Logger.Log("Subtraction between type: " + opA_type + " and type: " + opB_type + " is not supported!", Defaults.Config.VMLogFile);
+            Logger.LogLine("Subtraction between type: " + opA_type + " and type: " + opB_type + " is not supported!", Defaults.Config.VMLogFile);
             throw Exceptions.not_supported;
         }
 
@@ -369,7 +369,7 @@ namespace lightningUnit
                     return new Unit(p_opA.integerValue * p_opB.integerValue);
             }
 
-            Logger.Log("Multiplication between type: " + opA_type + " and type: " + opB_type + " is not supported!", Defaults.Config.VMLogFile);
+            Logger.LogLine("Multiplication between type: " + opA_type + " and type: " + opB_type + " is not supported!", Defaults.Config.VMLogFile);
             throw Exceptions.not_supported;
         }
 
@@ -389,7 +389,7 @@ namespace lightningUnit
                     return new Unit(p_opA.integerValue / p_opB.integerValue);
             }
 
-            Logger.Log("Division between type: " + opA_type + " and type: " + opB_type + " is not supported!", Defaults.Config.VMLogFile);
+            Logger.LogLine("Division between type: " + opA_type + " and type: " + opB_type + " is not supported!", Defaults.Config.VMLogFile);
             throw Exceptions.not_supported;
         }
 
@@ -406,7 +406,7 @@ namespace lightningUnit
                 return new Unit(p_opA.integerValue + 1);
             }
 
-            Logger.Log("Can not incrementn type: " + opA_type, Defaults.Config.VMLogFile);
+            Logger.LogLine("Can not incrementn type: " + opA_type, Defaults.Config.VMLogFile);
             throw Exceptions.not_supported;
         }
         public static Unit decrement(Unit p_opA)
@@ -422,7 +422,7 @@ namespace lightningUnit
                 return new Unit(p_opA.integerValue - 1);
             }
 
-            Logger.Log("Can not decrementn type: " + opA_type, Defaults.Config.VMLogFile);
+            Logger.LogLine("Can not decrementn type: " + opA_type, Defaults.Config.VMLogFile);
             throw Exceptions.not_supported;
         }
 
@@ -455,7 +455,7 @@ namespace lightningUnit
                         return lhs.floatValue.CompareTo(rhs.floatValue);
                     else
                     {
-                        Logger.Log("Trying to compare a: " + lhs_type + " to UnitType: " + rhs_type, Defaults.Config.VMLogFile);
+                        Logger.LogLine("Trying to compare a: " + lhs_type + " to UnitType: " + rhs_type, Defaults.Config.VMLogFile);
                         throw Exceptions.can_not_compare;
                     }
                 case UnitType.Integer:
@@ -463,7 +463,7 @@ namespace lightningUnit
                         return lhs.integerValue.CompareTo(rhs.integerValue);
                     else
                     {
-                        Logger.Log("Trying to compare a: " + lhs_type + " to UnitType: " + rhs_type, Defaults.Config.VMLogFile);
+                        Logger.LogLine("Trying to compare a: " + lhs_type + " to UnitType: " + rhs_type, Defaults.Config.VMLogFile);
                         throw Exceptions.can_not_compare;
                     }
                 case UnitType.Char:
@@ -471,7 +471,7 @@ namespace lightningUnit
                         return lhs.charValue.CompareTo(rhs.charValue);
                     else
                     {
-                        Logger.Log("Trying to compare a: " + lhs_type + " to UnitType: " + rhs_type, Defaults.Config.VMLogFile);
+                        Logger.LogLine("Trying to compare a: " + lhs_type + " to UnitType: " + rhs_type, Defaults.Config.VMLogFile);
                         throw Exceptions.can_not_compare;
                     }
                 case UnitType.String:
@@ -479,11 +479,11 @@ namespace lightningUnit
                         return ((StringUnit)lhs.heapUnitValue).content.CompareTo(((StringUnit)rhs.heapUnitValue).content);
                     else
                     {
-                        Logger.Log("Trying to compare a: " + lhs_type + " to UnitType: " + rhs_type, Defaults.Config.VMLogFile);
+                        Logger.LogLine("Trying to compare a: " + lhs_type + " to UnitType: " + rhs_type, Defaults.Config.VMLogFile);
                         throw Exceptions.can_not_compare;
                     }
                 default:
-                    Logger.Log("Trying to compare a: " + lhs_type + " to UnitType: " + rhs_type, Defaults.Config.VMLogFile);
+                    Logger.LogLine("Trying to compare a: " + lhs_type + " to UnitType: " + rhs_type, Defaults.Config.VMLogFile);
                     throw Exceptions.can_not_compare;
             }
         }

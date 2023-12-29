@@ -73,13 +73,13 @@ namespace lightningUnit
 
         public override bool Equals(object other)
         {
-            Logger.Log("Trying to check equality of ResultUnit!", Defaults.Config.VMLogFile);
+            Logger.LogLine("Trying to check equality of ResultUnit!", Defaults.Config.VMLogFile);
             throw Exceptions.not_supported;
         }
 
         public override int CompareTo(object p_compareTo)
         {
-            Logger.Log("Trying to compare with ResultUnit!", Defaults.Config.VMLogFile);
+            Logger.LogLine("Trying to compare with ResultUnit!", Defaults.Config.VMLogFile);
             throw Exceptions.can_not_compare;
         }
 
@@ -100,7 +100,7 @@ namespace lightningUnit
         {
             if (!IsOK)
             {
-                Logger.Log("Trying to unwrap result out of failed operation!", Defaults.Config.VMLogFile);
+                Logger.LogLine("Trying to unwrap result out of failed operation!", Defaults.Config.VMLogFile);
                 throw new AggregateException(
                     new Exception[]{
                         Exceptions.not_supported,
@@ -109,7 +109,7 @@ namespace lightningUnit
             }
             else if (Value.Type == UnitType.Void)
             {
-                Logger.Log("Trying to unwrap void result!", Defaults.Config.VMLogFile);
+                Logger.LogLine("Trying to unwrap void result!", Defaults.Config.VMLogFile);
                 throw Exceptions.not_supported;
             }
             else

@@ -54,13 +54,13 @@ namespace lightningUnit
 
         public override bool Equals(object other)
         {
-            Logger.Log("Trying to check equality of OptionUnit!", Defaults.Config.VMLogFile);
+            Logger.LogLine("Trying to check equality of OptionUnit!", Defaults.Config.VMLogFile);
             throw Exceptions.not_supported;
         }
 
         public override int CompareTo(object p_compareTo)
         {
-            Logger.Log("Trying to compare with OptionUnit!", Defaults.Config.VMLogFile);
+            Logger.LogLine("Trying to compare with OptionUnit!", Defaults.Config.VMLogFile);
             throw Exceptions.not_supported;
         }
 
@@ -78,7 +78,7 @@ namespace lightningUnit
         {
             if (Value.Type == UnitType.Void)
             {
-                Logger.Log("Option is VOID!", Defaults.Config.VMLogFile);
+                Logger.LogLine("Option is VOID!", Defaults.Config.VMLogFile);
                 throw Exceptions.not_supported;
             }
             else
@@ -98,7 +98,7 @@ namespace lightningUnit
         {
             if (Value.Type == UnitType.Void)
             {
-                Logger.Log("Option is VOID! " + p_msg, Defaults.Config.VMLogFile);
+                Logger.LogLine("Option is VOID! " + p_msg, Defaults.Config.VMLogFile);
                 throw Exceptions.not_supported;
             }
             else

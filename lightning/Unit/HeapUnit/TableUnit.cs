@@ -90,7 +90,7 @@ namespace lightningUnit
                 return this_unit;
             else
             {
-                Logger.Log("Table does not contain index: " + p_key.ToString(), Defaults.Config.VMLogFile);
+                Logger.LogLine("Table does not contain index: " + p_key.ToString(), Defaults.Config.VMLogFile);
                 throw Exceptions.not_found;
             }
         }
@@ -323,12 +323,12 @@ namespace lightningUnit
 
                     if (extension_table.GetExtensionTable() != null)
                     {
-                        Logger.Log("Extension Table has an Extention Table!", Defaults.Config.VMLogFile);
+                        Logger.LogLine("Extension Table has an Extention Table!", Defaults.Config.VMLogFile);
                         throw Exceptions.extension_table_has_extension_table;
                     }
                     if (this_unit.heapUnitValue.GetExtensionTable() != null)
                     {
-                        Logger.Log("Table already has an Extention Table!", Defaults.Config.VMLogFile);
+                        Logger.LogLine("Table already has an Extention Table!", Defaults.Config.VMLogFile);
                         throw Exceptions.can_not_override_extension_table;
                     }
 

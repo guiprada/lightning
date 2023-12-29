@@ -28,7 +28,7 @@ namespace lightningUnit
             }
             else
             {
-                Logger.Log("Cannot create ExternalFunctionUnit from null!", Defaults.Config.VMLogFile);
+                Logger.LogLine("Cannot create ExternalFunctionUnit from null!", Defaults.Config.VMLogFile);
                 throw Exceptions.can_not_create;
             }
         }

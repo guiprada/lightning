@@ -47,7 +47,7 @@ namespace lightningVM
         {
             if ((p_n < 0) || (p_n > (top - 1)))
             {
-                Logger.Log("Atempt to read empty stack.", Defaults.Config.VMLogFile);
+                Logger.LogLine("Atempt to read empty stack.", Defaults.Config.VMLogFile);
                 throw Exceptions.empty_stack;
             }
             return values[top - p_n - 1];

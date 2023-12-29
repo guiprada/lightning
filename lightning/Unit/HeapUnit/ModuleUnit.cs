@@ -70,7 +70,7 @@ namespace lightningUnit
                         globals[p_index] /= p_value;
                     break;
                 default:
-                    Logger.Log("Unknown assignment operator: " + op, Defaults.Config.VMLogFile);
+                    Logger.LogLine("Unknown assignment operator: " + op, Defaults.Config.VMLogFile);
                     throw Exceptions.unknown_operator;
             }
         }
@@ -116,7 +116,7 @@ namespace lightningUnit
                 return this_unit;
             else
             {
-                Logger.Log("Module Table does not contain index:" + p_key.ToString(), Defaults.Config.VMLogFile);
+                Logger.LogLine("Module Table does not contain index: " + p_key.ToString(), Defaults.Config.VMLogFile);
                 throw Exceptions.not_found;
             }
         }

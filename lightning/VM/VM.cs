@@ -199,7 +199,7 @@ namespace lightningVM
                 return GetGlobal(maybe_address.Value);
             else
             {
-                Logger.Log("Global value: " + p_name + " not found in module: " + p_chunk.ModuleName, Defaults.Config.VMLogFile);
+                Logger.LogLine("Global value: " + p_name + " not found in module: " + p_chunk.ModuleName, Defaults.Config.VMLogFile);
                 throw Exceptions.not_found;
             }
         }
@@ -214,7 +214,7 @@ namespace lightningVM
         {
             if (stack.Peek(p_n).Type != UnitType.String)
             {
-                Logger.Log("Expected a String.", Defaults.Config.VMLogFile);
+                Logger.LogLine("Expected a String.", Defaults.Config.VMLogFile);
                 throw Exceptions.wrong_type;
             }
             return ((StringUnit)stack.Peek(p_n).heapUnitValue).content;
@@ -228,7 +228,7 @@ namespace lightningVM
             if (this_value.Type == UnitType.Float)
                 return this_value.floatValue;
 
-            Logger.Log("Expected a Float or Integer.", Defaults.Config.VMLogFile);
+            Logger.LogLine("Expected a Float or Integer.", Defaults.Config.VMLogFile);
             throw Exceptions.wrong_type;
         }
 
@@ -238,7 +238,7 @@ namespace lightningVM
             if (this_value.Type == UnitType.Float)
                 return this_value.floatValue;
 
-            Logger.Log("Expected a Float.", Defaults.Config.VMLogFile);
+            Logger.LogLine("Expected a Float.", Defaults.Config.VMLogFile);
             throw Exceptions.wrong_type;
         }
 
@@ -248,7 +248,7 @@ namespace lightningVM
             if (this_value.Type == UnitType.Integer)
                 return this_value.integerValue;
 
-            Logger.Log("Expected a Integer.", Defaults.Config.VMLogFile);
+            Logger.LogLine("Expected a Integer.", Defaults.Config.VMLogFile);
             throw Exceptions.wrong_type;
         }
 
@@ -256,7 +256,7 @@ namespace lightningVM
         {
             if (stack.Peek(p_n).Type != UnitType.Table)
             {
-                Logger.Log("Expected a Table.", Defaults.Config.VMLogFile);
+                Logger.LogLine("Expected a Table.", Defaults.Config.VMLogFile);
                 throw Exceptions.wrong_type;
             }
             return (TableUnit)stack.Peek(p_n).heapUnitValue;
@@ -266,7 +266,7 @@ namespace lightningVM
         {
             if (stack.Peek(p_n).Type != UnitType.List)
             {
-                Logger.Log("Expected a List.", Defaults.Config.VMLogFile);
+                Logger.LogLine("Expected a List.", Defaults.Config.VMLogFile);
                 throw Exceptions.wrong_type;
             }
             return (ListUnit)stack.Peek(p_n).heapUnitValue;
@@ -276,7 +276,7 @@ namespace lightningVM
         {
             if (stack.Peek(p_n).Type != UnitType.Wrapper)
             {
-                Logger.Log("Expected a Wrapper.", Defaults.Config.VMLogFile);
+                Logger.LogLine("Expected a Wrapper.", Defaults.Config.VMLogFile);
                 throw Exceptions.wrong_type;
             }
             return ((WrapperUnit<T>)stack.Peek(p_n).heapUnitValue).UnWrap();
@@ -286,7 +286,7 @@ namespace lightningVM
         {
             if (stack.Peek(p_n).Type != UnitType.Wrapper)
             {
-                Logger.Log("Expected a Wrapper.", Defaults.Config.VMLogFile);
+                Logger.LogLine("Expected a Wrapper.", Defaults.Config.VMLogFile);
                 throw Exceptions.wrong_type;
             }
             return (WrapperUnit<T>)stack.Peek(p_n).heapUnitValue;
@@ -296,7 +296,7 @@ namespace lightningVM
         {
             if (stack.Peek(p_n).Type != UnitType.String)
             {
-                Logger.Log("Expected a String.", Defaults.Config.VMLogFile);
+                Logger.LogLine("Expected a String.", Defaults.Config.VMLogFile);
                 throw Exceptions.wrong_type;
             }
             return (StringUnit)stack.Peek(p_n).heapUnitValue;
@@ -306,7 +306,7 @@ namespace lightningVM
         {
             if (stack.Peek(p_n).Type != UnitType.Char)
             {
-                Logger.Log("Expected a Char.", Defaults.Config.VMLogFile);
+                Logger.LogLine("Expected a Char.", Defaults.Config.VMLogFile);
                 throw Exceptions.wrong_type;
             }
             return (stack.Peek(p_n).charValue);
@@ -316,7 +316,7 @@ namespace lightningVM
         {
             if (stack.Peek(p_n).Type != UnitType.Boolean)
             {
-                Logger.Log("Expected a Boolean.", Defaults.Config.VMLogFile);
+                Logger.LogLine("Expected a Boolean.", Defaults.Config.VMLogFile);
                 throw Exceptions.wrong_type;
             }
             return stack.Peek(p_n).ToBool();
@@ -326,7 +326,7 @@ namespace lightningVM
         {
             if (stack.Peek(p_n).Type != UnitType.Option)
             {
-                Logger.Log("Expected an Option.", Defaults.Config.VMLogFile);
+                Logger.LogLine("Expected an Option.", Defaults.Config.VMLogFile);
                 throw Exceptions.wrong_type;
             }
             return (OptionUnit)stack.Peek(p_n).heapUnitValue;
@@ -336,7 +336,7 @@ namespace lightningVM
         {
             if (stack.Peek(p_n).Type != UnitType.Result)
             {
-                Logger.Log("Expected an Result.", Defaults.Config.VMLogFile);
+                Logger.LogLine("Expected an Result.", Defaults.Config.VMLogFile);
                 throw Exceptions.wrong_type;
             }
             return (ResultUnit)stack.Peek(p_n).heapUnitValue;
@@ -462,7 +462,7 @@ namespace lightningVM
 
         public void Error(string p_msg)
         {
-            Logger.Log("VM Error: " + CurrentInstructionPositionDataString() +  p_msg, Defaults.Config.VMLogFile);
+            Logger.LogLine("VM Error: " + CurrentInstructionPositionDataString() +  p_msg, Defaults.Config.VMLogFile);
             throw Exceptions.code_execution_error;
         }
 

@@ -358,7 +358,7 @@ namespace lightningChunk
                 }
 
             }
-            Logger.Log(("Could not find Function: " + p_name), Defaults.Config.VMLogFile);
+            Logger.LogLine(("Could not find Function: " + p_name), Defaults.Config.VMLogFile);
             throw Exceptions.not_found;
         }
 
@@ -372,7 +372,7 @@ namespace lightningChunk
                 }
 
             }
-            Logger.Log("Could not find Unit: " + p_name + " in table: " + p_table, Defaults.Config.VMLogFile);
+            Logger.LogLine("Could not find Unit: " + p_name + " in table: " + p_table, Defaults.Config.VMLogFile);
             throw Exceptions.not_found;
         }
 

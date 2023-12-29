@@ -60,6 +60,9 @@ errors += require("tests/compound_calls.ltn")
 write_line("Eval tests ...")
 errors += require("tests/eval.ltn")
 
+write_line("IIFE tests ...")
+errors += require("tests/iife.ltn")
+
 write_line("Integer tests ...")
 errors += require("tests/integers.ltn")
 
@@ -86,6 +89,9 @@ errors += require("tests/numbers.ltn")
 
 write_line("Nuples tests ...")
 errors += require("tests/nuples.ltn")
+
+write_line("Option tests ...")
+errors += require("tests/option.ltn")
 
 write_line("Pmap tests ...")
 errors += require("tests/pmap.ltn")
@@ -142,14 +148,6 @@ write_line("Error count: " .. errors)
 
 //////////////////////////////// scratch
 {
-    // IIFE
-    var iife = \{return "iife"}()
-    assert(iife, "iife", "Failed IIFE Test 1.")
 
-    // Option
-    var opt_empty = OptionEmpty()
-    assert(opt_empty:is_ok(), false, "Failed option Test 1.")
-    var opt_in_opt = OptionNew(opt_empty)
-    assert(opt_in_opt:is_ok(), false, "Failed option Test 2.")
 }
 //////////////////////////////// end scratch

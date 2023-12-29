@@ -2,7 +2,6 @@ var assert_counter = require("assert_counter.ltn")
 var assert = assert_counter.assert
 var assert_not = assert_counter.assert_not
 {
-    // Void return
     var void_func = \{}
     var teste1 = try(void_func, [])
     assert(teste1:get_error(), "System.Exception: Void ResultUnit created!", "Get error from void result Test 1.")

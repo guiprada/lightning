@@ -41,13 +41,13 @@ namespace lightningUnit
         {
             if (p_key.Type != UnitType.Integer)
             {
-                Logger.Log("List only supports Integer indexes: " + p_key.ToString(), Defaults.Config.VMLogFile);
+                Logger.LogLine("List only supports Integer indexes: " + p_key.ToString(), Defaults.Config.VMLogFile);
                 throw Exceptions.not_supported;
             }
             Integer index = p_key.integerValue;
             if ((index > Count) || (index < 0))
             {
-                Logger.Log("List index is out of bounds: " + p_key.ToString(), Defaults.Config.VMLogFile);
+                Logger.LogLine("List index is out of bounds: " + p_key.ToString(), Defaults.Config.VMLogFile);
                 throw Exceptions.out_of_bounds;
             }
             ElementSet(p_key, p_value);
@@ -69,7 +69,7 @@ namespace lightningUnit
             if (MethodTable != null)
                 return MethodTable.Get(p_key);
 
-            Logger.Log("List does not contain a Method Table: " + p_key.ToString(), Defaults.Config.VMLogFile);
+            Logger.LogLine("List does not contain a Method Table: " + p_key.ToString(), Defaults.Config.VMLogFile);
             throw Exceptions.not_found;
         }
 
@@ -79,7 +79,7 @@ namespace lightningUnit
             if ((index >= 0) && (index < Elements.Count))
                 return Elements[(int)index];
 
-            Logger.Log("List does not contain index: " + p_key.ToString(), Defaults.Config.VMLogFile);
+            Logger.LogLine("List does not contain index: " + p_key.ToString(), Defaults.Config.VMLogFile);
             throw Exceptions.not_found;
         }
 

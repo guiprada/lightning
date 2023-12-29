@@ -130,7 +130,7 @@ namespace lightningUnit
                     return new Unit(val_input_string.ToString());
                 else
                 {
-                    Logger.Log("Trying to make a string copy of a non string!", Defaults.Config.VMLogFile);
+                    Logger.LogLine("Trying to make a string copy of a non string!", Defaults.Config.VMLogFile);
                     throw Exceptions.not_supported;
                 }
             }
