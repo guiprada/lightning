@@ -2,40 +2,69 @@ var assert_counter = require("assert_counter.ltn")
 var assert = assert_counter.assert
 var assert_not = assert_counter.assert_not
 {
-	const ONE = 1
-	ONE = 2
+    var test1 = try(eval, ["
+        const ONE = 1
+        ONE = 2
+        return ONE
+    "])
+    assert(test1:get_error():contains("System.Exception: Compilation Error!"), true, "Failed consts Test 1.")
 
-	assert(ONE, 1, "Failed consts Test 1.")
-
-	function change_const()
-	{
-		ONE = 3
-	}
-	assert(ONE, 1, "Failed consts Test 2.")
+    var test2 = try(eval, ["
+        const ONE = 1
+        function change_const()
+        {
+            ONE = 2
+        }
+        change_const()
+    "])
+    assert(test2:get_error():contains("System.Exception: Compilation Error!"), true, "Failed consts Test 2.")
 
 //
-	function ONE_FUNC ()
-	{
-		return 1
-	}
-
-	function TWO_FUNC ()
-	{
-		return 2
-	}
 
 // Function declarations should be const
-	ONE_FUNC = TWO_FUNC
-	assert(ONE_FUNC(), 1, "Failed consts Test 3.")
 
-// Function expressions should be var by defauld, optionally const
-	var ONE_FUNC_ALIAS = ONE_FUNC
-	ONE_FUNC_ALIAS = TWO_FUNC
-	assert(ONE_FUNC(), 2, "Failed consts Test 4.")
-	ONE_FUNC_ALIAS = ONE_FUNC
 
-	const CONST_ONE_FUNC_ALIAS = ONE_FUNC
-	CONST_ONE_FUNC_ALIAS = TWO_FUNC
-	assert(ONE_FUNC(), 1, "Failed consts Test 5.")
+    var test3 = try(eval, ["
+        function ONE_FUNC ()
+        {
+            return 1
+        }
+
+        function TWO_FUNC ()
+        {
+            return 2
+        }
+        ONE_FUNC = TWO_FUNC
+    "])
+    assert(test3:get_error():contains("System.Exception: Compilation Error!"), true, "Failed consts Test 3.")
+
+// // Function expressions should be var by defauld, optionally const
+    {
+        var one_func = function ()
+        {
+            return 1
+        }
+
+        var two_func = function ()
+        {
+            return 2
+        }
+        one_func = two_func
+        assert(one_func(), 2, "Failed consts Test 4.")
+    }
+
+    var test5 = try(eval, ["
+        const one_func = function ()
+        {
+            return 1
+        }
+
+        const two_func = function ()
+        {
+            return 2
+        }
+        one_func = two_func
+    "])
+    assert(test5:get_error():contains("System.Exception: Compilation Error!"), true, "Failed consts Test 5.")
 }
 return assert_counter.get_error_counter()
