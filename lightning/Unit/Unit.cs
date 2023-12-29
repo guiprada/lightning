@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Runtime.InteropServices;
-using System.Text.RegularExpressions;
+
 using lightningExceptions;
 using lightningTools;
 
@@ -129,7 +129,7 @@ namespace lightningUnit
             if (this_type == typeof(char))
                 return new Unit(new OptionUnit(new Unit((char)p_obj)));
 
-            if (this_type == typeof(String))
+            if (this_type == typeof(string))
                 return new Unit(new OptionUnit(new Unit((String)p_obj)));
 
             if (this_type == typeof(bool))
@@ -208,7 +208,7 @@ namespace lightningUnit
 
         public bool ToBool()
         {
-            UnitType this_type = this.Type;
+            UnitType this_type = Type;
             switch (this_type)
             {
                 case UnitType.Boolean:
@@ -227,7 +227,7 @@ namespace lightningUnit
                 throw Exceptions.can_not_compare;
             }
 
-            UnitType this_type = this.Type;
+            UnitType this_type = Type;
             UnitType other_type = ((Unit)p_other).Type;
             if (this_type == UnitType.Void || other_type == UnitType.Void)
             {
@@ -263,7 +263,7 @@ namespace lightningUnit
                 case UnitType.Char:
                     if (other_type == UnitType.Char)
                     {
-                        return this.charValue == ((Unit)p_other).charValue;
+                        return charValue == ((Unit)p_other).charValue;
                     }
                     return false;
                 case UnitType.Boolean:
@@ -279,7 +279,7 @@ namespace lightningUnit
 
         public override int GetHashCode()
         {
-            UnitType this_type = this.Type;
+            UnitType this_type = Type;
             switch (this_type)
             {
                 case UnitType.Float:

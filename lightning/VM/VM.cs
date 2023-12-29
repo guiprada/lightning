@@ -419,9 +419,9 @@ namespace lightningVM
             if (result.IsOK)
                 return result.Value;
             else
-                Error("Function Execution was not OK!");
+                Error("Function Execution was not OK!");// never returns
 
-            return new Unit(UnitType.Void);//this is dead code just to keep the compiler happy
+            return new Unit(UnitType.Void);// this is dead code just to keep the compiler happy
         }
         //////////////////////////////////////////////////// End Public
 

@@ -9,18 +9,36 @@ To Think
 
 To be Done
 ----------
+- remove exceptions and try intrinsic
 - Construtores em camel case
 - Construtores nao criam option
+- Create option default_action() intrinsic
+- create separated math functions for integers and floats where it makes sense
+- Create more option unwrap() tests
+
 - Criar const, ou let
+- stack trace
+  - fix assert error msg
+- convert try to builtin(parsed)
+- nupple as internal class
+- destructuring
+- optional typing
+- direct dispatch to typed functions
+- function signatures
+- parameters checking at compile time
+- bounds check at compile time
 - C# eval and company should return ResultUnit
-- consts
-- fix assert error msg
+- globals should be created with thread safe structure
+- upvalues should be stored with thread safe structure
 - remove call to this constructor in Unit?
+  - is this faster?(less initialization?)
+- Algebrical types and match
 - Finish roslyn module(finish compile)
 - Add logic to not recompile in roslyn
-- Create option default_action
-- create separated math functions for integers and floats where it makes sense
-- Create option unwrap() tests
+- generational aliasing
+- linear types
+- ffi
+
 
 add table.flatten => merge with extension table and unset extension table
     add table.flatten_under => merge extension table with table and unset extension table
