@@ -64,6 +64,9 @@ namespace lightningAST
                 case NodeType.VAR_DECLARATION:
                     PrintVarDeclaration(p_node as VarDeclarationNode);
                     break;
+                case NodeType.CONST_DECLARATION:
+                    PrintConstDeclaration(p_node as ConstDeclarationNode);
+                    break;
                 case NodeType.ASSIGMENT_OP:
                     PrintassignmentOp(p_node as AssignmentNode);
                     break;
@@ -366,6 +369,17 @@ namespace lightningAST
         private void PrintVarDeclaration(VarDeclarationNode p_node)
         {
             Console.Write(identString + "[VARIABLE DECLARATION " + p_node.Name);
+            if (p_node.Initializer != null)
+            {
+                Console.Write(" = ");
+                Print(p_node.Initializer);
+            }
+            Console.WriteLine("]");
+        }
+
+        private void PrintConstDeclaration(ConstDeclarationNode p_node)
+        {
+            Console.Write(identString + "[CONST DECLARATION " + p_node.Name);
             if (p_node.Initializer != null)
             {
                 Console.Write(" = ");

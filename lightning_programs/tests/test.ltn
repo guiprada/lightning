@@ -148,6 +148,6 @@ write_line("Error count: " .. errors)
 
 //////////////////////////////// scratch
 {
-
+    const tests = 1
 }
 //////////////////////////////// end scratch

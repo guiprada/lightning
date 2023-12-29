@@ -24,6 +24,7 @@ namespace lightningAST
         FOR,
 
         VAR_DECLARATION,
+        CONST_DECLARATION,
         ASSIGMENT,
         ASSIGMENT_OP,
 
@@ -304,8 +305,22 @@ namespace lightningAST
     {
         public string Name { get; private set; }
         public Node Initializer { get; private set; }
+
         public VarDeclarationNode(string p_Name, Node p_Initializer, PositionData p_PositionData)
             : base(NodeType.VAR_DECLARATION, p_PositionData)
+        {
+            Name = p_Name;
+            Initializer = p_Initializer;
+        }
+    }
+
+    public class ConstDeclarationNode : Node
+    {
+        public string Name { get; private set; }
+        public Node Initializer { get; private set; }
+
+        public ConstDeclarationNode(string p_Name, Node p_Initializer, PositionData p_PositionData)
+            : base(NodeType.CONST_DECLARATION, p_PositionData)
         {
             Name = p_Name;
             Initializer = p_Initializer;

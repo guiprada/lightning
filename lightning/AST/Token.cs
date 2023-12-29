@@ -65,6 +65,7 @@ namespace lightningAST
         THIS,
         TRUE,
         VAR,
+        CONST,
         WHILE,
         EOF
     }

@@ -9,6 +9,7 @@ To Think
 
 To be Done
 ----------
+- function declaration should be const!
 - remove exceptions and try intrinsic
 - Construtores em camel case
 - Construtores nao criam option

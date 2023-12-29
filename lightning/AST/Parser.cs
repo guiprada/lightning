@@ -123,15 +123,21 @@ namespace lightningAST
 		{
 			if (Match(TokenType.VAR))
 			{
-				Node varDecl = VarDecl();
+				Node var_decl = VarDecl();
 				ElideMany(TokenType.NEW_LINE);
-				return varDecl;
+				return var_decl;
 			}
 			else if (Match(TokenType.FUN))
 			{
-				Node functionDecl = FunctionDecl();
+				Node function_decl = FunctionDecl();
 				ElideMany(TokenType.NEW_LINE);
-				return functionDecl;
+				return function_decl;
+			}
+			else if (Match(TokenType.CONST))
+			{
+				Node const_decl = ConstDecl();
+				ElideMany(TokenType.NEW_LINE);
+				return const_decl;
 			}
 			else
 			{
@@ -213,6 +219,32 @@ namespace lightningAST
 			ElideMany(TokenType.NEW_LINE);
 
 			return new VarDeclarationNode(name.value, initializer, name.PositionData);
+		}
+
+		Node ConstDecl()
+		{
+			TokenString name = (TokenString)Consume(
+				TokenType.IDENTIFIER,
+				"Expected 'const identifier' after 'const'.",
+				true
+			);
+			Node initializer;
+			if (Match(TokenType.EQUAL))
+			{
+				ElideMany(TokenType.NEW_LINE);
+				initializer = Expression();
+			}
+			else
+			{
+				initializer = null;
+				Error("Uninitialized Const!", name.PositionData);
+			}
+
+			ElideMany(TokenType.NEW_LINE);
+			Elide(TokenType.SEMICOLON);
+			ElideMany(TokenType.NEW_LINE);
+
+			return new ConstDeclarationNode(name.value, initializer, name.PositionData);
 		}
 
 		List<string> Parameters()

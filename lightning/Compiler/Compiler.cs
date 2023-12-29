@@ -22,27 +22,30 @@ namespace lightningCompiler
 
 		struct Variable
 		{
-			public string name;
-			public int address;
-			public int envIndex;
-			public Node expression;
-			public ValueType type;
-			public Variable(string p_name, int p_address, int p_envIndex, ValueType p_type)
+			public readonly string name;
+			public readonly int address;
+			public readonly int envIndex;
+			public readonly Node expression;
+			public readonly ValueType type;
+			public readonly bool isConst;
+			public Variable(string p_name, int p_address, int p_envIndex, ValueType p_type, bool p_is_const)
 			{
 				name = p_name;
 				address = p_address;
 				envIndex = p_envIndex;
 				expression = null;
 				type = p_type;
+				isConst = p_is_const;
 			}
 
-			public Variable(Node p_expression)
+			public Variable(Node p_expression, bool p_is_const)
 			{
 				name = null;
 				address = -1;
 				envIndex = -1;
 				expression = p_expression;
 				type = ValueType.Expression;
+				isConst = p_is_const;
 			}
 		}
 
@@ -55,6 +58,8 @@ namespace lightningCompiler
 		private List<object> dataLiterals;
 		private List<List<string>> env;
 		private List<string> globals;
+		private List<List<string>> const_env;
+		private List<string> const_globals;
 		private Stack<List<Variable>> upvalueStack;
 		private Stack<int> funStartEnv;
 		public List<string> Errors { get; private set; }
@@ -102,22 +107,25 @@ namespace lightningCompiler
 			HasChunked = false;
 			Errors = new List<string>();
 			globals = new List<string>();
+			const_env = new List<List<string>>();
+			const_globals = new List<string>();
 			dataLiterals = new List<dynamic>();
 			upvalueStack = new Stack<List<Variable>>();
 			env = new List<List<string>>();
 			env.Add(globals);// set env[0] to globals
+			const_env.Add(const_globals);
 			funStartEnv = new Stack<int>();
 
 			// place prelude functions on data
 			foreach (IntrinsicUnit v in p_prelude.intrinsics)
 			{
-				SetGlobalVar(v.Name);
+				SetGlobalVar(v.Name, true);
 			}
 
 			// load prelude tables
 			foreach (KeyValuePair<string, TableUnit> entry in p_prelude.tables)
 			{
-				SetGlobalVar(entry.Key);
+				SetGlobalVar(entry.Key, true);
 
 			}
 		}
@@ -163,6 +171,9 @@ namespace lightningCompiler
 					break;
 				case NodeType.VAR_DECLARATION:
 					ChunkVarDeclaration(p_node as VarDeclarationNode);
+					break;
+				case NodeType.CONST_DECLARATION:
+					ChunkConstDeclaration(p_node as ConstDeclarationNode);
 					break;
 				case NodeType.ASSIGMENT_OP:
 					ChunkAssignmentOp(p_node as AssignmentNode);
@@ -392,6 +403,7 @@ namespace lightningCompiler
 		{
 			Add(OpCode.OPEN_ENV, p_node.PositionData);
 			env.Add(new List<string>());
+			const_env.Add(new List<string>());
 
 			ChunkIt(p_node.Initializer);
 
@@ -417,6 +429,7 @@ namespace lightningCompiler
 			int exit_address = instructionCounter;
 			Add(OpCode.CLOSE_ENV, p_node.PositionData);
 			env.RemoveAt(env.Count - 1);
+			const_env.RemoveAt(const_env.Count - 1);
 
 			chunk.FixInstruction(start_address, null, (Operand)(exit_address - start_address), null, null);
 			chunk.FixInstruction(go_back_address, null, (Operand)(go_back_address - condition_address), null, null);
@@ -500,13 +513,36 @@ namespace lightningCompiler
 		{
 			if (p_node.Initializer == null)
 			{
-				// This should Error during parsing.
+				// This should Error while parsing.
 				Error("Uninitialized Variable: " + p_node.Name, p_node.PositionData);
 			}
 			else
 				ChunkIt(p_node.Initializer);
 
-			Nullable<Variable> maybe_var = SetVar(p_node.Name);
+			Nullable<Variable> maybe_var = SetVar(p_node.Name, false);
+			if (maybe_var.HasValue)
+			{
+				Variable this_var = maybe_var.Value;
+				if (this_var.type == ValueType.Global)
+					Add(OpCode.DECLARE_GLOBAL, p_node.PositionData);
+				else
+					Add(OpCode.DECLARE_VARIABLE, p_node.PositionData);
+			}
+			else
+				Error("Variable Name has already been used!", p_node.PositionData);
+		}
+
+		private void ChunkConstDeclaration(ConstDeclarationNode p_node)
+		{
+			if (p_node.Initializer == null)
+			{
+				// This should Error while parsing.
+				Error("Uninitialized Variable: " + p_node.Name, p_node.PositionData);
+			}
+			else
+				ChunkIt(p_node.Initializer);
+
+			Nullable<Variable> maybe_var = SetVar(p_node.Name, true);
 			if (maybe_var.HasValue)
 			{
 				Variable this_var = maybe_var.Value;
@@ -597,9 +633,14 @@ namespace lightningCompiler
 		{
 			Add(OpCode.OPEN_ENV, p_node.PositionData);
 			env.Add(new List<string>());
+			const_env.Add(new List<string>());
+
 			foreach (Node n in p_node.Statements)
 				ChunkIt(n);
+
 			env.RemoveAt(env.Count - 1);
+			const_env.RemoveAt(const_env.Count - 1);
+
 			Add(OpCode.CLOSE_ENV, p_node.PositionData);
 		}
 
@@ -612,7 +653,7 @@ namespace lightningCompiler
 			// the first call, we need to decode the function name, or object
 			Variable this_called;
 			if (p_node.Variable.IsAnonymous)
-				this_called = new Variable(p_node.Variable.Expression);
+				this_called = new Variable(p_node.Variable.Expression, true);
 			else
 			{
 				Nullable<Variable> maybe_call = GetVar(p_node.Variable.Name, p_node.PositionData);
@@ -707,7 +748,7 @@ namespace lightningCompiler
 				if (globals.Contains(p_node.Variable.Name))
 					Error("Local functions can not override global ones.", p_node.PositionData);
 
-				Nullable<Variable> maybe_name = SetVar(p_node.Variable.Name);
+				Nullable<Variable> maybe_name = SetVar(p_node.Variable.Name, true);
 
 				if (maybe_name.HasValue)
 				{
@@ -768,6 +809,8 @@ namespace lightningCompiler
 
 			// env
 			env.Add(new List<string>());
+			const_env.Add(new List<string>());
+
 			Add(OpCode.OPEN_ENV, p_node.PositionData);
 			//Add funStartEnv
 			funStartEnv.Push(env.Count - 1);
@@ -779,7 +822,7 @@ namespace lightningCompiler
 			if (p_node.Parameters != null)
 				foreach (string p in p_node.Parameters)
 				{
-					SetVar(p);// it is always local
+					SetVar(p, true);// it is always local
 					Add(OpCode.DECLARE_VARIABLE, p_node.PositionData);
 					arity++;
 				}
@@ -821,6 +864,7 @@ namespace lightningCompiler
 
 			//Console.WriteLine("Removed env");
 			env.RemoveAt(env.Count - 1);
+			const_env.RemoveAt(const_env.Count - 1);
 
 			//pop fun start env
 			funStartEnv.Pop();
@@ -834,10 +878,11 @@ namespace lightningCompiler
 			for (int i = top_index; i >= 0; i--)
 			{
 				var this_env = env[i];
+				var this_const_env = const_env[i];
 				if (this_env.Contains(p_name))
 				{
 					bool is_in_function = upvalueStack.Count != 0;// if we are compiling a function this stack will not be empty
-					bool isGlobal = (i == 0);
+					bool isGlobal = i == 0;
 					if (!isGlobal)
 					{
 						if (is_in_function && i < funStartEnv.Peek())
@@ -847,11 +892,11 @@ namespace lightningCompiler
 							return this_upvalue;
 						}
 						// local var
-						return new Variable(p_name, this_env.IndexOf(p_name), top_index - i, ValueType.Local);
+						return new Variable(p_name, this_env.IndexOf(p_name), top_index - i, ValueType.Local, this_const_env.Contains(p_name));
 					}
 					if (isGlobal && globals.Contains(p_name))// Sanity check
 					{
-						return new Variable(p_name, this_env.IndexOf(p_name), 0, ValueType.Global);
+						return new Variable(p_name, this_env.IndexOf(p_name), 0, ValueType.Global, this_const_env.Contains(p_name));
 					}
 					else
 					{
@@ -868,7 +913,7 @@ namespace lightningCompiler
 			foreach (Variable v in p_list)
 				if (p_name == v.name) return v;
 
-			Variable this_upvalue = new Variable(p_name, p_address, p_env, ValueType.UpValue);
+			Variable this_upvalue = new Variable(p_name, p_address, p_env, ValueType.UpValue, const_env[p_env].Contains(p_name));
 			p_list.Add(this_upvalue);
 			return this_upvalue;
 		}
@@ -884,10 +929,10 @@ namespace lightningCompiler
 				return false;
 		}
 
-		private Nullable<Variable> SetVar(string p_name)
+		private Nullable<Variable> SetVar(string p_name, bool p_is_const)
 		{
-			if (env.Count == 1)// we are in global scope
-				return SetGlobalVar(p_name);
+			if (env.Count == 1)// global scope
+				return SetGlobalVar(p_name, p_is_const);
 			else
 			{
 				if (!IsLocalVar(p_name))
@@ -895,19 +940,27 @@ namespace lightningCompiler
 					int top_index = env.Count - 1;
 					var this_env = env[top_index];
 					this_env.Add(p_name);
-					return new Variable(p_name, this_env.IndexOf(p_name), 0, ValueType.Local);
+
+					if (p_is_const)
+						const_env[top_index].Add(p_name);
+
+					return new Variable(p_name, this_env.IndexOf(p_name), 0, ValueType.Local, p_is_const);
 				}
 			}
 			return null;
 		}
 
-		private Nullable<Variable> SetGlobalVar(string p_name)
+		private Nullable<Variable> SetGlobalVar(string p_name, bool p_is_const)
 		{
 			if (!globals.Contains(p_name))
 			{
 				globals.Add(p_name);
+
+				if (p_is_const)
+					const_globals.Add(p_name);
+
 				chunk.AddGlobalVariableAddress(p_name, (Operand)globals.IndexOf(p_name));
-				return new Variable(p_name, globals.IndexOf(p_name), 0, ValueType.Global);
+				return new Variable(p_name, globals.IndexOf(p_name), 0, ValueType.Global, p_is_const);
 			}
 
 			return null;

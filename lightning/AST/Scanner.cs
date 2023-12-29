@@ -10,22 +10,23 @@ namespace lightningAST
 	{
 		private static Dictionary<String, TokenType> keywords = new Dictionary<string, TokenType>()
 		{
-			{"else", TokenType.ELSE},
-			{"false", TokenType.FALSE},
-			{"for", TokenType.FOR},
-			{"function", TokenType.FUN},
-			{"if", TokenType.IF},
-			{"null", TokenType.NIL},
-			{"return", TokenType.RETURN},
-			{"true", TokenType.TRUE},
-			{"var", TokenType.VAR},
-			{"while", TokenType.WHILE},
-			{"and", TokenType.AND},
-			{"or", TokenType.OR},
-			{"xor", TokenType.XOR},
-			{"nand", TokenType.NAND},
-			{"nor", TokenType.NOR},
-			{"xnor", TokenType.XNOR},
+			{"else", TokenType.ELSE}
+			, {"false", TokenType.FALSE}
+			, {"for", TokenType.FOR}
+			, {"function", TokenType.FUN}
+			, {"if", TokenType.IF}
+			, {"null", TokenType.NIL}
+			, {"return", TokenType.RETURN}
+			, {"true", TokenType.TRUE}
+			, {"var", TokenType.VAR}
+			, {"const", TokenType.CONST}
+			, {"while", TokenType.WHILE}
+			, {"and", TokenType.AND}
+			, {"or", TokenType.OR}
+			, {"xor", TokenType.XOR}
+			, {"nand", TokenType.NAND}
+			, {"nor", TokenType.NOR}
+			, {"xnor", TokenType.XNOR},
 		};
 
 		private char[] source;
