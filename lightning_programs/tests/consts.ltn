@@ -19,12 +19,23 @@ var assert_not = assert_counter.assert_not
     "])
     assert(test2:get_error():contains("System.Exception: Compilation Error!"), true, "Failed consts Test 2.")
 
+    var test3 = try(eval, [#
+        const hello_world = ["hello", "world"]
+        function change_const(aList)
+        {
+            aList = ["not", "cool"]
+        }
+        change_const(hello_world)
+    #])
+    write_line(test3)
+    assert(test3:get_error():contains("System.Exception: Compilation Error!"), true, "Failed consts Test 3.")
+
 //
 
 // Function declarations should be const
 
 
-    var test3 = try(eval, ["
+    var test4 = try(eval, ["
         function ONE_FUNC ()
         {
             return 1
@@ -36,7 +47,7 @@ var assert_not = assert_counter.assert_not
         }
         ONE_FUNC = TWO_FUNC
     "])
-    assert(test3:get_error():contains("System.Exception: Compilation Error!"), true, "Failed consts Test 3.")
+    assert(test4:get_error():contains("System.Exception: Compilation Error!"), true, "Failed consts Test 4.")
 
 // // Function expressions should be var by defauld, optionally const
     {
@@ -50,10 +61,10 @@ var assert_not = assert_counter.assert_not
             return 2
         }
         one_func = two_func
-        assert(one_func(), 2, "Failed consts Test 4.")
+        assert(one_func(), 2, "Failed consts Test 5.")
     }
 
-    var test5 = try(eval, ["
+    var test6 = try(eval, ["
         const one_func = function ()
         {
             return 1
@@ -65,6 +76,6 @@ var assert_not = assert_counter.assert_not
         }
         one_func = two_func
     "])
-    assert(test5:get_error():contains("System.Exception: Compilation Error!"), true, "Failed consts Test 5.")
+    assert(test6:get_error():contains("System.Exception: Compilation Error!"), true, "Failed consts Test 6.")
 }
 return assert_counter.get_error_counter()
