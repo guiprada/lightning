@@ -6,29 +6,29 @@ var errors = 0
 
 assert_counter.assert_not = function(value1, value2, msg)
 {
-	var result = assert.assert_not(value1, value2, msg)
-	if(result == false)
-		errors++
-	return true
+    var result = assert.assert_not(value1, value2, msg)
+    if(result == false)
+        errors++
+    return true
 }
 
 assert_counter.assert = function(value1, value2, msg)
 {
-	var result = assert.assert(value1, value2, msg)
-	if(result == false)
-		errors++
+    var result = assert.assert(value1, value2, msg)
+    if(result == false)
+        errors++
 
-	return result
+    return result
 }
 
 assert_counter.get_error_counter = function()
 {
-	return errors
+    return errors
 }
 
 assert_counter.reset_error_counter = function()
 {
-	errors = 0
+    errors = 0
 }
 
 return assert_counter

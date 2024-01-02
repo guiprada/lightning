@@ -73,16 +73,37 @@ namespace lightningAST
         BRACKET,
     }
 
+    public struct ParameterInfo
+    {
+        public readonly string identifier;
+        public readonly bool isMut;
+
+        public ParameterInfo(string p_identifier, bool p_isMut)
+        {
+            identifier = p_identifier;
+            isMut = p_isMut;
+        }
+
+        public override string ToString()
+        {
+            if (isMut)
+                return "mut " + identifier;
+            else
+                return identifier;
+        }
+    }
+
     public struct CallInfo
     {
-        public List<Node> Arguments;
-        public List<IndexNode> Indexes;
+        public readonly List<Node> Arguments;
+        public readonly List<IndexNode> Indexes;
         public CallInfo(List<Node> p_Arguments, List<IndexNode> p_Indexes)
         {
             Arguments = p_Arguments;
             Indexes = p_Indexes;
         }
     }
+
     public abstract class Node
     {
         public NodeType Type { get; private set; }
@@ -416,10 +437,10 @@ namespace lightningAST
 
     public class FunctionExpressionNode : Node
     {
-        public List<string> Parameters { get; private set; }
+        public List<ParameterInfo> Parameters { get; private set; }
         public List<Node> Body { get; private set; }
 
-        public FunctionExpressionNode(List<string> p_Parameters, List<Node> p_Body, PositionData p_PositionData, NodeType p_Type = NodeType.FUNCTION_EXPRESSION)
+        public FunctionExpressionNode(List<ParameterInfo> p_Parameters, List<Node> p_Body, PositionData p_PositionData, NodeType p_Type = NodeType.FUNCTION_EXPRESSION)
             : base(p_Type, p_PositionData)
         {
             Parameters = p_Parameters;
@@ -431,7 +452,7 @@ namespace lightningAST
     {
         public string Name { get; private set; }
 
-        public MemberFunctionDeclarationNode(String p_Name, List<string> p_Parameters, List<Node> p_Body, PositionData p_PositionData)
+        public MemberFunctionDeclarationNode(String p_Name, List<ParameterInfo> p_Parameters, List<Node> p_Body, PositionData p_PositionData)
             : base(p_Parameters, p_Body, p_PositionData, NodeType.MEMBER_FUNCTION_DECLARATION)
         {
             Name = p_Name;
@@ -442,7 +463,7 @@ namespace lightningAST
     {
         public VariableNode Variable { get; private set; }
 
-        public FunctionDeclarationNode(VariableNode p_Variable, List<string> p_Parameters, List<Node> p_Body, PositionData p_PositionData)
+        public FunctionDeclarationNode(VariableNode p_Variable, List<ParameterInfo> p_Parameters, List<Node> p_Body, PositionData p_PositionData)
             : base(p_Parameters, p_Body, p_PositionData, NodeType.FUNCTION_DECLARATION)
         {
             Variable = p_Variable;

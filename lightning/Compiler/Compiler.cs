@@ -824,9 +824,9 @@ namespace lightningCompiler
 
             Operand arity = 0;
             if (p_node.Parameters != null)
-                foreach (string p in p_node.Parameters)
+                foreach (ParameterInfo p in p_node.Parameters)
                 {
-                    SetVar(p, false);// it is always local
+                    SetVar(p.identifier, !p.isMut);// it is always local
                     Add(OpCode.DECLARE_VARIABLE, p_node.PositionData);
                     arity++;
                 }

@@ -5,69 +5,70 @@ namespace lightningAST
 {
     public enum TokenType
     {
-        NEW_LINE,
+        NEW_LINE
         // one character tokens.
-        LEFT_PAREN,
-        RIGHT_PAREN,
-        LEFT_BRACE,
-        RIGHT_BRACE,
-        LEFT_BRACKET,
-        RIGHT_BRACKET,
-        COMMA,
-        MINUS,
-        MINUS_EQUAL,
-        MINUS_MINUS,
-        PLUS,
-        PLUS_EQUAL,
-        PLUS_PLUS,
-        SEMICOLON,
-        COLON,
-        PIPE,
-        SLASH,
-        SLASH_EQUAL,
-        STAR,
-        STAR_EQUAL,
+        , LEFT_PAREN
+        , RIGHT_PAREN
+        , LEFT_BRACE
+        , RIGHT_BRACE
+        , LEFT_BRACKET
+        , RIGHT_BRACKET
+        , COMMA
+        , MINUS
+        , MINUS_EQUAL
+        , MINUS_MINUS
+        , PLUS
+        , PLUS_EQUAL
+        , PLUS_PLUS
+        , SEMICOLON
+        , COLON
+        , PIPE
+        , SLASH
+        , SLASH_EQUAL
+        , STAR
+        , STAR_EQUAL
 
         // one or two character tokens.
-        DOT,
-        APPEND,
-        BANG,
-        BANG_EQUAL,
-        EQUAL,
-        EQUAL_EQUAL,
-        GREATER,
-        GREATER_EQUAL,
-        LESS,
-        LESS_EQUAL,
+        , DOT
+        , APPEND
+        , BANG
+        , BANG_EQUAL
+        , EQUAL
+        , EQUAL_EQUAL
+        , GREATER
+        , GREATER_EQUAL
+        , LESS
+        , LESS_EQUAL
 
         // literals.
-        IDENTIFIER,
-        STRING,
-        CHAR,
-        NUMBER,
+        , IDENTIFIER
+        , STRING
+        , CHAR
+        , NUMBER
 
         // reserved words.
-        XNOR,
-        NOR,
-        NAND,
-        XOR,
-        AND,
-        CLASS,
-        ELSE,
-        FALSE,
-        FUN,
-        FOR,
-        IF,
-        NIL,
-        OR,
-        RETURN,
-        SUPER,
-        THIS,
-        TRUE,
-        VAR,
-        CONST,
-        WHILE,
-        EOF
+        , XNOR
+        , NOR
+        , NAND
+        , XOR
+        , AND
+        , CLASS
+        , ELSE
+        , FALSE
+        , FUN
+        , FOR
+        , IF
+        , NIL
+        , OR
+        , RETURN
+        , SUPER
+        , THIS
+        , TRUE
+        , VAR
+        , CONST
+        , MUT
+        , WHILE
+        , EOF
     }
     public class Token
     {
