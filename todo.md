@@ -9,6 +9,7 @@ To Think
 
 To be Done
 ----------
+- Colocar mut na gramatica
 - Eval should return result
 - function declaration should be const!
 - test imported consts behavior
