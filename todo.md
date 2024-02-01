@@ -9,6 +9,7 @@ To Think
 
 To be Done
 ----------
+- Mut nao deveria ser necessario para value types
 - Colocar mut na gramatica
 - Eval should return result
 - function declaration should be const!
