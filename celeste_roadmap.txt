@@ -1,5 +1,8 @@
 
 *- remove nill, after adding an Option type
+- remove global and env dicotomy :|
+	- remove context from compiler
+	- should we build a new compiler?
 - remove exceptions
 - add become for tail call optimization.
 - add nuple (n tuple) type(leveraging roslyn to compile runtime generated UnitTypes), array based.

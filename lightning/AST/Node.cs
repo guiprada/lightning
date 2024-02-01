@@ -74,8 +74,8 @@ namespace lightningAST
 
     public struct CallInfo
     {
-        public List<Node> Arguments;
-        public List<IndexNode> Indexes;
+        public readonly List<Node> Arguments;
+        public readonly List<IndexNode> Indexes;
         public CallInfo(List<Node> p_Arguments, List<IndexNode> p_Indexes)
         {
             Arguments = p_Arguments;

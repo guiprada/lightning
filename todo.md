@@ -9,6 +9,10 @@ To Think
 
 To be Done
 ----------
+- Colocar mut na gramatica
+- Eval should return result
+- function declaration should be const!
+- test imported consts behavior
 - remove exceptions and try intrinsic
 - Construtores em camel case
 - Construtores nao criam option
