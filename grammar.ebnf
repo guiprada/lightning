@@ -1,4 +1,5 @@
-﻿program         <- newLines declaration* EOF;
+﻿newLines        <- ("\n")*
+program         <- newLines declaration* EOF;
 primary         <-
                 NUMBER |
                 STRING |
@@ -10,7 +11,6 @@ primary         <-
                 list |
                 funExpr |
                 table;
-newLines        <- ("\n")*
 
 (* STATEMENTS *)
 declaration     <- functionDecl newLines
@@ -52,7 +52,7 @@ assignment      <- (
                             "++" newLines |
                             "--" newLines
                         )
-                            assignment |
+                            expression |
                             logic_or;
                     ) newLines
 logic_or        <- logic_and ( "or" logic_and)*;

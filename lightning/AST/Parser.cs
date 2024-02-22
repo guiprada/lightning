@@ -496,7 +496,7 @@ namespace lightningAST
 			if (Match(TokenType.PLUS_EQUAL))
 			{
 				ElideMany(TokenType.NEW_LINE);
-				Node value = Assignment();
+				Node value = Expression();
 
 				if (assigned.Type == NodeType.VARIABLE)
 					return new AssignmentNode(
@@ -526,7 +526,7 @@ namespace lightningAST
 			else if (Match(TokenType.MINUS_EQUAL))
 			{
 				ElideMany(TokenType.NEW_LINE);
-				Node value = Assignment();
+				Node value = Expression();
 
 				if (assigned.Type == NodeType.VARIABLE)
 					return new AssignmentNode(
@@ -555,7 +555,7 @@ namespace lightningAST
 			else if (Match(TokenType.STAR_EQUAL))
 			{
 				ElideMany(TokenType.NEW_LINE);
-				Node value = Assignment();
+				Node value = Expression();
 
 				if (assigned.Type == NodeType.VARIABLE)
 					return new AssignmentNode(
@@ -567,10 +567,10 @@ namespace lightningAST
 				else
 					Error("Invalid assignment.", assigned.PositionData);
 			}
-			if (Match(TokenType.SLASH_EQUAL))
+			else if (Match(TokenType.SLASH_EQUAL))
 			{
 				ElideMany(TokenType.NEW_LINE);
-				Node value = Assignment();
+				Node value = Expression();
 
 				if (assigned.Type == NodeType.VARIABLE)
 					return new AssignmentNode(
@@ -585,7 +585,7 @@ namespace lightningAST
 			else if (Match(TokenType.EQUAL))
 			{
 				ElideMany(TokenType.NEW_LINE);
-				Node value = Assignment();
+				Node value = Expression();
 
 				if (assigned.Type == NodeType.VARIABLE)
 					return new AssignmentNode(
