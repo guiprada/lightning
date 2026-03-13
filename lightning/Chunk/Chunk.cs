@@ -93,8 +93,6 @@ namespace lightningChunk
                 case OpCode.DIVIDE:
                 case OpCode.NEGATE:
                 case OpCode.NOT:
-                case OpCode.INCREMENT:
-                case OpCode.DECREMENT:
                 case OpCode.AND:
                 case OpCode.OR:
                 case OpCode.XOR:
@@ -191,8 +189,6 @@ namespace lightningChunk
         MULTIPLY,
         DIVIDE,
         NEGATE,
-        INCREMENT,
-        DECREMENT,
 
         NOT,
         AND,

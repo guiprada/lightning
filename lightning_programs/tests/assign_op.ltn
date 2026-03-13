@@ -17,7 +17,7 @@ var assert_not = assert_counter.assert_not
 {
 	// Testing increment and decrement
 	var j = 1
-	var j1 = --j
+	var j1 = j - 1
 	assert(j1, 0, "Failed Increment Test 1.")
 
 	var j2 = 0
@@ -29,7 +29,7 @@ var assert_not = assert_counter.assert_not
 	assert(j3, 1, "Failed Increment Test 3.")
 
 	j2 = 0
-	j3 = ++j2
+	j3 = j2 + 1
 	assert(j3, 1, "Failed Increment Test 4.")
 
 	j = 2

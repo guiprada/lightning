@@ -40,9 +40,7 @@ namespace lightningAST
     public enum OperatorType
     {
         ADDITION,
-        INCREMENT,
         SUBTRACTION,
-        DECREMENT,
         MULTIPLICATION,
         DIVISION,
 

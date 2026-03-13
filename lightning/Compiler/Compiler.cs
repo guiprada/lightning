@@ -284,14 +284,6 @@ namespace lightningCompiler
 					this_opcode = OpCode.NEGATE;
 					Add(this_opcode, p_node.PositionData);
 					break;
-				case OperatorType.INCREMENT:
-					this_opcode = OpCode.INCREMENT;
-					Add(this_opcode, p_node.PositionData);
-					break;
-				case OperatorType.DECREMENT:
-					this_opcode = OpCode.DECREMENT;
-					Add(this_opcode, p_node.PositionData);
-					break;
 				default:
 					Error("Unkown Unary operator " + p_node.Op.ToString(), p_node.PositionData);
 					break;
