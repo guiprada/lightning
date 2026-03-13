@@ -15,7 +15,6 @@ namespace lightningUnit
         , Char
         , UpValue
         , Table
-        , List
         , Function
         , Intrinsic
         , ExternalFunction

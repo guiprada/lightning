@@ -59,13 +59,13 @@ namespace lightningPrelude
                     assemblies_list.Add(new Unit(dll.ToString()));
                 }
 
-                return new Unit(new ListUnit(assemblies_list));
+                return new Unit(new TableUnit(assemblies_list, null));
             }
             roslyn.Set("get_available_assemblies", new IntrinsicUnit("get_available_assemblies", GetAllDotNetAssemblies, 0));
 
             Unit GetReferencesFromList(VM p_vm)
             {
-                List<Unit> assemblies_list = (p_vm.GetList(0)).Elements;
+                List<Unit> assemblies_list = p_vm.GetTable(0).Elements;
 
                 List<Unit> references_list = new List<Unit>();
                 foreach (Unit assembly_name in assemblies_list )
@@ -73,7 +73,7 @@ namespace lightningPrelude
                     references_list.Add(new Unit(new WrapperUnit<PortableExecutableReference>(MetadataReference.CreateFromFile(assembly_name.ToString()))));
                 }
 
-                return new Unit(new ListUnit(references_list));
+                return new Unit(new TableUnit(references_list, null));
             }
             roslyn.Set("get_references_from_assemblies_list", new IntrinsicUnit("get_references_from_assemblies_list", GetReferencesFromList, 1));
 

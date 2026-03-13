@@ -145,7 +145,7 @@ namespace lightningUnit
                 {
                     string_list.Add(new Unit(c));
                 }
-                return new Unit(new ListUnit(string_list));
+                return new Unit(new TableUnit(string_list, null));
             }
             methodTable.Set("to_list", new IntrinsicUnit("string_to_list", ToList, 1));
 

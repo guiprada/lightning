@@ -33,7 +33,6 @@ namespace lightningPrelude
         {
             Dictionary<string, TableUnit> tables = new Dictionary<string, TableUnit>();
             tables.Add("string", StringUnit.ClassMethodTable);
-            tables.Add("list", ListUnit.ClassMethodTable);
             tables.Add("table", TableUnit.ClassMethodTable);
 
             ////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -190,8 +189,8 @@ namespace lightningPrelude
                 if (Unit.IsCallable(this_callable))
                 {
                     List<Unit> this_arguments = null;
-                    if(this_unit.Type == UnitType.List)
-                        this_arguments = ((ListUnit)this_unit.heapUnitValue).Elements;
+                    if(this_unit.Type == UnitType.Table)
+                        this_arguments = ((TableUnit)this_unit.heapUnitValue).Elements;
 
                     VM try_vm = p_vm.GetVM();
                     try
@@ -338,11 +337,11 @@ namespace lightningPrelude
             Unit ListNew(VM p_vm)
             {
                 Integer size = p_vm.GetInteger(0);
-                ListUnit new_list = new ListUnit(null);
+                List<Unit> elements = new List<Unit>();
                 for(int i=0; i<size; i++)
-                    new_list.Elements.Add(new Unit(new OptionUnit()));
+                    elements.Add(new Unit(new OptionUnit()));
 
-                return new Unit(new_list);
+                return new Unit(new TableUnit(elements, null));
             }
             functions.Add(new IntrinsicUnit("List", ListNew, 1));
 
@@ -351,11 +350,11 @@ namespace lightningPrelude
             {
                 Integer size = p_vm.GetInteger(0);
                 Unit default_value = p_vm.GetUnit(1);
-                ListUnit new_list = new ListUnit(null);
+                List<Unit> elements = new List<Unit>();
                 for(int i=0; i<size; i++)
-                    new_list.Elements.Add(default_value);
+                    elements.Add(default_value);
 
-                return new Unit(new_list);
+                return new Unit(new TableUnit(elements, null));
             }
             functions.Add(new IntrinsicUnit("ListInit", ListInitNew, 2));
 

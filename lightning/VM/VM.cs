@@ -262,15 +262,6 @@ namespace lightningVM
             return (TableUnit)stack.Peek(p_n).heapUnitValue;
         }
 
-        public ListUnit GetList(int p_n)
-        {
-            if (stack.Peek(p_n).Type != UnitType.List)
-            {
-                Logger.LogLine("Expected a List.", Defaults.Config.VMLogFile);
-                throw Exceptions.wrong_type;
-            }
-            return (ListUnit)stack.Peek(p_n).heapUnitValue;
-        }
 
         public T GetWrappedContent<T>(int p_n)
         {
@@ -1080,16 +1071,16 @@ namespace lightningVM
                         {
                             IP++;
 
-                            ListUnit new_list = new ListUnit(null);
+                            List<Unit> elements = new List<Unit>();
 
                             int n_table = instruction.opA;
                             for (int i = 0; i < n_table; i++)
                             {
                                 Unit val = stack.Pop();
-                                new_list.Elements.Add(val);
+                                elements.Add(val);
                             }
 
-                            stack.Push(new Unit(new_list));
+                            stack.Push(new Unit(new TableUnit(elements, null)));
                             break;
                         }
                     case OpCode.CALL:

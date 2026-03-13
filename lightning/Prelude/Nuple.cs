@@ -24,11 +24,11 @@ namespace lightningPrelude
             //////////////////////////////////////////////////////
             Unit NupleFromList(VM p_vm)
             {
-                ListUnit this_list = p_vm.GetList(0);
-                int size = this_list.Count;
+                TableUnit this_table = p_vm.GetTable(0);
+                int size = this_table.Elements != null ? this_table.Elements.Count : 0;
                 Unit[] new_nuple = new Unit[size];
                 for(int i = 0; i < size; i++)
-                    new_nuple[i] = this_list.Elements[i];
+                    new_nuple[i] = this_table.Elements[i];
                 WrapperUnit<Unit[]> new_nuple_object = new WrapperUnit<Unit[]>(new_nuple, nupleMethods);
 
                 return new Unit(new_nuple_object);
