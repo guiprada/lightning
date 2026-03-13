@@ -49,4 +49,48 @@ var assert_not = assert_counter.assert_not
     result++
     assert(result, 1, "Failed Grouping after function call Test.")
 }
+{
+    // Case 1: Triple chained call on same line
+    // make_adder(5) returns a function; that function takes a lambda arg and returns a closure
+    var make_adder = \(n){ return \(f){ return \{ return f() + n } } }
+    var result = make_adder(5)(\{return 42})()
+    assert(result, 47, "Failed triple compound call same-line test.")
+}
+{
+    // Case 2: Two calls on first line, newline, then () on next line is NOT chained
+    var make_adder = \(n){ return \(f){ return \{ return f() + n } } }
+    var result = make_adder(5)(\{return 42})
+    (0)
+    assert(type(result), "Closure", "Failed compound call + newline test - result should be Closure, not the final call result.")
+}
+{
+    // Case 3: Newline after first call - second line is an independent IIFE, not chained
+    var make_adder = \(n){ return \(f){ return \{ return f() + n } } }
+    var x = 0
+    make_adder(5)
+    x = \{return 42}()
+    assert(x, 42, "Failed newline-splits-calls test - second line is a standalone IIFE.")
+}
+{
+    // Case 4: getFunc()(someArg) same line - result is the value of the chained call
+    var get_doubler = \{ return \(x){ return x * 2 } }
+    var result = get_doubler()(5)
+    assert(result, 10, "Failed same-line getFunc()(arg) test.")
+}
+{
+    // Case 5: getFunc() newline (someArg) - result is the function, (someArg) is a discarded statement
+    var get_doubler = \{ return \(x){ return x * 2 } }
+    var result = get_doubler()
+    (5)
+    assert(type(result), "Closure", "Failed newline getFunc()\\n(arg) test - result should be the function.")
+}
+{
+    // Case 6a: IIFE \{...}() on same line works fine
+    var iife_result = \{return 42}()
+    assert(iife_result, 42, "Failed same-line IIFE test.")
+    // Case 6b: \{...} newline () - the lambda is assigned, () is a discarded statement, NOT an IIFE
+    var not_iife = \{return 42}
+    (0)
+    assert(type(not_iife), "Closure", "Failed IIFE newline test - lambda should not be called across newline.")
+}
 return assert_counter.get_error_counter()
