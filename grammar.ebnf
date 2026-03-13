@@ -1,4 +1,4 @@
-﻿newLines        <- ("\n")*
+newLines        <- ("\n")*
 program         <- newLines declaration* EOF;
 primary         <-
                 NUMBER |
@@ -8,7 +8,6 @@ primary         <-
                 "null" |
                 "(" expression ")" |
                 compoundVar |
-                list |
                 funExpr |
                 table;
 
@@ -16,7 +15,7 @@ primary         <-
 declaration     <- functionDecl newLines
                 | varDecl newLines
                 | statement newLines;
-functionDecl    <- "function" | "\" compoundVar function;
+functionDecl    <- ("function" | "\") compoundVar function;
 function        <- ("(" parameters newLines ")")? statement;
 parameters      <- newLines IDENTIFIER newLines ( "," newLines IDENTIFIER )*;
 varDecl         <- "var" IDENTIFIER "=" newLines expression newLines ";" newLines;
@@ -41,6 +40,8 @@ block           <- "{" newLines declaration* "}";
 (* EXPRESSIONS *)
 funExpr         <- ("function" | "\") function;
 expression      <- assignment;
+(* assignments are right-associative expressions; all return the new value *)
+(* e.g.: j1 = j += 1  is equivalent to  j += 1; j1 = j *)
 assignment      <- (
                         compoundVar
                         (
@@ -49,34 +50,42 @@ assignment      <- (
                             "-=" newLines |
                             "*=" newLines |
                             "/=" newLines |
-                            "++" newLines |
-                            "--" newLines
+                            "++" newLines |    (* postfix increment: compoundVar++ returns new value *)
+                            "--" newLines      (* postfix decrement: compoundVar-- returns new value *)
                         )
                             expression |
                             logic_or;
                     ) newLines
-logic_or        <- logic_and ( "or" logic_and)*;
-logic_and       <- logic_xor ( "xor" logic_xor)*;
-logic_xor       <- equality ( "and" equality)*;
+logic_or        <- logic_and ( "or"  logic_and)*;
+logic_and       <- logic_xor ( "and" logic_xor)*;
+logic_xor       <- equality  ( "xor" equality )*;
 equality        <- comparison ( ( "!=" | "==" ) comparison )*;
 comparison      <- addition ( ( ">" | ">=" | "<" | "<=" ) addition )*;
 addition        <- multiplication ( ( "-" | "+" | "..") multiplication )*;
-multiplication  <- unary ( ( "/" | "*" | "++" | "--" ) unary )*;
-unary           <- ( "!" | "-" ) unary | call;
+multiplication  <- unary ( ( "/" | "*" ) unary )*;
+(* prefix ++ and -- are pure value operators: ++x returns x+1 without mutating x *)
+unary           <- ( "!" | "-" | "++" | "--" ) unary | call;
 
 (* CALL *)
-call                <- primary ( callTail | anonymousMethodCall );
-callTail            <- "(" arguments* ")" indexedAccess* sequentialCall* anonymousMethodCall?;
+(* callTail loops: f(a)(b)(c) is a valid chained/compound call.         *)
+(* Newlines between calls are insignificant: f(a)\n(b) parses as f(a)(b) *)
+(* Use ";" to force a statement boundary when that is not the intent.    *)
+call                <- primary ( callTail | anonymousMethodCall )?;
+callTail            <- arguments indexedAccess* sequentialCall* anonymousMethodCall?;
 anonymousMethodCall <- methodAccess callTail;
-sequentialCall      <- ("(" arguments* ")" indexedAccess);
-arguments           <-  newLines expression newLines ( newLines "," newLines expression )* newLines;
+(* sequentialCall handles the result-of-call being immediately indexed *)
+sequentialCall      <- arguments indexedAccess*;
+arguments           <- "(" newLines ( expression newLines ( "," newLines expression newLines )* )? ")";
 
 (* ACCESS *)
 compoundVar     <- IDENTIFIER indexedAccess* methodAccess;
 indexedAccess   <- ( "[" expression "]" ) | ( "." IDENTIFIER );
 methodAccess    <-  ( ":" IDENTIFIER )?;
 
-(* TABLE *)
-table           <- "[" newLines tableEntry ( newLines "," newLines tableEntry )* newLines "]" newLines;
-tableEntry      <- ( (-)? Expression)
-                | ( (-)? IDENTIFIER : Expression );
+(* TABLE - unified type for both keyed and positional data *)
+(* [:]                        empty table                  *)
+(* [key: val, key: val, ...]  keyed entries (table mode)   *)
+(* [val, val, ...]            positional entries (list mode)*)
+table           <- "[" newLines ( tableEntry ( newLines "," newLines tableEntry )* newLines )? "]";
+tableEntry      <- ( "-"? expression )
+                | ( IDENTIFIER ":" expression );
