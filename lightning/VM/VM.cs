@@ -995,14 +995,6 @@ namespace lightningVM
                         IP++;
                         stack.Push(-stack.Pop());
                         break;
-                    case OpCode.INCREMENT:
-                        IP++;
-                        stack.Push(Unit.increment(stack.Pop()));
-                        break;
-                    case OpCode.DECREMENT:
-                        IP++;
-                        stack.Push(Unit.decrement(stack.Pop()));
-                        break;
                     case OpCode.EQUALS:
                         IP++;
                         stack.Push(new Unit(stack.Pop().Equals(stack.Pop())));

@@ -756,9 +756,7 @@ namespace lightningAST
 		{
 			if (Match(
 				TokenType.BANG,
-				TokenType.MINUS,
-				TokenType.MINUS_MINUS,
-				TokenType.PLUS_PLUS
+				TokenType.MINUS
 			))
 			{
 				Token op = Previous();
@@ -766,10 +764,6 @@ namespace lightningAST
 
 				if (op.Type == TokenType.BANG)
 					this_op = OperatorType.NOT;
-				else if (op.Type == TokenType.PLUS_PLUS)
-					this_op = OperatorType.INCREMENT;
-				else if (op.Type == TokenType.MINUS_MINUS)
-					this_op = OperatorType.DECREMENT;
 				else if (op.Type == TokenType.MINUS)
 					this_op = OperatorType.SUBTRACTION;
 				else

@@ -1,6 +1,57 @@
 ﻿todo
 ====
 
+Roadmap
+-------
+Phase 1 - Stabilize the language (current)
+  - Unify TableUnit: restore List<Unit> Elements + Dictionary<Unit,Unit> Map in one class
+    - Merge ListUnit metatable methods into TableUnit
+    - Collapse NEW_LIST opcode -> NEW_TABLE
+    - Remove UnitType.List and ListUnit class
+    - This fixes the inheritance/prototype chain (everything is a table again)
+  - Fix concurrency false contention: value-type globals (Float/Integer/Bool) all share
+    TypeUnit.Float etc. as their lock object. Replace with per-address lock array
+    object[] globalLocks to give independent locking per global slot.
+  - Document that tasks(n, func, args) assumes args is read-only across tasks;
+    consider factory function variant: tasks(n, \(i){ return args_for_i }, func)
+  - Define bytecode serialization format (.ltnc) so Chunk can be saved/loaded portably
+    - This is the bridge to multi-VM targets
+  - Improve error messages (parser error sync, stack traces, assert error messages)
+  - Remove DUP and STASH opcodes if unused (already in todo below)
+
+Phase 2 - Self-hosted compiler
+  - Write scanner + parser in Lightning
+  - Write compiler in Lightning, targeting the bytecode format above
+  - Bootstrap: use C# compiler to compile the Lightning compiler, then self-host
+
+Phase 3 - Multiple VM targets
+  - CIL backend via System.Linq.Expressions (expression trees -> .Compile())
+    - Prefer over raw ILGenerator for readability; fall back for advanced control flow
+    - NOT the DLR (too heavy, designed for C# dynamic keyword)
+  - WASM backend (compile to WASM text format or use Emscripten on C VM)
+  - Keep Roslyn as opt-in plugin (#if ROSLYN) - not a core language feature
+
+Phase 4 - C VM
+  - Port the dispatch loop + Unit struct to C
+  - Unit in C: union { float f; int32_t i; char c; bool b; } + HeapUnit* heap;
+  - TypeUnit sentinel trick ports directly: static HeapUnit objects for Float/Int/etc.
+  - Keep the prelude/compiler in C# initially; call C VM via P/Invoke
+  - Replace tasks() C# Parallel.For with pthreads or work-stealing queue in C VM
+  - Roslyn stays C#-only, enabled via bridge when C# host is present
+
+Notes
+-----
+  - Chained assignments (a = b += 1) exist in C/C++/Java; our postfix ++ semantics
+    (always returns new value) are consistent. Prefix ++ was removed (use x+1 instead).
+  - The module system implements a linker: MakeModule() relocates bytecode operands
+    from imported VM address space to importing VM address space. Worth documenting.
+  - The Unit struct dual representation (StructLayout Explicit + TypeUnit sentinel) is
+    novel - heapUnitValue is never null, TypeUnit singletons carry type info for value
+    types. Measured to be faster and more memory-efficient than boxed approaches.
+    This design is C-ready.
+  - Roslyn integration: roslyn.compile(name, arity, body) compiles C# at runtime and
+    returns a Lightning-callable function. Extraordinary for game scripting hot paths.
+
 To Think
 --------
 - Add typing tests, dont allow variables to change type

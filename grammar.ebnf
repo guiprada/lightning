@@ -63,8 +63,7 @@ equality        <- comparison ( ( "!=" | "==" ) comparison )*;
 comparison      <- addition ( ( ">" | ">=" | "<" | "<=" ) addition )*;
 addition        <- multiplication ( ( "-" | "+" | "..") multiplication )*;
 multiplication  <- unary ( ( "/" | "*" ) unary )*;
-(* prefix ++ and -- are pure value operators: ++x returns x+1 without mutating x *)
-unary           <- ( "!" | "-" | "++" | "--" ) unary | call;
+unary           <- ( "!" | "-" ) unary | call;
 
 (* CALL *)
 (* callTail loops: f(a)(b)(c) is a valid chained/compound call.         *)
