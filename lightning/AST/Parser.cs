@@ -642,72 +642,15 @@ namespace lightningAST
 
 		Node LogicalXor()
 		{
-			Node left = LogicalNand();
-
-			while (Match(TokenType.XOR))
-			{
-				Node right = LogicalNand();
-
-				left = new LogicalNode(
-					left,
-					OperatorType.XOR,
-					right,
-					left.PositionData
-				);
-			}
-
-			return left;
-		}
-
-		Node LogicalNand()
-		{
-			Node left = LogicalNor();
-
-			while (Match(TokenType.NAND))
-			{
-				Node right = LogicalNor();
-
-				left = new LogicalNode(
-					left,
-					OperatorType.NAND,
-					right,
-					left.PositionData
-				);
-			}
-
-			return left;
-		}
-
-		Node LogicalNor()
-		{
-			Node left = LogicalXnor();
-
-			while (Match(TokenType.NOR))
-			{
-				Node right = LogicalXnor();
-
-				left = new LogicalNode(
-					left,
-					OperatorType.NOR,
-					right,
-					left.PositionData
-				);
-			}
-
-			return left;
-		}
-
-		Node LogicalXnor()
-		{
 			Node left = Equality();
 
-			while (Match(TokenType.XNOR))
+			while (Match(TokenType.XOR))
 			{
 				Node right = Equality();
 
 				left = new LogicalNode(
 					left,
-					OperatorType.XNOR,
+					OperatorType.XOR,
 					right,
 					left.PositionData
 				);

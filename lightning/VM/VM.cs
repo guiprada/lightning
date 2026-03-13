@@ -1056,27 +1056,6 @@ namespace lightningVM
                             stack.Push(new Unit(stack.Pop().ToBool() ^ opB.ToBool()));
                             break;
                         }
-                    case OpCode.NAND:
-                        {
-                            IP++;
-                            Unit opB = stack.Pop();
-                            stack.Push(new Unit(!(stack.Pop().ToBool() && opB.ToBool())));
-                            break;
-                        }
-                    case OpCode.NOR:
-                        {
-                            IP++;
-                            Unit opB = stack.Pop();
-                            stack.Push(new Unit(!(stack.Pop().ToBool() || opB.ToBool())));
-                            break;
-                        }
-                    case OpCode.XNOR:
-                        {
-                            IP++;
-                            Unit opB = stack.Pop();
-                            stack.Push(new Unit(!(stack.Pop().ToBool() ^ opB.ToBool())));
-                            break;
-                        }
                     case OpCode.CLOSE_CLOSURE:
                         upValues.PopEnv();
                         EnvSet(instructions.TargetEnv);

@@ -47,9 +47,6 @@ namespace lightningAST
         NUMBER,
 
         // reserved words.
-        XNOR,
-        NOR,
-        NAND,
         XOR,
         AND,
         CLASS,

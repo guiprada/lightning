@@ -98,9 +98,6 @@ namespace lightningChunk
                 case OpCode.AND:
                 case OpCode.OR:
                 case OpCode.XOR:
-                case OpCode.NAND:
-                case OpCode.NOR:
-                case OpCode.XNOR:
                 case OpCode.EQUALS:
                 case OpCode.NOT_EQUALS:
                 case OpCode.GREATER_EQUALS:
@@ -201,9 +198,6 @@ namespace lightningChunk
         AND,
         OR,
         XOR,
-        NAND,
-        NOR,
-        XNOR,
 
         EQUALS,
         NOT_EQUALS,
