@@ -144,8 +144,6 @@ namespace lightningAST
             Console.Write("[UNARY ");
             if (p_node.Op == OperatorType.SUBTRACTION) Console.Write(" - ");
             else if (p_node.Op == OperatorType.NOT) Console.Write(" ! ");
-            else if (p_node.Op == OperatorType.INCREMENT) Console.Write(" ++ ");
-            else if (p_node.Op == OperatorType.DECREMENT) Console.Write(" -- ");
             else
                 Error("Invalid unary operator.", p_node.PositionData);
             Print(p_node.Right);
@@ -408,9 +406,6 @@ namespace lightningAST
             if (p_node.Op == OperatorType.AND) Console.Write(" and ");
             else if (p_node.Op == OperatorType.OR) Console.Write(" or ");
             else if (p_node.Op == OperatorType.XOR) Console.Write(" xor ");
-            else if (p_node.Op == OperatorType.NAND) Console.Write(" nand ");
-            else if (p_node.Op == OperatorType.NOR) Console.Write(" nor ");
-            else if (p_node.Op == OperatorType.XNOR) Console.Write(" xnor ");
             else
                 Error("Invalid logical operation.", p_node.PositionData);
 

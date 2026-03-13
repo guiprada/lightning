@@ -269,6 +269,23 @@ namespace lightningUnit
                     TableUnit this_table = vm.GetTable(0);
                     string value = "";
                     bool first = true;
+                    // List-mode: join Elements as comma-separated values
+                    if (this_table.Elements != null)
+                    {
+                        foreach (Unit v in this_table.Elements)
+                        {
+                            if (first)
+                            {
+                                value += System.Text.RegularExpressions.Regex.Unescape(v.ToString());
+                                first = false;
+                            }
+                            else
+                            {
+                                value += ", " + System.Text.RegularExpressions.Regex.Unescape(v.ToString());
+                            }
+                        }
+                    }
+                    // Map-mode: join entries as key : value pairs
                     foreach (KeyValuePair<Unit, Unit> entry in this_table.Map)
                     {
                         if (first)
