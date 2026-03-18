@@ -344,7 +344,9 @@ namespace lightningAST
 			else if (Match(TokenType.LEFT_BRACE))
 			{
 				Node statement = Block();
-				ElideMany(TokenType.NEW_LINE);
+				// Do NOT eat trailing newlines here: a newline after '}' must break
+				// compound call chains (e.g. \{...}\n(...) should NOT be a call).
+				// Each caller that needs to cross a newline (e.g. If/else) handles it locally.
 				return statement;
 			}
 			else
@@ -447,6 +449,7 @@ namespace lightningAST
 			);
 
 			Node then_branch = Statement();
+			ElideMany(TokenType.NEW_LINE); // allow 'else' to appear on the next line after '}'
 
 			Node else_branch = null;
 			if (Match(TokenType.ELSE))

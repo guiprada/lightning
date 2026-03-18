@@ -50,11 +50,12 @@ var assert_not = assert_counter.assert_not
     assert(result, 1, "Failed Grouping after function call Test.")
 }
 {
-    // Case 1: Triple chained call on same line
-    // return_id(n) returns an identity function; identity(f) returns f; f() gives 42
-    var return_id = \(n){ return \(x){ return x } }
-    var result = return_id(5)(\{return 42})()
-    assert(result, 42, "Failed triple compound call same-line test.")
+    // Case 1: Triple chained call — also tests upvalue chaining (BUG: currently crashes)
+    // make_adder(n) returns a closure; that closure takes f and returns \{ f() + n }.
+    // The innermost closure captures f (1 level up) AND n (2 levels up).
+    var make_adder = \(n){ return \(f){ return \{ return f() + n } } }
+    var result = make_adder(5)(\{return 42})()
+    assert(result, 47, "Failed triple compound call same-line test.")
 }
 {
     // Case 2: Two calls on first line, newline, then (0) on next line is NOT chained
