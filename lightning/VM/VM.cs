@@ -599,8 +599,18 @@ namespace lightningVM
                                 List<UpValueUnit> new_upValues = new List<UpValueUnit>();
                                 foreach (UpValueUnit u in this_closure.UpValues)
                                 {
-                                    // here we convert env from shift based to absolute based
-                                    UpValueUnit new_upvalue = registeredUpValues.Get(u.Address, CalculateEnvShiftUpVal(u.Env));
+                                    UpValueUnit new_upvalue;
+                                    if (u.IsChained)
+                                        // Chained: reuse the upvalue from the immediately enclosing closure.
+                                        new_upvalue = upValues.GetAt(u.ChainedIndex);
+                                    else
+                                    {
+                                        // Direct: u.Env is the absolute compiler env index.
+                                        // CalculateEnvShiftUpVal subtracts 1 because global env[0]
+                                        // is not tracked in registeredUpValues.
+                                        Operand renv = CalculateEnvShiftUpVal(u.Env);
+                                        new_upvalue = registeredUpValues.Get(u.Address, renv);
+                                    }
                                     new_upValues.Add(new_upvalue);
                                 }
                                 ClosureUnit new_closure = new ClosureUnit(this_closure.Function, new_upValues);

@@ -6,6 +6,10 @@ namespace lightningUnit
     {
         public Operand Address { get; private set; }
         public Operand Env { get; private set; }
+        // IsChained: true when this is a template upvalue that references an upvalue
+        // from the immediately enclosing closure's upvalue array (instead of a local var slot).
+        public bool IsChained { get; private set; }
+        public Operand ChainedIndex { get; private set; }
         private bool isCaptured;
         public bool IsCaptured { get { return isCaptured; } }
         private lightningVM.Memory<Unit> variables;
@@ -39,6 +43,20 @@ namespace lightningUnit
         {
             Address = p_Address;
             Env = p_Env;
+            IsChained = false;
+            ChainedIndex = 0;
+            isCaptured = false;
+            variables = null;
+            value = new Unit(UnitType.Void);
+        }
+
+        // Template constructor for chained upvalues: references enclosing closure's upvalue[p_ChainedIndex]
+        public UpValueUnit(Operand p_ChainedIndex, bool isChained)
+        {
+            Address = 0;
+            Env = 0;
+            IsChained = true;
+            ChainedIndex = p_ChainedIndex;
             isCaptured = false;
             variables = null;
             value = new Unit(UnitType.Void);

@@ -40,4 +40,61 @@ var assert_not = assert_counter.assert_not
 	f3()
 	assert(get_a(), 6, "Failed Nested UpValue Test 2.")
 }
+{
+	// UpValue chaining: 1 level deep (should already work)
+	// Inner closure captures a single param from immediately enclosing function.
+	var make1 = \(n) { return \{ return n } }
+	assert(make1(7)(), 7, "Failed UpValue chain 1-level (param).")
+
+	var make2 = \(n) {
+		var local = n + 1
+		return \{ return local }
+	}
+	assert(make2(9)(), 10, "Failed UpValue chain 1-level (local).")
+}
+{
+	// UpValue chaining: 2 levels deep (BUG: currently crashes)
+	// Innermost closure captures n which lives 2 function scopes up.
+	var make_outer = \(n) {
+		return \(f) {
+			return \{ return n }
+		}
+	}
+	assert(make_outer(3)(0)(), 3, "Failed UpValue chain 2-level (param only).")
+}
+{
+	// UpValue chaining: 2 levels, capture both immediate and distant scope (BUG)
+	var make_adder = \(n) {
+		return \(f) {
+			return \{ return f() + n }
+		}
+	}
+	assert(make_adder(5)(\{return 42})(), 47, "Failed UpValue chain 2-level (param+closure).")
+}
+{
+	// UpValue chaining: 2 levels, capture a local (not param) from 2 levels up (BUG)
+	var make_outer2 = \{
+		var base = 100
+		return \(x) {
+			return \{ return base + x }
+		}
+	}
+	assert(make_outer2()(7)(), 107, "Failed UpValue chain 2-level (local+param).")
+}
+{
+	// UpValue chaining: mutation through chain — captured var is incremented by innermost (BUG)
+	var make_counter = \{
+		var count = 0
+		return \{
+			return \{
+				count = count + 1
+				return count
+			}
+		}
+	}
+	var inc = make_counter()()
+	assert(inc(), 1, "Failed UpValue chain mutation 1.")
+	assert(inc(), 2, "Failed UpValue chain mutation 2.")
+	assert(inc(), 3, "Failed UpValue chain mutation 3.")
+}
 return assert_counter.get_error_counter()

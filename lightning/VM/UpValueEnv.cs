@@ -16,6 +16,7 @@ namespace lightningVM
             top = 0;
             variables = p_variables;
         }
+        public int Top { get { return top; } }
         public void Trim()
         {
             for (int i = 0; i < (env.Count - 1); i++)

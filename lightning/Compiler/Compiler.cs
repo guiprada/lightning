@@ -27,6 +27,10 @@ namespace lightningCompiler
 			public int envIndex;
 			public Node expression;
 			public ValueType type;
+			// For UpValue variables: isChained=true means this upvalue is resolved through
+			// the immediately enclosing closure's upvalue array (not a local variable slot).
+			public bool isChained;
+			public int chainedIndex; // index in the enclosing closure's upvalue array
 			public Variable(string p_name, int p_address, int p_envIndex, ValueType p_type)
 			{
 				name = p_name;
@@ -34,6 +38,8 @@ namespace lightningCompiler
 				envIndex = p_envIndex;
 				expression = null;
 				type = p_type;
+				isChained = false;
+				chainedIndex = 0;
 			}
 
 			public Variable(Node p_expression)
@@ -43,6 +49,8 @@ namespace lightningCompiler
 				envIndex = -1;
 				expression = p_expression;
 				type = ValueType.Expression;
+				isChained = false;
+				chainedIndex = 0;
 			}
 		}
 
@@ -55,8 +63,8 @@ namespace lightningCompiler
 		private List<object> dataLiterals;
 		private List<List<string>> env;
 		private List<string> globals;
-		private Stack<List<Variable>> upvalueStack;
-		private Stack<int> funStartEnv;
+		private List<List<Variable>> upvalueStack; // index 0 = outermost fn, last = innermost fn
+		private List<int> funStartEnv;             // absolute compiler env index where each fn starts
 		public List<string> Errors { get; private set; }
 
 		public Chunk Chunk
@@ -103,10 +111,10 @@ namespace lightningCompiler
 			Errors = new List<string>();
 			globals = new List<string>();
 			dataLiterals = new List<dynamic>();
-			upvalueStack = new Stack<List<Variable>>();
+			upvalueStack = new List<List<Variable>>();
 			env = new List<List<string>>();
 			env.Add(globals);// set env[0] to globals
-			funStartEnv = new Stack<int>();
+			funStartEnv = new List<int>();
 
 			// place prelude functions on data
 			foreach (IntrinsicUnit v in p_prelude.intrinsics)
@@ -442,7 +450,7 @@ namespace lightningCompiler
 					Add(OpCode.LOAD_GLOBAL, (Operand)p_variable.address, p_positionData);
 					break;
 				case ValueType.UpValue:
-					int this_index = upvalueStack.Peek().IndexOf(p_variable);
+					int this_index = IndexOfUpValue(p_variable, upvalueStack[upvalueStack.Count - 1]);
 					Add(OpCode.LOAD_UPVALUE, (Operand)this_index, p_positionData);
 					break;
 				case ValueType.Expression:
@@ -532,7 +540,7 @@ namespace lightningCompiler
 							Add(OpCode.ASSIGN_GLOBAL, (Operand)this_var.address, op, p_node.PositionData);
 							break;
 						case ValueType.UpValue:
-							int this_index = upvalueStack.Peek().IndexOf(this_var);
+							int this_index = IndexOfUpValue(this_var, upvalueStack[upvalueStack.Count - 1]);
 							Add(OpCode.ASSIGN_UPVALUE, (Operand)this_index, op, p_node.PositionData);
 							break;
 					}
@@ -753,7 +761,7 @@ namespace lightningCompiler
 			env.Add(new List<string>());
 			Add(OpCode.OPEN_ENV, p_node.PositionData);
 			//Add funStartEnv
-			funStartEnv.Push(env.Count - 1);
+			funStartEnv.Add(env.Count - 1);
 
 			int exit_instruction_address = instructionCounter;
 			Add(OpCode.RETURN_SET, 0, p_node.PositionData);
@@ -767,25 +775,30 @@ namespace lightningCompiler
 					arity++;
 				}
 
-			upvalueStack.Push(new List<Variable>());
+			upvalueStack.Add(new List<Variable>());
 			foreach (Node n in p_node.Body)
 				ChunkIt(n);
 
 			bool is_closure = false;
-			if (upvalueStack.Peek().Count != 0)
+			int lastFn = upvalueStack.Count - 1;
+			if (upvalueStack[lastFn].Count != 0)
 			{
 				is_closure = true;
-				List<Variable> this_variables = upvalueStack.Pop();
+				List<Variable> this_variables = upvalueStack[lastFn];
+				upvalueStack.RemoveAt(lastFn);
 				List<UpValueUnit> new_upvalues = new List<UpValueUnit>();
 				foreach (Variable v in this_variables)
 				{
-					new_upvalues.Add(new UpValueUnit((Operand)v.address, (Operand)v.envIndex));
+					if (v.isChained)
+						new_upvalues.Add(new UpValueUnit((Operand)v.chainedIndex, true));
+					else
+						new_upvalues.Add(new UpValueUnit((Operand)v.address, (Operand)v.envIndex));
 				}
 				ClosureUnit new_closure = new ClosureUnit(new_function, new_upvalues);
 				chunk.SwapDataLiteral(this_address, new Unit(new_closure));
 			}
 			else
-				upvalueStack.Pop();
+				upvalueStack.RemoveAt(lastFn);
 
 			// fix the exit address
 			chunk.FixInstruction(exit_instruction_address, null, (Operand)(instructionCounter - exit_instruction_address), null, null);
@@ -806,7 +819,7 @@ namespace lightningCompiler
 			env.RemoveAt(env.Count - 1);
 
 			//pop fun start env
-			funStartEnv.Pop();
+			funStartEnv.RemoveAt(funStartEnv.Count - 1);
 		}
 
 		//////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -823,11 +836,10 @@ namespace lightningCompiler
 					bool isGlobal = (i == 0);
 					if (!isGlobal)
 					{
-						if (is_in_function && i < funStartEnv.Peek())
-						{// not global
-							List<Variable> this_upvalues = upvalueStack.Peek();
-							Variable this_upvalue = GetOrSetUpValue(p_name, this_env.IndexOf(p_name), i, this_upvalues);
-							return this_upvalue;
+						int currentFnLevel = upvalueStack.Count - 1;
+						if (is_in_function && i < funStartEnv[currentFnLevel])
+						{// not global — upvalue, possibly chained
+							return GetUpValueWithChaining(p_name, this_env.IndexOf(p_name), i, currentFnLevel);
 						}
 						// local var
 						return new Variable(p_name, this_env.IndexOf(p_name), top_index - i, ValueType.Local);
@@ -846,14 +858,75 @@ namespace lightningCompiler
 			return null;
 		}
 
-		private Variable GetOrSetUpValue(string p_name, int p_address, int p_env, List<Variable> p_list)
+		// Find the index of a Variable in an upvalue list by name+chained flag.
+		private int IndexOfUpValue(Variable p_variable, List<Variable> p_list)
 		{
-			foreach (Variable v in p_list)
-				if (p_name == v.name) return v;
+			for (int i = 0; i < p_list.Count; i++)
+				if (p_list[i].name == p_variable.name && p_list[i].isChained == p_variable.isChained)
+					return i;
+			return -1;
+		}
 
-			Variable this_upvalue = new Variable(p_name, p_address, p_env, ValueType.UpValue);
-			p_list.Add(this_upvalue);
-			return this_upvalue;
+		// Set up upvalue capture with chaining through intermediate closure levels.
+		// p_envIndex is the absolute compiler env where p_name lives.
+		// p_currentFnLevel is the innermost function level (index into upvalueStack/funStartEnv).
+		private Variable GetUpValueWithChaining(string p_name, int p_address, int p_envIndex, int p_currentFnLevel)
+		{
+			// Find which function level "owns" this env slot.
+			int ownerLevel = -1;
+			for (int k = 0; k < funStartEnv.Count; k++)
+			{
+				int fnStart = funStartEnv[k];
+				int fnEnd = (k + 1 < funStartEnv.Count) ? funStartEnv[k + 1] : env.Count;
+				if (p_envIndex >= fnStart && p_envIndex < fnEnd)
+				{ ownerLevel = k; break; }
+			}
+
+			// directLevel: the function that can directly see the variable in registeredUpValues
+			// at its own DECLARE_FUNCTION time.
+			// When ownerLevel >= 0: the function immediately inside the owner captures it directly.
+			// When ownerLevel == -1: the variable is in an outer BLOCK scope (not inside any function);
+			//   the outermost function (level 0) can see it at DECLARE_FUNCTION time.
+			int directLevel = (ownerLevel >= 0) ? ownerLevel + 1 : 0;
+			// Store the absolute compiler env index in the upvalue template.
+			// At runtime, VM uses CalculateEnvShiftUpVal(u.Env) = u.Env - 1 to convert to
+			// the registeredUpValues index (global env[0] is not pushed to registeredUpValues).
+
+			// Add direct upvalue at directLevel (or reuse if already there).
+			Variable result = GetOrAddDirectUpValue(p_name, p_address, p_envIndex, directLevel);
+
+			// Chain through any intermediate levels up to currentFnLevel.
+			for (int level = directLevel + 1; level <= p_currentFnLevel; level++)
+			{
+				int prevIdx = IndexOfUpValue(result, upvalueStack[level - 1]);
+				result = GetOrAddChainedUpValue(p_name, prevIdx, level);
+			}
+
+			return result;
+		}
+
+		private Variable GetOrAddDirectUpValue(string p_name, int p_address, int p_relativeEnv, int p_fnLevel)
+		{
+			List<Variable> list = upvalueStack[p_fnLevel];
+			for (int i = 0; i < list.Count; i++)
+				if (list[i].name == p_name && !list[i].isChained)
+					return list[i];
+			Variable v = new Variable(p_name, p_address, p_relativeEnv, ValueType.UpValue);
+			list.Add(v);
+			return v;
+		}
+
+		private Variable GetOrAddChainedUpValue(string p_name, int p_chainedIndex, int p_fnLevel)
+		{
+			List<Variable> list = upvalueStack[p_fnLevel];
+			for (int i = 0; i < list.Count; i++)
+				if (list[i].name == p_name && list[i].isChained)
+					return list[i];
+			Variable v = new Variable(p_name, 0, 0, ValueType.UpValue);
+			v.isChained = true;
+			v.chainedIndex = p_chainedIndex;
+			list.Add(v);
+			return v;
 		}
 
 		private bool IsLocalVar(string p_name)
