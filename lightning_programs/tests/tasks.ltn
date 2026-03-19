@@ -45,20 +45,14 @@ var assert_not = assert_counter.assert_not
 
 {
 	// func returns null: result table has n null slots (option A — size is always n)
-	// Note: null is not comparable in Lightning (null == x throws), so we verify
-	// only that the table has exactly n slots and that accessing them does not throw.
 	var n = 4
 	function returns_null(args) { return null }
 	var result = tasks(n, returns_null, 0)
 	assert(result:count(), n, "tasks() null return: result size should be n.")
-	var accessed_ok = 0
 	for (var i = 0; i < n; i++)
 	{
-		var slot_access = try(\{ result[i] }, [])
-		if (slot_access:is_ok())
-			accessed_ok++
+		assert(is_null(result[i]), true, "tasks() null return: slot " .. i .. " should be null.")
 	}
-	assert(accessed_ok, n, "tasks() null return: all null slots should be accessible.")
 }
 
 {

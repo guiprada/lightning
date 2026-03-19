@@ -388,6 +388,14 @@ namespace lightningPrelude
             functions.Add(new IntrinsicUnit("tasks", Tasks, 3));
 
             //////////////////////////////////////////////////////
+            Unit IsNull(VM p_vm)
+            {
+                Unit value = p_vm.GetUnit(0);
+                return new Unit(value.Type == UnitType.Void);
+            }
+            functions.Add(new IntrinsicUnit("is_null", IsNull, 1));
+
+            //////////////////////////////////////////////////////
             Unit GetOS(VM p_vm)
             {
                 return new Unit(Environment.OSVersion.VersionString);
