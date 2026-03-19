@@ -605,11 +605,14 @@ namespace lightningVM
                                         new_upvalue = upValues.GetAt(u.ChainedIndex);
                                     else
                                     {
-                                        // Direct: u.Env is the absolute compiler env index.
-                                        // CalculateEnvShiftUpVal subtracts 1 because global env[0]
-                                        // is not tracked in registeredUpValues.
-                                        Operand renv = CalculateEnvShiftUpVal(u.Env);
-                                        new_upvalue = registeredUpValues.Get(u.Address, renv);
+                                        // Direct: u.Env is relativeDepth (computed at compile time).
+                                        // runtimeEnv = registeredUpValues.Top - 1 - relativeDepth
+                                        // This is correct even when outer functions have returned and
+                                        // their registeredUpValues slots were recycled, because we
+                                        // measure depth from the current top rather than using an
+                                        // absolute slot index.
+                                        Operand runtimeEnv = (Operand)(registeredUpValues.Top - 1 - u.Env);
+                                        new_upvalue = registeredUpValues.Get(u.Address, runtimeEnv);
                                     }
                                     new_upValues.Add(new_upvalue);
                                 }

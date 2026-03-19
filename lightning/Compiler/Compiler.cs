@@ -888,12 +888,20 @@ namespace lightningCompiler
 			// When ownerLevel == -1: the variable is in an outer BLOCK scope (not inside any function);
 			//   the outermost function (level 0) can see it at DECLARE_FUNCTION time.
 			int directLevel = (ownerLevel >= 0) ? ownerLevel + 1 : 0;
-			// Store the absolute compiler env index in the upvalue template.
-			// At runtime, VM uses CalculateEnvShiftUpVal(u.Env) = u.Env - 1 to convert to
-			// the registeredUpValues index (global env[0] is not pushed to registeredUpValues).
+			// relativeDepth: how far the variable's env slot is from registeredUpValues.Top
+			// at the moment DECLARE_FUNCTION runs for the function at directLevel.
+			//
+			// (funStartEnv[directLevel] - 1) is the number of non-global env levels that
+			// are live when fn_directLevel's DECLARE_FUNCTION executes (it equals the
+			// compiler env count just before fn_directLevel's first env was pushed).
+			// Subtracting p_envIndex gives the offset from the top of that stack to where
+			// the variable lives.
+			//
+			// At runtime:  runtimeEnv = registeredUpValues.Top - 1 - relativeDepth
+			int relativeDepth = (funStartEnv[directLevel] - 1) - p_envIndex;
 
 			// Add direct upvalue at directLevel (or reuse if already there).
-			Variable result = GetOrAddDirectUpValue(p_name, p_address, p_envIndex, directLevel);
+			Variable result = GetOrAddDirectUpValue(p_name, p_address, relativeDepth, directLevel);
 
 			// Chain through any intermediate levels up to currentFnLevel.
 			for (int level = directLevel + 1; level <= p_currentFnLevel; level++)
