@@ -19,6 +19,7 @@ namespace lightningUnit
                 return UnitType.Table;
             }
         }
+        public bool Frozen { get; set; }
         public int ElemCount => Elements?.Count ?? 0;
         public int MapCount => Map.Count;
         public int Count => ElemCount + MapCount;
@@ -85,6 +86,8 @@ namespace lightningUnit
         }
         public override void Set(Unit p_key, Unit p_value)
         {
+            if (Frozen)
+                throw Exceptions.frozen_mutation;
             if (p_key.Type == UnitType.Integer && Elements != null)
             {
                 int idx = (int)p_key.integerValue;
