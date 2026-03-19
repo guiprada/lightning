@@ -29,6 +29,7 @@ bld/
 #Custom
 win_builds/
 linux_builds/
+Defaults.json
 lightning_programs/*.out
 lightning_programs/*.tokens
 lightning_programs/*.ast
