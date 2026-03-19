@@ -361,7 +361,6 @@ namespace lightningPrelude
             //////////////////////////////////////////////////////
             Unit Tasks(VM p_vm)
             {
-
                 Integer n_tasks = p_vm.GetInteger(0);
                 Unit func = p_vm.GetUnit(1);
                 Unit arguments = p_vm.GetUnit(2);
@@ -372,17 +371,18 @@ namespace lightningPrelude
                     vms[i] = p_vm.GetParallelVM();
                 }
 
+                Unit[] results = new Unit[n_tasks];
                 System.Threading.Tasks.Parallel.For(0, n_tasks, (index) =>
                 {
                     List<Unit> args = new List<Unit>();
                     args.Add(arguments);
-                    vms[index].ProtectedCallFunction(func, args);
+                    results[index] = vms[index].CallFunction(func, args);
                 });
-                for (int i = 0; i<n_tasks; i++)
+                for (int i = 0; i < n_tasks; i++)
                 {
                     p_vm.RecycleVM(vms[i]);
                 }
-                return new Unit(true);
+                return new Unit(new TableUnit(new List<Unit>(results), null));
             }
 
             functions.Add(new IntrinsicUnit("tasks", Tasks, 3));
