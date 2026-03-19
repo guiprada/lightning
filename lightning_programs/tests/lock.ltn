@@ -26,24 +26,43 @@ var global_lock_test_counter = 5
 	assert(upvalue_lock_test_counter, n + 5, "Failed UpValue Lock Test 1.")
 }
 {
-	// False contention test (BUG: performance, not correctness)
-	// All Float/Integer/Bool globals share TypeUnit.Float/Integer/Boolean as their lock object.
-	// This means parallel tasks updating DIFFERENT globals of the same type serialize
-	// unnecessarily. After the fix (per-slot lock array), they will run independently.
-	//
-	// Correctness: independent parallel updates to two separate global counters must
-	// both reach the right totals. This test will PASS both before and after the fix.
-	// Performance improvement can only be validated by timing, not assertion.
+	// False contention test: two Integer globals updated concurrently from the same pmap.
+	// Before the per-slot lock fix both locked on TypeUnit.Integer (shared singleton),
+	// so tasks for counter_a serialized against tasks for counter_b unnecessarily.
+	// After the fix each slot has its own lock object; the correctness assertion
+	// catches any regression that breaks isolation.
+	var n = 1000
+	var list = ListInit(n, 0)
 	var counter_a = 0
 	var counter_b = 0
-	var n = 500
-	function inc_a(value) { counter_a += value }
-	function inc_b(value) { counter_b += value }
-	tasks(n, inc_a, 1)
-	tasks(n, inc_b, 1)
-	assert(counter_a, n, "Failed false contention test A (counter_a wrong).")
-	assert(counter_b, n, "Failed false contention test B (counter_b wrong).")
-	// After per-slot lock fix: counter_a and counter_b should use independent locks,
-	// so tasks(n, inc_a) and tasks(n, inc_b) running concurrently won't serialize.
+	function split_int(item, index)
+	{
+		if (index < 500)
+			counter_a += 1
+		else
+			counter_b += 1
+		return item
+	}
+	list:pmap(split_int)
+	assert(counter_a, 500, "Failed false contention test: counter_a (Integer).")
+	assert(counter_b, 500, "Failed false contention test: counter_b (Integer).")
+}
+{
+	// False contention test: Integer and Float globals updated concurrently.
+	var n = 1000
+	var list = ListInit(n, 0)
+	var int_count = 0
+	var float_count = 0.0
+	function split_mixed(item, index)
+	{
+		if (index < 500)
+			int_count += 1
+		else
+			float_count += 1.0
+		return item
+	}
+	list:pmap(split_mixed)
+	assert(int_count, 500, "Failed false contention test: int_count.")
+	assert(float_count, 500.0, "Failed false contention test: float_count.")
 }
 return assert_counter.get_error_counter()
