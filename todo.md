@@ -9,6 +9,11 @@ Phase 1 - Stabilize the language (current)
     - Collapse NEW_LIST opcode -> NEW_TABLE
     - Remove UnitType.List and ListUnit class
     - This fixes the inheritance/prototype chain (everything is a table again)
+
+    - the pattern:
+      int size = this_table.Elements != null ? this_table.Elements.Count : 0;
+      should be build in .Elements.Count() - if Elements == null -> return 0
+      - Remove this patter where it was added :) (Nuple.cs, TableUnit.cs:26, )
   - Fix line breaks and IIFE/coumpound Call constructs.
     - I think the solution is to double down on the newlines, there should not be newlines in a compount Call - they have to be on the same line; It it better this way 'cos this is the 'special' construct - spreading calls in lines should bring no suprises.
   - Fix concurrency false contention: value-type globals (Float/Integer/Bool) all share
