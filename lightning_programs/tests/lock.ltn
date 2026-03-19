@@ -26,7 +26,20 @@ var global_lock_test_counter = 5
 	assert(upvalue_lock_test_counter, n + 5, "Failed UpValue Lock Test 1.")
 }
 {
-	// False contention test: two Integer globals updated concurrently from the same pmap.
+	// False contention via tasks(): two Integer globals updated by separate task batches.
+	// Sequential batches, but verifies the tasks() path doesn't corrupt independent globals.
+	var n = 500
+	var tasks_a = 0
+	var tasks_b = 0
+	function inc_a(value) { tasks_a += value }
+	function inc_b(value) { tasks_b += value }
+	tasks(n, inc_a, 1)
+	tasks(n, inc_b, 1)
+	assert(tasks_a, n, "Failed false contention tasks() test: tasks_a.")
+	assert(tasks_b, n, "Failed false contention tasks() test: tasks_b.")
+}
+{
+	// False contention via pmap(): two Integer globals updated concurrently from the same batch.
 	// Before the per-slot lock fix both locked on TypeUnit.Integer (shared singleton),
 	// so tasks for counter_a serialized against tasks for counter_b unnecessarily.
 	// After the fix each slot has its own lock object; the correctness assertion
@@ -44,11 +57,11 @@ var global_lock_test_counter = 5
 		return item
 	}
 	list:pmap(split_int)
-	assert(counter_a, 500, "Failed false contention test: counter_a (Integer).")
-	assert(counter_b, 500, "Failed false contention test: counter_b (Integer).")
+	assert(counter_a, 500, "Failed false contention pmap() test: counter_a (Integer).")
+	assert(counter_b, 500, "Failed false contention pmap() test: counter_b (Integer).")
 }
 {
-	// False contention test: Integer and Float globals updated concurrently.
+	// False contention via pmap(): Integer and Float globals updated concurrently.
 	var n = 1000
 	var list = ListInit(n, 0)
 	var int_count = 0
@@ -62,7 +75,7 @@ var global_lock_test_counter = 5
 		return item
 	}
 	list:pmap(split_mixed)
-	assert(int_count, 500, "Failed false contention test: int_count.")
-	assert(float_count, 500.0, "Failed false contention test: float_count.")
+	assert(int_count, 500, "Failed false contention pmap() test: int_count.")
+	assert(float_count, 500.0, "Failed false contention pmap() test: float_count.")
 }
 return assert_counter.get_error_counter()
