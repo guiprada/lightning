@@ -54,10 +54,17 @@ namespace lightningAST
 						else
 						{
 							hasScanned = true;
-							using (StreamWriter file = new StreamWriter(lightningPath.ToPath(moduleName) + ".tokens", false))
+							try
 							{
-								foreach (Token token in tokens)
-									file.WriteLine(token.ToString());
+								using (StreamWriter file = new StreamWriter(lightningPath.ToPath(moduleName) + ".tokens", false))
+								{
+									foreach (Token token in tokens)
+										file.WriteLine(token.ToString());
+								}
+							}
+							catch (Exception e)
+							{
+								Logger.LogLine("Could not write .tokens file: " + e.Message, Defaults.Config.ScannerLogFile);
 							}
 						}
 					}

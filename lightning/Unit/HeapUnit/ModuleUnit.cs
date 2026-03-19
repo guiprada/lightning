@@ -13,6 +13,7 @@ namespace lightningUnit
         public Dictionary<Unit, Unit> Table { get; private set; }
         public List<Unit> globals;
         public List<Unit> Globals { get { return globals; } private set { globals = value; } }
+        private readonly object[] globalLocks;
         public List<Unit> Data { get; private set; }
         public Operand ImportIndex { get; set; }
         public override UnitType Type
@@ -29,19 +30,22 @@ namespace lightningUnit
             Globals = p_Globals ??= new List<Unit>();
             Data = p_Data ??= new List<Unit>();
             ImportIndex = 0;
+            globalLocks = new object[Globals.Count];
+            for (int i = 0; i < globalLocks.Length; i++)
+                globalLocks[i] = new object();
         }
 
         public Unit GetGlobal(Operand p_index)
         {
             Unit value;
-            lock (globals[p_index].heapUnitValue)
+            lock (globalLocks[p_index])
                 value = globals[p_index];
             return value;
         }
 
         public void SetGlobal(Unit p_value, Operand p_index)
         {
-            lock (globals[p_index].heapUnitValue)
+            lock (globalLocks[p_index])
                 globals[p_index] = p_value;
         }
 
@@ -50,23 +54,23 @@ namespace lightningUnit
             switch (op)
             {
                 case VM.ASSIGN:
-                    lock (globals[p_index].heapUnitValue)
+                    lock (globalLocks[p_index])
                         globals[p_index] = p_value;
                     break;
                 case VM.ADDITION_ASSIGN:
-                    lock (globals[p_index].heapUnitValue)
+                    lock (globalLocks[p_index])
                         globals[p_index] += p_value;
                     break;
                 case VM.SUBTRACTION_ASSIGN:
-                    lock (globals[p_index].heapUnitValue)
+                    lock (globalLocks[p_index])
                         globals[p_index] -= p_value;
                     break;
                 case VM.MULTIPLICATION_ASSIGN:
-                    lock (globals[p_index].heapUnitValue)
+                    lock (globalLocks[p_index])
                         globals[p_index] *= p_value;
                     break;
                 case VM.DIVISION_ASSIGN:
-                    lock (globals[p_index].heapUnitValue)
+                    lock (globalLocks[p_index])
                         globals[p_index] /= p_value;
                     break;
                 default:

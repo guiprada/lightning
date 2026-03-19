@@ -64,14 +64,6 @@ Read the VM log to understand the failure mode before writing any code.
 - No regressions in other test files.
 - If fixing a crash: confirm `Program returned: <correct value>`, no ERROR.
 
-## Known Bugs (tracked)
-
-| # | Description | Test file | Status |
-|---|-------------|-----------|--------|
-| 1 | Upvalue chaining: innermost closure crashes when capturing from 2+ levels up | `tests/up_value.ltn`, `tests/compound_calls.ltn` | Failing test added, fix pending |
-| 2 | Concurrency false contention: value-type globals share TypeUnit singleton as lock object | `tests/lock.ltn` | Failing test pending |
-| 3 | Roslyn: `linux_builds/refs/` not set up — runtime assembly resolution fails | `tests/roslyn.ltn` | Environment setup pending |
-
 ## Logs
 
 - `lightning_programs/_vm.log` — VM runtime log (exceptions, errors)

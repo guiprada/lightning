@@ -19,6 +19,7 @@ namespace lightningVM
         List<Instruction> instructionsCache;
 
         Memory<Unit> globals; // used for global variables
+        List<object> globalLocks; // per-slot lock objects, indexed same as globals
         Memory<Unit> variables; // used for scoped variables
         List<Unit> data;
 
@@ -64,16 +65,19 @@ namespace lightningVM
             data = p_chunk.GetData;
             Prelude = p_chunk.Prelude;
             globals = new Memory<Unit>();
+            globalLocks = new List<object>();
             Intrinsics = p_chunk.Prelude.intrinsics;
             foreach (IntrinsicUnit v in Intrinsics)
             {
                 // lock(globals) // not needed because this vm initialization does not run in parallel
                 globals.Add(new Unit(v));
+                globalLocks.Add(new object());
             }
             foreach (KeyValuePair<string, TableUnit> entry in p_chunk.Prelude.tables)
             {
                 // lock(globals) // not needed because this vm initialization does not run in parallel
                 globals.Add(new Unit(entry.Value));
+                globalLocks.Add(new object());
             }
             LoadedModules = new Dictionary<string, int>();
             modules = new List<ModuleUnit>();
@@ -85,6 +89,7 @@ namespace lightningVM
             FunctionUnit p_main,
             List<Unit> p_data,
             Memory<Unit> p_globals,
+            List<object> p_globalLocks,
             Library p_Prelude,
             Dictionary<string, int> p_LoadedModules,
             List<ModuleUnit> p_modules,
@@ -94,6 +99,7 @@ namespace lightningVM
             main = p_main;
             data = p_data;
             globals = p_globals;
+            globalLocks = p_globalLocks;
             Prelude = p_Prelude;
             LoadedModules = p_LoadedModules;
             modules = p_modules;
@@ -167,7 +173,7 @@ namespace lightningVM
             }
             else
             {
-                VM new_vm = new VM(main, data, globals, Prelude, LoadedModules, modules, vmPool, p_parallelVM);
+                VM new_vm = new VM(main, data, globals, globalLocks, Prelude, LoadedModules, modules, vmPool, p_parallelVM);
                 return new_vm;
             }
         }
@@ -514,7 +520,7 @@ namespace lightningVM
                     case OpCode.LOAD_GLOBAL:
                         IP++;
                         if (parallelVM == true)
-                            lock (globals.Get(instruction.opA).heapUnitValue) // needed because global may be loaded from parallel functions
+                            lock (globalLocks[instruction.opA]) // needed because global may be loaded from parallel functions
                                 stack.Push(globals.Get(instruction.opA));
                         else
                             stack.Push(globals.Get(instruction.opA));
@@ -568,6 +574,7 @@ namespace lightningVM
                             throw Exceptions.non_value_assign;
 
                         globals.Add(stack.Pop());
+                        globalLocks.Add(new object());
                         break;
                     case OpCode.DECLARE_FUNCTION:
                         {
@@ -583,6 +590,7 @@ namespace lightningVM
                                     {
                                         // lock(globals) // not needed because global declaration can not happen inside parallel functions
                                         globals.Add(this_callable);
+                                        globalLocks.Add(new object());
                                     }
                                     else
                                     {
@@ -624,6 +632,7 @@ namespace lightningVM
                                     {
                                         // lock(globals) // not needed because global declaration can not happen inside parallel functions
                                         globals.Add(new_closure_unit);
+                                        globalLocks.Add(new object());
                                     }
                                     else
                                     {
@@ -689,32 +698,32 @@ namespace lightningVM
                                 switch (op)
                                 {
                                     case ASSIGN:
-                                        lock (globals.Get(address).heapUnitValue)
+                                        lock (globalLocks[address])
                                             globals.Set(new_value, address);
                                         break;
                                     case ADDITION_ASSIGN:
-                                        lock (globals.Get(address).heapUnitValue)
+                                        lock (globalLocks[address])
                                         {
                                             Unit result = globals.Get(address) + new_value;
                                             globals.Set(result, address);
                                         }
                                         break;
                                     case SUBTRACTION_ASSIGN:
-                                        lock (globals.Get(address).heapUnitValue)
+                                        lock (globalLocks[address])
                                         {
                                             Unit result = globals.Get(address) - new_value;
                                             globals.Set(result, address);
                                         }
                                         break;
                                     case MULTIPLICATION_ASSIGN:
-                                        lock (globals.Get(address).heapUnitValue)
+                                        lock (globalLocks[address])
                                         {
                                             Unit result = globals.Get(address) * new_value;
                                             globals.Set(result, address);
                                         }
                                         break;
                                     case DIVISION_ASSIGN:
-                                        lock (globals.Get(address).heapUnitValue)
+                                        lock (globalLocks[address])
                                         {
                                             Unit result = globals.Get(address) / new_value;
                                             globals.Set(result, address);
