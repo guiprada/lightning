@@ -19,8 +19,12 @@ Phase 1 - Stabilize the language (current)
   - Fix concurrency false contention: value-type globals (Float/Integer/Bool) all share
     TypeUnit.Float etc. as their lock object. Replace with per-address lock array
     object[] globalLocks to give independent locking per global slot.
-  - Document that tasks(n, func, args) assumes args is read-only across tasks;
-    consider factory function variant: tasks(n, \(i){ return args_for_i }, func)
+  - tasks(n, func, args) — DONE:
+    - returns n-sized result table (one slot per task, nil slots preserved)
+    - freeze-on-entry: Table args frozen for duration of tasks(), unfrozen in finally
+    - nested tasks() with same frozen table detected and rejected at runtime
+    - is_null() intrinsic added (O(1) type check, no comparison needed)
+    - switched to CallFunction (fail-fast: errors propagate out of tasks())
   - Define bytecode serialization format (.ltnc) so Chunk can be saved/loaded portably
     - This is the bridge to multi-VM targets
   - Improve error messages (parser error sync, stack traces, assert error messages)
