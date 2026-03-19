@@ -13,7 +13,7 @@ namespace lightningUnit
         public Dictionary<Unit, Unit> Table { get; private set; }
         public List<Unit> globals;
         public List<Unit> Globals { get { return globals; } private set { globals = value; } }
-        private readonly object[] globalLocks;
+        private readonly List<object> globalLocks;
         public List<Unit> Data { get; private set; }
         public Operand ImportIndex { get; set; }
         public override UnitType Type
@@ -30,9 +30,15 @@ namespace lightningUnit
             Globals = p_Globals ??= new List<Unit>();
             Data = p_Data ??= new List<Unit>();
             ImportIndex = 0;
-            globalLocks = new object[Globals.Count];
-            for (int i = 0; i < globalLocks.Length; i++)
-                globalLocks[i] = new object();
+            globalLocks = new List<object>(Globals.Count);
+            for (int i = 0; i < Globals.Count; i++)
+                globalLocks.Add(new object());
+        }
+
+        public void AddGlobal(Unit p_value)
+        {
+            globals.Add(p_value);
+            globalLocks.Add(new object());
         }
 
         public Unit GetGlobal(Operand p_index)

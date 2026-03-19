@@ -574,7 +574,7 @@ namespace lightningPrelude
             {
                 Unit new_value = relocationInfo.importedVM.GetGlobal(relocationInfo.toBeRelocatedGlobals[i]);
 
-                relocationInfo.module.Globals.Add(new_value);
+                relocationInfo.module.AddGlobal(new_value);
                 relocationInfo.relocatedGlobals.Add(
                     relocationInfo.toBeRelocatedGlobals[i],
                     (Operand)(relocationInfo.module.Globals.Count - 1));
