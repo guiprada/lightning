@@ -1,0 +1,105 @@
+var assert_counter = require("assert_counter.ltn")
+var assert = assert_counter.assert
+var assert_not = assert_counter.assert_not
+
+{
+	// Scalar args: all tasks receive same value type, result table has n slots
+	var n = 5
+	function double(args) { return args * 2 }
+	var result = tasks(n, double, 3)
+	assert(result:count(), n, "tasks() scalar: result size should be n.")
+	for (var i = 0; i < n; i++)
+	{
+		assert(result[i], 6, "tasks() scalar: slot " .. i .. " should be 6.")
+	}
+}
+
+{
+	// Table args: tasks read fields from shared table, return computed values
+	var n = 10
+	var args = Table()
+	args.x = 7
+	function read_x(args) { return args.x * 2 }
+	var result = tasks(n, read_x, args)
+	assert(result:count(), n, "tasks() table args: result size should be n.")
+	for (var i = 0; i < n; i++)
+	{
+		assert(result[i], 14, "tasks() table args: slot " .. i .. " should be 14.")
+	}
+}
+
+{
+	// n=0 edge case: zero tasks, empty result table
+	function noop(args) { return 1 }
+	var result = tasks(0, noop, 0)
+	assert(result:count(), 0, "tasks() n=0: result should be empty.")
+}
+
+{
+	// n=1 edge case: single task, single element result table
+	function identity(args) { return args }
+	var result = tasks(1, identity, 42)
+	assert(result:count(), 1, "tasks() n=1: result size should be 1.")
+	assert(result[0], 42, "tasks() n=1: slot 0 should be 42.")
+}
+
+{
+	// func returns nil: result table has n nil slots (option A — size is always n)
+	var n = 4
+	function returns_nil(args) { return nil }
+	var result = tasks(n, returns_nil, 0)
+	assert(result:count(), n, "tasks() nil return: result size should be n.")
+	for (var i = 0; i < n; i++)
+	{
+		assert(result[i], nil, "tasks() nil return: slot " .. i .. " should be nil.")
+	}
+}
+
+{
+	// Freeze: mutation attempt on table args should throw, args must be unchanged
+	var args = Table()
+	args.x = 1
+	function try_mutate(args)
+	{
+		args.x = 2
+		return args.x
+	}
+	var threw = try(\{ tasks(1, try_mutate, args) }, [])
+	assert(threw:is_error(), true, "tasks() freeze: mutation of args should throw.")
+	assert(args.x, 1, "tasks() freeze: args must be unchanged after attempted mutation.")
+}
+
+{
+	// Freeze: reading frozen table args is allowed
+	var args = Table()
+	args.value = 99
+	function read_only(args) { return args.value }
+	var result = tasks(3, read_only, args)
+	assert(result:count(), 3, "tasks() freeze read: result size should be 3.")
+	for (var i = 0; i < 3; i++)
+	{
+		assert(result[i], 99, "tasks() freeze read: slot " .. i .. " should be 99.")
+	}
+}
+
+{
+	// Freeze: scalar args are value types — no freeze needed, always safe
+	var result = tasks(4, function(args) { return args + 1 }, 10)
+	assert(result:count(), 4, "tasks() scalar freeze: result size should be 4.")
+	for (var i = 0; i < 4; i++)
+	{
+		assert(result[i], 11, "tasks() scalar freeze: slot " .. i .. " should be 11.")
+	}
+}
+
+{
+	// Large n: result table has exactly n slots, boundary slots correct
+	var n = 1000
+	function constant(args) { return args }
+	var result = tasks(n, constant, 99)
+	assert(result:count(), n, "tasks() large n: result size should be n.")
+	assert(result[0], 99, "tasks() large n: first slot should be 99.")
+	assert(result[n - 1], 99, "tasks() large n: last slot should be 99.")
+}
+
+return assert_counter.get_error_counter()

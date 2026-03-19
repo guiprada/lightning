@@ -120,6 +120,9 @@ errors += require("tests/super_table.ltn")
 write_line("Table tests ...")
 errors += require("tests/table.ltn")
 
+write_line("Tasks tests ...")
+errors += require("tests/tasks.ltn")
+
 write_line("Transient tests ...")
 errors += require("tests/transient.ltn")
 
