@@ -19,9 +19,9 @@ namespace lightningUnit
                 return UnitType.Table;
             }
         }
-        public int ListCount => Elements?.Count ?? 0;
+        public int ElemCount => Elements?.Count ?? 0;
         public int MapCount => Map.Count;
-        public int Count => ListCount + MapCount;
+        public int Count => ElemCount + MapCount;
 
         // Constructor for keyed (map-only) tables
         public TableUnit(Dictionary<Unit, Unit> p_map)
@@ -489,7 +489,7 @@ namespace lightningUnit
                     TableUnit iterator = new TableUnit(null);
                     Unit next(VM vm)
                     {
-                        int count = this_table.ListCount;
+                        int count = this_table.ElemCount;
                         if (i < (count - 1))
                         {
                             i++;
@@ -513,7 +513,7 @@ namespace lightningUnit
                     TableUnit iterator = new TableUnit(null);
                     Unit next(VM vm)
                     {
-                        int count = this_table.ListCount;
+                        int count = this_table.ElemCount;
                         if (i < (count - 1))
                         {
                             i++;

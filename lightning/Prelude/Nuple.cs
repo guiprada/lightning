@@ -25,7 +25,7 @@ namespace lightningPrelude
             Unit NupleFromList(VM p_vm)
             {
                 TableUnit this_table = p_vm.GetTable(0);
-                int size = this_table.ListCount;
+                int size = this_table.ElemCount;
                 Unit[] new_nuple = new Unit[size];
                 for(int i = 0; i < size; i++)
                     new_nuple[i] = this_table.Elements[i];
