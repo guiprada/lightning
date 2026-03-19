@@ -375,7 +375,11 @@ namespace lightningPrelude
                     ? (TableUnit)arguments.heapUnitValue
                     : null;
                 if (frozenTable != null)
+                {
+                    if (frozenTable.Frozen)
+                        throw Exceptions.tasks_frozen_args;
                     frozenTable.Frozen = true;
+                }
 
                 Unit[] results = new Unit[n_tasks];
                 try

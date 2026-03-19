@@ -70,6 +70,20 @@ var assert_not = assert_counter.assert_not
 }
 
 {
+	// Nested tasks(): passing a frozen table to an inner tasks() must throw immediately
+	var args = Table()
+	args.x = 1
+	function inner(args) { return args.x }
+	function outer(args)
+	{
+		return tasks(2, inner, args)
+	}
+	var threw = try(\{ tasks(2, outer, args) }, [])
+	assert(threw:is_error(), true, "tasks() nested: passing frozen args to inner tasks() should throw.")
+	assert(args.x, 1, "tasks() nested: args must be unchanged.")
+}
+
+{
 	// Freeze: reading frozen table args is allowed
 	var args = Table()
 	args.value = 99
