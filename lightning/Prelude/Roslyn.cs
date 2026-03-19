@@ -9,7 +9,6 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 
 using lightningTools;
 using lightningUnit;
@@ -54,11 +53,8 @@ namespace lightningPrelude
 
             Unit GetAllDotNetAssemblies(VM p_vm)
             {
-                string refDir = Directory.Exists(Defaults.Config.AssembliesPath)
-                    ? Defaults.Config.AssembliesPath
-                    : FindNetRefDir();
                 List<Unit> assemblies_list = new List<Unit>();
-                foreach (string dll in Directory.GetFiles(refDir, "*.dll"))
+                foreach (string dll in Directory.GetFiles(Defaults.Config.AssembliesPath, "*.dll"))
                 {
                     assemblies_list.Add(new Unit(dll.ToString()));
                 }
@@ -90,12 +86,11 @@ namespace lightningPrelude
                 var tree = SyntaxFactory.ParseSyntaxTree(body);
                 string file_name = name + ".dll";
 
-                string refDir = FindNetRefDir();
                 var refs = new List<PortableExecutableReference> {
                     MetadataReference.CreateFromFile(typeof(Unit).GetTypeInfo().Assembly.Location)
-                    , MetadataReference.CreateFromFile(Path.Combine(refDir, "System.Runtime.dll"))
-                    , MetadataReference.CreateFromFile(Path.Combine(refDir, "System.Console.dll"))
-                    , MetadataReference.CreateFromFile(Path.Combine(refDir, "System.Core.dll"))
+                    , MetadataReference.CreateFromFile(AppDomain.CurrentDomain.BaseDirectory + "refs/" + "System.Runtime.dll")
+                    , MetadataReference.CreateFromFile(AppDomain.CurrentDomain.BaseDirectory + "refs/" + "System.Console.dll")
+                    , MetadataReference.CreateFromFile(AppDomain.CurrentDomain.BaseDirectory + "refs/" + "System.Core.dll")
                 };
 
                 var compilation = CSharpCompilation.Create(file_name)
@@ -152,37 +147,5 @@ namespace lightningPrelude
 #endif
             return roslyn;
         }
-
-#if ROSLYN
-        // Locate the .NET SDK reference pack directory (needed for Roslyn CSharpCompilation).
-        // SDK reference assemblies contain full Roslyn metadata; runtime assemblies do not.
-        // Strategy: navigate from typeof(object).Assembly.Location up to the dotnet root,
-        // then look inside packs/Microsoft.NETCore.App.Ref/.../ref/net{major}.{minor}/.
-        // Falls back to <BaseDirectory>/refs/ for self-contained deployments where the SDK
-        // packs are absent but were copied by build.sh.
-        static string FindNetRefDir()
-        {
-            int major = Environment.Version.Major;
-            int minor = Environment.Version.Minor;
-            string tfm = $"net{major}.{minor}";
-
-            // typeof(object) lives in .../shared/Microsoft.NETCore.App/{version}/
-            string runtimeDir = Path.GetDirectoryName(typeof(object).Assembly.Location)!;
-            // Walk up three levels: {version}/ -> Microsoft.NETCore.App/ -> shared/ -> dotnet root
-            string dotnetRoot = Path.GetDirectoryName(Path.GetDirectoryName(Path.GetDirectoryName(runtimeDir)))!;
-
-            string packsBase = Path.Combine(dotnetRoot, "packs", "Microsoft.NETCore.App.Ref");
-            if (Directory.Exists(packsBase))
-            {
-                string match = Directory.GetFiles(packsBase, "System.Runtime.dll", SearchOption.AllDirectories)
-                    .FirstOrDefault(f => Path.GetFileName(Path.GetDirectoryName(f)) == tfm);
-                if (match != null)
-                    return Path.GetDirectoryName(match)!;
-            }
-
-            // Fallback for self-contained deployments: refs/ copied by build.sh
-            return Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "refs");
-        }
-#endif
     }
 }
