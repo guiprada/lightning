@@ -328,7 +328,11 @@ namespace lightningCompiler
 
 		private void ChunkLiteral(LiteralNode p_node)
 		{
-			if (p_node.ValueType == typeof(bool))
+			if (p_node.ValueType == null)
+			{
+				Add(OpCode.LOAD_VOID, p_node.PositionData);
+			}
+			else if (p_node.ValueType == typeof(bool))
 			{
 				if ((bool)p_node.Value == true)
 				{
