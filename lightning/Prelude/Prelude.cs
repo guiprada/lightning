@@ -130,53 +130,56 @@ namespace lightningPrelude
                         return new Unit(v);
                 }
 
-                string module_code;
-                using (var sr = new StreamReader(path))
-                {
-                    module_code = sr.ReadToEnd();
-                }
+                Chunk chunk;
+                string ltncPath = path + "c";
+                bool cacheHit = !Defaults.ForceRecompile
+                    && File.Exists(ltncPath)
+                    && File.GetLastWriteTimeUtc(ltncPath) >= File.GetLastWriteTimeUtc(path);
 
-                if (module_code == null)
+                if (cacheHit)
                 {
-                    Logger.LogLine("Failed to read module: " + name, Defaults.Config.VMLogFile);
-                    throw Exceptions.io_error;
+                    chunk = Chunk.Load(ltncPath, p_vm.Prelude);
                 }
                 else
                 {
+                    string module_code;
+                    using (var sr = new StreamReader(path))
+                        module_code = sr.ReadToEnd();
+
                     Scanner scanner = new Scanner(module_code, name);
                     List<Token> tokens = scanner.Tokens;
-                    if(scanner.HasScanned == false){
+                    if (scanner.HasScanned == false){
                         Logger.LogLine("Scanning Error on module: " + name, Defaults.Config.VMLogFile);
                         throw Exceptions.scanner_error;
                     }
 
                     Parser parser = new Parser(tokens, name);
                     Node program = parser.ParsedTree;
-                    if(parser.HasParsed == false){
+                    if (parser.HasParsed == false){
                         Logger.LogLine("Parsing Error on module: " + name, Defaults.Config.VMLogFile);
                         throw Exceptions.parser_error;
                     }
 
                     Compiler chunker = new Compiler(program, name, p_vm.Prelude);
-                    Chunk chunk = chunker.Chunk;
+                    chunk = chunker.Chunk;
                     if (chunker.HasChunked == false){
                         Logger.LogLine("Code Generation Error on module: " + name, Defaults.Config.VMLogFile);
                         throw Exceptions.compiler_error;
                     }
-                    else
-                    {
-                        VM imported_vm = new VM(chunk);
-                        ResultUnit result = imported_vm.ProtectedRun();
-                        if (result.IsOK){
-                            MakeModule(result.Value, name, p_vm, imported_vm);
-                            return result.Value;
-                        }
-                        else
-                        {
-                            Logger.LogLine("Code execution was not OK :| on module: " + name, Defaults.Config.VMLogFile);
-                            throw Exceptions.code_execution_error;
-                        }
-                    }
+
+                    chunk.Save(ltncPath);
+                }
+
+                VM imported_vm = new VM(chunk);
+                ResultUnit result = imported_vm.ProtectedRun();
+                if (result.IsOK){
+                    MakeModule(result.Value, name, p_vm, imported_vm);
+                    return result.Value;
+                }
+                else
+                {
+                    Logger.LogLine("Code execution was not OK :| on module: " + name, Defaults.Config.VMLogFile);
+                    throw Exceptions.code_execution_error;
                 }
             }
             functions.Add(new IntrinsicUnit("require", Require, 1));

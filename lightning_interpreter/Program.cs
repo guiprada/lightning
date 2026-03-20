@@ -41,6 +41,7 @@ namespace interpreter
 
         static int RunFile(string path, bool forceCompile)
         {
+            Defaults.ForceRecompile = forceCompile;
             try
             {
                 if (path.EndsWith(".ltnc"))

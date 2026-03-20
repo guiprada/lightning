@@ -35,6 +35,7 @@ Phase 1 - Stabilize the language (current)
         interpreter script.ltn   → use .ltnc if newer, else compile + save + run
         interpreter --compile     → force recompile (use for tests / CI)
         interpreter script.ltnc  → load directly
+    - require() also caches: saves .ltnc beside each module, honours ForceRecompile flag
   - Improve error messages (parser error sync, stack traces, assert error messages)
   - Remove DUP and STASH opcodes if unused (already in todo below)
 

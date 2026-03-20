@@ -76,6 +76,8 @@ namespace lightningTools
 	{
 		private const string configPath = "Defaults.json";
 		public static Config Config { get; private set;}
+		// Set to true by --compile flag to force recompilation of all modules.
+		public static bool ForceRecompile { get; set; } = false;
 
 		static Defaults()
 		{
