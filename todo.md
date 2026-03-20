@@ -11,8 +11,11 @@ Phase 1 - Stabilize the language (current)
     - NEW_LIST and NEW_TABLE kept as distinct opcodes intentionally:
       different stack conventions (positional vs keyed), same TableUnit output.
       No speed gain from merging; extra branch would be a regression.
-  - Fix line breaks and IIFE/coumpound Call constructs.
-    - I think the solution is to double down on the newlines, there should not be newlines in a compount Call - they have to be on the same line; It it better this way 'cos this is the 'special' construct - spreading calls in lines should bring no suprises.
+  - Fix line breaks and IIFE/compound Call constructs — DONE:
+    - Newline after '}' in Statement(Block) does NOT eat trailing newlines
+    - Compound calls must be on the same line; newline always breaks the chain
+    - \{...}\n(arg) correctly does NOT chain (was falsely documented as a bug)
+    - All cases covered and tested in compound_calls.ltn
   - Fix concurrency false contention: value-type globals (Float/Integer/Bool) all share
     TypeUnit.Float etc. as their lock object. Replace with per-address lock array
     object[] globalLocks to give independent locking per global slot.

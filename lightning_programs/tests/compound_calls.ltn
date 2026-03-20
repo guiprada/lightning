@@ -91,8 +91,11 @@ var assert_not = assert_counter.assert_not
     // Case 6a: IIFE \{...}() on same line works
     var iife_result = \{return 42}()
     assert(iife_result, 42, "Failed same-line IIFE test.")
-    // Case 6b: NOTE: \{...}\n() is ALSO treated as a call due to Statement() eating the newline
-    // after block bodies. To test that newline breaks chains, use a variable reference.
+    // Case 6b: \{...}\n(0) — newline breaks the chain, (0) is a discarded statement
+    var iife_newline_result = \{return 42}
+    (0)
+    assert(type(iife_newline_result), "Function", "Failed IIFE\\n(0) test - newline should break chain.")
+    // Same behavior for variable references:
     var lam = \{return 42}
     var not_iife = lam
     (0)
