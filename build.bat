@@ -1,5 +1,8 @@
 if exist win_builds rmdir win_builds /Q/S
 
+@REM Kill any running instance so Windows releases the file lock before publish
+taskkill /F /IM lightning_interpreter.exe >nul 2>&1
+
 dotnet publish --nologo --self-contained true -r win-x64 -c Release /p:LinkDuringPublish=true lightning_interpreter\lightning_interpreter.csproj
 
 if not exist .\win_builds mkdir .\win_builds >nul
