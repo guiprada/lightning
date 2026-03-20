@@ -50,4 +50,36 @@ var assert_not = assert_counter.assert_not
 	assert(j, -6, "Failed Increment Assign Test 7.")
 }
 
+{
+	// Testing assign ops on closure upvalues
+	function make_counter(start)
+	{
+		var count = start
+		return function ()
+		{
+			count += 1
+			return count
+		}
+	}
+	var c = make_counter(0)
+	assert(c(), 1, "Failed assign_op closure upvalue test 1.")
+	assert(c(), 2, "Failed assign_op closure upvalue test 2.")
+	var c2 = make_counter(10)
+	assert(c2(), 11, "Failed assign_op closure upvalue test 3.")
+	assert(c(), 3, "Failed assign_op closure upvalue test 4.")
+
+	function make_acc(start)
+	{
+		var v = start
+		return [
+			add: function(x) { v += x; return v },
+			sub: function(x) { v -= x; return v },
+			mul: function(x) { v *= x; return v },
+		]
+	}
+	var acc = make_acc(10)
+	assert(acc.add(5), 15, "Failed assign_op closure upvalue test 5.")
+	assert(acc.sub(3), 12, "Failed assign_op closure upvalue test 6.")
+	assert(acc.mul(2), 24, "Failed assign_op closure upvalue test 7.")
+}
 return assert_counter.get_error_counter()

@@ -30,5 +30,9 @@ var assert_not = assert_counter.assert_not
 	assert(m.lookup.answer, 42, "Failed bytecode test: table integer value.")
 	assert(m.lookup.greeting, "hi", "Failed bytecode test: table string value.")
 	assert(m.lookup.nested.x, 10, "Failed bytecode test: nested table value.")
+
+	// null behaviour: assigning null errors, null in expressions errors
+	assert(try(\{var x = null}, []):is_error(), true, "Failed bytecode test: null assignment should error.")
+	assert(try(\{return null == null}, []):is_error(), true, "Failed bytecode test: null comparison should error.")
 }
 return assert_counter.get_error_counter()
