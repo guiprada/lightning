@@ -48,6 +48,9 @@ errors += require("tests/assign_op.ltn")
 write_line("Boolean tests ...")
 errors += require("tests/boolean.ltn")
 
+write_line("Bytecode tests ...")
+errors += require("tests/bytecode.ltn")
+
 write_line("Char tests ...")
 errors += require("tests/char.ltn")
 

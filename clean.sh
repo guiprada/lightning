@@ -3,6 +3,7 @@ cd lightning_programs
 	rm -f  *.tokens
 	rm -f  *.log
 	rm -f  *.chunk
+	rm -f  *.ltnc
 	rm -f  *.out
 
 	cd tests
@@ -10,6 +11,7 @@ cd lightning_programs
 		rm -f  *.tokens
 		rm -f  *.log
 		rm -f  *.chunk
+		rm -f  *.ltnc
 		rm -f  *.out
 	cd ..
 cd ..

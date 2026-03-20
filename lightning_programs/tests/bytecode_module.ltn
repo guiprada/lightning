@@ -1,0 +1,39 @@
+// Helper module for bytecode serialization tests.
+// Covers the main constant types and code patterns that must
+// survive a save → load round-trip through the .ltnc format.
+
+var pi = 3.14159265358979
+var neg = -42
+var msg = "Hello bytecode!"
+var flag_true = true
+var flag_false = false
+
+function make_counter(start)
+{
+    var count = start
+    return function ()
+    {
+        count = count + 1
+        return count
+    }
+}
+
+function fib(n)
+{
+    if (n < 2)
+        return n
+    return fib(n-1) + fib(n-2)
+}
+
+var lookup = [pi: 3.14159265358979, answer: 42, greeting: "hi", nested: [x: 10]]
+
+return [
+    pi: pi,
+    neg: neg,
+    msg: msg,
+    flag_true: flag_true,
+    flag_false: flag_false,
+    make_counter: make_counter,
+    fib: fib,
+    lookup: lookup,
+]

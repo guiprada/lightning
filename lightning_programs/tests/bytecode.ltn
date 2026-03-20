@@ -1,0 +1,34 @@
+var assert_counter = require("assert_counter.ltn")
+var assert = assert_counter.assert
+var assert_not = assert_counter.assert_not
+{
+	// Bytecode save / load round-trip tests.
+	// bytecode_module.ltn is compiled to .ltnc on the first (--compile) pass
+	// and loaded directly from .ltnc on subsequent passes.
+	var m = require("tests/bytecode_module.ltn")
+
+	// Constants
+	assert(m.pi, 3.14159265358979, "Failed bytecode test: float constant.")
+	assert(m.neg, -42, "Failed bytecode test: negative integer constant.")
+	assert(m.msg, "Hello bytecode!", "Failed bytecode test: string constant.")
+	assert(m.flag_true, true, "Failed bytecode test: bool true constant.")
+	assert(m.flag_false, false, "Failed bytecode test: bool false constant.")
+
+	// Closures
+	var counter = m.make_counter(10)
+	assert(counter(), 11, "Failed bytecode test: closure call 1.")
+	assert(counter(), 12, "Failed bytecode test: closure call 2.")
+	var counter2 = m.make_counter(0)
+	assert(counter2(), 1, "Failed bytecode test: independent closure.")
+	assert(counter(), 13, "Failed bytecode test: closure call 3.")
+
+	// Recursive function
+	assert(m.fib(10), 55, "Failed bytecode test: recursive function.")
+
+	// Table constants
+	assert(m.lookup.pi, 3.14159265358979, "Failed bytecode test: table float value.")
+	assert(m.lookup.answer, 42, "Failed bytecode test: table integer value.")
+	assert(m.lookup.greeting, "hi", "Failed bytecode test: table string value.")
+	assert(m.lookup.nested.x, 10, "Failed bytecode test: nested table value.")
+}
+return assert_counter.get_error_counter()
