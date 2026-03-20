@@ -31,7 +31,10 @@ Phase 1 - Stabilize the language (current)
     - Serializes: data literals (Float, Integer, Bool, Char, String, Function, Closure, Void),
       global address map, and main program body (instructions + positions interleaved)
     - ClosureUnit serialises function body + upvalue template descriptors (addr/env or chained)
-    - interpreter --compile script.ltn saves script.ltnc; interpreter script.ltnc loads directly
+    - Auto-caching (Python __pycache__ style):
+        interpreter script.ltn   → use .ltnc if newer, else compile + save + run
+        interpreter --compile     → force recompile (use for tests / CI)
+        interpreter script.ltnc  → load directly
   - Improve error messages (parser error sync, stack traces, assert error messages)
   - Remove DUP and STASH opcodes if unused (already in todo below)
 

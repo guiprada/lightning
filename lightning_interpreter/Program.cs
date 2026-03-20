@@ -17,32 +17,46 @@ namespace interpreter
         {
             if (args.Length == 1)
             {
-                RunFile(args[0], compile: false);
+                RunFile(args[0], forceCompile: false);
             }
             else if (args.Length == 2 && args[0] == "--compile")
             {
-                RunFile(args[1], compile: true);
+                RunFile(args[1], forceCompile: true);
             }
             else
             {
-                Console.WriteLine("Usage: lightning_interpreter [script]");
-                Console.WriteLine("       lightning_interpreter --compile [script]   (save .ltnc bytecode)");
+                Console.WriteLine("Usage: lightning_interpreter [script.ltn]");
+                Console.WriteLine("       lightning_interpreter --compile [script.ltn]  (force recompile)");
+                Console.WriteLine("       lightning_interpreter [script.ltnc]           (load bytecode directly)");
                 Environment.Exit(64);
             }
         }
 
-        static int RunFile(string path, bool compile)
+        // Returns true if the .ltnc is up-to-date relative to the .ltn source.
+        static bool BytecodeIsFresh(string ltnPath, string ltncPath)
+        {
+            return File.Exists(ltncPath) &&
+                   File.GetLastWriteTimeUtc(ltncPath) >= File.GetLastWriteTimeUtc(ltnPath);
+        }
+
+        static int RunFile(string path, bool forceCompile)
         {
             try
             {
                 if (path.EndsWith(".ltnc"))
                     return RunBytecode(path);
 
+                string ltncPath = path + "c"; // script.ltn -> script.ltnc
+
+                if (!forceCompile && BytecodeIsFresh(path, ltncPath))
+                    return RunBytecode(ltncPath);
+
+                // Compile (and always save .ltnc)
                 string input;
                 using (var sr = new StreamReader(path))
                     input = sr.ReadToEnd();
                 string name = lightningPath.ModuleName(path);
-                return Run(input, name, compile ? path + "c" : null);
+                return Run(input, name, saveAs: ltncPath);
             }
             catch (IOException e)
             {
@@ -84,10 +98,7 @@ namespace interpreter
             }
 
             if (saveAs != null)
-            {
                 chunk.Save(saveAs);
-                Console.WriteLine("Bytecode saved to: " + saveAs);
-            }
 
             return RunChunk(chunk);
         }
