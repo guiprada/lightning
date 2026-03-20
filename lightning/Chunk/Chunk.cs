@@ -24,6 +24,17 @@ namespace lightningChunk
         {
             return "(" + line + "," + column + ")";
         }
+        public void Write(BinaryWriter p_w)
+        {
+            p_w.Write(line);
+            p_w.Write(column);
+        }
+        public static PositionData Read(BinaryReader p_r)
+        {
+            int line = p_r.ReadInt32();
+            int column = p_r.ReadInt32();
+            return new PositionData(line, column);
+        }
     }
 
     public struct ChunkPosition
@@ -388,6 +399,284 @@ namespace lightningChunk
         public void SwapDataLiteral(int p_address, Unit p_new_value)
         {
             data[p_address] = p_new_value;
+        }
+
+        ///////////////////////////////////////////////////////////////////////////////
+        // .ltnc binary serialization
+        ///////////////////////////////////////////////////////////////////////////////
+
+        private static readonly byte[] LtncMagic = { (byte)'L', (byte)'T', (byte)'N', (byte)'C' };
+        private const ushort LtncVersion = 1;
+#if DOUBLE
+        private const ushort LtncFlags = 1; // float64 / int64
+#else
+        private const ushort LtncFlags = 0; // float32 / int32
+#endif
+
+        // Each instruction is serialised as 4 u16 values followed by a position (2 × i32).
+        static void WriteInstr(BinaryWriter p_w, Instruction p_i, PositionData p_pos)
+        {
+            p_w.Write((ushort)p_i.opCode);
+            p_w.Write((ushort)p_i.opA);
+            p_w.Write((ushort)p_i.opB);
+            p_w.Write((ushort)p_i.opC);
+            p_pos.Write(p_w);
+        }
+
+        static (Instruction instr, PositionData pos) ReadInstr(BinaryReader p_r)
+        {
+            OpCode opCode = (OpCode)p_r.ReadUInt16();
+            Operand opA = p_r.ReadUInt16();
+            Operand opB = p_r.ReadUInt16();
+            Operand opC = p_r.ReadUInt16();
+            PositionData pos = PositionData.Read(p_r);
+            return (new Instruction(opCode, opA, opB, opC), pos);
+        }
+
+        static void WriteStr(BinaryWriter p_w, string p_s)
+        {
+            byte[] bytes = System.Text.Encoding.UTF8.GetBytes(p_s);
+            p_w.Write((ushort)bytes.Length);
+            p_w.Write(bytes);
+        }
+
+        static string ReadStr(BinaryReader p_r)
+        {
+            ushort len = p_r.ReadUInt16();
+            byte[] bytes = p_r.ReadBytes(len);
+            return System.Text.Encoding.UTF8.GetString(bytes);
+        }
+
+        static void WriteUnit(BinaryWriter p_w, Unit p_unit)
+        {
+            switch (p_unit.Type)
+            {
+                case UnitType.Float:
+                    p_w.Write((byte)0);
+#if DOUBLE
+                    p_w.Write((double)p_unit.floatValue);
+#else
+                    p_w.Write((float)p_unit.floatValue);
+#endif
+                    break;
+                case UnitType.Integer:
+                    p_w.Write((byte)1);
+#if DOUBLE
+                    p_w.Write((long)p_unit.integerValue);
+#else
+                    p_w.Write((int)p_unit.integerValue);
+#endif
+                    break;
+                case UnitType.Boolean:
+                    p_w.Write((byte)2);
+                    p_w.Write(p_unit.boolValue);
+                    break;
+                case UnitType.Char:
+                    p_w.Write((byte)3);
+                    p_w.Write(p_unit.charValue);
+                    break;
+                case UnitType.String:
+                    p_w.Write((byte)4);
+                    WriteStr(p_w, ((StringUnit)p_unit.heapUnitValue).content);
+                    break;
+                case UnitType.Function:
+                    p_w.Write((byte)5);
+                    FunctionUnit fn = (FunctionUnit)p_unit.heapUnitValue;
+                    WriteStr(p_w, fn.Name);
+                    WriteStr(p_w, fn.Module);
+                    p_w.Write((ushort)fn.Arity);
+                    p_w.Write((ushort)fn.OriginalPosition);
+                    p_w.Write((ushort)fn.Body.Count);
+                    for (int i = 0; i < fn.Body.Count; i++)
+                        WriteInstr(p_w, fn.Body[i], fn.ChunkPosition.GetPosition(i));
+                    break;
+                case UnitType.Void:
+                    p_w.Write((byte)6);
+                    break;
+                case UnitType.Closure:
+                {
+                    p_w.Write((byte)7);
+                    ClosureUnit cl = (ClosureUnit)p_unit.heapUnitValue;
+                    WriteStr(p_w, cl.Function.Name);
+                    WriteStr(p_w, cl.Function.Module);
+                    p_w.Write((ushort)cl.Function.Arity);
+                    p_w.Write((ushort)cl.Function.OriginalPosition);
+                    p_w.Write((ushort)cl.Function.Body.Count);
+                    for (int i = 0; i < cl.Function.Body.Count; i++)
+                        WriteInstr(p_w, cl.Function.Body[i], cl.Function.ChunkPosition.GetPosition(i));
+                    p_w.Write((ushort)cl.UpValues.Count);
+                    foreach (UpValueUnit uv in cl.UpValues)
+                    {
+                        p_w.Write((byte)(uv.IsChained ? 1 : 0));
+                        if (uv.IsChained)
+                            p_w.Write((ushort)uv.ChainedIndex);
+                        else
+                        {
+                            p_w.Write((ushort)uv.Address);
+                            p_w.Write((ushort)uv.Env);
+                        }
+                    }
+                    break;
+                }
+                default:
+                    throw new InvalidOperationException("Cannot serialize Unit of type " + p_unit.Type);
+            }
+        }
+
+        static Unit ReadUnit(BinaryReader p_r)
+        {
+            byte tag = p_r.ReadByte();
+            switch (tag)
+            {
+                case 0:
+#if DOUBLE
+                    return new Unit((Float)p_r.ReadDouble());
+#else
+                    return new Unit((Float)p_r.ReadSingle());
+#endif
+                case 1:
+#if DOUBLE
+                    return new Unit((Integer)p_r.ReadInt64());
+#else
+                    return new Unit((Integer)p_r.ReadInt32());
+#endif
+                case 2:
+                    return new Unit(p_r.ReadBoolean());
+                case 3:
+                    return new Unit(p_r.ReadChar());
+                case 4:
+                    return new Unit(ReadStr(p_r));
+                case 5:
+                {
+                    string name = ReadStr(p_r);
+                    string module = ReadStr(p_r);
+                    ushort arity = p_r.ReadUInt16();
+                    ushort origPos = p_r.ReadUInt16();
+                    ushort instrCount = p_r.ReadUInt16();
+                    List<Instruction> body = new List<Instruction>(instrCount);
+                    List<PositionData> posList = new List<PositionData>(instrCount);
+                    for (int i = 0; i < instrCount; i++)
+                    {
+                        var (instr, pos) = ReadInstr(p_r);
+                        body.Add(instr);
+                        posList.Add(pos);
+                    }
+                    FunctionUnit fn = new FunctionUnit(name, module);
+                    fn.Set(arity, body, new ChunkPosition(posList), origPos);
+                    return new Unit(fn);
+                }
+                case 6:
+                    return new Unit(UnitType.Void);
+                case 7: // Closure
+                {
+                    string name = ReadStr(p_r);
+                    string module = ReadStr(p_r);
+                    ushort arity = p_r.ReadUInt16();
+                    ushort origPos = p_r.ReadUInt16();
+                    ushort instrCount = p_r.ReadUInt16();
+                    List<Instruction> body = new List<Instruction>(instrCount);
+                    List<PositionData> posList = new List<PositionData>(instrCount);
+                    for (int i = 0; i < instrCount; i++)
+                    {
+                        var (instr, pos) = ReadInstr(p_r);
+                        body.Add(instr);
+                        posList.Add(pos);
+                    }
+                    FunctionUnit fn = new FunctionUnit(name, module);
+                    fn.Set(arity, body, new ChunkPosition(posList), origPos);
+                    ushort uvCount = p_r.ReadUInt16();
+                    List<UpValueUnit> upValues = new List<UpValueUnit>(uvCount);
+                    for (int i = 0; i < uvCount; i++)
+                    {
+                        bool isChained = p_r.ReadByte() != 0;
+                        if (isChained)
+                            upValues.Add(new UpValueUnit(p_r.ReadUInt16(), true));
+                        else
+                        {
+                            ushort addr = p_r.ReadUInt16();
+                            ushort env = p_r.ReadUInt16();
+                            upValues.Add(new UpValueUnit(addr, env));
+                        }
+                    }
+                    return new Unit(new ClosureUnit(fn, upValues));
+                }
+                default:
+                    throw new InvalidOperationException("Unknown Unit tag in .ltnc: " + tag);
+            }
+        }
+
+        public void Save(string p_path)
+        {
+            using BinaryWriter w = new BinaryWriter(File.Open(p_path, FileMode.Create));
+
+            // Header
+            w.Write(LtncMagic);
+            w.Write(LtncVersion);
+            w.Write(LtncFlags);
+
+            // Module name
+            WriteStr(w, ModuleName);
+
+            // Data literals (constants + nested functions)
+            w.Write((ushort)data.Count);
+            foreach (Unit u in data)
+                WriteUnit(w, u);
+
+            // Global variable addresses
+            w.Write((ushort)globalVariablesAddresses.Count);
+            foreach (KeyValuePair<string, Operand> kv in globalVariablesAddresses)
+            {
+                WriteStr(w, kv.Key);
+                w.Write((ushort)kv.Value);
+            }
+
+            // Main program body
+            w.Write((ushort)program.Count);
+            for (int i = 0; i < program.Count; i++)
+                WriteInstr(w, program[i], chunkPosition.GetPosition(i));
+        }
+
+        public static Chunk Load(string p_path, Library p_prelude)
+        {
+            using BinaryReader r = new BinaryReader(File.OpenRead(p_path));
+
+            // Validate header
+            byte[] magic = r.ReadBytes(4);
+            if (magic[0] != 'L' || magic[1] != 'T' || magic[2] != 'N' || magic[3] != 'C')
+                throw new InvalidOperationException("Not a .ltnc file: " + p_path);
+            ushort version = r.ReadUInt16();
+            if (version != LtncVersion)
+                throw new InvalidOperationException(".ltnc version mismatch: " + version);
+            ushort flags = r.ReadUInt16();
+            if (flags != LtncFlags)
+                throw new InvalidOperationException(".ltnc flags mismatch: file=" + flags + " runtime=" + LtncFlags);
+
+            string moduleName = ReadStr(r);
+            Chunk chunk = new Chunk(moduleName, p_prelude);
+
+            // Data literals
+            ushort dataCount = r.ReadUInt16();
+            for (int i = 0; i < dataCount; i++)
+                chunk.AddData(ReadUnit(r));
+
+            // Global variable addresses
+            ushort globalCount = r.ReadUInt16();
+            for (int i = 0; i < globalCount; i++)
+            {
+                string name = ReadStr(r);
+                Operand address = r.ReadUInt16();
+                chunk.AddGlobalVariableAddress(name, address);
+            }
+
+            // Main program body
+            ushort instrCount = r.ReadUInt16();
+            for (int i = 0; i < instrCount; i++)
+            {
+                var (instr, pos) = ReadInstr(r);
+                chunk.WriteInstruction(instr.opCode, instr.opA, instr.opB, instr.opC, pos);
+            }
+
+            return chunk;
         }
     }
 }

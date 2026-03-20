@@ -16,17 +16,22 @@ Phase 1 - Stabilize the language (current)
     - Compound calls must be on the same line; newline always breaks the chain
     - \{...}\n(arg) correctly does NOT chain (was falsely documented as a bug)
     - All cases covered and tested in compound_calls.ltn
-  - Fix concurrency false contention: value-type globals (Float/Integer/Bool) all share
-    TypeUnit.Float etc. as their lock object. Replace with per-address lock array
-    object[] globalLocks to give independent locking per global slot.
+  - Fix concurrency false contention — DONE:
+    - Per-slot object[] globalLocks in VM and ModuleUnit (no shared TypeUnit sentinels)
+    - Each global address gets its own independent lock object
   - tasks(n, func, args) — DONE:
     - returns n-sized result table (one slot per task, nil slots preserved)
     - freeze-on-entry: Table args frozen for duration of tasks(), unfrozen in finally
     - nested tasks() with same frozen table detected and rejected at runtime
     - is_null() intrinsic added (O(1) type check, no comparison needed)
     - switched to CallFunction (fail-fast: errors propagate out of tasks())
-  - Define bytecode serialization format (.ltnc) so Chunk can be saved/loaded portably
-    - This is the bridge to multi-VM targets
+  - Define bytecode serialization format (.ltnc) — DONE:
+    - Chunk.Save(path) / Chunk.Load(path, prelude) in Chunk.cs
+    - Magic "LTNC" + version + flags (float32/64 mode encoded)
+    - Serializes: data literals (Float, Integer, Bool, Char, String, Function, Closure, Void),
+      global address map, and main program body (instructions + positions interleaved)
+    - ClosureUnit serialises function body + upvalue template descriptors (addr/env or chained)
+    - interpreter --compile script.ltn saves script.ltnc; interpreter script.ltnc loads directly
   - Improve error messages (parser error sync, stack traces, assert error messages)
   - Remove DUP and STASH opcodes if unused (already in todo below)
 

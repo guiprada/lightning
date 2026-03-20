@@ -15,28 +15,34 @@ namespace interpreter
     {
         static void Main(string[] args)
         {
-            if (args.Length != 1)
+            if (args.Length == 1)
+            {
+                RunFile(args[0], compile: false);
+            }
+            else if (args.Length == 2 && args[0] == "--compile")
+            {
+                RunFile(args[1], compile: true);
+            }
+            else
             {
                 Console.WriteLine("Usage: lightning_interpreter [script]");
+                Console.WriteLine("       lightning_interpreter --compile [script]   (save .ltnc bytecode)");
                 Environment.Exit(64);
-            }
-            else if (args.Length == 1)
-            {
-                RunFile(args[0]);
             }
         }
 
-        static int RunFile(string path)
+        static int RunFile(string path, bool compile)
         {
-            string input;
             try
             {
+                if (path.EndsWith(".ltnc"))
+                    return RunBytecode(path);
+
+                string input;
                 using (var sr = new StreamReader(path))
-                {
                     input = sr.ReadToEnd();
-                }
                 string name = lightningPath.ModuleName(path);
-                return Run(input, name);
+                return Run(input, name, compile ? path + "c" : null);
             }
             catch (IOException e)
             {
@@ -47,7 +53,13 @@ namespace interpreter
             }
         }
 
-        static int Run(string input, string name)
+        static int RunBytecode(string path)
+        {
+            Chunk chunk = Chunk.Load(path, Prelude.GetPrelude());
+            return RunChunk(chunk);
+        }
+
+        static int Run(string input, string name, string saveAs = null)
         {
             Scanner scanner = new Scanner(input, name);
             List<Token> tokens = scanner.Tokens;
@@ -65,33 +77,38 @@ namespace interpreter
 
             Compiler chunker = new Compiler(program, name, Prelude.GetPrelude());
             Chunk chunk = chunker.Chunk;
-            if (chunker.HasChunked == true)
-            {
-                VM vm = new VM(chunk);
-                ResultUnit result = vm.ProtectedRun();
-                if (result.IsOK)
-                    Console.WriteLine("Program returned: " + result.Value);
-                else
-                    Console.WriteLine("Program returned ERROR!");
-
-                // Print modules
-                Unit machine_modules = chunk.GetUnitFromTable("machine", "modules");
-                Console.WriteLine(vm.ProtectedCallFunction(machine_modules, null));
-
-                // Print memory_use
-                Unit machine_memory_use = chunk.GetUnitFromTable("machine", "memory_use");
-                Console.WriteLine(vm.ProtectedCallFunction(machine_memory_use, null));
-
-                // Print Global variable errors
-                // Unit errors_unit = vm.GetGlobal(chunk, "errors");
-                // if (errors_unit.Type == UnitType.Integer)
-                //     Console.WriteLine("Total errors in test: " + errors_unit.integerValue);
-            }
-            else
+            if (chunker.HasChunked == false)
             {
                 Console.WriteLine("Compiler Error!");
                 return 0;
             }
+
+            if (saveAs != null)
+            {
+                chunk.Save(saveAs);
+                Console.WriteLine("Bytecode saved to: " + saveAs);
+            }
+
+            return RunChunk(chunk);
+        }
+
+        static int RunChunk(Chunk chunk)
+        {
+            VM vm = new VM(chunk);
+            ResultUnit result = vm.ProtectedRun();
+            if (result.IsOK)
+                Console.WriteLine("Program returned: " + result.Value);
+            else
+                Console.WriteLine("Program returned ERROR!");
+
+            // Print modules
+            Unit machine_modules = chunk.GetUnitFromTable("machine", "modules");
+            Console.WriteLine(vm.ProtectedCallFunction(machine_modules, null));
+
+            // Print memory_use
+            Unit machine_memory_use = chunk.GetUnitFromTable("machine", "memory_use");
+            Console.WriteLine(vm.ProtectedCallFunction(machine_memory_use, null));
+
             return 0;
         }
     }
