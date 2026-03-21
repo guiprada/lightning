@@ -103,9 +103,12 @@ namespace lightningVM
             var sb = new StringBuilder();
             for (int i = currentInstructionsIndex; i >= 0; i--)
             {
+                // returnAddress[i+1] is post-CALL (IP++ runs first before PushRET),
+                // so it is always >= 1 and -1 is always safe — no underflow possible.
+                // Math.Max(0, ...) would be dead code; kept here as a reminder of why.
                 Operand frameIP = (i == currentInstructionsIndex)
                     ? p_currentIP
-                    : (Operand)(returnAddress[i + 1] - 1); // return addr is post-CALL (IP++ runs first), so -1 is the CALL site; always >= 0
+                    : (Operand)(returnAddress[i + 1] - 1);
                 PositionData pos = functions[i].ChunkPosition.GetPosition(frameIP);
                 if (i < currentInstructionsIndex) sb.AppendLine();
                 sb.Append("  at ");
