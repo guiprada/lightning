@@ -79,6 +79,7 @@ To Think
 
 To be Done
 ----------
+- add const keyword (freeze works for heap units; stack units - Float/Int/Bool/Char - are value types, need compiler enforcement)
 - Colocar mut na gramatica
 - Eval should return result
 - test imported consts behavior
