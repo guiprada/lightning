@@ -37,7 +37,6 @@ Phase 1 - Stabilize the language (current)
         interpreter script.ltnc  → load directly
     - require() also caches: saves .ltnc beside each module, honours ForceRecompile flag
   - Improve error messages (parser error sync, stack traces, assert error messages)
-  - Remove DUP and STASH opcodes if unused (already in todo below)
 
 Phase 2 - Self-hosted compiler
   - Write scanner + parser in Lightning
@@ -82,7 +81,6 @@ To be Done
 ----------
 - Colocar mut na gramatica
 - Eval should return result
-- function declaration should be const!
 - test imported consts behavior
 - remove exceptions and try intrinsic
 - Construtores em camel case
@@ -126,8 +124,6 @@ create an integer method "5.0":int
 make a queue
 
 file read and write test
-
-remove DUP and STASH
 
 improve function declaration - add method declaration?
 
