@@ -105,7 +105,7 @@ namespace lightningVM
             {
                 Operand frameIP = (i == currentInstructionsIndex)
                     ? p_currentIP
-                    : (Operand)System.Math.Max(0, returnAddress[i + 1] - 1);
+                    : (Operand)(returnAddress[i + 1] - 1); // return addr is post-CALL (IP++ runs first), so -1 is the CALL site; always >= 0
                 PositionData pos = functions[i].ChunkPosition.GetPosition(frameIP);
                 if (i < currentInstructionsIndex) sb.AppendLine();
                 sb.Append("  at ");
