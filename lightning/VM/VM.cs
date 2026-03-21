@@ -348,7 +348,7 @@ namespace lightningVM
             }
             catch (Exception e)
             {
-                Logger.LogLine("VM Busted ...\n" + CurrentInstructionPositionDataString() + "\n" + e.ToString(), Defaults.Config.VMLogFile);
+                Logger.LogLine("VM Busted: " + e.Message + "\n" + instructions.StackTrace(IP), Defaults.Config.VMLogFile);
                 return new Unit(UnitType.Void);
             }
         }
@@ -459,7 +459,7 @@ namespace lightningVM
 
         public void Error(string p_msg)
         {
-            Logger.LogLine("VM Error: " + CurrentInstructionPositionDataString() +  p_msg, Defaults.Config.VMLogFile);
+            Logger.LogLine("VM Error: " + p_msg + "\n" + instructions.StackTrace(IP), Defaults.Config.VMLogFile);
             throw Exceptions.code_execution_error;
         }
 
@@ -487,7 +487,7 @@ namespace lightningVM
             }
             catch (Exception e)
             {
-                Logger.LogLine("VM Busted ...\n" + CurrentInstructionPositionDataString() + "\n" + e.ToString(), Defaults.Config.VMLogFile);
+                Logger.LogLine("VM Busted: " + e.Message + "\n" + instructions.StackTrace(IP), Defaults.Config.VMLogFile);
                 return new ResultUnit(e);
             }
         }

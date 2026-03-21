@@ -1,5 +1,5 @@
 using System.Collections.Generic;
-
+using System.Text;
 
 using lightningChunk;
 using lightningUnit;
@@ -96,6 +96,26 @@ namespace lightningVM
         {
             returnAddress[returnAddressTop] = p_address;
             returnAddressTop++;
+        }
+
+        public string StackTrace(Operand p_currentIP)
+        {
+            var sb = new StringBuilder();
+            for (int i = currentInstructionsIndex; i >= 0; i--)
+            {
+                Operand frameIP = (i == currentInstructionsIndex)
+                    ? p_currentIP
+                    : (Operand)System.Math.Max(0, returnAddress[i + 1] - 1);
+                PositionData pos = functions[i].ChunkPosition.GetPosition(frameIP);
+                if (i < currentInstructionsIndex) sb.AppendLine();
+                sb.Append("  at ");
+                sb.Append(functions[i].Name);
+                sb.Append(" (");
+                sb.Append(functions[i].Module);
+                sb.Append(") ");
+                sb.Append(pos);
+            }
+            return sb.ToString();
         }
     }
 }
