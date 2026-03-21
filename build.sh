@@ -10,7 +10,7 @@ mv lightning_interpreter/bin/Release/net8.0/linux-x64/* linux_builds/
 # copy is only a fallback for machines where the SDK packs are absent.
 # We copy from the SDK reference packs (not runtime DLLs): runtime DLLs lack the full
 # Roslyn metadata and produce CS0518 "System.Object not defined" errors.
-REF_DIR=$(find /usr/lib/dotnet/packs/Microsoft.NETCore.App.Ref -name "System.Runtime.dll" -path "*/net8.0/*" 2>/dev/null | head -1 | xargs dirname)
+REF_DIR=$(find /usr/lib/dotnet/packs/Microsoft.NETCore.App.Ref -name "System.Runtime.dll" -path "*/net8.0/*" 2>/dev/null | head -1 | xargs -r dirname)
 if [ -n "$REF_DIR" ]; then
     mkdir -p linux_builds/refs
     cp "$REF_DIR/System.Runtime.dll" linux_builds/refs/
