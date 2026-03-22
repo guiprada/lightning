@@ -4,20 +4,49 @@
 	"scopeName": "source.lightning-ast",
 	"patterns": [
 		{
-			"match": "\\b(PROGRAM|BLOCK|FUNCTION DECLARATION|MEMBER FUNCTION DECLARATION|FUNCTION EXPRESSION|FUNCTION CALL|VARIABLE DECLARATION|ASSIGMENT|ASSIGMENT_OP|EXPR_STMT|RETURN|BINARY|UNARY|LOGICAL|LITERAL|VARIABLE|INDEX|GROUPING|TABLE|LIST|PRINT|IF|WHILE|FOR)\\b",
+			"comment": "Structural scope nodes",
+			"match": "\\b(PROGRAM|BLOCK)\\b",
+			"name": "entity.name.section.lightning-ast"
+		},
+		{
+			"comment": "Declaration nodes",
+			"match": "\\b(VARIABLE DECLARATION|FUNCTION DECLARATION|MEMBER FUNCTION DECLARATION)\\b",
+			"name": "storage.type.lightning-ast"
+		},
+		{
+			"comment": "Call and expression nodes",
+			"match": "\\b(FUNCTION CALL|FUNCTION EXPRESSION)\\b",
+			"name": "entity.name.function.lightning-ast"
+		},
+		{
+			"comment": "Control flow nodes",
+			"match": "\\b(IF|WHILE|FOR|RETURN)\\b",
 			"name": "keyword.control.lightning-ast"
 		},
 		{
+			"comment": "Statement nodes",
+			"match": "\\b(EXPR_STMT|ASSIGMENT|ASSIGMENT_OP|PRINT)\\b",
+			"name": "keyword.other.lightning-ast"
+		},
+		{
+			"comment": "Value/leaf nodes",
+			"match": "\\b(LITERAL|VARIABLE|TABLE|LIST)\\b",
+			"name": "variable.other.lightning-ast"
+		},
+		{
+			"comment": "Composite expression nodes",
+			"match": "\\b(BINARY|UNARY|LOGICAL|GROUPING|INDEX)\\b",
+			"name": "support.function.lightning-ast"
+		},
+		{
+			"comment": "Operator names",
 			"match": "\\b(ADDITION|SUBTRACTION|MULTIPLICATION|DIVISION|APPEND|NOT|AND|OR|XOR|NOT_EQUAL|EQUAL|GREATER|GREATER_EQUAL|LESS|LESS_EQUAL|VOID)\\b",
 			"name": "keyword.operator.lightning-ast"
 		},
 		{
+			"comment": "const modifier",
 			"match": "\\b(const)\\b",
 			"name": "storage.modifier.lightning-ast"
-		},
-		{
-			"match": "(?<![\\w\\d.])\\d+(\\.\\d+)?",
-			"name": "constant.numeric.lightning-ast"
 		},
 		{
 			"begin": "\"",
@@ -33,6 +62,10 @@
 		{
 			"match": "\\b(True|False)\\b",
 			"name": "constant.language.lightning-ast"
+		},
+		{
+			"match": "(?<![\\w\\d.])\\d+(\\.\\d+)?",
+			"name": "constant.numeric.lightning-ast"
 		},
 		{
 			"match": "[+\\-*\\/]",
