@@ -94,7 +94,11 @@ namespace lightningUnit
 
         // heapUnitValue is TypeUnit is the authoritative value-type check — it covers
         // Float/Integer which cannot carry PROTECTION_IS_VALUE_TYPE in DOUBLE mode.
-        // The dereference is paid once here; all reads/writes go through this property.
+        // The dereference is paid once here; all reads/writes go through these properties.
+        //
+        // ProtectionFlags      — throws on value types; use for writes and strict reads.
+        // ProtectionFlagsOrNone — returns PROTECTION_NONE silently on value types;
+        //                         use for query paths where scalars are simply unprotected.
         public int ProtectionFlags
         {
             get
@@ -108,6 +112,16 @@ namespace lightningUnit
                 if (heapUnitValue is TypeUnit)
                     throw Exceptions.prot_flag_on_scalar;
                 protectionFlags = value;
+            }
+        }
+
+        public int ProtectionFlagsOrNone
+        {
+            get
+            {
+                if (heapUnitValue is TypeUnit)
+                    return PROTECTION_NONE;
+                return protectionFlags;
             }
         }
 

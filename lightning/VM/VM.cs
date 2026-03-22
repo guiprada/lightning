@@ -571,12 +571,7 @@ namespace lightningVM
                         if (Unit.IsEmpty(stack.Peek()))
                             throw Exceptions.non_value_assign;
 
-                        // Value types are value-copied — const is meaningless for them.
-                        // The is TypeUnit guard also prevents ProtectionFlags from throwing,
-                        // since value types cannot carry protection flags (DOUBLE overlap).
-                        // Short-circuit: ProtectionFlags is only reached for heap units.
-                        if (!(stack.Peek().heapUnitValue is TypeUnit) &&
-                            (stack.Peek().ProtectionFlags & Unit.PROTECTION_CONST) == 0)
+                        if ((stack.Peek().ProtectionFlagsOrNone & Unit.PROTECTION_CONST) == 0)
                             throw Exceptions.const_required;
 
                         variables.Add(stack.Pop());
