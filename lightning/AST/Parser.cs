@@ -9,10 +9,10 @@ namespace lightningAST
 	{
 		struct FunctionStruct
 		{
-			public List<string> parameters;
+			public List<Parameter> parameters;
 			public List<Node> statements;
 			public FunctionStruct(
-				List<string> p_parameters,
+				List<Parameter> p_parameters,
 				List<Node> p_statements
 			)
 			{
@@ -253,7 +253,7 @@ namespace lightningAST
 
 		FunctionStruct Function()
 		{
-			List<string> parameters = null;
+			List<Parameter> parameters = null;
 			if (Match(TokenType.LEFT_PAREN))
 			{
 				parameters = Parameters();
@@ -1195,6 +1195,15 @@ namespace lightningAST
 				return FunctionExpr();
 			else if (Check(TokenType.IDENTIFIER))
 				return CompoundVar();
+			else if (Match(TokenType.CONST))
+			{
+				// "const" is a keyword but also the name of a built-in function.
+				// When it appears as a primary expression (e.g. const(t)), treat it
+				// as a variable reference so call-site parsing can proceed normally.
+				TokenString ct = Previous() as TokenString;
+				PositionData pd = Previous().PositionData;
+				return new VariableNode("const", new List<IndexNode>(), pd);
+			}
 			else if (Match(TokenType.MINUS))
 			{
 				if (Match(TokenType.NUMBER))

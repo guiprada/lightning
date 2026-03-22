@@ -571,7 +571,12 @@ namespace lightningVM
                         if (Unit.IsEmpty(stack.Peek()))
                             throw Exceptions.non_value_assign;
 
-                        if (stack.Peek().isHeapUnit && (stack.Peek().protectionFlags & Unit.PROTECTION_CONST) == 0)
+                        // Value types (int, float, bool, char) use TypeUnit sentinels —
+                        // they are value-copied, so no const enforcement is needed.
+                        // Reference types (table, function, string, ...) must carry
+                        // PROTECTION_CONST when declared with a const parameter.
+                        if (!(stack.Peek().heapUnitValue is TypeUnit) &&
+                            (stack.Peek().protectionFlags & Unit.PROTECTION_CONST) == 0)
                             throw Exceptions.const_required;
 
                         variables.Add(stack.Pop());
@@ -580,7 +585,7 @@ namespace lightningVM
                         IP++;
                         {
                             Unit u = stack.Pop();
-                            if (!u.isHeapUnit)
+                            if (u.heapUnitValue is TypeUnit)
                                 throw Exceptions.const_on_scalar;
                             u.protectionFlags |= Unit.PROTECTION_CONST;
                             stack.Push(u);
