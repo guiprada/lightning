@@ -84,11 +84,12 @@ namespace lightningUnit
 #endif
         public int protectionFlags;
         public const int PROTECTION_NONE  = 0;
-        public const int PROTECTION_CONST = 1 << 0;  // reference cannot be rebound
-                                                      // (future: enforced by compiler + runtime)
-        public const int IS_VALUE_TYPE    = 1 << 1;  // set on Bool/Char/Void Units
+        
+        public const int PROTECTION_IS_VALUE_TYPE    = 1 << 0;  // set on Bool/Char/Void Units
                                                       // NOT set on Float/Integer (DOUBLE overlap)
                                                       // NOT set on heap Units (Table, Closure ...)
+        public const int PROTECTION_CONST = 1 << 1;  // reference cannot be rebound
+                                                      // (future: enforced by compiler + runtime)
         // bits 2..31 reserved
 
         // Call this before setting any protectionFlags on an unknown Unit.
