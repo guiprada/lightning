@@ -580,8 +580,9 @@ namespace lightningVM
                         IP++;
                         {
                             Unit u = stack.Pop();
-                            if (u.isHeapUnit)
-                                u.protectionFlags |= Unit.PROTECTION_CONST;
+                            if (!u.isHeapUnit)
+                                throw Exceptions.const_on_scalar;
+                            u.protectionFlags |= Unit.PROTECTION_CONST;
                             stack.Push(u);
                         }
                         break;

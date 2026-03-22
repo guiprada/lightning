@@ -2,16 +2,16 @@ var assert_counter = require("assert_counter.ltn")
 var assert = assert_counter.assert
 
 {
-	// var const: scalar — MAKE_CONST is a no-op on value types, readable
-	var const x = 42
-	assert(x, 42, "var const scalar: value should be readable.")
+	// var const: scalar — const on a value type is meaningless and must throw
+	var threw = try(\{ var const x = 5 }, [])
+	assert(threw:is_error(), true, "var const scalar: declaring scalar as const must throw.")
 }
 
 {
 	// var const: table — heap unit gets PROTECTION_CONST, mutation must throw
 	var const t = Table()
 	var threw = try(\{ t.x = 1 }, [])
-	assert(threw:is_error(), true, "var const table: mutation should throw.")
+	assert(threw:is_error(), true, "var const table: mutation must throw.")
 }
 
 {
@@ -19,13 +19,13 @@ var assert = assert_counter.assert
 	var t = Table()
 	t.x = 99
 	var const ct = t
-	assert(ct.x, 99, "var const table: reading field should work.")
+	assert(ct.x, 99, "var const table: reading field must work.")
 }
 
 {
-	// function(const p): scalar arg — no enforcement (not a heap unit), call succeeds
+	// function(const p): scalar arg — no enforcement (scalars are value types), call succeeds
 	function f(const n) { return n + 1 }
-	assert(f(10), 11, "const param scalar: call with scalar should succeed.")
+	assert(f(10), 11, "const param scalar: call with scalar must succeed.")
 }
 
 {
@@ -34,7 +34,7 @@ var assert = assert_counter.assert
 	var t = Table()
 	t.x = 5
 	var threw = try(\{ f(t) }, [])
-	assert(threw:is_error(), true, "const param table: non-const table arg should throw.")
+	assert(threw:is_error(), true, "const param table: non-const table arg must throw.")
 }
 
 {
@@ -42,15 +42,16 @@ var assert = assert_counter.assert
 	function f(const t) { return t.x }
 	var t = Table()
 	t.x = 7
-	assert(f(const(t)), 7, "const param table: const() arg should be accepted.")
+	assert(f(const(t)), 7, "const param table: const() arg must be accepted.")
 }
 
 {
 	// function(const p): heap arg with PROTECTION_CONST (via var const) must succeed
-	var const t = Table()
+	var base = Table()
+	base.x = 55
+	var const ct = base
 	function f(const t) { return t.x }
-	var threw = try(\{ f(t) }, [])
-	assert(threw:is_error(), false, "const param: var const table should satisfy const param.")
+	assert(f(ct), 55, "const param: var const table must satisfy const param.")
 }
 
 return assert_counter.get_error_counter()
