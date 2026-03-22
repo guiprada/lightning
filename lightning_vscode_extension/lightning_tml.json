@@ -4,38 +4,30 @@
 	"scopeName": "source.lightning",
 	"patterns": [
 		{
-            "name": "comment.line.note.lightning",
-            "match": "(//).*$\\n?",
-            "captures": {
-                "1": {
-                    "name": "punctuation.definition.comment.lightning"
-                }
-            }
-        },
+			"name": "comment.line.note.lightning",
+			"match": "(//).*$\\n?",
+			"captures": {
+				"1": { "name": "punctuation.definition.comment.lightning" }
+			}
+		},
 		{
 			"begin": "\\b(function)\\s*(?:\\s+([a-zA-Z_][a-zA-Z0-9_]*(?:([\\.:])[a-zA-Z_][a-zA-Z0-9_]*)?)\\s*)?(\\()",
 			"beginCaptures": {
-				"1": {
-					"name": "keyword.control.lightning"
-				},
-				"2": {
-					"name": "entity.name.function.lightning"
-				},
-				"3": {
-					"name": "punctuation.separator.parameter.lightning"
-				},
-				"4": {
-					"name": "punctuation.definition.parameters.begin.lightning"
-				}
+				"1": { "name": "keyword.control.lightning" },
+				"2": { "name": "entity.name.function.lightning" },
+				"3": { "name": "punctuation.separator.parameter.lightning" },
+				"4": { "name": "punctuation.definition.parameters.begin.lightning" }
 			},
 			"end": "\\)",
 			"endCaptures": {
-				"0": {
-					"name": "punctuation.definition.parameters.end.lightning"
-				}
+				"0": { "name": "punctuation.definition.parameters.end.lightning" }
 			},
 			"name": "meta.function.lightning",
 			"patterns": [
+				{
+					"match": "\\b(const)\\b",
+					"name": "keyword.control.lightning"
+				},
 				{
 					"match": "[a-zA-Z_][a-zA-Z0-9_]*",
 					"name": "variable.parameter.function.lightning"
@@ -57,162 +49,119 @@
 		{
 			"begin": "#",
 			"beginCaptures": {
-				"0": {
-					"name": "punctuation.definition.string.begin.lightning"
-				}
+				"0": { "name": "punctuation.definition.string.begin.lightning" }
 			},
 			"end": "#",
 			"endCaptures": {
-				"0": {
-					"name": "punctuation.definition.string.end.lightning"
-				}
+				"0": { "name": "punctuation.definition.string.end.lightning" }
 			},
-			"name": "string.quoted.single.lightning",
+			"name": "string.quoted.other.multiline.lightning",
 			"patterns": [
-				{
-					"include": "#escaped_char"
-				}
+				{ "include": "#escaped_char" }
 			]
 		},
 		{
 			"begin": "\"",
 			"beginCaptures": {
-				"0": {
-					"name": "punctuation.definition.string.begin.lightning"
-				}
+				"0": { "name": "punctuation.definition.string.begin.lightning" }
 			},
 			"end": "\"",
 			"endCaptures": {
-				"0": {
-					"name": "punctuation.definition.string.end.lightning"
-				}
+				"0": { "name": "punctuation.definition.string.end.lightning" }
 			},
 			"name": "string.quoted.double.lightning",
 			"patterns": [
-				{
-					"include": "#escaped_char"
-				}
+				{ "include": "#escaped_char" }
 			]
 		},
 		{
 			"begin": "'",
 			"beginCaptures": {
-				"0": {
-					"name": "punctuation.definition.char.begin.lightning"
-				}
+				"0": { "name": "punctuation.definition.char.begin.lightning" }
 			},
 			"end": "'",
 			"endCaptures": {
-				"0": {
-					"name": "punctuation.definition.char.end.lightning"
-				}
+				"0": { "name": "punctuation.definition.char.end.lightning" }
 			},
-			"name": "char.lightning",
+			"name": "string.quoted.single.lightning",
 			"patterns": [
-				{
-					"include": "#escaped_char"
-				}
+				{ "include": "#escaped_char" }
 			]
 		},
 		{
 			"begin": "(?<=\\.cdef)\\s*(\\[(=*)\\[)",
 			"beginCaptures": {
-				"0": {
-					"name": "string.quoted.other.multiline.lightning"
-				},
-				"1": {
-					"name": "punctuation.definition.string.begin.lightning"
-				}
+				"0": { "name": "string.quoted.other.multiline.lightning" },
+				"1": { "name": "punctuation.definition.string.begin.lightning" }
 			},
 			"contentName": "meta.embedded.lightning",
 			"end": "(\\]\\2\\])",
 			"endCaptures": {
-				"0": {
-					"name": "string.quoted.other.multiline.lightning"
-				},
-				"1": {
-					"name": "punctuation.definition.string.end.lightning"
-				}
+				"0": { "name": "string.quoted.other.multiline.lightning" },
+				"1": { "name": "punctuation.definition.string.end.lightning" }
 			},
 			"patterns": [
-				{
-					"include": "source.c"
-				}
+				{ "include": "source.c" }
 			]
 		},
 		{
 			"begin": "(?<!--)\\[(=*)\\[",
 			"beginCaptures": {
-				"0": {
-					"name": "punctuation.definition.string.begin.lightning"
-				}
+				"0": { "name": "punctuation.definition.string.begin.lightning" }
 			},
 			"end": "\\]\\1\\]",
 			"endCaptures": {
-				"0": {
-					"name": "punctuation.definition.string.end.lightning"
-				}
+				"0": { "name": "punctuation.definition.string.end.lightning" }
 			},
 			"name": "string.quoted.other.multiline.lightning"
 		},
 		{
 			"captures": {
-				"1": {
-					"name": "keyword.control.var.lightning"
-				},
-				"2": {
-					"name": "constant.other.placeholder.lightning"
-				}
+				"1": { "name": "keyword.control.var.lightning" },
+				"2": { "name": "keyword.control.lightning" },
+				"3": { "name": "constant.other.placeholder.lightning" }
 			},
-			"match": "\\b(var)\\s+([a-zA-Z_][a-zA-Z0-9_]*)"
+			"match": "\\b(var)\\s+(const\\s+)?([a-zA-Z_][a-zA-Z0-9_]*)"
 		},
 		{
 			"captures": {
-				"1": {
-					"name": "punctuation.definition.label.begin.lightning"
-				},
-				"2": {
-					"name": "punctuation.definition.label.end.lightning"
-				}
+				"1": { "name": "punctuation.definition.label.begin.lightning" },
+				"2": { "name": "punctuation.definition.label.end.lightning" }
 			},
 			"match": "(::)[a-zA-Z_][a-zA-Z0-9_]*(::)",
 			"name": "constant.other.placeholder.lightning"
 		},
 		{
-			"match": "\\b(else|for|if|return|while)\\b",
+			"match": "\\b(else|for|if|return|while|const)\\b",
 			"name": "keyword.control.lightning"
 		},
 		{
-			"match": "(?<![^.]\\.|:)\\b(false|nil|true|var|math\\.(pi|e))\\b|(?<![.])\\.{3}(?!\\.)",
+			"match": "\\\\",
+			"name": "keyword.operator.lambda.lightning"
+		},
+		{
+			"match": "(?<![^.]\\.|:)\\b(false|true|void|self)\\b|(?<![.])\\.{3}(?!\\.)",
 			"name": "constant.language.lightning"
 		},
 		{
-			"match": "(?<![^.]\\.|:)\\b(self)\\b",
-			"name": "variable.language.self.lightning"
-		},
-		{
-			"match": "(?<![^.]\\.|:)\\b(assert|collectgarbage|dofile|error|getfenv|getmetatable|ipairs|loadfile|loadstring|module|next|pairs|pcall|print|rawequal|rawget|rawset|require|select|setfenv|setmetatable|tonumber|tostring|type|unpack|xpcall)\\b(?=\\s*(?:[({\"']|\\[\\[))",
+			"match": "(?<![^.]\\.|:)\\b(eval|require|try|write_line|write_line_raw|write_raw|write|read_line|read_number|read|type|to_integer|to_float|to_string|is_number|is_null|Table|List|ListInit|tasks|const|get_os|new_line|OptionNew|OptionEmpty|ResultValue|ResultEmpty|ResultError)\\b(?=\\s*[({\"'#])",
 			"name": "support.function.lightning"
-		},
-		{
-			"match": "(?<![^.]\\.|:)\\b(listMap\\.(indexOf|indexes|values|sum|shuffle|remove|range|foreach|slice|push|pop|pull)|string\\.(char|hasIndex|indexOf|len|lower|remove|upper)|table\\.(concat|insert|maxn|remove|sort)|math\\.(abs|acos|asin|atan|cos|pi|r|rnd|sign|sin|sqrt|tan)|io\\.(close|flush|input|lines|open|output|popen|read|tmpfile|type|write)|os\\.(clock|date|difftime|execute|exit|getenv|remove|rename|setlocale|time|tmpname)|package\\.(cpath|loaded|loadlib|path|preload|seeall))\\b(?=\\s*(?:[({\"']|\\[\\[))",
-			"name": "support.function.library.lightning"
 		},
 		{
 			"match": "\\b(and|or|not|xor|nand|nor|xnor)\\b",
 			"name": "keyword.operator.lightning"
 		},
 		{
-			"match": "\\b([a-zA-Z_][a-zA-Z0-9_]*)\\b(?=\\s*(?:[({\"']|\\[\\[))",
+			"match": "\\+\\+|--|\\+=|-=|\\*=|\\/=|==|~=|<=?|>=?|(?<!\\.)\\.{2}(?!\\.)|[+\\-*\\/^%]|=",
+			"name": "keyword.operator.lightning"
+		},
+		{
+			"match": "\\b([a-zA-Z_][a-zA-Z0-9_]*)\\b(?=\\s*(?:[({\"'#]|\\[\\[))",
 			"name": "support.function.any-method.lightning"
 		},
 		{
 			"match": "(?<=[^.]\\.|:)\\b([a-zA-Z_][a-zA-Z0-9_]*)",
 			"name": "variable.other.lightning"
-		},
-		{
-			"match": "\\+|-|%|#|\\*|\\/|\\^|==?|~=|<=?|>=?|(?<!\\.)\\.{2}(?!\\.)",
-			"name": "keyword.operator.lightning"
 		}
 	],
 	"repository": {
