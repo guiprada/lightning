@@ -25,6 +25,6 @@ namespace lightningExceptions
 		public static Exception can_not_override_extension_table = new Exception("Table already has an Extention Table!");
 		public static Exception const_mutation = new Exception("Cannot mutate a const Unit!");
 		public static Exception const_required = new Exception("Argument must be const!");
-		public static Exception const_on_scalar = new Exception("Cannot declare a scalar as const!");
+		public static Exception prot_flag_on_scalar = new Exception("Cannot set protection flags on a scalar!");
 	}
 }

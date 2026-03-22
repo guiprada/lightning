@@ -100,13 +100,13 @@ namespace lightningUnit
             get
             {
                 if (heapUnitValue is TypeUnit)
-                    throw Exceptions.const_on_scalar;
+                    throw Exceptions.prot_flag_on_scalar;
                 return protectionFlags;
             }
             set
             {
                 if (heapUnitValue is TypeUnit)
-                    throw Exceptions.const_on_scalar;
+                    throw Exceptions.prot_flag_on_scalar;
                 protectionFlags = value;
             }
         }
