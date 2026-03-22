@@ -1,0 +1,42 @@
+{
+	"$schema": "https://raw.githubusercontent.com/martinring/tmlanguage/master/tmlanguage.json",
+	"name": "lightning-ast",
+	"scopeName": "source.lightning-ast",
+	"patterns": [
+		{
+			"match": "\\b(PROGRAM|BLOCK|FUNCTION DECLARATION|MEMBER FUNCTION DECLARATION|FUNCTION EXPRESSION|FUNCTION CALL|VARIABLE DECLARATION|ASSIGMENT|ASSIGMENT_OP|EXPR_STMT|RETURN|BINARY|UNARY|LOGICAL|LITERAL|VARIABLE|INDEX|GROUPING|TABLE|LIST|PRINT|IF|WHILE|FOR)\\b",
+			"name": "keyword.control.lightning-ast"
+		},
+		{
+			"match": "\\b(ADDITION|SUBTRACTION|MULTIPLICATION|DIVISION|APPEND|NOT|AND|OR|XOR|NOT_EQUAL|EQUAL|GREATER|GREATER_EQUAL|LESS|LESS_EQUAL|VOID)\\b",
+			"name": "keyword.operator.lightning-ast"
+		},
+		{
+			"match": "\\b(const)\\b",
+			"name": "storage.modifier.lightning-ast"
+		},
+		{
+			"match": "(?<![\\w\\d.])\\d+(\\.\\d+)?",
+			"name": "constant.numeric.lightning-ast"
+		},
+		{
+			"begin": "\"",
+			"beginCaptures": {
+				"0": { "name": "punctuation.definition.string.begin.lightning-ast" }
+			},
+			"end": "\"",
+			"endCaptures": {
+				"0": { "name": "punctuation.definition.string.end.lightning-ast" }
+			},
+			"name": "string.quoted.double.lightning-ast"
+		},
+		{
+			"match": "\\b(True|False)\\b",
+			"name": "constant.language.lightning-ast"
+		},
+		{
+			"match": "[+\\-*\\/]",
+			"name": "keyword.operator.lightning-ast"
+		}
+	]
+}

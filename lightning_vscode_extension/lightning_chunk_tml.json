@@ -1,0 +1,69 @@
+{
+	"$schema": "https://raw.githubusercontent.com/martinring/tmlanguage/master/tmlanguage.json",
+	"name": "lightning-chunk",
+	"scopeName": "source.lightning-chunk",
+	"patterns": [
+		{
+			"match": "^-{3,}.*$",
+			"name": "comment.line.section-header.lightning-chunk"
+		},
+		{
+			"captures": {
+				"1": { "name": "keyword.other.lightning-chunk" },
+				"2": { "name": "constant.numeric.lightning-chunk" }
+			},
+			"match": "^(Data:)\\s+(\\d+)"
+		},
+		{
+			"captures": {
+				"1": { "name": "constant.numeric.lightning-chunk" },
+				"2": { "name": "keyword.other.on-position.lightning-chunk" },
+				"3": { "name": "constant.numeric.lightning-chunk" }
+			},
+			"match": "^(\\d+)(?=:)|\\b(on position:)\\s*(\\(\\d+,\\d+\\))"
+		},
+		{
+			"match": "\\b(LOAD_DATA|LOAD_VARIABLE|LOAD_GLOBAL|LOAD_IMPORTED_GLOBAL|LOAD_IMPORTED_DATA|LOAD_UPVALUE|LOAD_INTRINSIC|LOAD_VOID|LOAD_TRUE|LOAD_FALSE)\\b",
+			"name": "support.function.load.lightning-chunk"
+		},
+		{
+			"match": "\\b(DECLARE_GLOBAL|DECLARE_VARIABLE|DECLARE_CONST_VARIABLE|DECLARE_FUNCTION|ASSIGN_VARIABLE|ASSIGN_GLOBAL|ASSIGN_IMPORTED_GLOBAL|ASSIGN_UPVALUE|ASSIGN|ADDITION_ASSIGN|SUBTRACTION_ASSIGN|MULTIPLICATION_ASSIGN|DIVISION_ASSIGN|MAKE_CONST)\\b",
+			"name": "storage.type.lightning-chunk"
+		},
+		{
+			"match": "\\b(CALL|RETURN|RETURN_SET|EXIT)\\b",
+			"name": "keyword.control.lightning-chunk"
+		},
+		{
+			"match": "\\b(OPEN_ENV|CLOSE_ENV|CLOSE_FUNCTION|CLOSE_CLOSURE|NEW_LIST)\\b",
+			"name": "keyword.control.block.lightning-chunk"
+		},
+		{
+			"match": "\\b(GET|SET|POP|DUP|PUSH_STASH|POP_STASH)\\b",
+			"name": "keyword.operator.stack.lightning-chunk"
+		},
+		{
+			"match": "\\b(ADD|SUBTRACT|MULTIPLY|DIVIDE|NEGATE|NOT|AND|OR|XOR|EQUALS|NOT_EQUALS|GREATER_EQUALS|LESS_EQUALS|GREATER|LESS)\\b",
+			"name": "keyword.operator.lightning-chunk"
+		},
+		{
+			"begin": "\"",
+			"beginCaptures": {
+				"0": { "name": "punctuation.definition.string.begin.lightning-chunk" }
+			},
+			"end": "\"",
+			"endCaptures": {
+				"0": { "name": "punctuation.definition.string.end.lightning-chunk" }
+			},
+			"name": "string.quoted.double.lightning-chunk"
+		},
+		{
+			"match": "(?<![\\w\\d.])\\d+(\\.\\d+)?",
+			"name": "constant.numeric.lightning-chunk"
+		},
+		{
+			"match": "\\b(fun|lambda|Closure of)\\b",
+			"name": "entity.name.function.lightning-chunk"
+		}
+	]
+}

@@ -11,16 +11,40 @@
         "Programming Languages"
     ],
     "contributes": {
-        "languages": [{
-            "id": "lightning",
-            "aliases": ["lightning", "lightning"],
-            "extensions": ["ltn"],
-            "configuration": "language-configuration.json"
-        }],
-        "grammars": [{
-            "language": "lightning",
-            "scopeName": "source.lightning",
-            "path": "lightning_tml.json"
-        }]
+        "languages": [
+            {
+                "id": "lightning",
+                "aliases": ["lightning", "lightning"],
+                "extensions": ["ltn"],
+                "configuration": "language-configuration.json"
+            },
+            {
+                "id": "lightning-ast",
+                "aliases": ["lightning AST", "lightning-ast"],
+                "extensions": ["ast"]
+            },
+            {
+                "id": "lightning-chunk",
+                "aliases": ["lightning Chunk", "lightning-chunk"],
+                "extensions": ["chunk"]
+            }
+        ],
+        "grammars": [
+            {
+                "language": "lightning",
+                "scopeName": "source.lightning",
+                "path": "lightning_tml.json"
+            },
+            {
+                "language": "lightning-ast",
+                "scopeName": "source.lightning-ast",
+                "path": "lightning_ast_tml.json"
+            },
+            {
+                "language": "lightning-chunk",
+                "scopeName": "source.lightning-chunk",
+                "path": "lightning_chunk_tml.json"
+            }
+        ]
     }
 }
