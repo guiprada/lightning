@@ -37,8 +37,6 @@ namespace lightningUnit
         public char charValue;
         [FieldOffset(0)]
         public bool boolValue;
-        [FieldOffset(0)]
-        public bool isHeapUnit;
 
         // ── Reference-level protection flags ────────────────────────────────────────
         //
@@ -48,34 +46,33 @@ namespace lightningUnit
         // reachable through a protected Unit and an unprotected Unit simultaneously
         // (like a physical page mapped read-only in one process, read-write in another).
         //
-        // Value types (Float, Integer, Char, Bool) use TypeUnit sentinels and have
-        // isHeapUnit == false. They are copied by value with no shared identity, so
-        // reference-level protection is meaningless for them. Their const-ness is a
-        // compiler concern only (track in the variable slot, refuse to emit STORE).
-        // Attempting to set protectionFlags on a value-type Unit is undefined — the
-        // flag overlaps the value union and would corrupt it.
+        // Value types (Float, Integer, Char, Bool, Void) use TypeUnit sentinels and have
+        // IS_VALUE_TYPE set in protectionFlags. They are copied by value with no shared
+        // identity, so reference-level protection is meaningless for them.
+        // Heap types (Table, Closure, ...) have IS_VALUE_TYPE == 0.
         //
         // Layout — float32 mode (64-bit):
-        //   [FieldOffset( 0)]  value union       4 bytes  (float32/int32/char/bool/isHeapUnit)
-        //   [FieldOffset( 4)]  heapUnitValue      8 bytes  (reference)
-        //   [FieldOffset(12)]  protectionFlags    4 bytes  ← natural alignment padding: FREE
+        //   [FieldOffset( 0)]  value union       4 bytes  (float32/int32/char/bool)
+        //   [FieldOffset( 4)]  heapUnitValue     8 bytes  (reference)
+        //   [FieldOffset(12)]  protectionFlags   4 bytes  ← natural alignment padding: FREE
         //
         // Layout — DOUBLE mode (64-bit):
-        //   [FieldOffset( 0)]  value union        8 bytes  (float64/int64/char/bool/isHeapUnit)
-        //   [FieldOffset( 4)]  protectionFlags    4 bytes  ← overlaps HIGH bytes of float64/int64
-        //                                                     SAFE: when isHeapUnit==true the
-        //                                                     float64/int64 value is irrelevant;
-        //                                                     when isHeapUnit==false, Unit ctor
-        //                                                     writes the full 8-byte float64,
-        //                                                     zeroing these bytes automatically.
-        //   [FieldOffset( 8)]  heapUnitValue      8 bytes  (reference)
+        //   [FieldOffset( 0)]  value union       8 bytes  (float64/int64/char/bool)
+        //   [FieldOffset( 4)]  protectionFlags   4 bytes  ← overlaps HIGH bytes of float64/int64
+        //                                                    SAFE: when IS_VALUE_TYPE==0 (heap)
+        //                                                    the float64/int64 value is irrelevant;
+        //                                                    when IS_VALUE_TYPE!=0 (value type),
+        //                                                    the Unit ctor writes the full 8-byte
+        //                                                    value FIRST, zeroing offset 4, then
+        //                                                    sets protectionFlags = IS_VALUE_TYPE.
+        //   [FieldOffset( 8)]  heapUnitValue     8 bytes  (reference)
         //
         // sizeof(Unit) == 16 bytes in both modes. Zero cost.
         //
         // OS analogy:
         //   protectionFlags  ≅  page-table-entry bits  (per-reference, free)
         //
-        // Rule: only read/write protectionFlags when isHeapUnit == true.
+        // Rule: only set protection bits (PROTECTION_CONST etc.) when IS_VALUE_TYPE == 0.
 #if DOUBLE
         [FieldOffset(4)]
 #else
@@ -85,7 +82,9 @@ namespace lightningUnit
         public const int PROTECTION_NONE  = 0;
         public const int PROTECTION_CONST = 1 << 0;  // reference cannot be rebound
                                                       // (future: enforced by compiler + runtime)
-        // bits 1..31 reserved
+        public const int IS_VALUE_TYPE    = 1 << 1;  // set on Float/Integer/Char/Bool/Void Units
+                                                      // never set on heap Units (Table, Closure ...)
+        // bits 2..31 reserved
 
 #if DOUBLE
         [FieldOffset(8)]
@@ -104,57 +103,45 @@ namespace lightningUnit
 
         public Unit(HeapUnit p_value) : this()
         {
-            // OVERLAP: isHeapUnit writes 1 into offset 0 (the value union).
-            // The value union is irrelevant for heap units; heapUnitValue is the payload.
-            // DO NOT read isHeapUnit back as a type tag — non-zero scalar values
-            // (int 1, float 1.0, char 'A') also produce isHeapUnit == true.
-            // Use (heapUnitValue is TypeUnit) to distinguish value vs heap units.
-            isHeapUnit = true;
             heapUnitValue = p_value;
+            // IS_VALUE_TYPE is NOT set — protectionFlags stays 0 (heap unit).
         }
         public Unit(Float p_number) : this()
         {
-            // OVERLAP TRAP (DOUBLE mode): floatValue writes 8 bytes at offset 0,
-            // which zeroes [4..7] = protectionFlags. Never set protectionFlags before
-            // the value assignment in a value-type ctor, or it will be silently wiped.
-            // Also: isHeapUnit at offset 0 will read as truthy for any non-zero float —
-            // do NOT use isHeapUnit to identify value units at runtime.
             floatValue = p_number;
+            // DOUBLE MODE TRAP: floatValue writes 8 bytes at offset 0, zeroing
+            // protectionFlags at offset 4. IS_VALUE_TYPE MUST be set after this line.
             heapUnitValue = TypeUnit.Float;
+            protectionFlags = IS_VALUE_TYPE;
         }
 
         public Unit(Integer p_number) : this()
         {
-            // OVERLAP TRAP (DOUBLE mode): same as Float ctor — integerValue writes
-            // 8 bytes at offset 0, zeroing protectionFlags at offset 4.
-            // isHeapUnit at offset 0 reads as truthy for any non-zero integer.
             integerValue = p_number;
+            // DOUBLE MODE TRAP: integerValue writes 8 bytes at offset 0, zeroing
+            // protectionFlags at offset 4. IS_VALUE_TYPE MUST be set after this line.
             heapUnitValue = TypeUnit.Integer;
+            protectionFlags = IS_VALUE_TYPE;
         }
 
         public Unit(bool p_value) : this()
         {
-            // OVERLAP: boolValue writes 1 byte at offset 0 (same as isHeapUnit).
-            // For p_value == true, isHeapUnit reads back as true — misleading but harmless
-            // since the TypeUnit sentinel on heapUnitValue is the real type discriminator.
             boolValue = p_value;
             heapUnitValue = TypeUnit.Boolean;
+            protectionFlags = IS_VALUE_TYPE;
         }
 
         public Unit(String p_string) : this()
         {
-            // OVERLAP: same as HeapUnit ctor — isHeapUnit is not a reliable type tag.
-            isHeapUnit = true;
             heapUnitValue = new StringUnit(p_string);
+            // IS_VALUE_TYPE is NOT set — protectionFlags stays 0 (heap unit).
         }
 
         public Unit(char p_char) : this()
         {
-            // OVERLAP: charValue writes 2 bytes at offset 0; isHeapUnit (offset 0, 1 byte)
-            // will read as truthy for any char with non-zero low byte (i.e. most chars).
-            // Use (heapUnitValue is TypeUnit) to identify value units, not isHeapUnit.
             charValue = p_char;
             heapUnitValue = TypeUnit.Char;
+            protectionFlags = IS_VALUE_TYPE;
         }
 
         public Unit(UnitType p_type) : this()
@@ -163,18 +150,23 @@ namespace lightningUnit
             {
                 case UnitType.Void:
                     heapUnitValue = TypeUnit.Void;
+                    protectionFlags = IS_VALUE_TYPE;
                     break;
                 case UnitType.Boolean:
                     heapUnitValue = TypeUnit.Boolean;
+                    protectionFlags = IS_VALUE_TYPE;
                     break;
                 case UnitType.Float:
                     heapUnitValue = TypeUnit.Float;
+                    protectionFlags = IS_VALUE_TYPE;
                     break;
                 case UnitType.Integer:
                     heapUnitValue = TypeUnit.Integer;
+                    protectionFlags = IS_VALUE_TYPE;
                     break;
                 case UnitType.Char:
                     heapUnitValue = TypeUnit.Char;
+                    protectionFlags = IS_VALUE_TYPE;
                     break;
                 default:
                     Logger.LogLine("Trying to create a Unit of unknown type.", Defaults.Config.VMLogFile);
