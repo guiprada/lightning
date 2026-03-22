@@ -36,7 +36,7 @@ Phase 1 - Stabilize the language (current)
         interpreter --compile     → force recompile (use for tests / CI)
         interpreter script.ltnc  → load directly
     - require() also caches: saves .ltnc beside each module, honours ForceRecompile flag
-  - Improve error messages (parser error sync, stack traces, assert error messages)
+  - Improve error messages (parser error sync, stack traces, assert error messages) — stack traces DONE; assert msg improved
 
 Phase 2 - Self-hosted compiler
   - Write scanner + parser in Lightning
@@ -76,10 +76,22 @@ To Think
 - Add typing tests, dont allow variables to change type
 - readonly fields in Unit?
 
+Unit protection flags design (protectionFlags field already added to Unit.cs):
+  - Unit  ≅ virtual-memory mapping  → protectionFlags are page-table-entry bits (per-reference)
+  - TableUnit.Frozen ≅ mprotect()   → per-object, needed for tasks() thread safety
+  - Value types (Float/Int/Char/Bool): isHeapUnit==false, copied by value, no shared identity
+      → their const-ness is compiler-only (refuse STORE to const slot, zero runtime cost, Lua style)
+  - Heap types (Table, Closure, ...): isHeapUnit==true, protectionFlags are safe to use
+  - PROTECTION_CONST (bit 0): reference slot cannot be rebound
+  - sizeof(Unit) unchanged in both float32 and DOUBLE modes — field sits in existing padding
+  - DO NOT set protectionFlags when isHeapUnit==false (would corrupt value union)
+
 
 To be Done
 ----------
-- add const keyword (freeze works for heap units; stack units - Float/Int/Bool/Char - are value types, need compiler enforcement)
+- add const keyword:
+    heap units  → set PROTECTION_CONST in Unit.protectionFlags at runtime + compiler slot flag
+    stack units → compiler slot flag only (value types, zero runtime cost, Lua style)
 - Colocar mut na gramatica
 - Eval should return result
 - test imported consts behavior
@@ -91,8 +103,6 @@ To be Done
 - Create more option unwrap() tests
 
 - Criar const, ou let
-- stack trace
-  - fix assert error msg
 - convert try to builtin(parsed)
 - nupple as internal class
 - destructuring

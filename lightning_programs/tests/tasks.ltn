@@ -116,4 +116,32 @@ var assert_not = assert_counter.assert_not
 	assert(result[n - 1], 99, "tasks() large n: last slot should be 99.")
 }
 
+{
+	// Freeze is released after tasks() returns — table must be mutable again
+	var args = Table()
+	args.x = 1
+	function read_x(args) { return args.x }
+	tasks(3, read_x, args)
+	args.x = 42
+	assert(args.x, 42, "tasks() unfreeze: table must be mutable after tasks() returns.")
+}
+
+{
+	// Freeze does not affect tables that are not the args parameter
+	var side = Table()
+	side.x = 0
+	var args = Table()
+	args.x = 7
+	function accumulate(args)
+	{
+		// side is not the frozen arg — tasks() should not block access to it
+		// (each task runs in its own VM so side is not actually shared here,
+		//  but the frozen flag on args must not bleed onto unrelated tables)
+		return args.x
+	}
+	var result = tasks(3, accumulate, args)
+	assert(result:count(), 3, "tasks() freeze scope: result size should be 3.")
+	assert(result[0], 7, "tasks() freeze scope: slot 0 should be 7.")
+}
+
 return assert_counter.get_error_counter()

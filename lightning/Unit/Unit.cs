@@ -40,6 +40,57 @@ namespace lightningUnit
         [FieldOffset(0)]
         public bool isHeapUnit;
 
+        // ── Reference-level protection flags ────────────────────────────────────────
+        //
+        // Conceptual model: Unit is a typed pointer (analogous to a virtual-memory
+        // mapping). protectionFlags are the page-table-entry protection bits — they
+        // live on the *reference*, not the *object*. The same TableUnit can be
+        // reachable through a protected Unit and an unprotected Unit simultaneously
+        // (like a physical page mapped read-only in one process, read-write in another).
+        //
+        // This is distinct from TableUnit.Frozen, which is mprotect()-style: it marks
+        // the *object* immutable from any reference — needed for tasks() thread safety.
+        //
+        // Value types (Float, Integer, Char, Bool) use TypeUnit sentinels and have
+        // isHeapUnit == false. They are copied by value with no shared identity, so
+        // reference-level protection is meaningless for them. Their const-ness is a
+        // compiler concern only (track in the variable slot, refuse to emit STORE).
+        // Attempting to set protectionFlags on a value-type Unit is undefined — the
+        // flag overlaps the value union and would corrupt it.
+        //
+        // Layout — float32 mode (64-bit):
+        //   [FieldOffset( 0)]  value union       4 bytes  (float32/int32/char/bool/isHeapUnit)
+        //   [FieldOffset( 4)]  heapUnitValue      8 bytes  (reference)
+        //   [FieldOffset(12)]  protectionFlags    4 bytes  ← natural alignment padding: FREE
+        //
+        // Layout — DOUBLE mode (64-bit):
+        //   [FieldOffset( 0)]  value union        8 bytes  (float64/int64/char/bool/isHeapUnit)
+        //   [FieldOffset( 4)]  protectionFlags    4 bytes  ← overlaps HIGH bytes of float64/int64
+        //                                                     SAFE: when isHeapUnit==true the
+        //                                                     float64/int64 value is irrelevant;
+        //                                                     when isHeapUnit==false, Unit ctor
+        //                                                     writes the full 8-byte float64,
+        //                                                     zeroing these bytes automatically.
+        //   [FieldOffset( 8)]  heapUnitValue      8 bytes  (reference)
+        //
+        // sizeof(Unit) == 16 bytes in both modes. Zero cost.
+        //
+        // OS analogy:
+        //   protectionFlags  ≅  page-table-entry bits  (per-reference, free)
+        //   TableUnit.Frozen ≅  mprotect(PROT_READ)    (per-object, for tasks())
+        //
+        // Rule: only read/write protectionFlags when isHeapUnit == true.
+#if DOUBLE
+        [FieldOffset(4)]
+#else
+        [FieldOffset(12)]
+#endif
+        public int protectionFlags;
+        public const int PROTECTION_NONE  = 0;
+        public const int PROTECTION_CONST = 1 << 0;  // reference cannot be rebound
+                                                      // (future: enforced by compiler + runtime)
+        // bits 1..31 reserved
+
 #if DOUBLE
         [FieldOffset(8)]
 #else

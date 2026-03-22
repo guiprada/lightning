@@ -3,7 +3,7 @@ var lib = Table()
 lib.assert = function(value1, value2, msg)
 {
 	if(value1 != value2){
-		write_line(msg)
+		write_line(msg .. " | expected: " .. value2 .. " got: " .. value1)
 		return false
 	}
 	return true
@@ -11,7 +11,7 @@ lib.assert = function(value1, value2, msg)
 lib.assert_not = function(value1, value2, msg)
 {
 	if(value1 == value2){
-		write_line(msg)
+		write_line(msg .. " | expected: not " .. value2 .. " got: " .. value1)
 		return false
 	}
 	return true
