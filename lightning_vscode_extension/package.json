@@ -3,7 +3,7 @@
     "displayName": "lightning",
     "description": "lightning is a yet another little language",
     "version": "0.0.1",
-    "publisher": "void*",
+    "publisher": "guiprada",
     "engines": {
         "vscode": "^1.27.0"
     },
