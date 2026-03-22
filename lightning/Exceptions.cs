@@ -23,5 +23,6 @@ namespace lightningExceptions
 		public static Exception non_value_assign = new Exception("Trying to assign a non-value!");
 		public static Exception extension_table_has_extension_table = new Exception("Extension Table has an Extention Table!");
 		public static Exception can_not_override_extension_table = new Exception("Table already has an Extention Table!");
+		public static Exception const_mutation = new Exception("Cannot mutate a const Unit!");
 	}
 }

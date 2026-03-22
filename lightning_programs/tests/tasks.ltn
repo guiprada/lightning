@@ -56,7 +56,21 @@ var assert_not = assert_counter.assert_not
 }
 
 {
-	// Nested tasks(): inner tasks() with same args is allowed
+	// const: mutation attempt on const table args must throw, args must be unchanged
+	var args = Table()
+	args.x = 1
+	function try_mutate(args)
+	{
+		args.x = 2
+		return args.x
+	}
+	var threw = try(\{ tasks(1, try_mutate, args) }, [])
+	assert(threw:is_error(), true, "tasks() const: mutation of args should throw.")
+	assert(args.x, 1, "tasks() const: args must be unchanged after attempted mutation.")
+}
+
+{
+	// const: nested tasks() with same args is allowed — args is already const, propagates
 	var args = Table()
 	args.x = 1
 	function inner(args) { return args.x }
@@ -69,15 +83,15 @@ var assert_not = assert_counter.assert_not
 }
 
 {
-	// Reading table args is allowed
+	// const: reading const table args is allowed
 	var args = Table()
 	args.value = 99
 	function read_only(args) { return args.value }
 	var result = tasks(3, read_only, args)
-	assert(result:count(), 3, "tasks() read: result size should be 3.")
+	assert(result:count(), 3, "tasks() const read: result size should be 3.")
 	for (var i = 0; i < 3; i++)
 	{
-		assert(result[i], 99, "tasks() read: slot " .. i .. " should be 99.")
+		assert(result[i], 99, "tasks() const read: slot " .. i .. " should be 99.")
 	}
 }
 
@@ -102,13 +116,40 @@ var assert_not = assert_counter.assert_not
 }
 
 {
-	// Table remains mutable after tasks() returns
+	// const: table remains mutable in outer scope after tasks() returns
+	// tasks() stamps PROTECTION_CONST only on the local copy it distributes
 	var args = Table()
 	args.x = 1
 	function read_x(args) { return args.x }
 	tasks(3, read_x, args)
 	args.x = 42
 	assert(args.x, 42, "tasks() post: table must be mutable after tasks() returns.")
+}
+
+{
+	// const: const flag on args does not bleed onto unrelated tables
+	var side = Table()
+	side.x = 0
+	var args = Table()
+	args.x = 7
+	function read_args(args) { return args.x }
+	var result = tasks(3, read_args, args)
+	assert(result:count(), 3, "tasks() const scope: result size should be 3.")
+	assert(result[0], 7, "tasks() const scope: slot 0 should be 7.")
+	side.x = 99
+	assert(side.x, 99, "tasks() const scope: unrelated table must remain mutable.")
+}
+
+{
+	// const() intrinsic: creates a const alias — mutation throws, original unchanged
+	var t = Table()
+	t.x = 1
+	var ct = const(t)
+	var threw = try(\{ ct.x = 2 }, [])
+	assert(threw:is_error(), true, "const(): mutation through const alias should throw.")
+	assert(t.x, 1, "const(): original table must be unchanged.")
+	t.x = 42
+	assert(t.x, 42, "const(): original table must remain mutable.")
 }
 
 return assert_counter.get_error_counter()

@@ -367,6 +367,8 @@ namespace lightningPrelude
                 Integer n_tasks = p_vm.GetInteger(0);
                 Unit func = p_vm.GetUnit(1);
                 Unit arguments = p_vm.GetUnit(2);
+                if (arguments.isHeapUnit)
+                    arguments.protectionFlags |= Unit.PROTECTION_CONST;
 
                 VM[] vms = new VM[n_tasks];
                 for (int i = 0; i < (int)n_tasks; i++)
@@ -398,6 +400,16 @@ namespace lightningPrelude
                 return new Unit(value.Type == UnitType.Void);
             }
             functions.Add(new IntrinsicUnit("is_null", IsNull, 1));
+
+            //////////////////////////////////////////////////////
+            Unit Const(VM p_vm)
+            {
+                Unit u = p_vm.GetUnit(0);
+                if (u.isHeapUnit)
+                    u.protectionFlags |= Unit.PROTECTION_CONST;
+                return u;
+            }
+            functions.Add(new IntrinsicUnit("const", Const, 1));
 
             //////////////////////////////////////////////////////
             Unit GetOS(VM p_vm)

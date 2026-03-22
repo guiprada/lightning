@@ -858,6 +858,9 @@ namespace lightningVM
 
                             Unit this_table = stack.Pop();
 
+                            if ((this_table.protectionFlags & Unit.PROTECTION_CONST) != 0)
+                                throw Exceptions.const_mutation;
+
                             for (int i = 0; i < indexes_counter - 1; i++)
                             {
                                 Unit v = indexes[i];
