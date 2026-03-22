@@ -576,7 +576,7 @@ namespace lightningVM
                         // Reference types (table, function, string, ...) must carry
                         // PROTECTION_CONST when declared with a const parameter.
                         if (!(stack.Peek().heapUnitValue is TypeUnit) &&
-                            (stack.Peek().protectionFlags & Unit.PROTECTION_CONST) == 0)
+                            (stack.Peek().ProtectionFlags & Unit.PROTECTION_CONST) == 0)
                             throw Exceptions.const_required;
 
                         variables.Add(stack.Pop());
@@ -585,9 +585,7 @@ namespace lightningVM
                         IP++;
                         {
                             Unit u = stack.Pop();
-                            if (u.heapUnitValue is TypeUnit)
-                                throw Exceptions.const_on_scalar;
-                            u.protectionFlags |= Unit.PROTECTION_CONST;
+                            u.ProtectionFlags |= Unit.PROTECTION_CONST;
                             stack.Push(u);
                         }
                         break;
@@ -884,7 +882,7 @@ namespace lightningVM
 
                             Unit this_table = stack.Pop();
 
-                            if ((this_table.protectionFlags & Unit.PROTECTION_CONST) != 0)
+                            if ((this_table.ProtectionFlags & Unit.PROTECTION_CONST) != 0)
                                 throw Exceptions.const_mutation;
 
                             for (int i = 0; i < indexes_counter - 1; i++)

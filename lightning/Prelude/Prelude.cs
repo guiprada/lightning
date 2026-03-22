@@ -403,8 +403,7 @@ namespace lightningPrelude
             Unit Const(VM p_vm)
             {
                 Unit u = p_vm.GetUnit(0);
-                if (!(u.heapUnitValue is TypeUnit))
-                    u.protectionFlags |= Unit.PROTECTION_CONST;
+                u.ProtectionFlags |= Unit.PROTECTION_CONST;
                 return u;
             }
             functions.Add(new IntrinsicUnit("const", Const, 1));
