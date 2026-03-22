@@ -56,21 +56,7 @@ var assert_not = assert_counter.assert_not
 }
 
 {
-	// Freeze: mutation attempt on table args should throw, args must be unchanged
-	var args = Table()
-	args.x = 1
-	function try_mutate(args)
-	{
-		args.x = 2
-		return args.x
-	}
-	var threw = try(\{ tasks(1, try_mutate, args) }, [])
-	assert(threw:is_error(), true, "tasks() freeze: mutation of args should throw.")
-	assert(args.x, 1, "tasks() freeze: args must be unchanged after attempted mutation.")
-}
-
-{
-	// Nested tasks(): passing a frozen table to an inner tasks() must throw immediately
+	// Nested tasks(): inner tasks() with same args is allowed
 	var args = Table()
 	args.x = 1
 	function inner(args) { return args.x }
@@ -78,31 +64,30 @@ var assert_not = assert_counter.assert_not
 	{
 		return tasks(2, inner, args)
 	}
-	var threw = try(\{ tasks(2, outer, args) }, [])
-	assert(threw:is_error(), true, "tasks() nested: passing frozen args to inner tasks() should throw.")
-	assert(args.x, 1, "tasks() nested: args must be unchanged.")
+	var result = tasks(2, outer, args)
+	assert(result:count(), 2, "tasks() nested: result size should be 2.")
 }
 
 {
-	// Freeze: reading frozen table args is allowed
+	// Reading table args is allowed
 	var args = Table()
 	args.value = 99
 	function read_only(args) { return args.value }
 	var result = tasks(3, read_only, args)
-	assert(result:count(), 3, "tasks() freeze read: result size should be 3.")
+	assert(result:count(), 3, "tasks() read: result size should be 3.")
 	for (var i = 0; i < 3; i++)
 	{
-		assert(result[i], 99, "tasks() freeze read: slot " .. i .. " should be 99.")
+		assert(result[i], 99, "tasks() read: slot " .. i .. " should be 99.")
 	}
 }
 
 {
-	// Freeze: scalar args are value types — no freeze needed, always safe
+	// Scalar args are value types — always safe
 	var result = tasks(4, function(args) { return args + 1 }, 10)
-	assert(result:count(), 4, "tasks() scalar freeze: result size should be 4.")
+	assert(result:count(), 4, "tasks() scalar: result size should be 4.")
 	for (var i = 0; i < 4; i++)
 	{
-		assert(result[i], 11, "tasks() scalar freeze: slot " .. i .. " should be 11.")
+		assert(result[i], 11, "tasks() scalar: slot " .. i .. " should be 11.")
 	}
 }
 
@@ -117,31 +102,13 @@ var assert_not = assert_counter.assert_not
 }
 
 {
-	// Freeze is released after tasks() returns — table must be mutable again
+	// Table remains mutable after tasks() returns
 	var args = Table()
 	args.x = 1
 	function read_x(args) { return args.x }
 	tasks(3, read_x, args)
 	args.x = 42
-	assert(args.x, 42, "tasks() unfreeze: table must be mutable after tasks() returns.")
-}
-
-{
-	// Freeze does not affect tables that are not the args parameter
-	var side = Table()
-	side.x = 0
-	var args = Table()
-	args.x = 7
-	function accumulate(args)
-	{
-		// side is not the frozen arg — tasks() should not block access to it
-		// (each task runs in its own VM so side is not actually shared here,
-		//  but the frozen flag on args must not bleed onto unrelated tables)
-		return args.x
-	}
-	var result = tasks(3, accumulate, args)
-	assert(result:count(), 3, "tasks() freeze scope: result size should be 3.")
-	assert(result[0], 7, "tasks() freeze scope: slot 0 should be 7.")
+	assert(args.x, 42, "tasks() post: table must be mutable after tasks() returns.")
 }
 
 return assert_counter.get_error_counter()

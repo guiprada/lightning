@@ -23,7 +23,5 @@ namespace lightningExceptions
 		public static Exception non_value_assign = new Exception("Trying to assign a non-value!");
 		public static Exception extension_table_has_extension_table = new Exception("Extension Table has an Extention Table!");
 		public static Exception can_not_override_extension_table = new Exception("Table already has an Extention Table!");
-		public static Exception frozen_mutation = new Exception("Cannot mutate frozen table!");
-		public static Exception tasks_frozen_args = new Exception("tasks() args table is already frozen — pass a const Unit to allow nested tasks() with shared args!");
 	}
 }

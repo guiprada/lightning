@@ -48,9 +48,6 @@ namespace lightningUnit
         // reachable through a protected Unit and an unprotected Unit simultaneously
         // (like a physical page mapped read-only in one process, read-write in another).
         //
-        // This is distinct from TableUnit.Frozen, which is mprotect()-style: it marks
-        // the *object* immutable from any reference — needed for tasks() thread safety.
-        //
         // Value types (Float, Integer, Char, Bool) use TypeUnit sentinels and have
         // isHeapUnit == false. They are copied by value with no shared identity, so
         // reference-level protection is meaningless for them. Their const-ness is a
@@ -77,7 +74,6 @@ namespace lightningUnit
         //
         // OS analogy:
         //   protectionFlags  ≅  page-table-entry bits  (per-reference, free)
-        //   TableUnit.Frozen ≅  mprotect(PROT_READ)    (per-object, for tasks())
         //
         // Rule: only read/write protectionFlags when isHeapUnit == true.
 #if DOUBLE

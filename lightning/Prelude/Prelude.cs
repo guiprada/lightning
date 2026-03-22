@@ -374,37 +374,13 @@ namespace lightningPrelude
                     vms[i] = p_vm.GetParallelVM();
                 }
 
-                TableUnit frozenTable = arguments.Type == UnitType.Table
-                    ? (TableUnit)arguments.heapUnitValue
-                    : null;
-                bool weSetFrozen = false;
-                if (frozenTable != null)
-                {
-                    bool alreadyConst = (arguments.protectionFlags & Unit.PROTECTION_CONST) != 0;
-                    if (frozenTable.Frozen && !alreadyConst)
-                        throw Exceptions.tasks_frozen_args;
-                    if (!frozenTable.Frozen)
-                    {
-                        frozenTable.Frozen = true;
-                        weSetFrozen = true;
-                    }
-                }
-
                 Unit[] results = new Unit[n_tasks];
-                try
+                System.Threading.Tasks.Parallel.For(0, n_tasks, (index) =>
                 {
-                    System.Threading.Tasks.Parallel.For(0, n_tasks, (index) =>
-                    {
-                        List<Unit> args = new List<Unit>();
-                        args.Add(arguments);
-                        results[index] = vms[index].CallFunction(func, args);
-                    });
-                }
-                finally
-                {
-                    if (weSetFrozen)
-                        frozenTable.Frozen = false;
-                }
+                    List<Unit> args = new List<Unit>();
+                    args.Add(arguments);
+                    results[index] = vms[index].CallFunction(func, args);
+                });
 
                 for (int i = 0; i < n_tasks; i++)
                 {
