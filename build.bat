@@ -7,16 +7,16 @@ taskkill /F /IM lightning_interpreter.exe >nul 2>&1
 @REM previous apphost.exe memory-mapped between builds, causing CreateAppHost
 @REM to fail with IOException.  Shut it down first, then clean intermediates.
 dotnet build-server shutdown >nul 2>&1
-if exist lightning_interpreter\bin\Release\net10.0\win-x64 rmdir lightning_interpreter\bin\Release\net10.0\win-x64 /Q/S
-if exist lightning_interpreter\obj\Release\net10.0\win-x64 rmdir lightning_interpreter\obj\Release\net10.0\win-x64 /Q/S
+if exist lightning_interpreter\bin\Release\net8.0\win-x64 rmdir lightning_interpreter\bin\Release\net8.0\win-x64 /Q/S
+if exist lightning_interpreter\obj\Release\net8.0\win-x64 rmdir lightning_interpreter\obj\Release\net8.0\win-x64 /Q/S
 
 dotnet publish --nologo --self-contained true -r win-x64 -c Release /p:LinkDuringPublish=true lightning_interpreter\lightning_interpreter.csproj
 
 if not exist .\win_builds mkdir .\win_builds >nul
-xcopy lightning_interpreter\bin\Release\net10.0\win-x64\* .\win_builds\ /E/H >nul
+xcopy lightning_interpreter\bin\Release\net8.0\win-x64\* .\win_builds\ /E/H >nul
 
 if not exist .\win_builds\refs mkdir .\win_builds\refs >nul
-xcopy lightning\bin\Release\net10.0\refs\* .\win_builds\refs\ /E/H >nul
+xcopy lightning\bin\Release\net8.0\refs\* .\win_builds\refs\ /E/H >nul
 
 @REM Works but compiles old code
 @REM dotnet build -c Release -o win_builds lightning
