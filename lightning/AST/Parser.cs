@@ -191,6 +191,7 @@ namespace lightningAST
 
 		Node VarDecl()
 		{
+			bool isConst = Match(TokenType.CONST);
 			TokenString name = (TokenString)Consume(
 				TokenType.IDENTIFIER,
 				"Expected 'variable identifier' after 'var'.",
@@ -212,23 +213,24 @@ namespace lightningAST
 			Elide(TokenType.SEMICOLON);
 			ElideMany(TokenType.NEW_LINE);
 
-			return new VarDeclarationNode(name.value, initializer, name.PositionData);
+			return new VarDeclarationNode(name.value, initializer, name.PositionData, isConst);
 		}
 
-		List<string> Parameters()
+		List<Parameter> Parameters()
 		{
-			List<string> parameters = new List<string>();
+			List<Parameter> parameters = new List<Parameter>();
 
 			ElideMany(TokenType.NEW_LINE);
-			bool has_parameter = Check(TokenType.IDENTIFIER);
+			bool has_parameter = Check(TokenType.IDENTIFIER) || Check(TokenType.CONST);
 			while (has_parameter)
 			{
+				bool isConst = Match(TokenType.CONST);
 				TokenString new_parameter = (TokenString)Consume(
 					TokenType.IDENTIFIER,
 					"Expected 'identifier' as 'function parameter'.",
 					true
 				);
-				parameters.Add(new_parameter.value);
+				parameters.Add(new Parameter(new_parameter.value, isConst));
 				ElideMany(TokenType.NEW_LINE);
 				if (Check(TokenType.COMMA))
 				{
@@ -238,7 +240,7 @@ namespace lightningAST
 						true
 					);
 					ElideMany(TokenType.NEW_LINE);
-					has_parameter = Check(TokenType.IDENTIFIER);
+					has_parameter = Check(TokenType.IDENTIFIER) || Check(TokenType.CONST);
 				}
 				else
 				{

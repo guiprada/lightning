@@ -20,6 +20,7 @@ namespace lightningAST
 			{"true", TokenType.TRUE},
 			{"var", TokenType.VAR},
 			{"while", TokenType.WHILE},
+			{"const", TokenType.CONST},
 			{"and", TokenType.AND},
 			{"or", TokenType.OR},
 			{"xor", TokenType.XOR},

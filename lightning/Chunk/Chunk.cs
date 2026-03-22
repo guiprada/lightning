@@ -124,6 +124,8 @@ namespace lightningChunk
                 case OpCode.CLOSE_FUNCTION:
                 case OpCode.LOAD_FALSE:
                 case OpCode.LOAD_TRUE:
+                case OpCode.DECLARE_CONST_VARIABLE:
+                case OpCode.MAKE_CONST:
                     return op.ToString();
 
                 // 1 op
@@ -172,6 +174,8 @@ namespace lightningChunk
 
         DECLARE_GLOBAL,
         DECLARE_VARIABLE,
+        DECLARE_CONST_VARIABLE,  // like DECLARE_VARIABLE but checks PROTECTION_CONST first
+        MAKE_CONST,              // stamps PROTECTION_CONST on TOS Unit (for var const)
         DECLARE_FUNCTION,
         ASSIGN_VARIABLE,
         ASSIGN_GLOBAL,

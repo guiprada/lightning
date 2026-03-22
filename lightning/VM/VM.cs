@@ -565,6 +565,26 @@ namespace lightningVM
 
                         variables.Add(stack.Pop());
                         break;
+                    case OpCode.DECLARE_CONST_VARIABLE:
+                        IP++;
+
+                        if (Unit.IsEmpty(stack.Peek()))
+                            throw Exceptions.non_value_assign;
+
+                        if (stack.Peek().isHeapUnit && (stack.Peek().protectionFlags & Unit.PROTECTION_CONST) == 0)
+                            throw Exceptions.const_required;
+
+                        variables.Add(stack.Pop());
+                        break;
+                    case OpCode.MAKE_CONST:
+                        IP++;
+                        {
+                            Unit u = stack.Pop();
+                            if (u.isHeapUnit)
+                                u.protectionFlags |= Unit.PROTECTION_CONST;
+                            stack.Push(u);
+                        }
+                        break;
                     case OpCode.DECLARE_GLOBAL:
                         IP++;
 

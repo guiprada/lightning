@@ -31,7 +31,8 @@ namespace lightningCompiler
 			// the immediately enclosing closure's upvalue array (not a local variable slot).
 			public bool isChained;
 			public int chainedIndex; // index in the enclosing closure's upvalue array
-			public Variable(string p_name, int p_address, int p_envIndex, ValueType p_type)
+			public bool isConst;    // var const: compiler refuses to emit ASSIGN to this slot
+			public Variable(string p_name, int p_address, int p_envIndex, ValueType p_type, bool p_isConst = false)
 			{
 				name = p_name;
 				address = p_address;
@@ -40,6 +41,7 @@ namespace lightningCompiler
 				type = p_type;
 				isChained = false;
 				chainedIndex = 0;
+				isConst = p_isConst;
 			}
 
 			public Variable(Node p_expression)
@@ -51,6 +53,7 @@ namespace lightningCompiler
 				type = ValueType.Expression;
 				isChained = false;
 				chainedIndex = 0;
+				isConst = false;
 			}
 		}
 
@@ -62,6 +65,7 @@ namespace lightningCompiler
 		private int instructionCounter;
 		private List<object> dataLiterals;
 		private List<List<string>> env;
+		private List<List<bool>> envConst;  // parallel to env: tracks which slots are const
 		private List<string> globals;
 		private List<List<Variable>> upvalueStack; // index 0 = outermost fn, last = innermost fn
 		private List<int> funStartEnv;             // absolute compiler env index where each fn starts
@@ -113,7 +117,9 @@ namespace lightningCompiler
 			dataLiterals = new List<dynamic>();
 			upvalueStack = new List<List<Variable>>();
 			env = new List<List<string>>();
+			envConst = new List<List<bool>>();
 			env.Add(globals);// set env[0] to globals
+			envConst.Add(new List<bool>());// mirror globals scope
 			funStartEnv = new List<int>();
 
 			// place prelude functions on data
@@ -396,6 +402,7 @@ namespace lightningCompiler
 		{
 			Add(OpCode.OPEN_ENV, p_node.PositionData);
 			env.Add(new List<string>());
+			envConst.Add(new List<bool>());
 
 			ChunkIt(p_node.Initializer);
 
@@ -592,9 +599,11 @@ namespace lightningCompiler
 		{
 			Add(OpCode.OPEN_ENV, p_node.PositionData);
 			env.Add(new List<string>());
+			envConst.Add(new List<bool>());
 			foreach (Node n in p_node.Statements)
 				ChunkIt(n);
 			env.RemoveAt(env.Count - 1);
+			envConst.RemoveAt(envConst.Count - 1);
 			Add(OpCode.CLOSE_ENV, p_node.PositionData);
 		}
 
