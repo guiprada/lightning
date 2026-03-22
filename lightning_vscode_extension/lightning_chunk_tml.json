@@ -4,47 +4,76 @@
 	"scopeName": "source.lightning-chunk",
 	"patterns": [
 		{
+			"comment": "Section headers",
 			"match": "^-{3,}.*$",
 			"name": "comment.line.section-header.lightning-chunk"
 		},
 		{
+			"comment": "Data: N label",
 			"captures": {
-				"1": { "name": "keyword.other.lightning-chunk" },
+				"1": { "name": "entity.name.tag.lightning-chunk" },
 				"2": { "name": "constant.numeric.lightning-chunk" }
 			},
 			"match": "^(Data:)\\s+(\\d+)"
 		},
 		{
+			"comment": "Instruction index and on position annotation",
 			"captures": {
 				"1": { "name": "constant.numeric.lightning-chunk" },
-				"2": { "name": "keyword.other.on-position.lightning-chunk" },
-				"3": { "name": "constant.numeric.lightning-chunk" }
+				"2": { "name": "comment.block.lightning-chunk" },
+				"3": { "name": "comment.block.lightning-chunk" }
 			},
 			"match": "^(\\d+)(?=:)|\\b(on position:)\\s*(\\(\\d+,\\d+\\))"
 		},
 		{
+			"comment": "Load opcodes — push values onto stack",
 			"match": "\\b(LOAD_DATA|LOAD_VARIABLE|LOAD_GLOBAL|LOAD_IMPORTED_GLOBAL|LOAD_IMPORTED_DATA|LOAD_UPVALUE|LOAD_INTRINSIC|LOAD_VOID|LOAD_TRUE|LOAD_FALSE)\\b",
-			"name": "support.function.load.lightning-chunk"
+			"name": "support.function.lightning-chunk"
 		},
 		{
-			"match": "\\b(DECLARE_GLOBAL|DECLARE_VARIABLE|DECLARE_CONST_VARIABLE|DECLARE_FUNCTION|ASSIGN_VARIABLE|ASSIGN_GLOBAL|ASSIGN_IMPORTED_GLOBAL|ASSIGN_UPVALUE|ASSIGN|ADDITION_ASSIGN|SUBTRACTION_ASSIGN|MULTIPLICATION_ASSIGN|DIVISION_ASSIGN|MAKE_CONST)\\b",
+			"comment": "Declare opcodes — bind names",
+			"match": "\\b(DECLARE_GLOBAL|DECLARE_VARIABLE|DECLARE_CONST_VARIABLE|DECLARE_FUNCTION)\\b",
 			"name": "storage.type.lightning-chunk"
 		},
 		{
+			"comment": "Assign and const opcodes — mutate bindings",
+			"match": "\\b(ASSIGN_VARIABLE|ASSIGN_GLOBAL|ASSIGN_IMPORTED_GLOBAL|ASSIGN_UPVALUE|ASSIGN|ADDITION_ASSIGN|SUBTRACTION_ASSIGN|MULTIPLICATION_ASSIGN|DIVISION_ASSIGN|MAKE_CONST)\\b",
+			"name": "storage.modifier.lightning-chunk"
+		},
+		{
+			"comment": "Call and return — control transfer",
 			"match": "\\b(CALL|RETURN|RETURN_SET|EXIT)\\b",
 			"name": "keyword.control.lightning-chunk"
 		},
 		{
-			"match": "\\b(OPEN_ENV|CLOSE_ENV|CLOSE_FUNCTION|CLOSE_CLOSURE|NEW_LIST)\\b",
-			"name": "keyword.control.block.lightning-chunk"
+			"comment": "Environment and closure lifecycle",
+			"match": "\\b(OPEN_ENV|CLOSE_ENV|CLOSE_FUNCTION|CLOSE_CLOSURE)\\b",
+			"name": "entity.name.section.lightning-chunk"
 		},
 		{
-			"match": "\\b(GET|SET|POP|DUP|PUSH_STASH|POP_STASH)\\b",
-			"name": "keyword.operator.stack.lightning-chunk"
+			"comment": "Collection constructors",
+			"match": "\\b(NEW_LIST)\\b",
+			"name": "support.class.lightning-chunk"
 		},
 		{
-			"match": "\\b(ADD|SUBTRACT|MULTIPLY|DIVIDE|NEGATE|NOT|AND|OR|XOR|EQUALS|NOT_EQUALS|GREATER_EQUALS|LESS_EQUALS|GREATER|LESS)\\b",
+			"comment": "Table get/set — field access",
+			"match": "\\b(GET|SET)\\b",
+			"name": "variable.language.lightning-chunk"
+		},
+		{
+			"comment": "Stack manipulation",
+			"match": "\\b(POP|DUP|PUSH_STASH|POP_STASH)\\b",
+			"name": "keyword.other.lightning-chunk"
+		},
+		{
+			"comment": "Arithmetic operators",
+			"match": "\\b(ADD|SUBTRACT|MULTIPLY|DIVIDE|NEGATE)\\b",
 			"name": "keyword.operator.lightning-chunk"
+		},
+		{
+			"comment": "Logic and comparison operators",
+			"match": "\\b(NOT|AND|OR|XOR|EQUALS|NOT_EQUALS|GREATER_EQUALS|LESS_EQUALS|GREATER|LESS)\\b",
+			"name": "keyword.operator.logical.lightning-chunk"
 		},
 		{
 			"begin": "\"",
@@ -62,6 +91,7 @@
 			"name": "constant.numeric.lightning-chunk"
 		},
 		{
+			"comment": "Function references in data section",
 			"match": "\\b(fun|lambda|Closure of)\\b",
 			"name": "entity.name.function.lightning-chunk"
 		}
