@@ -35,11 +35,13 @@ lightning_programs/*.tokens
 lightning_programs/*.ast
 lightning_programs/*.chunk
 lightning_programs/*.log
+lightning_programs/*.ltnc
 lightning_programs/*/*.out
 lightning_programs/*/*.tokens
 lightning_programs/*/*.ast
 lightning_programs/*/*.chunk
 lightning_programs/*/*.log
+lightning_programs/*/*.ltnc
 
 # Visual Studio 2015/2017 cache/options directory
 .vs/
