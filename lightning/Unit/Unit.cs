@@ -104,35 +104,55 @@ namespace lightningUnit
 
         public Unit(HeapUnit p_value) : this()
         {
+            // OVERLAP: isHeapUnit writes 1 into offset 0 (the value union).
+            // The value union is irrelevant for heap units; heapUnitValue is the payload.
+            // DO NOT read isHeapUnit back as a type tag — non-zero scalar values
+            // (int 1, float 1.0, char 'A') also produce isHeapUnit == true.
+            // Use (heapUnitValue is TypeUnit) to distinguish value vs heap units.
             isHeapUnit = true;
             heapUnitValue = p_value;
         }
         public Unit(Float p_number) : this()
         {
+            // OVERLAP TRAP (DOUBLE mode): floatValue writes 8 bytes at offset 0,
+            // which zeroes [4..7] = protectionFlags. Never set protectionFlags before
+            // the value assignment in a value-type ctor, or it will be silently wiped.
+            // Also: isHeapUnit at offset 0 will read as truthy for any non-zero float —
+            // do NOT use isHeapUnit to identify value units at runtime.
             floatValue = p_number;
             heapUnitValue = TypeUnit.Float;
         }
 
         public Unit(Integer p_number) : this()
         {
+            // OVERLAP TRAP (DOUBLE mode): same as Float ctor — integerValue writes
+            // 8 bytes at offset 0, zeroing protectionFlags at offset 4.
+            // isHeapUnit at offset 0 reads as truthy for any non-zero integer.
             integerValue = p_number;
             heapUnitValue = TypeUnit.Integer;
         }
 
         public Unit(bool p_value) : this()
         {
+            // OVERLAP: boolValue writes 1 byte at offset 0 (same as isHeapUnit).
+            // For p_value == true, isHeapUnit reads back as true — misleading but harmless
+            // since the TypeUnit sentinel on heapUnitValue is the real type discriminator.
             boolValue = p_value;
             heapUnitValue = TypeUnit.Boolean;
         }
 
         public Unit(String p_string) : this()
         {
+            // OVERLAP: same as HeapUnit ctor — isHeapUnit is not a reliable type tag.
             isHeapUnit = true;
             heapUnitValue = new StringUnit(p_string);
         }
 
         public Unit(char p_char) : this()
         {
+            // OVERLAP: charValue writes 2 bytes at offset 0; isHeapUnit (offset 0, 1 byte)
+            // will read as truthy for any char with non-zero low byte (i.e. most chars).
+            // Use (heapUnitValue is TypeUnit) to identify value units, not isHeapUnit.
             charValue = p_char;
             heapUnitValue = TypeUnit.Char;
         }
