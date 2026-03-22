@@ -476,16 +476,17 @@ namespace lightningAST
             Console.Write("\n" + identString + "[FUNCTION EXPRESSION (");
             bool is_first = true;
             if (p_node.Parameters != null)
-                foreach (string n in p_node.Parameters)
+                foreach (Parameter n in p_node.Parameters)
                 {
+                    string display = n.IsConst ? "const " + n.Name : n.Name;
                     if (is_first)
                     {
-                        Console.Write(n);
+                        Console.Write(display);
                         is_first = false;
                     }
                     else
                     {
-                        Console.Write(", " + n);
+                        Console.Write(", " + display);
                     }
                 }
             Console.WriteLine(")");
@@ -507,16 +508,17 @@ namespace lightningAST
             bool is_first = true;
 
             if (p_node.Parameters != null)
-                foreach (string n in p_node.Parameters)
+                foreach (Parameter n in p_node.Parameters)
                 {
+                    string display = n.IsConst ? "const " + n.Name : n.Name;
                     if (is_first)
                     {
-                        Console.Write(n);
+                        Console.Write(display);
                         is_first = false;
                     }
                     else
                     {
-                        Console.Write(", " + n);
+                        Console.Write(", " + display);
                     }
                 }
             Console.WriteLine(")");

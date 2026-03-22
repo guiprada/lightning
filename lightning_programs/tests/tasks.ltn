@@ -29,12 +29,12 @@ var assert_not = assert_counter.assert_not
 }
 
 {
-	// const required: passing a non-const table to tasks() must throw
+	// const required: f declares const arg — passing non-const must throw
 	var args = Table()
 	args.x = 1
-	function f(args) { return args.x }
-	var threw = try(\{ tasks(1, f, args) }, [])
-	assert(threw:is_error(), true, "tasks() const required: non-const table arg should throw.")
+	function f(const args) { return args.x }
+	var threw = try(\{ f(args) }, [])
+	assert(threw:is_error(), true, "const param: calling f(const args) with non-const must throw.")
 }
 
 {
