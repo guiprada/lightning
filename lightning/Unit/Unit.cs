@@ -82,9 +82,9 @@ namespace lightningUnit
 #else
         [FieldOffset(12)]
 #endif
-        public int protectionFlags;
+        private int protectionFlags;
         public const int PROTECTION_NONE  = 0;
-        
+
         public const int PROTECTION_IS_VALUE_TYPE    = 1 << 0;  // set on Bool/Char/Void Units
                                                       // NOT set on Float/Integer (DOUBLE overlap)
                                                       // NOT set on heap Units (Table, Closure ...)
@@ -92,10 +92,24 @@ namespace lightningUnit
                                                       // (future: enforced by compiler + runtime)
         // bits 2..31 reserved
 
-        // Call this before setting any protectionFlags on an unknown Unit.
-        // The heapUnitValue is TypeUnit check is expensive (pointer dereference) but
-        // happens only once at write time — reads of protectionFlags are always cheap.
-        public bool CanSetProtectionFlags => !(heapUnitValue is TypeUnit);
+        // heapUnitValue is TypeUnit is the authoritative value-type check — it covers
+        // Float/Integer which cannot carry PROTECTION_IS_VALUE_TYPE in DOUBLE mode.
+        // The dereference is paid once here; all reads/writes go through this property.
+        public int ProtectionFlags
+        {
+            get
+            {
+                if (heapUnitValue is TypeUnit)
+                    throw Exceptions.const_on_scalar;
+                return protectionFlags;
+            }
+            set
+            {
+                if (heapUnitValue is TypeUnit)
+                    throw Exceptions.const_on_scalar;
+                protectionFlags = value;
+            }
+        }
 
 #if DOUBLE
         [FieldOffset(8)]
