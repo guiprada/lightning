@@ -31,8 +31,7 @@ namespace lightningCompiler
 			// the immediately enclosing closure's upvalue array (not a local variable slot).
 			public bool isChained;
 			public int chainedIndex; // index in the enclosing closure's upvalue array
-			public bool isConst;    // var const: compiler refuses to emit ASSIGN to this slot
-			public Variable(string p_name, int p_address, int p_envIndex, ValueType p_type, bool p_isConst = false)
+			public Variable(string p_name, int p_address, int p_envIndex, ValueType p_type)
 			{
 				name = p_name;
 				address = p_address;
@@ -41,7 +40,6 @@ namespace lightningCompiler
 				type = p_type;
 				isChained = false;
 				chainedIndex = 0;
-				isConst = p_isConst;
 			}
 
 			public Variable(Node p_expression)
@@ -53,7 +51,6 @@ namespace lightningCompiler
 				type = ValueType.Expression;
 				isChained = false;
 				chainedIndex = 0;
-				isConst = false;
 			}
 		}
 
@@ -64,7 +61,7 @@ namespace lightningCompiler
 		public bool HasChunked { get; private set; }
 		private int instructionCounter;
 		private List<object> dataLiterals;
-		private List<List<(string name, bool isConst)>> env;
+		private List<List<string>> env;
 		private List<string> globals;
 		private List<List<Variable>> upvalueStack; // index 0 = outermost fn, last = innermost fn
 		private List<int> funStartEnv;             // absolute compiler env index where each fn starts
@@ -115,8 +112,8 @@ namespace lightningCompiler
 			globals = new List<string>();
 			dataLiterals = new List<dynamic>();
 			upvalueStack = new List<List<Variable>>();
-			env = new List<List<(string name, bool isConst)>>();
-			env.Add(new List<(string, bool)>());// env[0] = global scope
+			env = new List<List<string>>();
+			env.Add(globals);// env[0] = global scope
 			funStartEnv = new List<int>();
 
 			// place prelude functions on data
@@ -398,7 +395,7 @@ namespace lightningCompiler
 		private void ChunkFor(ForNode p_node)
 		{
 			Add(OpCode.OPEN_ENV, p_node.PositionData);
-			env.Add(new List<(string, bool)>());
+			env.Add(new List<string>());
 
 			ChunkIt(p_node.Initializer);
 
@@ -516,7 +513,7 @@ namespace lightningCompiler
 			if (p_node.IsConst)
 				Add(OpCode.MAKE_CONST, p_node.PositionData);
 
-			Nullable<Variable> maybe_var = SetVar(p_node.Name, p_node.IsConst);
+			Nullable<Variable> maybe_var = SetVar(p_node.Name);
 			if (maybe_var.HasValue)
 			{
 				Variable this_var = maybe_var.Value;
@@ -539,8 +536,6 @@ namespace lightningCompiler
 			if (maybe_var.HasValue)
 			{
 				Variable this_var = maybe_var.Value;
-				if (this_var.isConst)
-					Error("Cannot assign to const variable: " + p_node.Assigned.Name, p_node.PositionData);
 				if (p_node.Assigned.Indexes.Count == 0)
 				{
 					switch (this_var.type)
@@ -599,7 +594,7 @@ namespace lightningCompiler
 		private void ChunkBlock(BlockNode p_node)
 		{
 			Add(OpCode.OPEN_ENV, p_node.PositionData);
-			env.Add(new List<(string, bool)>());
+			env.Add(new List<string>());
 			foreach (Node n in p_node.Statements)
 				ChunkIt(n);
 			env.RemoveAt(env.Count - 1);
@@ -770,7 +765,7 @@ namespace lightningCompiler
 			int function_start = instructionCounter;
 
 			// env
-			env.Add(new List<(string, bool)>());
+			env.Add(new List<string>());
 			Add(OpCode.OPEN_ENV, p_node.PositionData);
 			//Add funStartEnv
 			funStartEnv.Add(env.Count - 1);
@@ -782,7 +777,7 @@ namespace lightningCompiler
 			if (p_node.Parameters != null)
 				foreach (Parameter p in p_node.Parameters)
 				{
-					SetVar(p.Name, p.IsConst);// it is always local
+					SetVar(p.Name);// it is always local
 					Add(p.IsConst ? OpCode.DECLARE_CONST_VARIABLE : OpCode.DECLARE_VARIABLE, p_node.PositionData);
 					arity++;
 				}
@@ -842,10 +837,8 @@ namespace lightningCompiler
 			for (int i = top_index; i >= 0; i--)
 			{
 				var this_env = env[i];
-				int idx = this_env.FindIndex(e => e.name == p_name);
-				if (idx >= 0)
+				if (this_env.Contains(p_name))
 				{
-					bool isConst = this_env[idx].isConst;
 					bool is_in_function = upvalueStack.Count != 0;
 					bool isGlobal = (i == 0);
 					if (!isGlobal)
@@ -853,14 +846,13 @@ namespace lightningCompiler
 						int currentFnLevel = upvalueStack.Count - 1;
 						if (is_in_function && i < funStartEnv[currentFnLevel])
 						{// not global — upvalue, possibly chained
-							return GetUpValueWithChaining(p_name, idx, i, currentFnLevel);
+							return GetUpValueWithChaining(p_name, this_env.IndexOf(p_name), i, currentFnLevel);
 						}
-						// local var
-						return new Variable(p_name, idx, top_index - i, ValueType.Local, isConst);
+						return new Variable(p_name, this_env.IndexOf(p_name), top_index - i, ValueType.Local);
 					}
 					if (isGlobal && globals.Contains(p_name))// Sanity check
 					{
-						return new Variable(p_name, idx, 0, ValueType.Global, isConst);
+						return new Variable(p_name, this_env.IndexOf(p_name), 0, ValueType.Global);
 					}
 					else
 					{
@@ -955,35 +947,33 @@ namespace lightningCompiler
 		{
 			int top_index = env.Count - 1;
 			var this_env = env[top_index];
-			return this_env.Exists(e => e.name == p_name);
+			return this_env.Contains(p_name);
 		}
 
-		private Nullable<Variable> SetVar(string p_name, bool p_isConst = false)
+		private Nullable<Variable> SetVar(string p_name)
 		{
 			if (env.Count == 1)// we are in global scope
-				return SetGlobalVar(p_name, p_isConst);
+				return SetGlobalVar(p_name);
 			else
 			{
 				if (!IsLocalVar(p_name))
 				{
 					int top_index = env.Count - 1;
 					var this_env = env[top_index];
-					this_env.Add((p_name, p_isConst));
-					int idx = this_env.Count - 1;
-					return new Variable(p_name, idx, 0, ValueType.Local, p_isConst);
+					this_env.Add(p_name);
+					return new Variable(p_name, this_env.IndexOf(p_name), 0, ValueType.Local);
 				}
 			}
 			return null;
 		}
 
-		private Nullable<Variable> SetGlobalVar(string p_name, bool p_isConst = false)
+		private Nullable<Variable> SetGlobalVar(string p_name)
 		{
 			if (!globals.Contains(p_name))
 			{
 				globals.Add(p_name);
-				env[0].Add((p_name, p_isConst));
 				chunk.AddGlobalVariableAddress(p_name, (Operand)globals.IndexOf(p_name));
-				return new Variable(p_name, globals.IndexOf(p_name), 0, ValueType.Global, p_isConst);
+				return new Variable(p_name, globals.IndexOf(p_name), 0, ValueType.Global);
 			}
 
 			return null;
