@@ -377,11 +377,17 @@ namespace lightningPrelude
                 TableUnit frozenTable = arguments.Type == UnitType.Table
                     ? (TableUnit)arguments.heapUnitValue
                     : null;
+                bool weSetFrozen = false;
                 if (frozenTable != null)
                 {
-                    if (frozenTable.Frozen)
+                    bool alreadyConst = (arguments.protectionFlags & Unit.PROTECTION_CONST) != 0;
+                    if (frozenTable.Frozen && !alreadyConst)
                         throw Exceptions.tasks_frozen_args;
-                    frozenTable.Frozen = true;
+                    if (!frozenTable.Frozen)
+                    {
+                        frozenTable.Frozen = true;
+                        weSetFrozen = true;
+                    }
                 }
 
                 Unit[] results = new Unit[n_tasks];
@@ -396,7 +402,7 @@ namespace lightningPrelude
                 }
                 finally
                 {
-                    if (frozenTable != null)
+                    if (weSetFrozen)
                         frozenTable.Frozen = false;
                 }
 
