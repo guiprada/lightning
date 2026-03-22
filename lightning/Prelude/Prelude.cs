@@ -367,8 +367,8 @@ namespace lightningPrelude
                 Integer n_tasks = p_vm.GetInteger(0);
                 Unit func = p_vm.GetUnit(1);
                 Unit arguments = p_vm.GetUnit(2);
-                if (arguments.isHeapUnit)
-                    arguments.protectionFlags |= Unit.PROTECTION_CONST;
+                if (arguments.isHeapUnit && (arguments.protectionFlags & Unit.PROTECTION_CONST) == 0)
+                    throw Exceptions.const_required;
 
                 VM[] vms = new VM[n_tasks];
                 for (int i = 0; i < (int)n_tasks; i++)

@@ -3,7 +3,7 @@ var assert = assert_counter.assert
 var assert_not = assert_counter.assert_not
 
 {
-	// Scalar args: all tasks receive same value type, result table has n slots
+	// Scalar args: value types have no const requirement
 	var n = 5
 	function double(args) { return args * 2 }
 	var result = tasks(n, double, 3)
@@ -15,17 +15,26 @@ var assert_not = assert_counter.assert_not
 }
 
 {
-	// Table args: tasks read fields from shared table, return computed values
+	// Table args: caller must pass const(args) explicitly — fail fast
 	var n = 10
 	var args = Table()
 	args.x = 7
 	function read_x(args) { return args.x * 2 }
-	var result = tasks(n, read_x, args)
+	var result = tasks(n, read_x, const(args))
 	assert(result:count(), n, "tasks() table args: result size should be n.")
 	for (var i = 0; i < n; i++)
 	{
 		assert(result[i], 14, "tasks() table args: slot " .. i .. " should be 14.")
 	}
+}
+
+{
+	// const required: passing a non-const table to tasks() must throw
+	var args = Table()
+	args.x = 1
+	function f(args) { return args.x }
+	var threw = try(\{ tasks(1, f, args) }, [])
+	assert(threw:is_error(), true, "tasks() const required: non-const table arg should throw.")
 }
 
 {
@@ -44,7 +53,7 @@ var assert_not = assert_counter.assert_not
 }
 
 {
-	// func returns null: result table has n null slots (option A — size is always n)
+	// func returns null: result table has n null slots
 	var n = 4
 	function returns_null(args) { return null }
 	var result = tasks(n, returns_null, 0)
@@ -64,21 +73,21 @@ var assert_not = assert_counter.assert_not
 		args.x = 2
 		return args.x
 	}
-	var threw = try(\{ tasks(1, try_mutate, args) }, [])
+	var threw = try(\{ tasks(1, try_mutate, const(args)) }, [])
 	assert(threw:is_error(), true, "tasks() const: mutation of args should throw.")
 	assert(args.x, 1, "tasks() const: args must be unchanged after attempted mutation.")
 }
 
 {
-	// const: nested tasks() with same args is allowed — args is already const, propagates
+	// const: nested tasks() — args already const, caller passes it as const(args)
 	var args = Table()
 	args.x = 1
 	function inner(args) { return args.x }
 	function outer(args)
 	{
-		return tasks(2, inner, args)
+		return tasks(2, inner, const(args))
 	}
-	var result = tasks(2, outer, args)
+	var result = tasks(2, outer, const(args))
 	assert(result:count(), 2, "tasks() nested: result size should be 2.")
 }
 
@@ -87,7 +96,7 @@ var assert_not = assert_counter.assert_not
 	var args = Table()
 	args.value = 99
 	function read_only(args) { return args.value }
-	var result = tasks(3, read_only, args)
+	var result = tasks(3, read_only, const(args))
 	assert(result:count(), 3, "tasks() const read: result size should be 3.")
 	for (var i = 0; i < 3; i++)
 	{
@@ -96,7 +105,7 @@ var assert_not = assert_counter.assert_not
 }
 
 {
-	// Scalar args are value types — always safe
+	// Scalar args are value types — no const required
 	var result = tasks(4, function(args) { return args + 1 }, 10)
 	assert(result:count(), 4, "tasks() scalar: result size should be 4.")
 	for (var i = 0; i < 4; i++)
@@ -116,24 +125,23 @@ var assert_not = assert_counter.assert_not
 }
 
 {
-	// const: table remains mutable in outer scope after tasks() returns
-	// tasks() stamps PROTECTION_CONST only on the local copy it distributes
+	// const: original table remains mutable after tasks() — const(args) is a separate Unit
 	var args = Table()
 	args.x = 1
 	function read_x(args) { return args.x }
-	tasks(3, read_x, args)
+	tasks(3, read_x, const(args))
 	args.x = 42
-	assert(args.x, 42, "tasks() post: table must be mutable after tasks() returns.")
+	assert(args.x, 42, "tasks() post: original table must be mutable after tasks() returns.")
 }
 
 {
-	// const: const flag on args does not bleed onto unrelated tables
+	// const: const flag does not bleed onto unrelated tables
 	var side = Table()
 	side.x = 0
 	var args = Table()
 	args.x = 7
 	function read_args(args) { return args.x }
-	var result = tasks(3, read_args, args)
+	var result = tasks(3, read_args, const(args))
 	assert(result:count(), 3, "tasks() const scope: result size should be 3.")
 	assert(result[0], 7, "tasks() const scope: slot 0 should be 7.")
 	side.x = 99
