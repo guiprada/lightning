@@ -15,18 +15,18 @@
             {
                 "id": "lightning",
                 "aliases": ["lightning", "lightning"],
-                "extensions": ["ltn"],
+                "extensions": [".ltn"],
                 "configuration": "language-configuration.json"
             },
             {
                 "id": "lightning-ast",
                 "aliases": ["lightning AST", "lightning-ast"],
-                "extensions": ["ast"]
+                "extensions": [".ast"]
             },
             {
                 "id": "lightning-chunk",
                 "aliases": ["lightning Chunk", "lightning-chunk"],
-                "extensions": ["chunk"]
+                "extensions": [".chunk"]
             }
         ],
         "grammars": [
