@@ -1,5 +1,38 @@
 ﻿todo
 ====
+Parser error syncCurrently zero error recovery — Error() just appends to a list and parsing continues blindly. "Error sync" would mean: on a bad token, skip until a safe resumption point (next newline, next var/fun/}) so the parser can report multiple real errors in one pass instead of cascading garbage. Not critical yet — defer to after language stabilization.
+-> this is cool, lets create a plan in todo.md
+
+This is a complete, coherent model. mut is not needed — the default is mutable, const opts into immutability. That's settled.
+-> I see it now, we should have gone with mut as the function parameter marking. Even this would cause some cognitive model breakage. 
+      -> We should consider choosing one model and sticking with it.
+          ->(Transparent) -> All ref aliasing and passing is transformed in const, almost always, we might need a returning non const from a closing env should to be the exception.
+          ->(Hand holding) -> (this is what we have, but need to fix the mut argument) All functions that need mutation should mark their arguments with 'mut'. Compiler detects when functions are not marked and mutates and errors on it, and VM enforces it at runtime it receives no const parameters. All ref aliasing and passing is const, in that sense, our const() in userspace is pointless. To break the hatch we are going to clone. We are going to need an optimal deep clone function.
+
+test imported constsWhen you require() a module, you get back a plain Table. Any const variables declared inside the module are not const from the caller's perspective — the caller can rebind module.someConst = ... and nothing stops it. The question is: should require() return a frozen/const table? Or should the exporting module mark exported bindings as const? This needs a design decision before self-hosting — it's a module system semantic
+-> yeah, this is general table semantics. not only required ones. We would have to mark the index as const for this to work. It is a form of aliasing after all. How do we deald with this?
+
+try / exceptions / builtinCurrently: try is a C# intrinsic (Prelude.cs:216) — it spins up a sandbox VM, calls a function inside a C# try/catch, and returns a ResultUnit. It is NOT a keyword, NOT a VM opcode.
+-> Ok, pretty sure i optimized this, but ... is not this crazy expensive and wastefull?
+
+* "Remove exceptions" → the C# throw/catch path in the VM should never surface to the user; all errors should become ResultUnit
+-> sure, how easy is that?
+
+* "Convert try to builtin(parsed)" → already done conceptually, but "parsed" means it could get nicer call syntax (e.g. try func(args) vs try(func, args)) if you add it to the grammar
+-> I see, looks cool, breaks syntactic minimalism coolness ;) - Worth it?
+
+
+* No true exceptions in the language — ResultUnit is the error type. try just makes the sandbox. This is settled and good.
+-> Cool right ;)
+
+Constructors / Option / const
+The const on constructor arguments (var const t = Table()) sets PROTECTION_CONST on the reference slot, but there's no constructor-level const enforcement. The open questions from todo.md:
+* "Constructors in camelCase" — you have mixed: Table(), List() are PascalCase intrinsics
+-> What are the other names?
+* "Constructors don't create option" — currently Table() returns a TableUnit directly, not Option<TableUnit>. This was a design choice (fail fast vs option-returning)
+-> Seems reasonable, is there any option returning one? Do you think we should do it?
+* const + constructors: var const x = Table() works. fun f(const t) works. What doesn't work is imported const (above)
+-> we have to fix that
 
 Roadmap
 -------
