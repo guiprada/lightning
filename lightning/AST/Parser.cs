@@ -221,16 +221,16 @@ namespace lightningAST
 			List<Parameter> parameters = new List<Parameter>();
 
 			ElideMany(TokenType.NEW_LINE);
-			bool has_parameter = Check(TokenType.IDENTIFIER) || Check(TokenType.CONST);
+			bool has_parameter = Check(TokenType.IDENTIFIER) || Check(TokenType.MUT);
 			while (has_parameter)
 			{
-				bool isConst = Match(TokenType.CONST);
+				bool isMut = Match(TokenType.MUT);
 				TokenString new_parameter = (TokenString)Consume(
 					TokenType.IDENTIFIER,
 					"Expected 'identifier' as 'function parameter'.",
 					true
 				);
-				parameters.Add(new Parameter(new_parameter.value, isConst));
+				parameters.Add(new Parameter(new_parameter.value, isMut));
 				ElideMany(TokenType.NEW_LINE);
 				if (Check(TokenType.COMMA))
 				{
@@ -240,7 +240,7 @@ namespace lightningAST
 						true
 					);
 					ElideMany(TokenType.NEW_LINE);
-					has_parameter = Check(TokenType.IDENTIFIER) || Check(TokenType.CONST);
+					has_parameter = Check(TokenType.IDENTIFIER) || Check(TokenType.MUT);
 				}
 				else
 				{
@@ -1195,15 +1195,6 @@ namespace lightningAST
 				return FunctionExpr();
 			else if (Check(TokenType.IDENTIFIER))
 				return CompoundVar();
-			else if (Match(TokenType.CONST))
-			{
-				// "const" is a keyword but also the name of a built-in function.
-				// When it appears as a primary expression (e.g. const(t)), treat it
-				// as a variable reference so call-site parsing can proceed normally.
-				TokenString ct = Previous() as TokenString;
-				PositionData pd = Previous().PositionData;
-				return new VariableNode("const", new List<IndexNode>(), pd);
-			}
 			else if (Match(TokenType.MINUS))
 			{
 				if (Match(TokenType.NUMBER))

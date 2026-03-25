@@ -7,8 +7,8 @@ namespace lightningAST
     public struct Parameter
     {
         public string Name;
-        public bool IsConst;
-        public Parameter(string p_name, bool p_isConst) { Name = p_name; IsConst = p_isConst; }
+        public bool IsMut;
+        public Parameter(string p_name, bool p_isMut) { Name = p_name; IsMut = p_isMut; }
     }
 
     public enum NodeType

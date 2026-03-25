@@ -571,10 +571,13 @@ namespace lightningVM
                         if (Unit.IsEmpty(stack.Peek()))
                             throw Exceptions.non_value_assign;
 
-                        if ((stack.Peek().ProtectionFlagsOrNone & Unit.PROTECTION_CONST) == 0)
-                            throw Exceptions.const_required;
-
-                        variables.Add(stack.Pop());
+                        {
+                            Unit u = stack.Pop();
+                            // Apply PROTECTION_CONST to heap types; value types are copied and need no flag.
+                            if (!(u.heapUnitValue is TypeUnit))
+                                u.ProtectionFlags |= Unit.PROTECTION_CONST;
+                            variables.Add(u);
+                        }
                         break;
                     case OpCode.MAKE_CONST:
                         IP++;

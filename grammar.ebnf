@@ -17,8 +17,9 @@ declaration     <- functionDecl newLines
                 | statement newLines;
 functionDecl    <- ("function" | "\") compoundVar function;
 function        <- ("(" parameters newLines ")")? statement;
-parameters      <- newLines IDENTIFIER newLines ( "," newLines IDENTIFIER )*;
-varDecl         <- "var" IDENTIFIER "=" newLines expression newLines ";" newLines;
+parameters      <- newLines param newLines ( "," newLines param newLines )*;
+param           <- "mut"? IDENTIFIER;   (* default: implicitly const; "mut" opts into mutation *)
+varDecl         <- "var" "const"? IDENTIFIER "=" newLines expression newLines ";" newLines;
 statement       <- newLines
                 (
                     exprStmt |

@@ -2,7 +2,7 @@ var assert_counter = require("assert_counter.ltn")
 var assert = assert_counter.assert
 
 {
-	// var const: scalar — const on a value type is meaningless and must throw
+	// var const: scalar — MAKE_CONST on a value type throws (value types have no protection flags)
 	var threw = try(\{ var const x = 5 }, [])
 	assert(threw:is_error(), true, "var const scalar: declaring scalar as const must throw.")
 }
@@ -23,35 +23,53 @@ var assert = assert_counter.assert
 }
 
 {
-	// function(const p): scalar arg — no enforcement (scalars are value types), call succeeds
-	function f(const n) { return n + 1 }
-	assert(f(10), 11, "const param scalar: call with scalar must succeed.")
+	// var const: creates a const alias — original table remains mutable
+	var t = Table()
+	t.x = 1
+	var const ct = t
+	var threw = try(\{ ct.x = 2 }, [])
+	assert(threw:is_error(), true, "var const alias: mutation through const alias must throw.")
+	t.x = 42
+	assert(t.x, 42, "var const alias: original table must remain mutable.")
 }
 
 {
-	// function(const p): heap arg without PROTECTION_CONST must throw
-	function f(const t) { return t.x }
+	// function param: default (no annotation) — implicitly const, scalar succeeds
+	function f(n) { return n + 1 }
+	assert(f(10), 11, "default param scalar: call with scalar must succeed.")
+}
+
+{
+	// function param: default (no annotation) — heap arg gets PROTECTION_CONST applied, call succeeds
+	function f(t) { return t.x }
 	var t = Table()
 	t.x = 5
-	var threw = try(\{ f(t) }, [])
-	assert(threw:is_error(), true, "const param table: non-const table arg must throw.")
+	assert(f(t), 5, "default param table: call with table must succeed.")
 }
 
 {
-	// function(const p): heap arg with PROTECTION_CONST (via const()) must succeed
-	function f(const t) { return t.x }
+	// function param: default — mutation of implicitly-const param must throw
+	function f(t) { t.x = 99 }
 	var t = Table()
-	t.x = 7
-	assert(f(const(t)), 7, "const param table: const() arg must be accepted.")
+	t.x = 1
+	var threw = try(\{ f(t) }, [])
+	assert(threw:is_error(), true, "default param: mutation of implicit const param must throw.")
+	assert(t.x, 1, "default param: original table must be unchanged after failed mutation.")
 }
 
 {
-	// function(const p): heap arg with PROTECTION_CONST (via var const) must succeed
-	var base = Table()
-	base.x = 55
-	var const ct = base
-	function f(const t) { return t.x }
-	assert(f(ct), 55, "const param: var const table must satisfy const param.")
+	// function param: mut — mutation is allowed
+	function f(mut t) { t.x = 99 }
+	var t = Table()
+	t.x = 1
+	f(t)
+	assert(t.x, 99, "mut param: mutation must succeed.")
+}
+
+{
+	// function param: mut scalar — mut on scalar is a no-op (value type, copied)
+	function f(mut n) { return n + 1 }
+	assert(f(10), 11, "mut param scalar: call with scalar must succeed.")
 }
 
 return assert_counter.get_error_counter()

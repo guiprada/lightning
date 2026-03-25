@@ -478,7 +478,7 @@ namespace lightningAST
             if (p_node.Parameters != null)
                 foreach (Parameter n in p_node.Parameters)
                 {
-                    string display = n.IsConst ? "const " + n.Name : n.Name;
+                    string display = n.IsMut ? "mut " + n.Name : n.Name;
                     if (is_first)
                     {
                         Console.Write(display);
@@ -510,7 +510,7 @@ namespace lightningAST
             if (p_node.Parameters != null)
                 foreach (Parameter n in p_node.Parameters)
                 {
-                    string display = n.IsConst ? "const " + n.Name : n.Name;
+                    string display = n.IsMut ? "mut " + n.Name : n.Name;
                     if (is_first)
                     {
                         Console.Write(display);

@@ -12,10 +12,10 @@ var assert_not = assert_counter.assert_not
 	}
 
 	var n = 100
-	var table1 = ListInit(n, "not_used")
+	var table1 = list_init(n, "not_used")
 	table1:rmap(16, init)
 
-	function reducing_function(item, index, accumulator)
+	function reducing_function(item, index, mut accumulator)
 	{
 		accumulator.value += item.x
 	}

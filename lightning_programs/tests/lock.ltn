@@ -16,7 +16,7 @@ var global_lock_test_counter = 5
 {
 	// Testing UpValue Lock
 	var n = 1000
-	var this_list = ListInit(n, "not_used_value")
+	var this_list = list_init(n, "not_used_value")
 	var upvalue_lock_test_counter = 5
 	function many(item, index)
 	{
@@ -45,7 +45,7 @@ var global_lock_test_counter = 5
 	// After the fix each slot has its own lock object; the correctness assertion
 	// catches any regression that breaks isolation.
 	var n = 1000
-	var list = ListInit(n, 0)
+	var list = list_init(n, 0)
 	var counter_a = 0
 	var counter_b = 0
 	function split_int(item, index)
@@ -63,7 +63,7 @@ var global_lock_test_counter = 5
 {
 	// False contention via pmap(): Integer and Float globals updated concurrently.
 	var n = 1000
-	var list = ListInit(n, 0)
+	var list = list_init(n, 0)
 	var int_count = 0
 	var float_count = 0.0
 	function split_mixed(item, index)

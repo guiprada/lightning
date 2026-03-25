@@ -64,6 +64,7 @@ namespace lightningAST
         VAR,
         WHILE,
         CONST,
+        MUT,
         EOF
     }
     public class Token

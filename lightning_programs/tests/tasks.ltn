@@ -15,26 +15,17 @@ var assert_not = assert_counter.assert_not
 }
 
 {
-	// Table args: caller must pass const(args) explicitly — fail fast
+	// Table args: params are implicitly const — no explicit const() needed
 	var n = 10
 	var args = Table()
 	args.x = 7
 	function read_x(args) { return args.x * 2 }
-	var result = tasks(n, read_x, const(args))
+	var result = tasks(n, read_x, args)
 	assert(result:count(), n, "tasks() table args: result size should be n.")
 	for (var i = 0; i < n; i++)
 	{
 		assert(result[i], 14, "tasks() table args: slot " .. i .. " should be 14.")
 	}
-}
-
-{
-	// const required: f declares const arg — passing non-const must throw
-	var args = Table()
-	args.x = 1
-	function f(const args) { return args.x }
-	var threw = try(\{ f(args) }, [])
-	assert(threw:is_error(), true, "const param: calling f(const args) with non-const must throw.")
 }
 
 {
@@ -65,7 +56,7 @@ var assert_not = assert_counter.assert_not
 }
 
 {
-	// const: mutation attempt on const table args must throw, args must be unchanged
+	// const: mutation attempt on implicitly-const param must throw, args unchanged
 	var args = Table()
 	args.x = 1
 	function try_mutate(args)
@@ -73,30 +64,30 @@ var assert_not = assert_counter.assert_not
 		args.x = 2
 		return args.x
 	}
-	var threw = try(\{ tasks(1, try_mutate, const(args)) }, [])
+	var threw = try(\{ tasks(1, try_mutate, args) }, [])
 	assert(threw:is_error(), true, "tasks() const: mutation of args should throw.")
 	assert(args.x, 1, "tasks() const: args must be unchanged after attempted mutation.")
 }
 
 {
-	// const: nested tasks() — args already const, caller passes it as const(args)
+	// const: nested tasks() — inner function reads implicitly-const args
 	var args = Table()
 	args.x = 1
 	function inner(args) { return args.x }
 	function outer(args)
 	{
-		return tasks(2, inner, const(args))
+		return tasks(2, inner, args)
 	}
-	var result = tasks(2, outer, const(args))
+	var result = tasks(2, outer, args)
 	assert(result:count(), 2, "tasks() nested: result size should be 2.")
 }
 
 {
-	// const: reading const table args is allowed
+	// const: reading implicitly-const param is allowed
 	var args = Table()
 	args.value = 99
 	function read_only(args) { return args.value }
-	var result = tasks(3, read_only, const(args))
+	var result = tasks(3, read_only, args)
 	assert(result:count(), 3, "tasks() const read: result size should be 3.")
 	for (var i = 0; i < 3; i++)
 	{
@@ -125,11 +116,11 @@ var assert_not = assert_counter.assert_not
 }
 
 {
-	// const: original table remains mutable after tasks() — const(args) is a separate Unit
+	// const: original table remains mutable after tasks() — param binding is a separate Unit
 	var args = Table()
 	args.x = 1
 	function read_x(args) { return args.x }
-	tasks(3, read_x, const(args))
+	tasks(3, read_x, args)
 	args.x = 42
 	assert(args.x, 42, "tasks() post: original table must be mutable after tasks() returns.")
 }
@@ -141,7 +132,7 @@ var assert_not = assert_counter.assert_not
 	var args = Table()
 	args.x = 7
 	function read_args(args) { return args.x }
-	var result = tasks(3, read_args, const(args))
+	var result = tasks(3, read_args, args)
 	assert(result:count(), 3, "tasks() const scope: result size should be 3.")
 	assert(result[0], 7, "tasks() const scope: slot 0 should be 7.")
 	side.x = 99
@@ -149,15 +140,24 @@ var assert_not = assert_counter.assert_not
 }
 
 {
-	// const() intrinsic: creates a const alias — mutation throws, original unchanged
+	// var const alias: mutation throws, original unchanged
 	var t = Table()
 	t.x = 1
-	var ct = const(t)
+	var const ct = t
 	var threw = try(\{ ct.x = 2 }, [])
-	assert(threw:is_error(), true, "const(): mutation through const alias should throw.")
-	assert(t.x, 1, "const(): original table must be unchanged.")
+	assert(threw:is_error(), true, "var const alias: mutation through const alias should throw.")
+	assert(t.x, 1, "var const alias: original table must be unchanged.")
 	t.x = 42
-	assert(t.x, 42, "const(): original table must remain mutable.")
+	assert(t.x, 42, "var const alias: original table must remain mutable.")
+}
+
+{
+	// mut param: mutation is allowed when explicitly marked
+	function mutate(mut args) { args.x = 99 }
+	var args = Table()
+	args.x = 1
+	mutate(args)
+	assert(args.x, 99, "mut param: mutation of mut param must succeed.")
 }
 
 return assert_counter.get_error_counter()

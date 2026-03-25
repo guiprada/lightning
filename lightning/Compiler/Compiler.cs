@@ -778,7 +778,7 @@ namespace lightningCompiler
 				foreach (Parameter p in p_node.Parameters)
 				{
 					SetVar(p.Name);// it is always local
-					Add(p.IsConst ? OpCode.DECLARE_CONST_VARIABLE : OpCode.DECLARE_VARIABLE, p_node.PositionData);
+					Add(p.IsMut ? OpCode.DECLARE_VARIABLE : OpCode.DECLARE_CONST_VARIABLE, p_node.PositionData);
 					arity++;
 				}
 
