@@ -21,8 +21,7 @@ namespace lightningAST
 			{"var", TokenType.VAR},
 			{"while", TokenType.WHILE},
 			{"const", TokenType.CONST},
-			{"mut", TokenType.MUT},
-			{"and", TokenType.AND},
+				{"and", TokenType.AND},
 			{"or", TokenType.OR},
 			{"xor", TokenType.XOR},
 		};
@@ -141,6 +140,7 @@ namespace lightningAST
 				case '[': tokens.Add(new Token(TokenType.LEFT_BRACKET, line, Column)); break;
 				case ']': tokens.Add(new Token(TokenType.RIGHT_BRACKET, line, Column)); break;
 				case ',': tokens.Add(new Token(TokenType.COMMA, line, Column)); break;
+			case '&': tokens.Add(new Token(TokenType.AMP, line, Column)); break;
 				case '-':
 					if (Match('='))
 					{

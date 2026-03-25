@@ -11,7 +11,7 @@ var assert_not = assert_counter.assert_not
 		player.position["x"] = 0
 		player.position["y"] = 0
 
-		player.move = function (mut self, x, y)
+		player.move = function (self, x, y)
 		{
 			self.position.x = self.position.x + x;
 			self.position.y = self.position.y + y;
@@ -28,10 +28,10 @@ var assert_not = assert_counter.assert_not
 	assert(p1:move(0,3).y, 3, "Failed method call test 2.")
 
 	var name = "move"
-	assert(p1[name](p1,0,3).y, 6, "Failed method call test 3.")
-	assert(p1["move"](p1,0,0).y, 6, "Failed method call test 4.")
-	assert(p1[-(1+1)](p1,0,0).y, 6, "Failed method call test 5.")
-	assert(p1["mo".."ve"](p1,0,0).y, 6, "Failed method call test 6.")
+	assert(p1[name](&p1,0,3).y, 6, "Failed method call test 3.")
+	assert(p1["move"](&p1,0,0).y, 6, "Failed method call test 4.")
+	assert(p1[-(1+1)](&p1,0,0).y, 6, "Failed method call test 5.")
+	assert(p1["mo".."ve"](&p1,0,0).y, 6, "Failed method call test 6.")
 
 	assert(p1:[name](0,0).y, 6, "Failed method call test 7.")
 	assert(p1:"move"(0,0).y, 6, "Failed method call test 8.")

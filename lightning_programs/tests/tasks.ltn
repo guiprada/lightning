@@ -152,12 +152,12 @@ var assert_not = assert_counter.assert_not
 }
 
 {
-	// mut param: mutation is allowed when explicitly marked
-	function mutate(mut args) { args.x = 99 }
+	// & move: mutation is allowed when passing with &
+	function mutate(args) { args.x = 99 }
 	var args = Table()
 	args.x = 1
-	mutate(args)
-	assert(args.x, 99, "mut param: mutation of mut param must succeed.")
+	mutate(&args)
+	assert(args.x, 99, "& move: mutation of moved param must succeed.")
 }
 
 return assert_counter.get_error_counter()

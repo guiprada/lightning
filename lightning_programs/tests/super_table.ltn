@@ -20,7 +20,7 @@ var assert_not = assert_counter.assert_not
 
     var a_table = [:]
     a_table.a_function = \(self){return self[0]}
-    var this_list = list(0)
+    var this_list = List(0)
     this_list:push(99)
     this_list:set_extension_table(a_table)
     assert(this_list:count(), 1, "Failed Super Table Test 6.")

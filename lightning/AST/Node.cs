@@ -7,8 +7,7 @@ namespace lightningAST
     public struct Parameter
     {
         public string Name;
-        public bool IsMut;
-        public Parameter(string p_name, bool p_isMut) { Name = p_name; IsMut = p_isMut; }
+        public Parameter(string p_name) { Name = p_name; }
     }
 
     public enum NodeType
@@ -42,6 +41,7 @@ namespace lightningAST
 
         RETURN,
         PROGRAM,
+        MOVE,
     }
 
     public enum OperatorType
@@ -131,6 +131,16 @@ namespace lightningAST
         {
             Op = p_Op;
             Right = p_Right;
+        }
+    }
+
+    public class MoveNode : Node
+    {
+        public Node Inner { get; private set; }
+        public MoveNode(Node p_Inner, PositionData p_PositionData)
+            : base(NodeType.MOVE, p_PositionData)
+        {
+            Inner = p_Inner;
         }
     }
 

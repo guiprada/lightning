@@ -151,6 +151,9 @@ namespace lightningCompiler
 				case NodeType.UNARY:
 					ChunkUnary(p_node as UnaryNode);
 					break;
+				case NodeType.MOVE:
+					ChunkMove(p_node as MoveNode);
+					break;
 				case NodeType.LITERAL:
 					ChunkLiteral(p_node as LiteralNode);
 					break;
@@ -296,6 +299,12 @@ namespace lightningCompiler
 					Error("Unkown Unary operator " + p_node.Op.ToString(), p_node.PositionData);
 					break;
 			}
+		}
+
+		private void ChunkMove(MoveNode p_node)
+		{
+			ChunkIt(p_node.Inner);
+			Add(OpCode.MAKE_MOVE, p_node.PositionData);
 		}
 
 		private void ChunkTable(TableNode p_node)
@@ -636,6 +645,7 @@ namespace lightningCompiler
 					}
 
 					Add(OpCode.GET, (Operand)(p_node.Variable.Indexes.Count - 1), p_node.PositionData);
+					Add(OpCode.MAKE_MOVE, p_node.PositionData); // self is always mutable in colon-method calls
 					Add(OpCode.POP_STASH, p_node.PositionData);
 				}
 				else
@@ -778,7 +788,7 @@ namespace lightningCompiler
 				foreach (Parameter p in p_node.Parameters)
 				{
 					SetVar(p.Name);// it is always local
-					Add(p.IsMut ? OpCode.DECLARE_VARIABLE : OpCode.DECLARE_CONST_VARIABLE, p_node.PositionData);
+					Add(OpCode.DECLARE_CONST_VARIABLE, p_node.PositionData);
 					arity++;
 				}
 

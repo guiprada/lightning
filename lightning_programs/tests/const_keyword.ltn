@@ -58,18 +58,18 @@ var assert = assert_counter.assert
 }
 
 {
-	// function param: mut — mutation is allowed
-	function f(mut t) { t.x = 99 }
+	// function param: mut — mutation is allowed via &
+	function f(t) { t.x = 99 }
 	var t = Table()
 	t.x = 1
-	f(t)
+	f(&t)
 	assert(t.x, 99, "mut param: mutation must succeed.")
 }
 
 {
-	// function param: mut scalar — mut on scalar is a no-op (value type, copied)
-	function f(mut n) { return n + 1 }
-	assert(f(10), 11, "mut param scalar: call with scalar must succeed.")
+	// function param: scalar — value type, always copied
+	function f(n) { return n + 1 }
+	assert(f(10), 11, "scalar param: call with scalar must succeed.")
 }
 
 return assert_counter.get_error_counter()

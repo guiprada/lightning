@@ -573,10 +573,26 @@ namespace lightningVM
 
                         {
                             Unit u = stack.Pop();
-                            // Apply PROTECTION_CONST to heap types; value types are copied and need no flag.
                             if (!(u.heapUnitValue is TypeUnit))
-                                u.ProtectionFlags |= Unit.PROTECTION_CONST;
+                            {
+                                if ((u.ProtectionFlagsOrNone & Unit.PROTECTION_MOVE) != 0)
+                                    // &arg: clear the move flag, do NOT apply PROTECTION_CONST
+                                    u.ProtectionFlags &= ~Unit.PROTECTION_MOVE;
+                                else
+                                    // normal arg: apply PROTECTION_CONST
+                                    u.ProtectionFlags |= Unit.PROTECTION_CONST;
+                            }
                             variables.Add(u);
+                        }
+                        break;
+                    case OpCode.MAKE_MOVE:
+                        IP++;
+                        {
+                            Unit u = stack.Pop();
+                            // Set PROTECTION_MOVE on heap types; value types are unaffected.
+                            if (!(u.heapUnitValue is TypeUnit))
+                                u.ProtectionFlags |= Unit.PROTECTION_MOVE;
+                            stack.Push(u);
                         }
                         break;
                     case OpCode.MAKE_CONST:

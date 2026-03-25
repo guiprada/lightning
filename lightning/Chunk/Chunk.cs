@@ -126,6 +126,7 @@ namespace lightningChunk
                 case OpCode.LOAD_TRUE:
                 case OpCode.DECLARE_CONST_VARIABLE:
                 case OpCode.MAKE_CONST:
+                case OpCode.MAKE_MOVE:
                     return op.ToString();
 
                 // 1 op
@@ -176,6 +177,7 @@ namespace lightningChunk
         DECLARE_VARIABLE,
         DECLARE_CONST_VARIABLE,  // like DECLARE_VARIABLE but checks PROTECTION_CONST first
         MAKE_CONST,              // stamps PROTECTION_CONST on TOS Unit (for var const)
+        MAKE_MOVE,               // stamps PROTECTION_MOVE on TOS heap Unit (for &arg call-site)
         DECLARE_FUNCTION,
         ASSIGN_VARIABLE,
         ASSIGN_GLOBAL,

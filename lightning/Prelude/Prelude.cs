@@ -346,7 +346,7 @@ namespace lightningPrelude
 
                 return new Unit(new TableUnit(elements, null));
             }
-            functions.Add(new IntrinsicUnit("list", ListNew, 1));
+            functions.Add(new IntrinsicUnit("List", ListNew, 1));
 
             //////////////////////////////////////////////////////
             Unit ListInitNew(VM p_vm)
@@ -359,7 +359,7 @@ namespace lightningPrelude
 
                 return new Unit(new TableUnit(elements, null));
             }
-            functions.Add(new IntrinsicUnit("list_init", ListInitNew, 2));
+            functions.Add(new IntrinsicUnit("ListInit", ListInitNew, 2));
 
             //////////////////////////////////////////////////////
             Unit Tasks(VM p_vm)
@@ -419,14 +419,14 @@ namespace lightningPrelude
                 Unit value = vm.GetUnit(0);
                 return new Unit(new OptionUnit(value));
             }
-            functions.Add(new IntrinsicUnit("option", NewOption, 1));
+            functions.Add(new IntrinsicUnit("OptionNew", NewOption, 1));
 
             //////////////////////////////////////////////////////
             Unit NewEmptyOption (VM vm)
             {
                 return new Unit(new OptionUnit());
             }
-            functions.Add(new IntrinsicUnit("option_empty", NewEmptyOption, 0));
+            functions.Add(new IntrinsicUnit("OptionEmpty", NewEmptyOption, 0));
 
             //////////////////////////////////////////////////////
             Unit NewResultValue (VM vm)
@@ -434,14 +434,14 @@ namespace lightningPrelude
                 Unit value = vm.GetUnit(0);
                 return new Unit(new ResultUnit(value));
             }
-            functions.Add(new IntrinsicUnit("result", NewResultValue, 1));
+            functions.Add(new IntrinsicUnit("ResultValue", NewResultValue, 1));
 
             //////////////////////////////////////////////////////
             Unit NewEmptyResult (VM vm)
             {
                 return new Unit(new ResultUnit());
             }
-            functions.Add(new IntrinsicUnit("result_empty", NewEmptyResult, 0));
+            functions.Add(new IntrinsicUnit("ResultEmpty", NewEmptyResult, 0));
 
             //////////////////////////////////////////////////////
             Unit NewErrorResult (VM vm)
@@ -449,7 +449,7 @@ namespace lightningPrelude
                 string error_string = vm.GetString(0);
                 return new Unit(new ResultUnit(error_string));
             }
-            functions.Add(new IntrinsicUnit("result_error", NewErrorResult, 1));
+            functions.Add(new IntrinsicUnit("ResultError", NewErrorResult, 1));
 
             //////////////////////////////////////////////////////
             Library prelude = new Library(functions, tables);
