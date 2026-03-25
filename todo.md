@@ -69,7 +69,49 @@ Phase 1 - Stabilize the language (current)
         interpreter --compile     → force recompile (use for tests / CI)
         interpreter script.ltnc  → load directly
     - require() also caches: saves .ltnc beside each module, honours ForceRecompile flag
-  - Improve error messages (parser error sync, stack traces, assert error messages) — stack traces DONE; assert msg improved
+  - Improve error messages — stack traces DONE; assert msg improved
+  - Parser error sync — PLANNED (defer to post-Phase 2):
+      Current: Error() appends to list, parsing continues blindly → cascading garbage errors
+      Plan:
+        1. Add Synchronize() method: consume tokens until newline / 'var' / 'fun' / '}' / EOF
+        2. Call Synchronize() at the top of Statement() on unexpected token
+        3. Call Synchronize() in Consume() when expected token is missing
+        4. Gate: only sync if no error was reported in the last N tokens (avoid spin)
+        Result: multiple real, independent errors reported per compile pass
+
+  - Language stabilization — decisions made, implementation pending:
+
+    MEMORY MODEL (chosen: Hand-holding / mut-opt-in):
+      All function parameters are implicitly const (immutable reference).
+      Parameters that mutate must be marked 'mut'. Compiler errors if unmarked param is mutated.
+      VM enforces at runtime: non-mut params may not receive mutable references.
+      To get a mutable copy: explicit clone() — need fast deep clone intrinsic.
+      Consequences:
+        - 'const' keyword on var decl stays (marks rebind-immutable slot)
+        - 'const()' userspace intrinsic is REMOVED (redundant under new model)
+        - All passing/aliasing of refs is implicitly const → no surprise mutation
+        - Rejected alternative: Transparent (everything const, clone to mutate) —
+          correct but requires clone story first; revisit for Phase 3+
+
+    MODULE CONST / TABLE FIELD CONST:
+      Problem: require() returns plain Table; caller can mutate module fields freely.
+      Chosen approach: require() returns a const-flagged Table (whole-table freeze).
+        - Caller cannot rebind the module var (already true if declared const)
+        - Caller cannot SET fields on the module table (enforced by existing PROTECTION_CONST)
+        - Per-field const (HashSet<string> of frozen keys) deferred — too costly
+        - Same applies to any user-created "namespace" table: use const(table) to freeze it
+
+    CONSTRUCTOR NAMING:
+      Rename all constructors to lowercase: Table → table, List → list, ListInit → list_init
+      Option/Result constructors: option(val), option(), result(val), result(), result_error(val)
+      Fallible constructors (file I/O, etc.) return Option. Table/List cannot fail → no Option.
+      Constructors in camelCase: REJECTED. All intrinsics use snake_case → stay consistent.
+
+    TRY:
+      Keep try(func, args) as plain intrinsic call — no grammar sugar.
+      try() uses VM pool (GetVM/RecycleVM) — not wasteful, pool is reused.
+      Next: make VM dispatch loop catch all internal throws and convert to ResultUnit,
+        never letting C# exceptions escape to user code (medium refactor, ~32 throw sites in VM.cs).
 
 Phase 2 - Self-hosted compiler
   - Write scanner + parser in Lightning
