@@ -804,10 +804,6 @@ namespace lightningUnit
                         throw Exceptions.not_supported;
                     }
 
-                    // Mark accumulator as moved so the reducing function receives mutable access.
-                    if (!(accumulator.heapUnitValue is TypeUnit))
-                        accumulator.ProtectionFlags |= Unit.PROTECTION_MOVE;
-
                     for (int index = 0; index < this_table.Elements.Count; index++)
                     {
                         List<Unit> args = new List<Unit>();

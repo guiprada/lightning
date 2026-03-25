@@ -305,6 +305,24 @@ namespace lightningCompiler
 		{
 			ChunkIt(p_node.Inner);
 			Add(OpCode.MAKE_MOVE, p_node.PositionData);
+
+			// Tombstone the source variable so it cannot be accessed after the move.
+			if (p_node.Inner.Type == NodeType.VARIABLE)
+			{
+				VariableNode varNode = (VariableNode)p_node.Inner;
+				if (varNode.Indexes.Count == 0)
+				{
+					Nullable<Variable> maybe_var = GetVar(varNode.Name, varNode.PositionData);
+					if (maybe_var.HasValue)
+					{
+						Variable sourceVar = maybe_var.Value;
+						if (sourceVar.type == ValueType.Local)
+							Add(OpCode.TOMBSTONE_VARIABLE, (Operand)sourceVar.address, (Operand)sourceVar.envIndex, varNode.PositionData);
+						else if (sourceVar.type == ValueType.Global)
+							Add(OpCode.TOMBSTONE_GLOBAL, (Operand)sourceVar.address, varNode.PositionData);
+					}
+				}
+			}
 		}
 
 		private void ChunkTable(TableNode p_node)
@@ -788,7 +806,7 @@ namespace lightningCompiler
 				foreach (Parameter p in p_node.Parameters)
 				{
 					SetVar(p.Name);// it is always local
-					Add(OpCode.DECLARE_CONST_VARIABLE, p_node.PositionData);
+					Add(p.IsMut ? OpCode.DECLARE_VARIABLE : OpCode.DECLARE_CONST_VARIABLE, p_node.PositionData);
 					arity++;
 				}
 

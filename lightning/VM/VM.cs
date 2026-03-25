@@ -515,15 +515,26 @@ namespace lightningVM
                         break;
                     case OpCode.LOAD_VARIABLE:
                         IP++;
-                        stack.Push(variables.GetAt(instruction.opA, CalculateEnvShift(instruction.opB)));
+                        {
+                            Unit loadedVar = variables.GetAt(instruction.opA, CalculateEnvShift(instruction.opB));
+                            if ((loadedVar.ProtectionFlagsOrNone & Unit.PROTECTION_TOMBSTONE) != 0)
+                                throw Exceptions.tombstone_access;
+                            stack.Push(loadedVar);
+                        }
                         break;
                     case OpCode.LOAD_GLOBAL:
                         IP++;
-                        if (parallelVM == true)
-                            lock (globalLocks[instruction.opA]) // needed because global may be loaded from parallel functions
-                                stack.Push(globals.Get(instruction.opA));
-                        else
-                            stack.Push(globals.Get(instruction.opA));
+                        {
+                            Unit loadedGlobal;
+                            if (parallelVM == true)
+                                lock (globalLocks[instruction.opA])
+                                    loadedGlobal = globals.Get(instruction.opA);
+                            else
+                                loadedGlobal = globals.Get(instruction.opA);
+                            if ((loadedGlobal.ProtectionFlagsOrNone & Unit.PROTECTION_TOMBSTONE) != 0)
+                                throw Exceptions.tombstone_access;
+                            stack.Push(loadedGlobal);
+                        }
                         break;
                     case OpCode.LOAD_IMPORTED_GLOBAL:
                         IP++;
@@ -563,7 +574,36 @@ namespace lightningVM
                         if (Unit.IsEmpty(stack.Peek()))
                             throw Exceptions.non_value_assign;
 
-                        variables.Add(stack.Pop());
+                        {
+                            Unit u = stack.Pop();
+                            // Clear transient PROTECTION_MOVE so the slot is stored as clean/mutable.
+                            if (!(u.heapUnitValue is TypeUnit) && (u.ProtectionFlagsOrNone & Unit.PROTECTION_MOVE) != 0)
+                                u.ProtectionFlags &= ~Unit.PROTECTION_MOVE;
+                            variables.Add(u);
+                        }
+                        break;
+                    case OpCode.TOMBSTONE_VARIABLE:
+                        IP++;
+                        {
+                            // Set PROTECTION_TOMBSTONE in-place on the variable slot.
+                            Unit u = variables.GetAt(instruction.opA, CalculateEnvShift(instruction.opB));
+                            if (!(u.heapUnitValue is TypeUnit))
+                            {
+                                u.ProtectionFlags |= Unit.PROTECTION_TOMBSTONE;
+                                variables.SetAt(u, instruction.opA, CalculateEnvShift(instruction.opB));
+                            }
+                        }
+                        break;
+                    case OpCode.TOMBSTONE_GLOBAL:
+                        IP++;
+                        {
+                            Unit u = globals.Get(instruction.opA);
+                            if (!(u.heapUnitValue is TypeUnit))
+                            {
+                                u.ProtectionFlags |= Unit.PROTECTION_TOMBSTONE;
+                                globals.Set(u, instruction.opA);
+                            }
+                        }
                         break;
                     case OpCode.DECLARE_CONST_VARIABLE:
                         IP++;
@@ -694,7 +734,13 @@ namespace lightningVM
                             switch (instruction.opC)
                             {
                                 case ASSIGN:
-                                    variables.SetAt(stack.Peek(), instruction.opA, CalculateEnvShift(instruction.opB));
+                                    {
+                                        Unit assignVal = stack.Peek();
+                                        // Clear transient PROTECTION_MOVE so the slot is stored clean.
+                                        if (!(assignVal.heapUnitValue is TypeUnit) && (assignVal.ProtectionFlagsOrNone & Unit.PROTECTION_MOVE) != 0)
+                                            assignVal.ProtectionFlags &= ~Unit.PROTECTION_MOVE;
+                                        variables.SetAt(assignVal, instruction.opA, CalculateEnvShift(instruction.opB));
+                                    }
                                     break;
                                 case ADDITION_ASSIGN:
                                     result = old_value + stack.Pop();

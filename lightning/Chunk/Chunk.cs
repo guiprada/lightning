@@ -143,9 +143,13 @@ namespace lightningChunk
                 case OpCode.NEW_LIST:
                     return op.ToString() + " " + this.opA;
                 // 2 op
+                case OpCode.TOMBSTONE_GLOBAL:
+                    return op.ToString() + " " + this.opA;
+                // 2 op
                 case OpCode.ASSIGN_GLOBAL:
                 case OpCode.ASSIGN_UPVALUE:
                 case OpCode.LOAD_VARIABLE:
+                case OpCode.TOMBSTONE_VARIABLE:
                 case OpCode.LOAD_IMPORTED_GLOBAL:
                 case OpCode.LOAD_IMPORTED_DATA:
                 case OpCode.SET:
@@ -178,6 +182,8 @@ namespace lightningChunk
         DECLARE_CONST_VARIABLE,  // like DECLARE_VARIABLE but checks PROTECTION_CONST first
         MAKE_CONST,              // stamps PROTECTION_CONST on TOS Unit (for var const)
         MAKE_MOVE,               // stamps PROTECTION_MOVE on TOS heap Unit (for &arg call-site)
+        TOMBSTONE_VARIABLE,      // invalidates variables[opA,opB] in-place (after & move)
+        TOMBSTONE_GLOBAL,        // invalidates globals[opA] in-place (after & move)
         DECLARE_FUNCTION,
         ASSIGN_VARIABLE,
         ASSIGN_GLOBAL,

@@ -58,18 +58,40 @@ var assert = assert_counter.assert
 }
 
 {
-	// function param: mut — mutation is allowed via &
-	function f(t) { t.x = 99 }
+	// function param: mut — mutable shared reference
+	function f(mut t) { t.x = 99 }
 	var t = Table()
 	t.x = 1
-	f(&t)
-	assert(t.x, 99, "mut param: mutation must succeed.")
+	f(t)
+	assert(t.x, 99, "mut param: mutation visible through shared reference.")
 }
 
 {
 	// function param: scalar — value type, always copied
 	function f(n) { return n + 1 }
 	assert(f(10), 11, "scalar param: call with scalar must succeed.")
+}
+
+{
+	// & move: var x = &y tombstones y, x is mutable
+	var a = Table()
+	a.x = 1
+	var b = &a
+	b.x = 99
+	assert(b.x, 99, "& move declaration: moved var is mutable.")
+	var threw = try(\{ var _ = a.x }, [])
+	assert(threw:is_error(), true, "& move declaration: tombstoned var access must throw.")
+}
+
+{
+	// & move: assignment x = &y tombstones y
+	var a = Table()
+	a.x = 1
+	var b = Table()
+	b.x = 0
+	b = &a
+	b.x = 99
+	assert(b.x, 99, "& move assignment: moved var is mutable.")
 }
 
 return assert_counter.get_error_counter()

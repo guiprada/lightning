@@ -90,9 +90,10 @@ namespace lightningUnit
                                                       // NOT set on heap Units (Table, Closure ...)
         public const int PROTECTION_CONST = 1 << 1;  // reference cannot be rebound
                                                       // (future: enforced by compiler + runtime)
-        public const int PROTECTION_MOVE  = 1 << 2;  // arg was passed with &: callee gets mutable access
-                                                      // cleared by DECLARE_CONST_VARIABLE (not re-applied)
-        // bits 3..31 reserved
+        public const int PROTECTION_MOVE      = 1 << 2;  // arg passed with &: callee gets mutable access
+                                                         // cleared by DECLARE_CONST_VARIABLE (not re-applied)
+        public const int PROTECTION_TOMBSTONE = 1 << 3;  // variable moved out via &; any access throws
+        // bits 4..31 reserved
 
         // heapUnitValue is TypeUnit is the authoritative value-type check — it covers
         // Float/Integer which cannot carry PROTECTION_IS_VALUE_TYPE in DOUBLE mode.

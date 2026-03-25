@@ -26,5 +26,6 @@ namespace lightningExceptions
 		public static Exception const_mutation = new Exception("Cannot mutate a const Unit!");
 		public static Exception const_required = new Exception("Argument must be const!");
 		public static Exception prot_flag_on_scalar = new Exception("Cannot set protection flags on a scalar!");
+		public static Exception tombstone_access = new Exception("Variable has been moved (tombstoned) and cannot be accessed!");
 	}
 }

@@ -221,15 +221,16 @@ namespace lightningAST
 			List<Parameter> parameters = new List<Parameter>();
 
 			ElideMany(TokenType.NEW_LINE);
-			bool has_parameter = Check(TokenType.IDENTIFIER);
+			bool has_parameter = Check(TokenType.IDENTIFIER) || Check(TokenType.MUT);
 			while (has_parameter)
 			{
+				bool isMut = Match(TokenType.MUT);
 				TokenString new_parameter = (TokenString)Consume(
 					TokenType.IDENTIFIER,
 					"Expected 'identifier' as 'function parameter'.",
 					true
 				);
-				parameters.Add(new Parameter(new_parameter.value));
+				parameters.Add(new Parameter(new_parameter.value, isMut));
 				ElideMany(TokenType.NEW_LINE);
 				if (Check(TokenType.COMMA))
 				{
@@ -239,7 +240,7 @@ namespace lightningAST
 						true
 					);
 					ElideMany(TokenType.NEW_LINE);
-					has_parameter = Check(TokenType.IDENTIFIER);
+					has_parameter = Check(TokenType.IDENTIFIER) || Check(TokenType.MUT);
 				}
 				else
 				{
