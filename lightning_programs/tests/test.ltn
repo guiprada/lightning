@@ -126,6 +126,9 @@ errors += require("tests/table.ltn")
 write_line("Tasks tests ...")
 errors += require("tests/tasks.ltn")
 
+write_line("Const keyword tests ...")
+errors += require("tests/const_keyword.ltn")
+
 write_line("Transient tests ...")
 errors += require("tests/transient.ltn")
 

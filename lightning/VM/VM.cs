@@ -546,11 +546,16 @@ namespace lightningVM
                         break;
                     case OpCode.LOAD_UPVALUE:
                         IP++;
-                        if (parallelVM == true)
-                            lock (upValues.GetAt(instruction.opA)) // needed because upvalue may be loaded from parallel functions
-                                stack.Push(upValues.GetAt(instruction.opA).UpValue);
-                        else
-                            stack.Push(upValues.GetAt(instruction.opA).UpValue);
+                        {
+                            Unit upval = upValues.GetAt(instruction.opA).UpValue;
+                            if ((upval.ProtectionFlagsOrNone & Unit.PROTECTION_TOMBSTONE) != 0)
+                                throw Exceptions.tombstone_access;
+                            if (parallelVM == true)
+                                lock (upValues.GetAt(instruction.opA))
+                                    stack.Push(upValues.GetAt(instruction.opA).UpValue);
+                            else
+                                stack.Push(upval);
+                        }
                         break;
                     case OpCode.LOAD_VOID:
                         IP++;
@@ -576,9 +581,20 @@ namespace lightningVM
 
                         {
                             Unit u = stack.Pop();
-                            // Clear transient PROTECTION_MOVE so the slot is stored as clean/mutable.
-                            if (!(u.heapUnitValue is TypeUnit) && (u.ProtectionFlagsOrNone & Unit.PROTECTION_MOVE) != 0)
+                            if (u.heapUnitValue is TypeUnit)
+                            {
+                                // Scalar: strip const — copying a const scalar into a mutable var
+                                // does not propagate const-ness (value semantics).
+                                if      (u.heapUnitValue == TypeUnit.ConstFloat)   u.heapUnitValue = TypeUnit.Float;
+                                else if (u.heapUnitValue == TypeUnit.ConstInteger) u.heapUnitValue = TypeUnit.Integer;
+                                else if (u.heapUnitValue == TypeUnit.ConstBoolean) u.heapUnitValue = TypeUnit.Boolean;
+                                else if (u.heapUnitValue == TypeUnit.ConstChar)    u.heapUnitValue = TypeUnit.Char;
+                            }
+                            else if ((u.ProtectionFlagsOrNone & Unit.PROTECTION_MOVE) != 0)
+                            {
+                                // Clear transient PROTECTION_MOVE so the slot is stored as clean/mutable.
                                 u.ProtectionFlags &= ~Unit.PROTECTION_MOVE;
+                            }
                             variables.Add(u);
                         }
                         break;
@@ -613,7 +629,16 @@ namespace lightningVM
 
                         {
                             Unit u = stack.Pop();
-                            if (!(u.heapUnitValue is TypeUnit))
+                            if (u.heapUnitValue is TypeUnit)
+                            {
+                                // Scalar: swap to const singleton (scalars have no move semantics).
+                                if      (u.heapUnitValue == TypeUnit.Float)   u.heapUnitValue = TypeUnit.ConstFloat;
+                                else if (u.heapUnitValue == TypeUnit.Integer) u.heapUnitValue = TypeUnit.ConstInteger;
+                                else if (u.heapUnitValue == TypeUnit.Boolean) u.heapUnitValue = TypeUnit.ConstBoolean;
+                                else if (u.heapUnitValue == TypeUnit.Char)    u.heapUnitValue = TypeUnit.ConstChar;
+                                // Void and already-const TypeUnits: no-op
+                            }
+                            else
                             {
                                 if ((u.ProtectionFlagsOrNone & Unit.PROTECTION_MOVE) != 0)
                                     // &arg: clear the move flag, do NOT apply PROTECTION_CONST
@@ -639,7 +664,12 @@ namespace lightningVM
                         IP++;
                         {
                             Unit u = stack.Pop();
-                            u.ProtectionFlags |= Unit.PROTECTION_CONST;
+                            if      (u.heapUnitValue == TypeUnit.Float)   u.heapUnitValue = TypeUnit.ConstFloat;
+                            else if (u.heapUnitValue == TypeUnit.Integer) u.heapUnitValue = TypeUnit.ConstInteger;
+                            else if (u.heapUnitValue == TypeUnit.Boolean) u.heapUnitValue = TypeUnit.ConstBoolean;
+                            else if (u.heapUnitValue == TypeUnit.Char)    u.heapUnitValue = TypeUnit.ConstChar;
+                            else if (!(u.heapUnitValue is TypeUnit))      u.ProtectionFlags |= Unit.PROTECTION_CONST;
+                            // Already-const TypeUnits and Void: no-op
                             stack.Push(u);
                         }
                         break;
@@ -728,6 +758,9 @@ namespace lightningVM
                             Unit old_value = variables.GetAt(instruction.opA, CalculateEnvShift(instruction.opB));
                             Unit result;
 
+                            if ((old_value.ProtectionFlagsOrNone & Unit.PROTECTION_CONST) != 0)
+                                throw Exceptions.const_mutation;
+
                             if (Unit.IsEmpty(stack.Peek()))
                                 throw Exceptions.non_value_assign;
 
@@ -773,6 +806,9 @@ namespace lightningVM
                             Operand address = instruction.opA;
                             Operand op = instruction.opB;
                             Unit new_value = stack.Peek();
+
+                            if ((globals.Get(address).ProtectionFlagsOrNone & Unit.PROTECTION_CONST) != 0)
+                                throw Exceptions.const_mutation;
 
                             if (new_value.Type == UnitType.Void)
                                 throw Exceptions.non_value_assign;
@@ -857,6 +893,11 @@ namespace lightningVM
                         break;
                     case OpCode.ASSIGN_UPVALUE:
                         IP++;
+                        {
+                            Unit upval_slot = upValues.GetAt(instruction.opA).UpValue;
+                            if ((upval_slot.ProtectionFlagsOrNone & Unit.PROTECTION_CONST) != 0)
+                                throw Exceptions.const_mutation;
+                        }
                         if (parallelVM == true)
                         {
                             UpValueUnit this_upValue;
@@ -922,9 +963,18 @@ namespace lightningVM
                                 indexes[i] = stack.Pop();
 
                             Unit value = stack.Pop();
+                            bool constContext = (value.ProtectionFlagsOrNone & Unit.PROTECTION_CONST) != 0;
                             foreach (Unit v in indexes)
                             {
                                 value = value.heapUnitValue.Get(v);
+                                if (constContext)
+                                {
+                                    if      (value.heapUnitValue == TypeUnit.Float)   value.heapUnitValue = TypeUnit.ConstFloat;
+                                    else if (value.heapUnitValue == TypeUnit.Integer) value.heapUnitValue = TypeUnit.ConstInteger;
+                                    else if (value.heapUnitValue == TypeUnit.Boolean) value.heapUnitValue = TypeUnit.ConstBoolean;
+                                    else if (value.heapUnitValue == TypeUnit.Char)    value.heapUnitValue = TypeUnit.ConstChar;
+                                    else if (!(value.heapUnitValue is TypeUnit))      value.ProtectionFlags |= Unit.PROTECTION_CONST;
+                                }
                             }
                             stack.Push(value);
                             break;

@@ -40,74 +40,57 @@ namespace lightningUnit
 
         // ── Reference-level protection flags ────────────────────────────────────────
         //
-        // Conceptual model: Unit is a typed pointer (analogous to a virtual-memory
-        // mapping). protectionFlags are the page-table-entry protection bits — they
-        // live on the *reference*, not the *object*. The same TableUnit can be
-        // reachable through a protected Unit and an unprotected Unit simultaneously
-        // (like a physical page mapped read-only in one process, read-write in another).
+        // Conceptual model: Unit is a typed pointer. protectionFlags are per-reference
+        // bits — they live on the Unit copy, not the object (HeapUnit). The same
+        // TableUnit can be reachable through a const Unit and a mutable Unit at the
+        // same time: same heap object, different protection per reference.
         //
-        // Value types use TypeUnit sentinels and are copied by value with no shared
-        // identity, so reference-level protection is meaningless for them.
-        // Bool/Char/Void have PROTECTION_IS_VALUE_TYPE set in protectionFlags.
-        // Float/Integer do NOT — in DOUBLE mode protectionFlags at offset 4 overlaps
-        // the high bytes of the 8-byte value; setting it would corrupt the number.
-        // Heap types (Table, Closure, ...) have PROTECTION_IS_VALUE_TYPE == 0.
-        // Use CanSetProtectionFlags (checks heapUnitValue is TypeUnit) before writing
-        // any protectionFlags on an unknown Unit.
+        // Scalar types (Float, Integer, Boolean, Char, Void) use TypeUnit sentinels as
+        // heapUnitValue. In DOUBLE mode, the struct's protectionFlags field at offset 4
+        // overlaps the high bytes of the 8-byte numeric value — writing it corrupts
+        // Float/Integer. Scalar protection flags are therefore stored on the TypeUnit
+        // sentinel itself (TypeUnit.ProtectionFlags). Const scalars use dedicated
+        // TypeUnit singletons (TypeUnit.ConstFloat, ConstInteger, ConstBoolean, ConstChar).
+        //
+        // Heap types (Table, Closure, ...) use the struct's protectionFlags field.
         //
         // Layout — float32 mode (64-bit):
         //   [FieldOffset( 0)]  value union       4 bytes  (float32/int32/char/bool)
         //   [FieldOffset( 4)]  heapUnitValue     8 bytes  (reference)
-        //   [FieldOffset(12)]  protectionFlags   4 bytes  ← natural alignment padding: FREE
+        //   [FieldOffset(12)]  protectionFlags   4 bytes
         //
         // Layout — DOUBLE mode (64-bit):
         //   [FieldOffset( 0)]  value union       8 bytes  (float64/int64/char/bool)
-        //   [FieldOffset( 4)]  protectionFlags   4 bytes  ← overlaps HIGH bytes of float64/int64
-        //                                                    SAFE: when PROTECTION_IS_VALUE_TYPE==0 (heap)
-        //                                                    the float64/int64 value is irrelevant;
-        //                                                    when PROTECTION_IS_VALUE_TYPE!=0 (value type),
-        //                                                    the Unit ctor writes the full 8-byte
-        //                                                    value FIRST, zeroing offset 4, then
-        //                                                    sets protectionFlags = PROTECTION_IS_VALUE_TYPE.
+        //   [FieldOffset( 4)]  protectionFlags   4 bytes  ← overlaps float64/int64 hi-bytes;
+        //                                                    only written for heap types (safe:
+        //                                                    value bytes are irrelevant for heap)
         //   [FieldOffset( 8)]  heapUnitValue     8 bytes  (reference)
         //
-        // sizeof(Unit) == 16 bytes in both modes. Zero cost.
+        // sizeof(Unit) == 16 bytes in both modes.
         //
-        // OS analogy:
-        //   protectionFlags  ≅  page-table-entry bits  (per-reference, free)
-        //
-        // Rule: only set protection bits (PROTECTION_CONST etc.) when PROTECTION_IS_VALUE_TYPE == 0.
+        // ProtectionFlags getter  — reads TypeUnit.ProtectionFlags for scalars; throws if
+        //                           caller tries to write via setter on a scalar (use MAKE_CONST).
+        // ProtectionFlagsOrNone   — same read path, never throws.
 #if DOUBLE
         [FieldOffset(4)]
 #else
         [FieldOffset(12)]
 #endif
         private int protectionFlags;
-        public const int PROTECTION_NONE  = 0;
+        public const int PROTECTION_NONE      = 0;
+        public const int PROTECTION_CONST     = 1 << 0;  // const alias: fields cannot be mutated,
+                                                          // slot cannot be rebound
+        public const int PROTECTION_MOVE      = 1 << 1;  // transient: arg passed with &; callee gets
+                                                          // mutable access; cleared by DECLARE_VARIABLE
+        public const int PROTECTION_TOMBSTONE = 1 << 2;  // variable moved out via &; any LOAD throws
+        // bits 3..31 reserved
 
-        public const int PROTECTION_IS_VALUE_TYPE    = 1 << 0;  // set on Bool/Char/Void Units
-                                                      // NOT set on Float/Integer (DOUBLE overlap)
-                                                      // NOT set on heap Units (Table, Closure ...)
-        public const int PROTECTION_CONST = 1 << 1;  // reference cannot be rebound
-                                                      // (future: enforced by compiler + runtime)
-        public const int PROTECTION_MOVE      = 1 << 2;  // arg passed with &: callee gets mutable access
-                                                         // cleared by DECLARE_CONST_VARIABLE (not re-applied)
-        public const int PROTECTION_TOMBSTONE = 1 << 3;  // variable moved out via &; any access throws
-        // bits 4..31 reserved
-
-        // heapUnitValue is TypeUnit is the authoritative value-type check — it covers
-        // Float/Integer which cannot carry PROTECTION_IS_VALUE_TYPE in DOUBLE mode.
-        // The dereference is paid once here; all reads/writes go through these properties.
-        //
-        // ProtectionFlags      — throws on value types; use for writes and strict reads.
-        // ProtectionFlagsOrNone — returns PROTECTION_NONE silently on value types;
-        //                         use for query paths where scalars are simply unprotected.
         public int ProtectionFlags
         {
             get
             {
-                if (heapUnitValue is TypeUnit)
-                    throw Exceptions.prot_flag_on_scalar;
+                if (heapUnitValue is TypeUnit tu)
+                    return tu.ProtectionFlags;
                 return protectionFlags;
             }
             set
@@ -122,8 +105,8 @@ namespace lightningUnit
         {
             get
             {
-                if (heapUnitValue is TypeUnit)
-                    return PROTECTION_NONE;
+                if (heapUnitValue is TypeUnit tu)
+                    return tu.ProtectionFlags;
                 return protectionFlags;
             }
         }
@@ -146,31 +129,27 @@ namespace lightningUnit
         public Unit(HeapUnit p_value) : this()
         {
             heapUnitValue = p_value;
-            // PROTECTION_IS_VALUE_TYPE is NOT set — protectionFlags stays 0 (heap unit).
         }
         public Unit(Float p_number) : this()
         {
             floatValue = p_number;
             // DOUBLE MODE: floatValue writes 8 bytes at offset 0, zeroing protectionFlags
-            // at offset 4. DO NOT set protectionFlags here — it would corrupt the value.
-            // Float units must never have protectionFlags set (use heapUnitValue is TypeUnit
-            // to guard before any protectionFlags write on an unknown Unit).
+            // at offset 4. DO NOT set struct protectionFlags — it would corrupt the value.
+            // Scalar protection flags live on the TypeUnit sentinel (TypeUnit.ProtectionFlags).
             heapUnitValue = TypeUnit.Float;
         }
 
         public Unit(Integer p_number) : this()
         {
             integerValue = p_number;
-            // DOUBLE MODE: same as Float — integerValue writes 8 bytes at offset 0,
-            // zeroing protectionFlags at offset 4. DO NOT set protectionFlags here.
+            // DOUBLE MODE: same as Float — do not set struct protectionFlags.
             heapUnitValue = TypeUnit.Integer;
         }
 
         public Unit(bool p_value) : this()
         {
-            boolValue = p_value;           // 1 byte at offset 0 — offset 4 untouched
+            boolValue = p_value;
             heapUnitValue = TypeUnit.Boolean;
-            protectionFlags = PROTECTION_IS_VALUE_TYPE;
         }
 
         public Unit(String p_string) : this()
@@ -183,7 +162,6 @@ namespace lightningUnit
         {
             charValue = p_char;
             heapUnitValue = TypeUnit.Char;
-            protectionFlags = PROTECTION_IS_VALUE_TYPE;
         }
 
         public Unit(UnitType p_type) : this()
@@ -192,23 +170,18 @@ namespace lightningUnit
             {
                 case UnitType.Void:
                     heapUnitValue = TypeUnit.Void;
-                    protectionFlags = PROTECTION_IS_VALUE_TYPE;
                     break;
                 case UnitType.Boolean:
                     heapUnitValue = TypeUnit.Boolean;
-                    protectionFlags = PROTECTION_IS_VALUE_TYPE;
                     break;
                 case UnitType.Float:
                     heapUnitValue = TypeUnit.Float;
-                    // DO NOT set protectionFlags — see Float ctor comment.
                     break;
                 case UnitType.Integer:
                     heapUnitValue = TypeUnit.Integer;
-                    // DO NOT set protectionFlags — see Integer ctor comment.
                     break;
                 case UnitType.Char:
                     heapUnitValue = TypeUnit.Char;
-                    protectionFlags = PROTECTION_IS_VALUE_TYPE;
                     break;
                 default:
                     Logger.LogLine("Trying to create a Unit of unknown type.", Defaults.Config.VMLogFile);

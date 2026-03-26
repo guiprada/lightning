@@ -31,6 +31,7 @@ namespace lightningCompiler
 			// the immediately enclosing closure's upvalue array (not a local variable slot).
 			public bool isChained;
 			public int chainedIndex; // index in the enclosing closure's upvalue array
+			public bool isConst;     // true for var const declarations
 			public Variable(string p_name, int p_address, int p_envIndex, ValueType p_type)
 			{
 				name = p_name;
@@ -40,6 +41,7 @@ namespace lightningCompiler
 				type = p_type;
 				isChained = false;
 				chainedIndex = 0;
+				isConst = false;
 			}
 
 			public Variable(Node p_expression)
@@ -51,6 +53,7 @@ namespace lightningCompiler
 				type = ValueType.Expression;
 				isChained = false;
 				chainedIndex = 0;
+				isConst = false;
 			}
 		}
 
@@ -537,17 +540,23 @@ namespace lightningCompiler
 			else
 				ChunkIt(p_node.Initializer);
 
-			if (p_node.IsConst)
-				Add(OpCode.MAKE_CONST, p_node.PositionData);
-
 			Nullable<Variable> maybe_var = SetVar(p_node.Name);
 			if (maybe_var.HasValue)
 			{
 				Variable this_var = maybe_var.Value;
 				if (this_var.type == ValueType.Global)
+				{
+					if (p_node.IsConst)
+						Add(OpCode.MAKE_CONST, p_node.PositionData);
 					Add(OpCode.DECLARE_GLOBAL, p_node.PositionData);
+				}
 				else
-					Add(OpCode.DECLARE_VARIABLE, p_node.PositionData);
+				{
+					if (p_node.IsConst)
+						Add(OpCode.DECLARE_CONST_VARIABLE, p_node.PositionData);
+					else
+						Add(OpCode.DECLARE_VARIABLE, p_node.PositionData);
+				}
 			}
 			else
 				Error("Variable Name has already been used!", p_node.PositionData);

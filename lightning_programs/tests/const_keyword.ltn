@@ -2,9 +2,16 @@ var assert_counter = require("assert_counter.ltn")
 var assert = assert_counter.assert
 
 {
-	// var const: scalar — MAKE_CONST on a value type throws (value types have no protection flags)
-	var threw = try(\{ var const x = 5 }, [])
-	assert(threw:is_error(), true, "var const scalar: declaring scalar as const must throw.")
+	// var const: scalar — now succeeds (TypeUnit singleton carries PROTECTION_CONST)
+	var const x = 5
+	assert(x, 5, "var const scalar: value must be readable.")
+}
+
+{
+	// var const: scalar — rebinding must throw (ASSIGN_VARIABLE const check)
+	var const x = 5
+	var threw = try(\{ x = 6 }, [])
+	assert(threw:is_error(), true, "var const scalar: rebinding must throw.")
 }
 
 {
@@ -31,6 +38,18 @@ var assert = assert_counter.assert
 	assert(threw:is_error(), true, "var const alias: mutation through const alias must throw.")
 	t.x = 42
 	assert(t.x, 42, "var const alias: original table must remain mutable.")
+}
+
+{
+	// deep const: GET propagates PROTECTION_CONST through field chains
+	var inner = Table()
+	inner.y = 7
+	var outer = Table()
+	outer.inner = inner
+	var const co = outer
+	var sub = co.inner  // sub must inherit const protection
+	var threw = try(\{ sub.y = 99 }, [])
+	assert(threw:is_error(), true, "deep const: field access from const must return const.")
 }
 
 {

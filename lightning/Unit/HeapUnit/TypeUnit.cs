@@ -2,13 +2,24 @@ namespace lightningUnit
 {
 	public class TypeUnit : HeapUnit
     {
-        public static TypeUnit Float = new TypeUnit(UnitType.Float);
-        public static TypeUnit Integer = new TypeUnit(UnitType.Integer);
-        public static TypeUnit Boolean = new TypeUnit(UnitType.Boolean);
-        public static TypeUnit Char = new TypeUnit(UnitType.Char);
-        public static TypeUnit Void = new TypeUnit(UnitType.Void);
+        // Plain singletons (no protection)
+        public static readonly TypeUnit Float        = new TypeUnit(UnitType.Float,    0);
+        public static readonly TypeUnit Integer      = new TypeUnit(UnitType.Integer,  0);
+        public static readonly TypeUnit Boolean      = new TypeUnit(UnitType.Boolean,  0);
+        public static readonly TypeUnit Char         = new TypeUnit(UnitType.Char,     0);
+        public static readonly TypeUnit Void         = new TypeUnit(UnitType.Void,     0);
+
+        // Const singletons — same UnitType, PROTECTION_CONST flag set.
+        // Used by MAKE_CONST and DECLARE_CONST_VARIABLE to represent const scalars
+        // without touching the Unit struct's protectionFlags field (which overlaps
+        // the numeric value in DOUBLE mode).
+        public static readonly TypeUnit ConstFloat   = new TypeUnit(UnitType.Float,    Unit.PROTECTION_CONST);
+        public static readonly TypeUnit ConstInteger = new TypeUnit(UnitType.Integer,  Unit.PROTECTION_CONST);
+        public static readonly TypeUnit ConstBoolean = new TypeUnit(UnitType.Boolean,  Unit.PROTECTION_CONST);
+        public static readonly TypeUnit ConstChar    = new TypeUnit(UnitType.Char,     Unit.PROTECTION_CONST);
 
         UnitType type;
+        public readonly int ProtectionFlags;
 
         public override UnitType Type
         {
@@ -18,9 +29,10 @@ namespace lightningUnit
             }
         }
 
-        private TypeUnit(UnitType p_type)
+        private TypeUnit(UnitType p_type, int p_protectionFlags)
         {
             type = p_type;
+            ProtectionFlags = p_protectionFlags;
         }
 
         public override string ToString()
