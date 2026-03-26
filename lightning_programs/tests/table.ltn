@@ -205,7 +205,7 @@ var assert_not = assert_counter.assert_not
 {
 	var a_list = []
 	try(
-		list.init,
+		table.init,
 		[a_list, 5]
 	)
 	var a_table = [:]
