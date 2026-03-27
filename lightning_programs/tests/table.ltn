@@ -204,10 +204,8 @@ var assert_not = assert_counter.assert_not
 }
 {
 	var a_list = []
-	try(
-		table.init,
-		[a_list, 5]
-	)
+	try(table.extend_to_size, [a_list, 5])
+	assert(ElemCount(a_list), 5, "Failed table.extend_to_size test 1.")
 	var a_table = [:]
 	var common_table = [hey: "oba"]
 	assert(try(

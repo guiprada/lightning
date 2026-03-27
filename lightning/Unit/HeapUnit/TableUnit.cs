@@ -374,6 +374,20 @@ namespace lightningUnit
                 }
                 methodTable.Set("merge", new IntrinsicUnit("merge", Merge, 2));
 
+                //////////////////////////////////////////////////////
+                Unit ExtendToSize(VM vm)
+                {
+                    ListUnit this_list = vm.GetList(0);
+                    Integer new_size = vm.GetInteger(1);
+                    int size = this_list.Count;
+
+                    for (int i = size; i < new_size; i++)
+                        this_list.Elements.Add(new Unit(new OptionUnit()));
+
+                    return new Unit(true);
+                }
+                methodTable.Set("extend_to_size", new IntrinsicUnit("table_extend_to_size", ExtendToSize, 2));
+
             }
         }
     }

@@ -1,1 +1,1 @@
-Copy-Item -Force -Recurse lightning_vscode C:\Users\$env:UserName\.vscode\extensions\lightning_vscode
+Copy-Item -Force -Recurse lightning_vscode_extension C:\Users\$env:UserName\.vscode\extensions\lightning_vscode

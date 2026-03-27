@@ -129,7 +129,7 @@ namespace lightningAST
             {
                 try
                 {
-                    floatValue = Float.Parse(p_value);
+                    floatValue = Float.Parse(p_value, System.Globalization.CultureInfo.InvariantCulture);
                     type = floatValue.GetType();
                 }
                 catch (FormatException)
