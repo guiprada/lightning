@@ -63,13 +63,15 @@ equality        <- comparison ( ( "!=" | "==" ) comparison )*;
 comparison      <- addition ( ( ">" | ">=" | "<" | "<=" ) addition )*;
 addition        <- multiplication ( ( "-" | "+" | "..") multiplication )*;
 multiplication  <- unary ( ( "/" | "*" ) unary )*;
-unary           <- ( "!" | "-" ) unary | call;
+unary           <- ( "!" | "-" ) unary | prefixExpr;
 
-(* CALL *)
-(* callTail loops: f(a)(b)(c) is a valid chained/compound call.         *)
+(* PREFIX EXPR — primary with optional call/index/method suffixes *)
+(* Unlike Lua, bare identifiers and parenthesized expressions are valid  *)
+(* statements — the result is simply popped. Not easy to be this simple! *)
+(* callTail loops: f(a)(b)(c) is a valid chained/compound call.          *)
 (* Newlines between calls are insignificant: f(a)\n(b) parses as f(a)(b) *)
-(* Use ";" to force a statement boundary when that is not the intent.    *)
-call                <- primary ( callTail | anonymousMethodCall )?;
+(* Use ";" to force a statement boundary when that is not the intent.     *)
+prefixExpr          <- primary ( callTail | anonymousMethodCall )?;
 callTail            <- arguments indexedAccess* sequentialCall* anonymousMethodCall?;
 anonymousMethodCall <- methodAccess callTail;
 (* sequentialCall handles the result-of-call being immediately indexed *)
@@ -81,10 +83,20 @@ compoundVar     <- IDENTIFIER indexedAccess* methodAccess;
 indexedAccess   <- ( "[" expression "]" ) | ( "." IDENTIFIER );
 methodAccess    <-  ( ":" IDENTIFIER )?;
 
-(* TABLE - unified type for both keyed and positional data *)
-(* [:]                        empty table                  *)
-(* [key: val, key: val, ...]  keyed entries (table mode)   *)
-(* [val, val, ...]            positional entries (list mode)*)
-table           <- "[" newLines ( tableEntry ( newLines "," newLines tableEntry )* newLines )? "]";
-tableEntry      <- ( "-"? expression )
-                | ( IDENTIFIER ":" expression );
+(* TABLE - unified type for both keyed and positional data              *)
+(* Mode is disambiguated by Peek2: if second token is ":" → table mode  *)
+(* [:]                 empty table                                       *)
+(* []                  empty list                                        *)
+(* [key: val, ...]     table mode — keys: IDENTIFIER, NUMBER, or STRING  *)
+(* [val, val, ...]     list mode  — values: any expression               *)
+table      <- "[" ( ":" "]"                                    (* empty table *)
+                  | "]"                                        (* empty list  *)
+                  | newLines tableEntry ("," newLines tableEntry)* newLines "]"
+                  | newLines listEntry  ("," newLines listEntry)*  newLines "]"
+                  );
+(* "-" in tableEntry: only valid for numeric keys (negates the key literal) *)
+tableEntry <- ( IDENTIFIER ":" expression )
+            | ( "-"? NUMBER ":" expression )
+            | ( STRING ":" expression );
+(* "-" in listEntry: only valid for numeric literals (negates the literal) *)
+listEntry  <- "-"? NUMBER | expression;
