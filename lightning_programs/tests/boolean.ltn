@@ -25,23 +25,23 @@ var assert_not = assert_counter.assert_not
 	assert(false, !true, "Failed NOT test 1.");
 	assert(true, !false, "Failed NOT test 2.");
 
-	//NAND
-	assert(true, (false nand false), "Failed NAND test 1.");
-	assert(true, (false nand true), "Failed NAND test 2.");
-	assert(true, (true nand false), "Failed NAND test 3.");
-	assert(false, (true nand true), "Failed NAND test 4.");
+	//NAND (expressed as not (a and b))
+	assert(true, !(false and false), "Failed NAND test 1.");
+	assert(true, !(false and true), "Failed NAND test 2.");
+	assert(true, !(true and false), "Failed NAND test 3.");
+	assert(false, !(true and true), "Failed NAND test 4.");
 
-	//NOR
-	assert(true, (false nor false), "Failed NOR test 1.");
-	assert(false, (false nor true), "Failed NOR test 2.");
-	assert(false, (true nor false), "Failed NOR test 3.");
-	assert(false, (true nor true), "Failed NOR test 4.");
+	//NOR (expressed as not (a or b))
+	assert(true, !(false or false), "Failed NOR test 1.");
+	assert(false, !(false or true), "Failed NOR test 2.");
+	assert(false, !(true or false), "Failed NOR test 3.");
+	assert(false, !(true or true), "Failed NOR test 4.");
 
-	//XNOR
-	assert(true, (false xnor false), "Failed XNOR test 1.");
-	assert(false, (false xnor true), "Failed XNOR test 2.");
-	assert(false, (true xnor false), "Failed XNOR test 3.");
-	assert(true, (true xnor true), "Failed XNOR test 4.");
+	//XNOR (expressed as not (a xor b))
+	assert(true, !(false xor false), "Failed XNOR test 1.");
+	assert(false, !(false xor true), "Failed XNOR test 2.");
+	assert(false, !(true xor false), "Failed XNOR test 3.");
+	assert(true, !(true xor true), "Failed XNOR test 4.");
 
 	//Truthness of null :)
 	var try_result = try(\{return null == null}, [])

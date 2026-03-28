@@ -52,9 +52,6 @@ namespace lightningAST
         AND,
         OR,
         XOR,
-        NAND,
-        NOR,
-        XNOR,
 
         NOT_EQUAL,
         EQUAL,

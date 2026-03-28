@@ -1,4 +1,4 @@
-﻿using System;
+﻿﻿﻿using System;
 using System.Collections.Generic;
 
 using lightningTools;
@@ -574,15 +574,6 @@ namespace lightningCompiler
 					break;
 				case OperatorType.XOR:
 					this_opcode = OpCode.XOR;
-					break;
-				case OperatorType.NAND:
-					this_opcode = OpCode.NAND;
-					break;
-				case OperatorType.NOR:
-					this_opcode = OpCode.NOR;
-					break;
-				case OperatorType.XNOR:
-					this_opcode = OpCode.XNOR;
 					break;
 				default:
 					Error("Unkown Logical operator " + p_node.Op.ToString(), p_node.PositionData);

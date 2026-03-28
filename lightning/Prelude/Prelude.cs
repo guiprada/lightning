@@ -214,6 +214,17 @@ namespace lightningPrelude
             functions.Add(new IntrinsicUnit("try", Try, 2));
 
             //////////////////////////////////////////////////////
+            Unit ElemCount(VM p_vm)
+            {
+                Unit this_unit = p_vm.GetUnit(0);
+                if (this_unit.Type == UnitType.List)
+                    return new Unit(((ListUnit)this_unit.heapUnitValue).Count);
+                Logger.LogLine("ElemCount: expected a List.", Defaults.Config.VMLogFile);
+                throw Exceptions.wrong_type;
+            }
+            functions.Add(new IntrinsicUnit("ElemCount", ElemCount, 1));
+
+            //////////////////////////////////////////////////////
             Unit WriteLine(VM p_vm)
             {
                 try
